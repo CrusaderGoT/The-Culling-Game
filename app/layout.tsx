@@ -1,9 +1,12 @@
 import { Header } from "@/components/shell/Header";
+
 import { TanQueryProvider } from "@/components/shell/TanQueryProvider";
 import { ThemeProvider } from "@/components/shell/theme-povider";
+
 import { Toaster } from "@/components/ui/sonner";
-import { inter } from "@/fonts/googleFonts";
+
 import "@/styles/global.css";
+
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -18,7 +21,7 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en">
-            <body className={`${inter.className} antialiased`}>
+            <body className={`antialiased`}>
                 <ThemeProvider
                     attribute={"class"}
                     defaultTheme="system"

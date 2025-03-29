@@ -8,7 +8,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { lusitana } from "@/fonts/googleFonts";
+import Naluka from "@/fonts/NalukaFont";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 
@@ -21,7 +21,7 @@ export function Header() {
 
                     <div>
                         <p
-                            className={`${lusitana.className} max-h-[60px] font-bold text-sm sm:text-lg md:text-xl lg:text-2xl tracking-wide md:tracking-wider lg:tracking-widest text-nowrap`}
+                            className={`${Naluka.className} max-h-[60px] font-bold text-sm sm:text-lg md:text-xl lg:text-2xl tracking-wide md:tracking-wider lg:tracking-widest text-nowrap`}
                         >
                             The Culling Games
                         </p>
