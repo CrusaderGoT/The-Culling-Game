@@ -45,7 +45,7 @@ export const currentUserOptions = (options?: Options<CurrentUserData>) => {
                 ...options,
                 ...queryKey[0],
                 signal,
-                throwOnError: true
+                throwOnError: false
             });
             return data;
         },

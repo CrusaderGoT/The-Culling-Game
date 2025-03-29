@@ -1,12 +1,11 @@
 import { currentUserOptions } from "@/api/client/@tanstack/react-query.gen";
+import { PushButton } from "@/components/buttons/PushButton";
 import { CreatePlayerForm } from "@/components/player/forms/CreatePlayerForm";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { LoaderCircle } from "lucide-react";
-import { useRouter } from "next/navigation";
 
 export default function CreatePlayerPage() {
-    const router = useRouter();
     // get access token
     const token = localStorage.getItem("access_token");
     // check if player exists for this user, and if user exist
@@ -54,30 +53,22 @@ export default function CreatePlayerPage() {
                     {error.detail && (
                         <div className="flex flex-col items-center">
                             <p>{error.detail}</p>
-                            <Button
-                                onClick={(e) => {
-                                    e.currentTarget.disabled;
-                                    router.push("/user/login");
-                                }}
+                            <PushButton
+                                pushTo="/user/login"
+                                label="Login"
                                 className="max-w-xs w-full"
-                            >
-                                Login
-                            </Button>
+                            />
                         </div>
                     )}
 
                     {typeof error === "string" && (
                         <div className="flex flex-col items-center">
                             <p>{error}</p>
-                            <Button
+                            <PushButton
+                                pushTo="/user/edit"
+                                label="Edit Player"
                                 className="max-w-xs w-full"
-                                onClick={(e) => {
-                                    e.currentTarget.disabled;
-                                    router.push("/player/edit");
-                                }}
-                            >
-                                Edit Player
-                            </Button>
+                            />
                         </div>
                     )}
                 </div>
@@ -95,9 +86,10 @@ export default function CreatePlayerPage() {
                     !isFetching && (
                         <div className="w-full h-dvh grid place-content-center fixed inset-0">
                             <p>Already Have a Player</p>
-                            <Button onClick={() => router.push("/player/edit")}>
-                                Edit Player
-                            </Button>
+                            <PushButton
+                                pushTo="/player/edit"
+                                label="Edit Player"
+                            />
                         </div>
                     )
                 )
