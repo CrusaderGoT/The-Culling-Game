@@ -16,9 +16,9 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 
+import { TooltipPopover } from "@/components/general/TooltipPopover";
 import { LucideIcon } from "lucide-react";
 import { FieldPath, FieldValues, useFormContext } from "react-hook-form";
-import { TooltipPopover } from "../TooltipPopover";
 
 type DataObj = {
     id: string;

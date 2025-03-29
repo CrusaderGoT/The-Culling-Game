@@ -1,17 +1,19 @@
 "use client";
 
-import { LucideIcon } from "lucide-react";
-import { InputHTMLAttributes } from "react";
-import { FieldPath, FieldValues, useFormContext } from "react-hook-form";
-import { TooltipPopover } from "../TooltipPopover";
+import { TooltipPopover } from "@/components/general/TooltipPopover";
 import {
     FormControl,
     FormField,
     FormItem,
     FormLabel,
     FormMessage,
-} from "../ui/form";
-import { Input } from "../ui/input";
+} from "@/components/ui/form";
+
+import { LucideIcon } from "lucide-react";
+import { InputHTMLAttributes } from "react";
+import { FieldPath, FieldValues, useFormContext } from "react-hook-form";
+
+import { Input } from "@/components/ui/input";
 
 type InputProps<S extends FieldValues> = {
     fieldTitle: string;

@@ -1,11 +1,9 @@
-"use client";
-
 import { currentUserOptions } from "@/api/client/@tanstack/react-query.gen";
+import { CreatePlayerForm } from "@/components/player/forms/CreatePlayerForm";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { LoaderCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { CreatePlayerForm } from "./CreatePlayerForm";
 
 export default function CreatePlayerPage() {
     const router = useRouter();

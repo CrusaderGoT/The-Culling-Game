@@ -1,8 +1,5 @@
-// for defining the components of the signup page -> down to top.
-"use client";
-
+import { CreateUserForm } from "@/components/user/forms/CreateUserForm";
 import Image from "next/image";
-import { CreateUserForm } from "./CreateUserForm";
 
 function Description() {
     return (
@@ -25,7 +22,9 @@ function Description() {
 export default function SignUpPage() {
     return (
         <div className="sm:m-5 m-3 flex flex-col">
-            <h3 className="font-bold text-xl mb-3 self-center">Register to Play</h3>
+            <h3 className="font-bold text-xl mb-3 self-center">
+                Register to Play
+            </h3>
             <div className="flex flex-col sm:flex-row gap-3 self-center">
                 <Description />
                 <CreateUserForm />

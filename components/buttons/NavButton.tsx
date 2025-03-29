@@ -1,20 +1,17 @@
+"use client";
+
 import { LucideIcon } from "lucide-react";
 import Link from "next/link";
-import { Button } from "./ui/button";
+import { Button } from "@/components/ui/button";
 
 type Props = {
-    icon: LucideIcon,
-    label: string,
-    href?: string,
-    className?: string,
-}
+    icon: LucideIcon;
+    label: string;
+    href?: string;
+    className?: string;
+};
 
-export function NavButton({
-    icon: Icon,
-    label,
-    href,
-    className,
-}: Props) {
+export function NavButton({ icon: Icon, label, href, className }: Props) {
     return (
         <Button
             variant={"ghost"}
@@ -26,12 +23,11 @@ export function NavButton({
         >
             {href ? (
                 <Link href={href}>
-                <Icon />
+                    <Icon />
                 </Link>
-            ): (
+            ) : (
                 <Icon />
             )}
         </Button>
-    )
-    
+    );
 }

@@ -6,6 +6,7 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip";
+
 import { InfoIcon, LucideIcon } from "lucide-react";
 
 type TooltipProps = {
@@ -26,10 +27,13 @@ export function TooltipPopover({
             <Tooltip>
                 <TooltipTrigger asChild>
                     {TriggerComponent && TriggerIcon === undefined ? (
-                        <TriggerComponent className="h-3 md:h-4 min-h-3 max-h-7">{triggerText}</TriggerComponent>
+                        <TriggerComponent className="h-3 md:h-4 min-h-3 max-h-7">
+                            {triggerText}
+                        </TriggerComponent>
                     ) : TriggerIcon && TriggerComponent === undefined ? (
                         <div className="flex h-3 items-center">
-                            <TriggerIcon className="h-3 md:h-4 min-h-3 max-h-7" /> <p className="text-xs">{triggerText}</p> 
+                            <TriggerIcon className="h-3 md:h-4 min-h-3 max-h-7" />{" "}
+                            <p className="text-xs">{triggerText}</p>
                         </div>
                     ) : triggerText ? (
                         triggerText

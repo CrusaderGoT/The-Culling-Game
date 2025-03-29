@@ -1,8 +1,8 @@
 "use client";
 
-import { DisplayResponseMessage } from "@/components/DisplayServerResponse";
+import { LinkButton } from "@/components/buttons/LinkButton";
+import { DisplayResponseMessage } from "@/components/general/DisplayServerResponse";
 import { InputForm } from "@/components/inputs/InputForm";
-import { LinkButton } from "@/components/LinkButton";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { useLoginMutation } from "@/lib/custom-hooks/user-mutations";

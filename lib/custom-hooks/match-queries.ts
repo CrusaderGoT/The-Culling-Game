@@ -1,5 +1,3 @@
-"use client";
-
 import { getLastestMatchOptions } from "@/api/client/@tanstack/react-query.gen";
 import { useQuery } from "@tanstack/react-query";
 

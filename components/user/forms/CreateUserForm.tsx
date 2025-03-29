@@ -6,15 +6,15 @@ import { useForm } from "react-hook-form";
 
 import { Form } from "@/components/ui/form";
 
+import { LinkButton } from "@/components/buttons/LinkButton";
 import { InputForm } from "@/components/inputs/InputForm";
 import { SelectForm } from "@/components/inputs/SelectForm";
-import { LinkButton } from "@/components/LinkButton";
 import { Button } from "@/components/ui/button";
 import { LoaderCircle, LogInIcon, UserPlus2Icon } from "lucide-react";
 
 import { Country, CreateUser } from "@/api/client";
 import { zCreateUser } from "@/api/client/zod.gen";
-import { DisplayResponseMessage } from "@/components/DisplayServerResponse";
+import { DisplayResponseMessage } from "@/components/general/DisplayServerResponse";
 import { COUNTRIES } from "@/constants/COUNTRIES";
 import {
     useLoginMutation,
@@ -58,7 +58,7 @@ export function CreateUserForm() {
             });
         } catch (error) {
             // Errors are already handled by each mutation's onError callback.
-            console.log("SignUp Error")
+            console.log("SignUp Error");
         }
     }
 

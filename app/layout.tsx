@@ -1,10 +1,10 @@
-import type { Metadata } from "next";
-import "./globals.css";
-import { inter } from "./fonts";
-import { ThemeProvider } from "@/components/theme-povider";
-import { Header } from "@/components/Header";
+import { Header } from "@/components/shell/Header";
+import { TanQueryProvider } from "@/components/shell/TanQueryProvider";
+import { ThemeProvider } from "@/components/shell/theme-povider";
 import { Toaster } from "@/components/ui/sonner";
-import { TanQueryProvider } from "@/components/TanQueryProvider";
+import { inter } from "@/fonts/googleFonts";
+import "@/styles/global.css";
+import type { Metadata } from "next";
 
 export const metadata: Metadata = {
     title: "The Culling Games",

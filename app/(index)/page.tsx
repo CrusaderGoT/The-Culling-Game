@@ -1,7 +1,5 @@
-"use client";
-
+import index from "@/styles/index.module.css";
 import Image from "next/image";
-import index from "./index.module.css";
 import { useRouter } from "next/navigation";
 
 export default function Home() {
@@ -20,14 +18,9 @@ export default function Home() {
 function ColonyCircle() {
     return (
         <div
-            className={`${index.colonyCircle} p-5 overflow-hidden
-      w-[380px] h-[380px]
-      sm:w-[600px] sm:h-[600px]
-      md:w-[700px] md:h-[700px]
-      rounded-full cursor-default
-      relative flex items-center justify-center
-      container
-      `}
+            className={`
+                ${index.colonyCircle} p-5 overflow-hidden w-[380px] h-[380px] sm:w-[600px] sm:h-[600px] md:w-[700px] md:h-[700px] rounded-full cursor-default relative flex items-center justify-center container
+            `}
         >
             <ColonyBarrier />
             <ColonyImg />

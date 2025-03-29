@@ -1,9 +1,6 @@
 "use client";
 
-import { lusitana } from "@/app/fonts";
-import * as React from "react";
-import { Moon, Sun } from "lucide-react";
-import { useTheme } from "next-themes";
+import { KoganeImage } from "@/components/general/KoganeImage";
 import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
@@ -11,16 +8,13 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { KoganeImage } from "./KoganeImage";
+import { lusitana } from "@/fonts/googleFonts";
+import { Moon, Sun } from "lucide-react";
+import { useTheme } from "next-themes";
 
 export function Header() {
     return (
-        <header
-            className={`fixed min-w-[250px] bg-gradient-to-b from-[hsla(0,0%,0%,50%)]
-      dark:from-[hsla(0,0%,0%,100%)] to-transparent
-      top-0 z-[100] w-full h-fit min-h-[50px]
-      max-h-[60px] p-1 backdrop-blur-xl`}
-        >
+        <header className="fixed min-w-[250px] bg-gradient-to-b from-[hsla(0,0%,0%,50%)] dark:from-[hsla(0,0%,0%,100%)] to-transparent top-0 z-[100] w-full h-fit min-h-[50px] max-h-[60px] p-1 backdrop-blur-xl">
             <div className="flex justify-center items-center relative">
                 <div className="flex items-center gap-3 justify-between">
                     <KoganeImage />

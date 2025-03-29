@@ -1,17 +1,17 @@
 "use client";
 
-import { LucideIcon } from "lucide-react";
-import { TextareaHTMLAttributes } from "react";
-import { FieldPath, FieldValues, useFormContext } from "react-hook-form";
-import { TooltipPopover } from "../TooltipPopover";
+import { TooltipPopover } from "@/components/general/TooltipPopover";
 import {
     FormControl,
     FormField,
     FormItem,
     FormLabel,
     FormMessage,
-} from "../ui/form";
-import { Textarea } from "../ui/textarea";
+} from "@/components/ui/form";
+import { Textarea } from "@/components/ui/textarea";
+import { LucideIcon } from "lucide-react";
+import { TextareaHTMLAttributes } from "react";
+import { FieldPath, FieldValues, useFormContext } from "react-hook-form";
 
 type TextareaProps<S extends FieldValues> = {
     fieldTitle: string;
@@ -64,7 +64,7 @@ export function TextAreaForm<S extends FieldValues>({
                         <Textarea
                             {...field}
                             {...props}
-                            id={nameInSchema}                    
+                            id={nameInSchema}
                             className={`dark:disabled:text-yellow-300 disabled:text-green-500 disabled:opacity-50 ${className}`}
                         />
                     </FormControl>

@@ -1,12 +1,5 @@
-// defines the login page
-"use client"
-
-import { LoginForm } from "./LoginForm";
-
+import { LoginForm } from "@/components/user/forms/LoginForm";
 
 export default function LoginPage() {
-    return (
-      <LoginForm />
-    );
+    return <LoginForm />;
 }
-

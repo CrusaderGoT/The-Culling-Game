@@ -1,7 +1,6 @@
-import type { CreateClientConfig } from "./client/client.gen";
-
+import type { CreateClientConfig } from "@/api/client/client.gen";
 
 export const createClientConfig: CreateClientConfig = (config) => ({
-  ...config,
-  baseUrl: "http://localhost:8000",
+    ...config,
+    baseUrl: "http://localhost:8000",
 });

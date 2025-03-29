@@ -1,60 +1,76 @@
 "use client";
 
-import { type BodyEditPlayer, type PlayerInfo } from "@/api/client";
-import { zBodyEditPlayer } from "@/api/client/zod.gen";
-import { DisplayResponseMessage } from "@/components/DisplayServerResponse";
+import { BodyCreatePlayer, UserInfo } from "@/api/client";
+import { zCreateCt, zCreateCtApp, zCreatePlayer } from "@/api/client/zod.gen";
+import { DisplayResponseMessage } from "@/components/general/DisplayServerResponse";
 import { InputForm } from "@/components/inputs/InputForm";
 import { SelectForm } from "@/components/inputs/SelectForm";
 import { TextAreaForm } from "@/components/inputs/TextAreaForm";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { GENDERS } from "@/constants/GENDERS";
-import { useEditPlayerMutation } from "@/lib/custom-hooks/player-mutations";
+import { useCreatePlayerMutation } from "@/lib/custom-hooks/player-mutations";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { InfoIcon, LoaderCircle } from "lucide-react";
 import { useForm } from "react-hook-form";
+import { z } from "zod";
 
-type EditPlayerProps = {
-    player: PlayerInfo;
+type CreatePlayerProp = {
+    user: UserInfo;
 };
 
-export function EditPlayerForm({ player: currentPlayer }: EditPlayerProps) {
-    const defaultValues: BodyEditPlayer = {
-        player: {
-            name: currentPlayer.name,
-            age: currentPlayer.age,
-            role: currentPlayer.role,
-            gender: currentPlayer.gender,
-        },
-        cursed_technique: currentPlayer.cursed_technique,
-        applications: currentPlayer.cursed_technique.applications,
-    };
-
-    const form = useForm<BodyEditPlayer>({
-        mode: "onBlur",
-        resolver: zodResolver(zBodyEditPlayer),
-        defaultValues: defaultValues,
+export function CreatePlayerForm({ user }: CreatePlayerProp) {
+    const createPlayerFormSchema = z.object({
+        player: zCreatePlayer,
+        cursed_technique: zCreateCt,
+        applications: z.array(zCreateCtApp).max(5).min(5),
     });
 
-    const accessToken = localStorage.getItem("accesstoken");
+    const defaultValues: BodyCreatePlayer = {
+        player: {
+            name: "",
+            age: 18,
+            gender: "non-binary",
+            role: "",
+        },
+        cursed_technique: {
+            name: "",
+            definition: "",
+        },
+        applications: [
+            { name: "", application: "" },
+            { name: "", application: "" },
+            { name: "", application: "" },
+            { name: "", application: "" },
+            { name: "", application: "" },
+        ],
+    };
+
+    const form = useForm<BodyCreatePlayer>({
+        resolver: zodResolver(createPlayerFormSchema),
+        mode: "onBlur",
+        defaultValues,
+    });
+
+    const accessToken = localStorage.getItem("access_token");
 
     const {
         mutate,
-        isPending: isEditingUser,
-        error: editPlayerError,
-    } = useEditPlayerMutation(accessToken);
+        isPending: isCreatingPlayer,
+        error: createPlayerError,
+        isSuccess: createPlayerSuccess,
+    } = useCreatePlayerMutation(accessToken);
 
-    function onSubmit(data: BodyEditPlayer) {
-        console.log(data);
+    function onSubmit(data: BodyCreatePlayer) {
         mutate({
             body: { ...data },
-            path: { player_id: currentPlayer.id },
+            path: { user: user.id },
         });
     }
 
     return (
-        <div className="px-4 py-6 sm:py-10 sm:px-8 min-w-[50%] rounded-xl bg-gray-400/80 dark:bg-gray-700/80">
-            {isEditingUser && (
+        <div className="px-4 py-6 sm:py-10 sm:px-8 min-w-[50%] rounded-xl bg-primary-foreground/80">
+            {isCreatingPlayer && (
                 <div className="w-full max-w-xs flex justify-center items-center text-xs font-semibold">
                     <LoaderCircle className="animate-spin max-h-full ml-2 text-lime-300 w-[12px]" />
 
@@ -71,21 +87,21 @@ export function EditPlayerForm({ player: currentPlayer }: EditPlayerProps) {
                                 Player Info
                             </h2>
                             {/** for player */}
-                            <InputForm<BodyEditPlayer>
+                            <InputForm<BodyCreatePlayer>
                                 nameInSchema="player.name"
                                 fieldTitle="Player Name"
                                 includeTip
                                 TooltipIcon={InfoIcon}
                                 tooltipContent="This is the name of your Player"
                             />
-                            <InputForm<BodyEditPlayer>
+                            <InputForm<BodyCreatePlayer>
                                 nameInSchema="player.role"
                                 fieldTitle="Role"
                                 includeTip
                                 TooltipIcon={InfoIcon}
                                 tooltipContent="This is the role or occupation of your Player. e.g, Doctor, Curse User, Sorcerer, Curse, etc..."
                             />
-                            <InputForm<BodyEditPlayer>
+                            <InputForm<BodyCreatePlayer>
                                 nameInSchema="player.age"
                                 fieldTitle="Age"
                                 type="number"
@@ -93,7 +109,7 @@ export function EditPlayerForm({ player: currentPlayer }: EditPlayerProps) {
                                 TooltipIcon={InfoIcon}
                                 tooltipContent="This is the age of your Player. Must be in the range of 10 yrs old to 102 yrs old."
                             />
-                            <SelectForm<BodyEditPlayer>
+                            <SelectForm<BodyCreatePlayer>
                                 nameInSchema="player.gender"
                                 fieldTitle="Gender"
                                 data={GENDERS}
@@ -108,14 +124,14 @@ export function EditPlayerForm({ player: currentPlayer }: EditPlayerProps) {
                             <h2 className="text-sm absolute -inset-y-2.5 backdrop-blur h-fit w-fit font-semibold px-1 text-green-500 rounded-lg">
                                 Cursed Technique Overview
                             </h2>
-                            <InputForm<BodyEditPlayer>
+                            <InputForm<BodyCreatePlayer>
                                 nameInSchema="cursed_technique.name"
                                 fieldTitle="Cursed Technique Name"
                                 includeTip
                                 TooltipIcon={InfoIcon}
                                 tooltipContent="This is the name of your player's cursed technique. Not the same as its subsets/applications. e.g, Shadow Manipulation, Infinity, etc..."
                             />
-                            <TextAreaForm<BodyEditPlayer>
+                            <TextAreaForm<BodyCreatePlayer>
                                 nameInSchema="cursed_technique.definition"
                                 fieldTitle="Cursed Technique Definition"
                                 includeTip
@@ -130,21 +146,15 @@ export function EditPlayerForm({ player: currentPlayer }: EditPlayerProps) {
                             <h2 className="text-sm absolute -inset-y-2.5 backdrop-blur h-fit w-fit font-semibold px-1 text-green-400 rounded-lg">
                                 Your Five (5) Applications
                             </h2>
-                            <div className="flex flex-col gap-1 border-b pb-3 border-red-400">
-                                <InputForm<BodyEditPlayer>
-                                    nameInSchema="applications.0.number"
-                                    fieldTitle=""
-                                    disabled
-                                    className="hidden"
-                                />
-                                <InputForm<BodyEditPlayer>
+                            <div className="flex flex-col gap-1">
+                                <InputForm<BodyCreatePlayer>
                                     nameInSchema="applications.0.name"
                                     fieldTitle="Name (1)"
                                     includeTip
                                     TooltipIcon={InfoIcon}
                                     tooltipContent="This is the name of an application/subset of the player's CT. e.g, Demon Dogs, Red, etc."
                                 />
-                                <TextAreaForm<BodyEditPlayer>
+                                <TextAreaForm<BodyCreatePlayer>
                                     nameInSchema="applications.0.application"
                                     fieldTitle="Application (2)"
                                     includeTip
@@ -154,21 +164,15 @@ export function EditPlayerForm({ player: currentPlayer }: EditPlayerProps) {
                                 />
                             </div>
 
-                            <div className="flex flex-col gap-1 border-b pb-3 border-red-400">
-                                <InputForm<BodyEditPlayer>
-                                    nameInSchema="applications.1.number"
-                                    fieldTitle=""
-                                    disabled
-                                    className="hidden"
-                                />
-                                <InputForm<BodyEditPlayer>
+                            <div className="flex flex-col gap-1">
+                                <InputForm<BodyCreatePlayer>
                                     nameInSchema="applications.1.name"
                                     fieldTitle="Name (2)"
                                     includeTip
                                     TooltipIcon={InfoIcon}
                                     tooltipContent="This is the name of an application/subset of the player's CT. e.g, Demon Dogs, Red, etc."
                                 />
-                                <TextAreaForm<BodyEditPlayer>
+                                <TextAreaForm<BodyCreatePlayer>
                                     nameInSchema="applications.1.application"
                                     fieldTitle="Application (2)"
                                     includeTip
@@ -178,21 +182,15 @@ export function EditPlayerForm({ player: currentPlayer }: EditPlayerProps) {
                                 />
                             </div>
 
-                            <div className="flex flex-col gap-1 border-b pb-3 border-red-400">
-                                <InputForm<BodyEditPlayer>
-                                    nameInSchema="applications.2.number"
-                                    fieldTitle=""
-                                    disabled
-                                    className="hidden"
-                                />
-                                <InputForm<BodyEditPlayer>
+                            <div className="flex flex-col gap-1">
+                                <InputForm<BodyCreatePlayer>
                                     nameInSchema="applications.2.name"
                                     fieldTitle="Name (3)"
                                     includeTip
                                     TooltipIcon={InfoIcon}
                                     tooltipContent="This is the name of an application/subset of the player's CT. e.g, Demon Dogs, Red, etc."
                                 />
-                                <TextAreaForm<BodyEditPlayer>
+                                <TextAreaForm<BodyCreatePlayer>
                                     nameInSchema="applications.2.application"
                                     fieldTitle="Application (3)"
                                     includeTip
@@ -202,21 +200,15 @@ export function EditPlayerForm({ player: currentPlayer }: EditPlayerProps) {
                                 />
                             </div>
 
-                            <div className="flex flex-col gap-1 border-b pb-3 border-red-400">
-                                <InputForm<BodyEditPlayer>
-                                    nameInSchema="applications.3.number"
-                                    fieldTitle=""
-                                    disabled
-                                    className="hidden"
-                                />
-                                <InputForm<BodyEditPlayer>
+                            <div className="flex flex-col gap-1">
+                                <InputForm<BodyCreatePlayer>
                                     nameInSchema="applications.3.name"
                                     fieldTitle="Name (4)"
                                     includeTip
                                     TooltipIcon={InfoIcon}
                                     tooltipContent="This is the name of an application/subset of the player's CT. e.g, Demon Dogs, Red, etc."
                                 />
-                                <TextAreaForm<BodyEditPlayer>
+                                <TextAreaForm<BodyCreatePlayer>
                                     nameInSchema="applications.3.application"
                                     fieldTitle="Application (4)"
                                     includeTip
@@ -227,20 +219,14 @@ export function EditPlayerForm({ player: currentPlayer }: EditPlayerProps) {
                             </div>
 
                             <div className="flex flex-col gap-1">
-                                <InputForm<BodyEditPlayer>
-                                    nameInSchema="applications.4.number"
-                                    fieldTitle=""
-                                    disabled
-                                    className="hidden"
-                                />
-                                <InputForm<BodyEditPlayer>
+                                <InputForm<BodyCreatePlayer>
                                     nameInSchema="applications.4.name"
                                     fieldTitle="Name (5)"
                                     includeTip
                                     TooltipIcon={InfoIcon}
                                     tooltipContent="This is the name of an application/subset of the player's CT. e.g, Demon Dogs, Red, etc."
                                 />
-                                <TextAreaForm<BodyEditPlayer>
+                                <TextAreaForm<BodyCreatePlayer>
                                     nameInSchema="applications.4.application"
                                     fieldTitle="Application (5)"
                                     includeTip
@@ -250,10 +236,10 @@ export function EditPlayerForm({ player: currentPlayer }: EditPlayerProps) {
                                 />
                             </div>
 
-                            {editPlayerError && (
+                            {createPlayerError && (
                                 <div className="max-w-md self-end my-1 max-h-max">
                                     <DisplayResponseMessage
-                                        error={editPlayerError}
+                                        error={createPlayerError}
                                     />
                                 </div>
                             )}
@@ -261,8 +247,13 @@ export function EditPlayerForm({ player: currentPlayer }: EditPlayerProps) {
 
                         <div className="self-end">
                             {/** submit buttons */}
-                            <Button type="submit" disabled={isEditingUser}>
-                                Edit Player
+                            <Button
+                                type="submit"
+                                disabled={
+                                    isCreatingPlayer || createPlayerSuccess
+                                }
+                            >
+                                Create Player
                             </Button>
                         </div>
                     </div>
