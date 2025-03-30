@@ -1,4 +1,3 @@
-import { PushButton } from "@/components/buttons/PushButton";
 import index from "@/styles/index.module.css";
 import Image from "next/image";
 
@@ -56,16 +55,6 @@ function CircleContent() {
         <div className="relative !text-white z-[6] rounded-full flex flex-col items-center justify-center w-full h-full">
             <ColonyText />
             <ColonyWarning />
-            <PushButton
-                pushTo="/"
-                label="Enter"
-                className={`
-                    ${index.colonyBtn} opacity-0 absolute bottom-[25%] h-[12px] w-[32px] sm:h-[20px] sm:w-[50px] 
-                    rounded-full text-[9px] sm:text-[12px] md:text-base font-semibold
-                    tracking-wider flex items-center justify-center
-                    bg-gradient-conic from-slate-600 via-slate-900 to-black
-                `}
-            />
         </div>
     );
 }

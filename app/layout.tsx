@@ -1,11 +1,12 @@
-import { Header } from "@/components/shell/Header";
+// Import styles of packages that you've installed.
+// All packages except `@mantine/hooks` require styles imports
+import "@mantine/core/styles.css";
 
-import { TanQueryProvider } from "@/components/shell/TanQueryProvider";
-import { ThemeProvider } from "@/components/shell/theme-povider";
-
-import { Toaster } from "@/components/ui/sonner";
-
-import "@/styles/global.css";
+import {
+    ColorSchemeScript,
+    MantineProvider,
+    mantineHtmlProps,
+} from "@mantine/core";
 
 import type { Metadata } from "next";
 
@@ -20,20 +21,12 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en">
+        <html lang="en" {...mantineHtmlProps}>
+            <head>
+                <ColorSchemeScript />
+            </head>
             <body className={`antialiased`}>
-                <ThemeProvider
-                    attribute={"class"}
-                    defaultTheme="system"
-                    enableSystem
-                    disableTransitionOnChange
-                >
-                    <Header />
-                    <main className="w-full min-h-screen border pt-[60px] bg-gradient-radial dark:from-slate-400 dark:to-slate-900 to-slate-400 from-slate-900">
-                        <TanQueryProvider>{children}</TanQueryProvider>
-                    </main>
-                    <Toaster position="top-right" />
-                </ThemeProvider>
+                <MantineProvider>{children}</MantineProvider>
             </body>
         </html>
     );
