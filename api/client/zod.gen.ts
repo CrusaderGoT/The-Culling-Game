@@ -1409,8 +1409,8 @@ export const zHttpValidationError = z.object({
 });
 
 export const zMatchInfo = z.object({
-    begin: z.coerce.string().datetime(),
-    end: z.coerce.string().datetime(),
+    begin: z.string().datetime(),
+    end: z.string().datetime(),
     part: z.number().int(),
     id: z.number().int(),
     winner: z.union([
