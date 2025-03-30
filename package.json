@@ -13,6 +13,7 @@
     "@hey-api/client-next": "^0.2.4",
     "@mantine/core": "^7.17.3",
     "@mantine/hooks": "^7.17.3",
+    "@tabler/icons-react": "^3.31.0",
     "@tanstack/react-query": "^5.66.0",
     "@tanstack/react-query-devtools": "^5.66.0",
     "class-variance-authority": "^0.7.1",
