@@ -1,9 +1,10 @@
-import { Box } from "@mantine/core";
+import { LiveMatch } from "@/components/match/LiveMatch";
+import { Container } from "@mantine/core";
 
 export default async function HomePage() {
     return (
-        <Box>
-            Colony Circle
-        </Box>
-    )
+        <Container size={"xl"}>
+            <LiveMatch />
+        </Container>
+    );
 }
