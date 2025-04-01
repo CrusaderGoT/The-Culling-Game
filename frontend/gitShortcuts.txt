@@ -1,0 +1,9 @@
+git pullRemoteFront='subtree pull --prefix frontend https://github.com/CrusaderGoT/The-Culling-Games-Frontend.git principal'
+
+git pullRemoteBack='subtree pull --prefix backend https://github.com/CrusaderGoT/The-Culling-Games-Backend.git principal'
+
+git pullRemoteOrigin='pull origin principal'
+
+git pullRemoteOriginBack='subtree pull --prefix backend https://github.com/CrusaderGoT/The-Culling-Game.git principal'
+
+git pullRemoteOriginFront='subtree pull --prefix frontend https://github.com/CrusaderGoT/The-Culling-Game.git principal'
