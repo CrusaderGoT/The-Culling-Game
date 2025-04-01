@@ -8,5 +8,6 @@ git pullRemoteOriginBack='subtree pull --prefix backend https://github.com/Crusa
 
 git pullRemoteOriginFront='subtree pull --prefix frontend https://github.com/CrusaderGoT/The-Culling-Game.git principal'
 
-git pushRemoteOriginFront='subtree push --prefix frontend https://gith
-ub.com/CrusaderGoT/The-Culling-Games-Frontend.git principal'
+git pushRemoteOriginFront='subtree push --prefix frontend https://github.com/CrusaderGoT/The-Culling-Games-Frontend.git principal'
+
+git pushRemoteOriginBack='subtree push --prefix backend https://github.com/CrusaderGoT/The-Culling-Games-Backend.git principal'
