@@ -1,0 +1,8 @@
+.vscode/
+__pycache__/
+.env
+.venv
+test.db
+.pytest_cache
+certs/*
+BACKEND/.gitignore
