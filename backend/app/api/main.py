@@ -11,6 +11,9 @@ from fastapi.security import  OAuth2PasswordRequestForm
 from app.routers import admins, matches, players, users, colonies
 from ..utils.logic import usernamedb
 
+from fastapi.openapi.docs import get_swagger_ui_html, get_redoc_html
+
+
 
 # ROUTERS
 app.include_router(users.router)
@@ -78,3 +81,11 @@ def create_user(session: session,
         else:
             err_msg = "passwords do not match"
             raise HTTPException(status.HTTP_412_PRECONDITION_FAILED, detail=err_msg)
+
+@app.get("/docs", include_in_schema=False)
+def overridden_swagger():
+	return get_swagger_ui_html(openapi_url="/openapi.json", title="The Culling Games", swagger_favicon_url="C:/Users/DELL/Documents/my progamming folder/Projects/CG/backend/app/assests/images/Kogane.png")
+
+@app.get("/redoc", include_in_schema=False)
+def overridden_redoc():
+	return get_redoc_html(openapi_url="/openapi.json", title="The Culling Games", redoc_favicon_url="/backend/app/assests/images/Kogane.png")

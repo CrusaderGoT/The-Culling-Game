@@ -17,7 +17,11 @@ def custom_generate_unique_id(route: APIRoute):
 
 
 app = FastAPI(
-    title="The Culling Games API", generate_unique_id_function=custom_generate_unique_id
+    title="The Culling Games API",
+    description="",
+    generate_unique_id_function=custom_generate_unique_id,
+    docs_url=None,
+    redoc_url=None,
 )
 """
 The Global FastAPI app. To allow for use in multiple files.\n
