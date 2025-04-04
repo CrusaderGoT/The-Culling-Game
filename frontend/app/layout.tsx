@@ -1,13 +1,17 @@
 // Import styles of packages that you've installed.
 // All packages except `@mantine/hooks` require styles imports
+import "@mantine/charts/styles.css";
 import "@mantine/core/styles.css";
-import '@mantine/charts/styles.css';
 
 import {
     ColorSchemeScript,
     MantineProvider,
     mantineHtmlProps,
 } from "@mantine/core";
+
+import queryClient from "@/constants/queryClient";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
 import type { Metadata } from "next";
 
@@ -27,7 +31,12 @@ export default function RootLayout({
                 <ColorSchemeScript />
             </head>
             <body className={`antialiased`}>
-                <MantineProvider>{children}</MantineProvider>
+                <MantineProvider>
+                    <QueryClientProvider client={queryClient}>
+                        {children}
+                        <ReactQueryDevtools initialIsOpen={false} />
+                    </QueryClientProvider>
+                </MantineProvider>
             </body>
         </html>
     );
