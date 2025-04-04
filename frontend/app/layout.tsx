@@ -5,13 +5,11 @@ import "@mantine/core/styles.css";
 
 import {
     ColorSchemeScript,
+    Container,
     MantineProvider,
     mantineHtmlProps,
 } from "@mantine/core";
 
-import queryClient from "@/constants/queryClient";
-import { QueryClientProvider } from "@tanstack/react-query";
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
 import type { Metadata } from "next";
 
@@ -30,12 +28,11 @@ export default function RootLayout({
             <head>
                 <ColorSchemeScript />
             </head>
-            <body className={`antialiased`}>
+            <body>
                 <MantineProvider>
-                    <QueryClientProvider client={queryClient}>
+                    <Container size={"lg"} my={40}>
                         {children}
-                        <ReactQueryDevtools initialIsOpen={false} />
-                    </QueryClientProvider>
+                    </Container>
                 </MantineProvider>
             </body>
         </html>
