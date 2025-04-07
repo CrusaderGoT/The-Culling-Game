@@ -1,136 +1,185 @@
 "use client";
 
 import {
+    Avatar,
+    Badge,
     Box,
     Button,
+    Card,
+    CardSection,
+    Code,
     Drawer,
     Flex,
     Group,
+    Indicator,
+    Paper,
     Stack,
-    Tabs,
     Text,
-    Title,
+    ThemeIcon,
 } from "@mantine/core";
 
-import {
-    IconMessageCircle,
-    IconPhoto,
-    IconSettings,
-} from "@tabler/icons-react";
+import { BarChart } from "@mantine/charts";
 
 import { useDisclosure } from "@mantine/hooks";
+import {
+    IconArrowDown,
+    IconArrowUp,
+    IconAward,
+    IconChartArcs,
+    IconVs,
+} from "@tabler/icons-react";
 
-import { BarChart } from "@mantine/charts";
-import { PlayerInfo } from "@/api/client";
+function MatchHeader() {
+    const timer = "20 secs left";
+    const colony = "1 - AD";
 
-export function LiveMatch() {
+    return (
+        <Group align="center" justify="space-between">
+            <Indicator position="middle-start" size={12} processing withBorder>
+                <Badge variant="light" size="md" rightSection={colony}>
+                    Live
+                </Badge>
+            </Indicator>
+
+            <Code>{timer}</Code>
+        </Group>
+    );
+}
+
+function MatchPlayers() {
     return (
         <Flex
-            direction={"column"}
-            align={"center"}
-            p={"md"}
-            justify={"space-between"}
-            gap={"xl"}
+            justify="space-between"
+            gap={"xs"}
+            direction={{ base: "column", md: "row" }}
         >
-            <Group>
-                <Title order={2}>Emy</Title>
-                <Text>vs</Text>
-                <Title order={2}>Emeka</Title>
-            </Group>
+            <Paper flex={1}>
+                <Group justify="space-between" p={5}>
+                    <ThemeIcon color="grape" size={"xs"} radius={"lg"}>
+                        <IconAward size={14} />
+                    </ThemeIcon>
 
-            <VotingChart />
+                    <Badge
+                        size="xs"
+                        leftSection={<IconChartArcs size={14} />}
+                        rightSection={<IconArrowDown size={14} />}
+                    >
+                        120
+                    </Badge>
+                </Group>
 
-            <VoteDrawer />
+                <Stack p={"xs"} align="center">
+                    <Avatar size={"lg"} name="Ethan" />
+                    <Text>Ethan</Text>
+                    <Badge>Grade 1</Badge>
+                </Stack>
+            </Paper>
+
+            <ThemeIcon
+                color="red"
+                size={"lg"}
+                variant="light"
+                radius="lg"
+                style={{
+                    alignSelf: "center",
+                }}
+            >
+                <IconVs size={18} />
+            </ThemeIcon>
+
+            <Paper flex={1}>
+                <Group justify="space-between" p={5}>
+                    <Badge
+                        size="xs"
+                        leftSection={<IconChartArcs size={14} />}
+                        rightSection={<IconArrowUp size={14} />}
+                    >
+                        120
+                    </Badge>
+                </Group>
+                <Stack p={"md"} align="center">
+                    <Avatar size={"lg"} name="Ethan" />
+                    <Text>Nahte</Text>
+                    <Badge>Grade 1</Badge>
+                </Stack>
+            </Paper>
         </Flex>
     );
 }
 
-type VoteDrawerProp = {
-    fighters: string[]; // to be passed to forms
-};
+function MatchVoteChart() {
+    const data = [
+        { player: "Ethan", Smartphones: 1200, Laptops: 900, Tablets: 700 },
+        { player: "Nahte", Dullphones: 1500, Mobile: 1200, Pills: 400 },
+    ];
 
-function VoteDrawer() {
-    const [opened, { open, close }] = useDisclosure();
-
-    return (
-        <Box>
-            <Drawer
-                opened={opened}
-                onClose={close}
-                title="Cast Your Vote"
-                offset={10}
-                radius={"md"}
-                position="bottom"
-                transitionProps={{
-                    transition: "fade-up",
-                    duration: 500,
-                    timingFunction: "ease-in-out",
-                }}
-            >
-                <VoteDrawerTabs />
-            </Drawer>
-
-            <Button onClick={open}>Vote</Button>
-        </Box>
-    );
-}
-
-function VotingChart() {
     return (
         <BarChart
+            type="stacked"
+            orientation="vertical"
             h={300}
             data={data}
-            dataKey="month"
-            type="percent"
-            orientation="vertical"
-            withLegend
-            tickLine="xy"
-            gridAxis="xy"
+            dataKey="player"
             series={[
-                { name: "Demon Dogs", color: "violet.6" },
-                { name: "Nue", color: "blue.6" },
-                { name: "Orochi", color: "teal.6" },
+                { name: "Smartphones", color: "violet.6" },
+                { name: "Laptops", color: "blue.6" },
+                { name: "Tablets", color: "teal.6" },
 
-                { name: "Hollow", color: "red.6" },
-                { name: "Uzumaki", color: "cyan.6" },
-                { name: "Swap", color: "yellow.6" },
+                { name: "Dullphones", color: "pink.6" },
+                { name: "Mobile", color: "black" },
+                { name: "Pills", color: "white" },
             ]}
+            withLegend
+            legendProps={{ verticalAlign: "bottom" }}
+            tickLine="x"
+            gridAxis="y"
+            xAxisLabel="Points"
+            tooltipAnimationDuration={200}
+            withBarValueLabel
+            barChartProps={{ maxBarSize: 50 }}
         />
     );
 }
 
-const data = [
-    { month: "Emeka", "Demon Dogs": 1200, Nue: 500, Orochi: 800 },
-    { month: "Emy", Hollow: 1900, Uzumaki: 1200, Swap: 400 },
-];
+function VoteTab() {
+    const [opened, { open, close }] = useDisclosure(false);
 
-function VoteDrawerTabs() {
     return (
-        <Tabs defaultValue="Emy">
-            <Tabs.List grow>
-                <Tabs.Tab value="Emy" leftSection={<IconPhoto size={12} />} color="yellow">
-                    Emy
-                </Tabs.Tab>
+        <Box>
+            <Drawer
+                offset={8}
+                radius="md"
+                opened={opened}
+                onClose={close}
+                title="Authentication"
+            >
+                {/* Drawer content */}
+            </Drawer>
 
-                <Tabs.Tab
-                    value="Emeka"
-                    leftSection={<IconMessageCircle size={12} />}
-                >
-                    Emeka
-                </Tabs.Tab>
-            </Tabs.List>
-
-            <Tabs.Panel value="Emeka">Some type of Form?</Tabs.Panel>
-
-            <Tabs.Panel value="Emy">Player CT details and checkbox for ct apps</Tabs.Panel>
-        </Tabs>
+            <Button variant="filled" onClick={open}>
+                Vote
+            </Button>
+        </Box>
     );
 }
 
-type VoteFormProp = {
-    player: PlayerInfo["cursed_technique"]
-}
+export function LiveMatch() {
+    return (
+        <Card padding={"xs"}>
+            <CardSection p={"xs"}>
+                <MatchHeader />
+            </CardSection>
 
-function VoteForm() {
+            <MatchPlayers />
 
+            <CardSection p={"xs"} pr={"xl"}>
+                <MatchVoteChart />
+            </CardSection>
+
+            <CardSection mx={"auto"} p={"xs"}>
+                <VoteTab />
+            </CardSection>
+            
+        </Card>
+    );
 }
