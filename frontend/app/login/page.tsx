@@ -1,4 +1,4 @@
-import { CreateUserForm } from "@/components/forms/createUserForm";
+import { CreateUserForm } from "@/components/forms/create-user-form";
 import { Group, Paper } from "@mantine/core";
 
 export default async function LoginPage() {

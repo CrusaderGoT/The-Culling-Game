@@ -1,4 +1,4 @@
-import { LiveMatch } from "@/components/match/LiveMatch";
+import { LiveMatch } from "@/components/match/live-match";
 import { Container } from "@mantine/core";
 
 export default async function HomePage() {

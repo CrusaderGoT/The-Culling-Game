@@ -20,6 +20,7 @@ import {
 
 import { BarChart } from "@mantine/charts";
 
+import { PlayerInfo, type CastVote } from "@/api/client";
 import { useDisclosure } from "@mantine/hooks";
 import {
     IconArrowDown,
@@ -28,6 +29,55 @@ import {
     IconChartArcs,
     IconVs,
 } from "@tabler/icons-react";
+import { useState } from "react";
+import { VoteCards, VoteForm } from "./forms/vote-form";
+
+export const playerInfo: PlayerInfo = {
+    id: 1,
+    cursed_technique: {
+        name: "my ct",
+        id: 2,
+        definition: "my ct definition",
+        applications: [
+            {
+                name: "ct app",
+                id: 4,
+                number: 5,
+                application: "my ct app application",
+            },
+            {
+                name: "ct app",
+                id: 5,
+                number: 5,
+                application: "my ct app application",
+            },
+            {
+                name: "ct app",
+                id: 3,
+                number: 5,
+                application: "my ct app application",
+            },
+        ],
+    },
+    age: 60,
+    name: "my name",
+    gender: "male",
+    created: new Date().toDateString(),
+    grade: 4,
+    points: 4.0,
+    matches: [],
+    user: {
+        username: "my username",
+        id: 50,
+        email: "e@gmail.com",
+        created: new Date().toDateString(),
+    },
+    barrier_technique: null,
+    colony: {
+        id: 10,
+        country: "AD",
+    },
+};
 
 function MatchHeader() {
     const timer = "20 secs left";
@@ -35,8 +85,19 @@ function MatchHeader() {
 
     return (
         <Group align="center" justify="space-between">
-            <Indicator position="middle-start" size={12} processing withBorder>
-                <Badge variant="light" size="md" rightSection={colony}>
+            <Indicator
+                position="middle-start"
+                size={12}
+                color={"green"}
+                processing
+                withBorder
+            >
+                <Badge
+                    variant="light"
+                    size="md"
+                    color="teal"
+                    rightSection={colony}
+                >
                     Live
                 </Badge>
             </Indicator>
@@ -144,6 +205,13 @@ function MatchVoteChart() {
 function VoteTab() {
     const [opened, { open, close }] = useDisclosure(false);
 
+    const [value, setValue] = useState<string[]>([]);
+
+    const votes: CastVote[] = value.map((appId) => ({
+        player_id: 1,
+        ct_app_id: Number(appId),
+    }));
+
     return (
         <Box>
             <Drawer
@@ -151,9 +219,17 @@ function VoteTab() {
                 radius="md"
                 opened={opened}
                 onClose={close}
-                title="Authentication"
+                title="Cast Your Votes"
+                returnFocus
+                position="bottom"
             >
-                {/* Drawer content */}
+                <VoteCards
+                    value={value}
+                    setValue={setValue}
+                    player={playerInfo}
+                />{" "}
+                #tab 1
+                <VoteForm votes={votes} /> #tab 2{`${JSON.stringify(votes)}`}
             </Drawer>
 
             <Button variant="filled" onClick={open}>
@@ -179,7 +255,6 @@ export function LiveMatch() {
             <CardSection mx={"auto"} p={"xs"}>
                 <VoteTab />
             </CardSection>
-            
         </Card>
     );
 }
