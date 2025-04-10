@@ -14,14 +14,15 @@ import {
     Indicator,
     Paper,
     Stack,
+    Tabs,
     Text,
     ThemeIcon,
 } from "@mantine/core";
 
 import { BarChart } from "@mantine/charts";
 
-import { PlayerInfo, type CastVote } from "@/api/client";
-import { useDisclosure } from "@mantine/hooks";
+import { PlayerInfo } from "@/api/client";
+import { randomId, useDisclosure } from "@mantine/hooks";
 import {
     IconArrowDown,
     IconArrowUp,
@@ -76,6 +77,47 @@ export const playerInfo: PlayerInfo = {
     colony: {
         id: 10,
         country: "AD",
+    },
+};
+
+export const playerInfo2: PlayerInfo = {
+    id: 2,
+    cursed_technique: {
+        name: "void technique",
+        id: 3,
+        definition: "manipulates empty space",
+        applications: [
+            {
+                name: "teleport",
+                id: 6,
+                number: 3,
+                application: "instant movement through void",
+            },
+            {
+                name: "void pocket",
+                id: 7,
+                number: 4,
+                application: "store items in pocket dimension",
+            },
+        ],
+    },
+    age: 25,
+    name: "Nahte",
+    gender: "female",
+    created: new Date().toDateString(),
+    grade: 1,
+    points: 8.5,
+    matches: [],
+    user: {
+        username: "void_walker",
+        id: 51,
+        email: "void@example.com",
+        created: new Date().toDateString(),
+    },
+    barrier_technique: null,
+    colony: {
+        id: 11,
+        country: "JP",
     },
 };
 
@@ -202,15 +244,14 @@ function MatchVoteChart() {
     );
 }
 
-function VoteTab() {
+type VoteTabProp = {
+    players: PlayerInfo[];
+};
+
+function VoteTab({ players }: VoteTabProp) {
     const [opened, { open, close }] = useDisclosure(false);
 
     const [value, setValue] = useState<string[]>([]);
-
-    const votes: CastVote[] = value.map((appId) => ({
-        player_id: 1,
-        ct_app_id: Number(appId),
-    }));
 
     return (
         <Box>
@@ -223,13 +264,33 @@ function VoteTab() {
                 returnFocus
                 position="bottom"
             >
-                <VoteCards
-                    value={value}
-                    setValue={setValue}
-                    player={playerInfo}
-                />{" "}
-                #tab 1
-                <VoteForm votes={votes} /> #tab 2{`${JSON.stringify(votes)}`}
+                <Tabs color="lime" variant="pills" defaultValue="gallery">
+                    <Tabs.List grow>
+                        {players.map((player) => (
+                            <Tabs.Tab
+                                key={randomId()}
+                                value={player.name}
+                                leftSection={
+                                    <Avatar name={player.name} size={18} />
+                                }
+                            >
+                                {player.name}
+                            </Tabs.Tab>
+                        ))}
+                    </Tabs.List>
+
+                    {players.map((player) => (
+                        <Tabs.Panel key={randomId()} value={player.name}>
+                            <VoteCards
+                                value={value}
+                                setValue={setValue}
+                                player={player}
+                            />
+                        </Tabs.Panel>
+                    ))}
+                </Tabs>
+                <VoteForm votes={JSON.parse(JSON.stringify(value))} /> #drawer 2
+                {`${JSON.parse(JSON.stringify(value))}`}
             </Drawer>
 
             <Button variant="filled" onClick={open}>
@@ -253,7 +314,7 @@ export function LiveMatch() {
             </CardSection>
 
             <CardSection mx={"auto"} p={"xs"}>
-                <VoteTab />
+                <VoteTab players={[playerInfo, playerInfo2]} />
             </CardSection>
         </Card>
     );

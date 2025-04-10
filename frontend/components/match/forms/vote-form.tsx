@@ -48,23 +48,24 @@ type VoteCardProp = {
 };
 
 export function VoteCards({ player, value, setValue }: VoteCardProp) {
-    const cards = player.cursed_technique.applications.map(
-        (application, index) => (
-            <Checkbox.Card
-                key={randomId()}
-                radius={"md"}
-                value={`${application.id}`}
-            >
-                <Group>
-                    <Checkbox.Indicator />
-                    <Stack>
-                        <Text>{application.name}</Text>
-                        <Text>{application.application}</Text>
-                    </Stack>
-                </Group>
-            </Checkbox.Card>
-        )
-    );
+    const cards = player.cursed_technique.applications.map((application) => (
+        <Checkbox.Card
+            key={randomId()}
+            radius={"md"}
+            value={`${JSON.stringify({
+                ct_app_id: application.id,
+                player_id: player.id,
+            })}`}
+        >
+            <Group>
+                <Checkbox.Indicator />
+                <Stack>
+                    <Text>{application.name}</Text>
+                    <Text>{application.application}</Text>
+                </Stack>
+            </Group>
+        </Checkbox.Card>
+    ));
 
     return (
         <Box>
