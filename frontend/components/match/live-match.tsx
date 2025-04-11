@@ -3,18 +3,14 @@
 import {
     Avatar,
     Badge,
-    Box,
-    Button,
     Card,
     CardSection,
     Code,
-    Drawer,
     Flex,
     Group,
     Indicator,
     Paper,
     Stack,
-    Tabs,
     Text,
     ThemeIcon,
 } from "@mantine/core";
@@ -22,7 +18,6 @@ import {
 import { BarChart } from "@mantine/charts";
 
 import { PlayerInfo } from "@/api/client";
-import { randomId, useDisclosure } from "@mantine/hooks";
 import {
     IconArrowDown,
     IconArrowUp,
@@ -30,8 +25,7 @@ import {
     IconChartArcs,
     IconVs,
 } from "@tabler/icons-react";
-import { useState } from "react";
-import { VoteCards, VoteForm } from "./forms/vote-form";
+import { VoteDrawer } from "../vote/vote-drawer";
 
 export const playerInfo: PlayerInfo = {
     id: 1,
@@ -61,7 +55,7 @@ export const playerInfo: PlayerInfo = {
         ],
     },
     age: 60,
-    name: "my name",
+    name: "Ethan",
     gender: "male",
     created: new Date().toDateString(),
     grade: 4,
@@ -244,62 +238,6 @@ function MatchVoteChart() {
     );
 }
 
-type VoteTabProp = {
-    players: PlayerInfo[];
-};
-
-function VoteTab({ players }: VoteTabProp) {
-    const [opened, { open, close }] = useDisclosure(false);
-
-    const [value, setValue] = useState<string[]>([]);
-
-    return (
-        <Box>
-            <Drawer
-                offset={8}
-                radius="md"
-                opened={opened}
-                onClose={close}
-                title="Cast Your Votes"
-                returnFocus
-                position="bottom"
-            >
-                <Tabs color="lime" variant="pills" defaultValue="gallery">
-                    <Tabs.List grow>
-                        {players.map((player) => (
-                            <Tabs.Tab
-                                key={randomId()}
-                                value={player.name}
-                                leftSection={
-                                    <Avatar name={player.name} size={18} />
-                                }
-                            >
-                                {player.name}
-                            </Tabs.Tab>
-                        ))}
-                    </Tabs.List>
-
-                    {players.map((player) => (
-                        <Tabs.Panel key={randomId()} value={player.name}>
-                            <VoteCards
-                                value={value}
-                                setValue={setValue}
-                                player={player}
-                            />
-                        </Tabs.Panel>
-                    ))}
-                </Tabs>
-                <VoteForm votes={JSON.parse(JSON.stringify(value))} /> #drawer 2
-                {`${JSON.parse(JSON.stringify(value))}`}
-            </Drawer>
-
-            <Button variant="filled" onClick={open}>
-                Vote
-            </Button>
-        </Box>
-    );
-}
-
 export function LiveMatch() {
     return (
         <Card padding={"xs"}>
@@ -314,7 +252,7 @@ export function LiveMatch() {
             </CardSection>
 
             <CardSection mx={"auto"} p={"xs"}>
-                <VoteTab players={[playerInfo, playerInfo2]} />
+                <VoteDrawer players={[playerInfo, playerInfo2]} />
             </CardSection>
         </Card>
     );

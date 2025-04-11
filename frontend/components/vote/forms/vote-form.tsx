@@ -16,7 +16,7 @@ import {
     useVoteForm,
     VoteFormProvider,
     VoteFormType,
-} from "@/components/match/forms/vote-form-context";
+} from "@/components/vote/forms/vote-form-context";
 
 import { Dispatch, SetStateAction } from "react";
 
@@ -35,7 +35,9 @@ export function VoteForm({ votes }: VoteFormType) {
     return (
         <VoteFormProvider form={form}>
             <form onSubmit={form.onSubmit((data) => console.log(data))}>
-                <Button type="submit">submit</Button>
+                <Button type="submit" color="red">
+                    Confirm
+                </Button>
             </form>
         </VoteFormProvider>
     );
