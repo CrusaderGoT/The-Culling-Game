@@ -9,6 +9,7 @@ import {
     Stack,
     Text,
     TextInput,
+    VisuallyHidden,
 } from "@mantine/core";
 
 import { type PlayerInfo } from "@/api/client";
@@ -22,8 +23,6 @@ import {
 import { Dispatch, SetStateAction } from "react";
 
 import { zCastVote } from "@/api/client/zod.gen";
-
-import { randomId } from "@mantine/hooks";
 
 import { zodResolver } from "@mantine/form";
 
@@ -39,15 +38,20 @@ export function VoteForm({ votes }: VoteFormType) {
     const form = useVoteForm({
         mode: "uncontrolled",
         initialValues,
-        validate: zodResolver(voteSchema)
+        validate: zodResolver(voteSchema),
     });
+
+    const handleSubmit = (data: VoteFormType) => {
+        // Replace this with the actual submit logic
+        console.log("Submitting form data:", data);
+    };
 
     return (
         <VoteFormProvider form={form}>
-            <form onSubmit={form.onSubmit((data) => console.log(data))}>
-                <Stack>
-                    {form.getValues().votes.map((_, index) => {
-                        return (
+            <form onSubmit={form.onSubmit(handleSubmit)}>
+                <VisuallyHidden>
+                    <Stack>
+                        {form.getValues().votes.map((_, index) => (
                             <Box key={index}>
                                 <TextInput
                                     key={form.key(`votes.${index}.player_id`)}
@@ -65,14 +69,11 @@ export function VoteForm({ votes }: VoteFormType) {
                                     disabled
                                 />
                             </Box>
-                        );
-                    })}
-                </Stack>
+                        ))}
+                    </Stack>
+                </VisuallyHidden>
 
-                <Button
-                    type="submit"
-                    color="red"
-                >
+                <Button type="submit" color="red">
                     Confirm
                 </Button>
             </form>
@@ -89,7 +90,7 @@ type VoteCardProp = {
 export function VoteCards({ player, value, setValue }: VoteCardProp) {
     const cards = player.cursed_technique.applications.map((application) => (
         <Checkbox.Card
-            key={randomId()}
+            key={application.id}
             radius={"md"}
             value={`${JSON.stringify({
                 ct_app_id: application.id,
