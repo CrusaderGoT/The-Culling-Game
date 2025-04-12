@@ -1,9 +1,9 @@
 "use client";
 
 import { PlayerInfo } from "@/api/client";
+import { VoteCards } from "@/components/vote/vote-cards";
 import { Avatar, MantineColor, Tabs, Text } from "@mantine/core";
 import { Dispatch, SetStateAction } from "react";
-import { VoteCards } from "./forms/vote-form";
 
 export function VoteTabs({ players, value, setValue }: VoteTabsProp) {
     const colors: MantineColor[] = [
@@ -52,6 +52,7 @@ export function VoteTabs({ players, value, setValue }: VoteTabsProp) {
                         value={value}
                         setValue={setValue}
                         player={player}
+                        color={getColorFromId(player.id)}
                     />
                 </Tabs.Panel>
             ))}
