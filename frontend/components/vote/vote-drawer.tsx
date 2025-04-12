@@ -1,15 +1,21 @@
 "use client";
 
-import { PlayerInfo } from "@/api/client";
+import { CastVote, PlayerInfo } from "@/api/client";
+import { VoteForm } from "@/components/vote/forms/vote-form";
+import { VoteTabs } from "@/components/vote/vote-tabs";
 import { Box, Button, Drawer, Text, useDrawersStack } from "@mantine/core";
-import { useState } from "react";
-import { VoteForm } from "./forms/vote-form";
-import { VoteTabs } from "./vote-tabs";
+import { useMemo, useState } from "react";
 
 export function VoteDrawer({ players }: VoteDrawerProp) {
+    const stack = useDrawersStack(["voting-info", "vote-tab", "confirm-vote"]);
+
     const [value, setValue] = useState<string[]>([]);
 
-    const stack = useDrawersStack(["voting-info", "vote-tab", "confirm-vote"]);
+    const makeVotes = (value: string[]) => {
+        return value.map((vote: string) => JSON.parse(vote) as CastVote);
+    };
+
+    const votes = useMemo(() => makeVotes(value), [value]);
 
     return (
         <Box>
@@ -18,7 +24,7 @@ export function VoteDrawer({ players }: VoteDrawerProp) {
                     {...stack.register("voting-info")}
                     title="⚠️ IMPORTANT!!! ⚠️"
                 >
-                    <Text lh={2} lts={1.3}>
+                    <Text lh={2}>
                         Each match allows a maximum of five votes in total.
                         During the voting process, you can select the cursed
                         technique applications you want to vote for each player
@@ -64,9 +70,7 @@ export function VoteDrawer({ players }: VoteDrawerProp) {
                     {...stack.register("confirm-vote")}
                     title="confirm your votes"
                 >
-                    <VoteForm votes={JSON.parse(JSON.stringify(value))} />
-
-                    {JSON.parse(JSON.stringify(value))}
+                    <VoteForm votes={votes} />
 
                     <Button
                         onClick={() => {

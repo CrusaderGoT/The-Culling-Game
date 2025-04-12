@@ -8,6 +8,7 @@ import {
     Group,
     Stack,
     Text,
+    TextInput,
 } from "@mantine/core";
 
 import { type PlayerInfo } from "@/api/client";
@@ -20,21 +21,54 @@ import {
 
 import { Dispatch, SetStateAction } from "react";
 
+import { zCastVote } from "@/api/client/zod.gen";
+
 import { randomId } from "@mantine/hooks";
 
+import { zodResolver } from "@mantine/form";
+
+import { z } from "zod";
+
 export function VoteForm({ votes }: VoteFormType) {
+    const voteSchema = z.array(zCastVote);
+
     const initialValues: VoteFormType = {
-        votes: [],
+        votes: votes,
     };
 
     const form = useVoteForm({
         mode: "uncontrolled",
         initialValues,
+        validate: zodResolver(voteSchema),
     });
 
     return (
         <VoteFormProvider form={form}>
             <form onSubmit={form.onSubmit((data) => console.log(data))}>
+                <Stack>
+                    {form.getValues().votes.map((_, index) => {
+                        return (
+                            <Box key={index}>
+                                <TextInput
+                                    key={form.key(`votes.${index}.player_id`)}
+                                    {...form.getInputProps(
+                                        `votes.${index}.player_id`
+                                    )}
+                                    disabled
+                                />
+
+                                <TextInput
+                                    key={form.key(`votes.${index}.ct_app_id`)}
+                                    {...form.getInputProps(
+                                        `votes.${index}.ct_app_id`
+                                    )}
+                                    disabled
+                                />
+                            </Box>
+                        );
+                    })}
+                </Stack>
+
                 <Button type="submit" color="red">
                     Confirm
                 </Button>

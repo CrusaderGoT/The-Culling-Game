@@ -1,4 +1,4 @@
-import { type CastVote } from "@/api/client";
+import { CastVote } from "@/api/client";
 import { createFormContext } from "@mantine/form";
 
 export type VoteFormType = {
