@@ -30,7 +30,7 @@ import { zodResolver } from "@mantine/form";
 import { z } from "zod";
 
 export function VoteForm({ votes }: VoteFormType) {
-    const voteSchema = z.array(zCastVote);
+    const voteSchema = z.object({ votes: z.array(zCastVote) });
 
     const initialValues: VoteFormType = {
         votes: votes,
@@ -39,7 +39,7 @@ export function VoteForm({ votes }: VoteFormType) {
     const form = useVoteForm({
         mode: "uncontrolled",
         initialValues,
-        validate: zodResolver(voteSchema),
+        validate: zodResolver(voteSchema)
     });
 
     return (
@@ -69,7 +69,10 @@ export function VoteForm({ votes }: VoteFormType) {
                     })}
                 </Stack>
 
-                <Button type="submit" color="red">
+                <Button
+                    type="submit"
+                    color="red"
+                >
                     Confirm
                 </Button>
             </form>
