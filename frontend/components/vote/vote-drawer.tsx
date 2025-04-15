@@ -78,6 +78,12 @@ export function VoteDrawer({ players }: VoteDrawerProp) {
 
                     <Button
                         onClick={() => {
+                            // check vote counts
+                            if (selectedVotes.length > 5)
+                                return alert("Total votes must not exceed 5");
+                            if (selectedVotes.length < 1)
+                                return alert("Total votes must be at least 1");
+
                             stack.closeAll();
                             stack.open("confirm-vote");
                         }}
