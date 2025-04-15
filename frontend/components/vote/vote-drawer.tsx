@@ -3,19 +3,31 @@
 import { CastVote, PlayerInfo } from "@/api/client";
 import { VoteForm } from "@/components/vote/forms/vote-form";
 import { VoteTabs } from "@/components/vote/vote-tabs";
-import { Box, Button, Drawer, Text, useDrawersStack } from "@mantine/core";
+import {
+    Box,
+    Button,
+    Dialog,
+    Drawer,
+    Group,
+    Text,
+    useDrawersStack,
+} from "@mantine/core";
 import { useMemo, useState } from "react";
+
+import exceedVoteClasses from "@/styles/exceed-vote.module.css";
+import { IconAlertCircle } from "@tabler/icons-react";
+import cx from "clsx";
 
 export function VoteDrawer({ players }: VoteDrawerProp) {
     const stack = useDrawersStack(["voting-info", "vote-tab", "confirm-vote"]);
 
-    const [value, setValue] = useState<string[]>([]);
+    const [selectedVotes, setSelectedVotes] = useState<string[]>([]);
 
     const makeVotes = (value: string[]) => {
         return value.map((vote: string) => JSON.parse(vote) as CastVote);
     };
 
-    const votes = useMemo(() => makeVotes(value), [value]);
+    const votes = useMemo(() => makeVotes(selectedVotes), [selectedVotes]);
 
     return (
         <Box>
@@ -59,8 +71,8 @@ export function VoteDrawer({ players }: VoteDrawerProp) {
                     overlayProps={{ backgroundOpacity: 0.5, blur: 4 }}
                 >
                     <VoteTabs
-                        value={value}
-                        setValue={setValue}
+                        value={selectedVotes}
+                        setValue={setSelectedVotes}
                         players={players}
                     />
 
@@ -69,10 +81,35 @@ export function VoteDrawer({ players }: VoteDrawerProp) {
                             stack.closeAll();
                             stack.open("confirm-vote");
                         }}
-                        color={value.length < 5 ? "teal" : "orange"}
+                        color={
+                            !selectedVotes.length
+                                ? "charcoal"
+                                : selectedVotes.length < 5
+                                ? "teal"
+                                : "orange"
+                        }
                     >
-                        Cast {value.length} Votes
+                        Cast {selectedVotes.length} Votes
                     </Button>
+
+                    <Dialog
+                        opened={votes.length > 5}
+                        withBorder
+                        withinPortal={false}
+                        position={{ bottom: 20, left: 10 }}
+                        className={cx(exceedVoteClasses.warningContainer)}
+                    >
+                        <Group wrap="nowrap">
+                            <IconAlertCircle color="red" />
+                            <Text
+                                className={cx(exceedVoteClasses.warningText)}
+                                truncate="start"
+                                flex={1}
+                            >
+                                Total votes must not exceed 5
+                            </Text>
+                        </Group>
+                    </Dialog>
                 </Drawer>
 
                 <Drawer
