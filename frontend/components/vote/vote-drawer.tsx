@@ -23,8 +23,13 @@ export function VoteDrawer({ players }: VoteDrawerProp) {
                 <Drawer
                     {...stack.register("voting-info")}
                     title="⚠️ IMPORTANT!!! ⚠️"
+                    position="top"
+                    transitionProps={{ transition: "pop" }}
+                    offset={10}
+                    size={"xs"}
+                    overlayProps={{ backgroundOpacity: 0.5, blur: 4 }}
                 >
-                    <Text lh={2}>
+                    <Text>
                         Each match allows a maximum of five votes in total.
                         During the voting process, you can select the cursed
                         technique applications you want to vote for each player
@@ -48,6 +53,10 @@ export function VoteDrawer({ players }: VoteDrawerProp) {
                 <Drawer
                     {...stack.register("vote-tab")}
                     title="vote awesome techniques"
+                    position="bottom"
+                    transitionProps={{ transition: "scale" }}
+                    offset={10}
+                    overlayProps={{ backgroundOpacity: 0.5, blur: 4 }}
                 >
                     <VoteTabs
                         value={value}
@@ -69,6 +78,10 @@ export function VoteDrawer({ players }: VoteDrawerProp) {
                 <Drawer
                     {...stack.register("confirm-vote")}
                     title="confirm your votes"
+                    position="right"
+                    transitionProps={{ transition: "fade-left" }}
+                    offset={10}
+                    overlayProps={{ backgroundOpacity: 0.5, blur: 4 }}
                 >
                     <VoteForm votes={votes} />
 

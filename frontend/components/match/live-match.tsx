@@ -35,22 +35,39 @@ export const playerInfo: PlayerInfo = {
         definition: "my ct definition",
         applications: [
             {
-                name: "ct app",
+                name: "Domain Expansion",
                 id: 4,
-                number: 5,
-                application: "my ct app application",
+                number: 1,
+                application:
+                    "Creates a guaranteed-hit barrier space where technique is amplified",
             },
             {
-                name: "ct app",
+                name: "Simple Domain",
                 id: 5,
-                number: 5,
-                application: "my ct app application",
+                number: 2,
+                application:
+                    "Creates a small barrier that neutralizes Domain Expansion effects",
             },
             {
-                name: "ct app",
+                name: "Cursed Energy Reinforcement",
                 id: 3,
+                number: 3,
+                application:
+                    "Enhances physical capabilities using cursed energy",
+            },
+            {
+                name: "Black Flash",
+                id: 6,
+                number: 4,
+                application:
+                    "Distorts space-time with perfect timing to multiply damage by 2.5",
+            },
+            {
+                name: "Reversed Cursed Technique",
+                id: 7,
                 number: 5,
-                application: "my ct app application",
+                application:
+                    "Combines positive and negative energy to heal injuries",
             },
         ],
     },
@@ -82,16 +99,36 @@ export const playerInfo2: PlayerInfo = {
         definition: "manipulates empty space",
         applications: [
             {
-                name: "teleport",
+                name: "Teleport",
                 id: 6,
                 number: 3,
                 application: "instant movement through void",
             },
             {
-                name: "void pocket",
+                name: "Void Pocket",
                 id: 7,
                 number: 4,
                 application: "store items in pocket dimension",
+            },
+            {
+                name: "Hollow Purple",
+                id: 8,
+                number: 1,
+                application:
+                    "Combines opposing forces to create destructive void energy",
+            },
+            {
+                name: "Maximum Technique",
+                id: 9,
+                number: 2,
+                application:
+                    "Unleashes the technique's full potential at the cost of more cursed energy",
+            },
+            {
+                name: "Binding Vow",
+                id: 10,
+                number: 3,
+                application: "Creates restrictions to gain power boosts",
             },
         ],
     },
@@ -195,7 +232,7 @@ function MatchPlayers() {
                     </Badge>
                 </Group>
                 <Stack p={"md"} align="center">
-                    <Avatar size={"lg"} name="Ethan" />
+                    <Avatar size={"lg"} name="Nahte" />
                     <Text>Nahte</Text>
                     <Badge>Grade 1</Badge>
                 </Stack>
@@ -224,7 +261,7 @@ function MatchVoteChart() {
 
                 { name: "Dullphones", color: "pink.6" },
                 { name: "Mobile", color: "black" },
-                { name: "Pills", color: "white" },
+                { name: "Pills", color: "gray.6" },
             ]}
             withLegend
             legendProps={{ verticalAlign: "bottom" }}

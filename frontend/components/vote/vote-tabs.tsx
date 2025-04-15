@@ -2,7 +2,7 @@
 
 import { PlayerInfo } from "@/api/client";
 import { VoteCards } from "@/components/vote/vote-cards";
-import { Avatar, MantineColor, Tabs, Text } from "@mantine/core";
+import { Avatar, MantineColor, ScrollArea, Tabs, Text } from "@mantine/core";
 import { Dispatch, SetStateAction } from "react";
 
 export function VoteTabs({ players, value, setValue }: VoteTabsProp) {
@@ -32,7 +32,11 @@ export function VoteTabs({ players, value, setValue }: VoteTabsProp) {
     };
 
     return (
-        <Tabs variant="pills" defaultValue={players[0]?.name || "default"}>
+        <Tabs
+            data-autofocus
+            variant="pills"
+            defaultValue={players[0]?.name || "default"}
+        >
             <Tabs.List grow>
                 {players.map((player) => (
                     <Tabs.Tab
@@ -47,7 +51,13 @@ export function VoteTabs({ players, value, setValue }: VoteTabsProp) {
             </Tabs.List>
 
             {players.map((player) => (
-                <Tabs.Panel key={player.id} value={player.name} p={"xs"}>
+                <Tabs.Panel
+                    key={player.id}
+                    value={player.name}
+                    p={"sm"}
+                    component={ScrollArea}
+                    h={285}
+                >
                     <VoteCards
                         value={value}
                         setValue={setValue}

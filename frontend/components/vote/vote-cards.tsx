@@ -11,7 +11,7 @@ import {
 } from "@mantine/core";
 import { Dispatch, SetStateAction } from "react";
 
-import voteClasses from "@/styles/voteCard.module.css";
+import voteClasses from "@/styles/vote-card.module.css";
 import cx from "clsx";
 
 type VoteCardProp = {
@@ -54,7 +54,7 @@ export function VoteCards({ player, value, setValue, color }: VoteCardProp) {
                     <Checkbox.Indicator color={`${color}.5`} />
                     <Stack gap="xs">
                         <Text fw={500}>{application.name}</Text>
-                        <Text size="sm" c="dimmed">
+                        <Text size="sm" c="dimmed" lineClamp={1}>
                             {application.application}
                         </Text>
                     </Stack>
