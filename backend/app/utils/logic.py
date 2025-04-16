@@ -9,10 +9,11 @@ from fastapi import HTTPException, Path, status
 from sqlmodel import Session, and_, exists, not_, select
 
 from app.models.barrier import BarrierRecord, BarrierTech
-from app.models.match import Match, MatchPlayerLink, Vote
+from app.models.match import Match, MatchPlayerLink
 from app.models.user import User
 from app.utils.config import UserException
 from app.utils.dependencies import atp, session
+from app.models.vote import Vote
 
 from ..models.colony import Colony
 from ..models.player import Player
@@ -83,7 +84,7 @@ def get_players_not_in_part(colony_id: int, part: int, session: Session):
     # Subquery to get player IDs who have fought in the specified part
     part_matches_subquery = (
         select(MatchPlayerLink.player_id)
-        .join(Match, MatchPlayerLink.match_id == Match.id) # type: ignore
+        .join(Match, MatchPlayerLink.match_id == Match.id)  # type: ignore
         .where(Match.id == part)
     ).subquery()
 
@@ -91,7 +92,7 @@ def get_players_not_in_part(colony_id: int, part: int, session: Session):
 
     # Query to get players in the specified colony who haven't fought in the part
     players_not_in_part_query = select(Player).where(
-        and_(Player.colony_id == colony_id, not_(Player.id.in_(part_matches_select))) # type: ignore
+        and_(Player.colony_id == colony_id, not_(Player.id.in_(part_matches_select)))  # type: ignore
     )
 
     players_not_in_part = session.exec(players_not_in_part_query).all()
@@ -104,7 +105,7 @@ def select_players_fought_in_part(part: int):
     returns a select statement"""
     subquery = (
         select(MatchPlayerLink.player_id)
-        .join(Match, MatchPlayerLink.match_id == Match.id) # type: ignore
+        .join(Match, MatchPlayerLink.match_id == Match.id)  # type: ignore
         .where(Match.part == part)
     ).subquery(name=f"matches_in_part_{part}")
     # Convert the subquery into a select() construct for use in the IN clause
@@ -161,7 +162,7 @@ def points_required_for_upgrade(grade: Player.Grade):
 def get_last_created_match(session: session):
     "Get the last created Match, according to begin date. None if no Match exists"
     last_match = session.exec(
-        select(Match).order_by(Match.begin.desc()).limit(1) # type: ignore
+        select(Match).order_by(Match.begin.desc()).limit(1)  # type: ignore
     ).first()
     return last_match
 
@@ -178,14 +179,16 @@ def create_new_match(session: session, part: int, atp: atp):
         # Randomly select 2 players from the colony for the match
         players = random_players_for_match(session, players_not_in_part, colony_id)
         # create match
-        begin = datetime.now(timezone.utc) + atp.delay_begin_match  # match begins in timedelta
+        begin = (
+            datetime.now(timezone.utc) + atp.delay_begin_match
+        )  # match begins in timedelta
         end = begin + atp.match_duration  # match ends in timedelta
         new_match = Match(
             begin=begin, end=end, part=part, colony_id=colony_id, players=players
         )
         return new_match
     else:
-        detail = f"No colony with players who haven't fought in part {part}. Begin/Try part {part+1}. Else no player yet..."
+        detail = f"No colony with players who haven't fought in part {part}. Begin/Try part {part + 1}. Else no player yet..."
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail=detail)
 
 
