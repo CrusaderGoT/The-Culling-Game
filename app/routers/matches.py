@@ -33,9 +33,10 @@ from ..auth.dependencies import active_user, admin_user, oauth2_scheme
 from ..models.admin import Permission
 from ..models.barrier import BarrierTech, BarrierTechInfo
 from ..models.base import ModelName
-from ..models.match import CastVote, ClientVoteInfo, Match, MatchInfo, Vote
+from ..models.match import Match, MatchInfo
 from ..models.player import CTApp, CursedTechnique, Player
 from ..models.user import User
+from ..models.vote import CastVote, ClientVoteInfo, Vote
 from ..utils.config import Tag, UserException
 from ..utils.dependencies import atp, session
 
