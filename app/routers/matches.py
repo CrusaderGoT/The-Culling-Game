@@ -1,15 +1,7 @@
 """module for the match routers"""
 
-from datetime import datetime
 from typing import Annotated
 
-from app.utils.barrier import (
-    activate_domain,
-    activate_simple_domain,
-    conditions_for_barrier_tech,
-    deactivate_domain,
-    deactivate_simple_domain,
-)
 from app.utils.match import (
     assign_match_winner,
     create_new_match,
@@ -33,7 +25,6 @@ from sqlmodel import select
 
 from ..auth.dependencies import active_user, admin_user, oauth2_scheme
 from ..models.admin import Permission
-from ..models.barrier import BarrierTech, BarrierTechInfo
 from ..models.base import ModelName
 from ..models.match import Match, MatchInfo
 from ..models.player import CTApp, CursedTechnique, Player
@@ -240,174 +231,6 @@ def vote(
             raise HTTPException(status.HTTP_423_LOCKED, detail="match has ended")
     else:  # match doesn't exist
         raise HTTPException(status.HTTP_404_NOT_FOUND, "match doesn't exist")
-
-
-@router.post("/activate/domain/{player_id}", response_model=BarrierTechInfo)
-def domain_expansion(
-    player_id: Annotated[int, Path()],
-    match_id: Annotated[int, Query()],
-    current_user: active_user,
-    session: session,
-    background: BackgroundTasks,
-    atp: atp,
-) -> BarrierTech:
-    """Activates the domain of a player in an ongoing match.\n
-    Buffs the vote to x4 per vote.\n
-    Weakend by simple domain"""
-    # first get the match, check if it is ongoing
-    match = session.get(Match, match_id)
-    player = session.get(Player, player_id)
-
-    # get the condition necessary for a BT
-    barrier_tech, barrier_record, match, _ = conditions_for_barrier_tech(
-        player=player,
-        match=match,
-        player_id=player_id,
-        match_id=match_id,
-        current_user=current_user,
-        session=session,
-    )
-
-    if (
-        barrier_record is not None
-        and (count := barrier_record.domain_counter) >= atp.limit_domain_expansion
-    ):
-        # check if they have reach limit for domain expansion in a match
-        if (
-            (end_time := barrier_tech.de_end_time) is not None
-            and end_time <= datetime.now()
-            or barrier_tech.domain_expansion is True
-        ):  # should have ended, but backgroud task failed
-            # deactivate domain
-            deactivate_domain(barrier_tech, session)
-        raise HTTPException(
-            status.HTTP_423_LOCKED,
-            f"domain can only be activated {count} times per match",
-        )
-
-    elif (
-        end_time := barrier_tech.de_end_time
-    ) and barrier_tech.domain_expansion is True:
-        # has a barrier tech; check if domain is currently active
-        # modify to accout for situations where one of them is True-ish/
-        # also if de end time has passed, that means that domain should have ended but the backgroud task failed
-        if end_time <= datetime.now():  # should have ended, but backgroud task failed
-            barrier_tech = activate_domain(
-                barrier_tech, barrier_record, match, session, atp
-            )
-            # schedule background task for deactivation
-            background.add_task(deactivate_domain, barrier_tech, session)
-            return barrier_tech
-        else:  # active
-            raise HTTPException(
-                status.HTTP_409_CONFLICT,
-                f"Domain is already active, deactivates in {
-                    round(
-                        (barrier_tech.de_end_time - datetime.now()).total_seconds(), 1
-                    )
-                } seconds.",
-            )
-
-    else:  # no domain activated or no deactivation time
-        barrier_tech = activate_domain(
-            barrier_tech, barrier_record, match, session, atp
-        )
-        # schedule background task for deactivation
-        background.add_task(deactivate_domain, barrier_tech, session)
-        return barrier_tech
-
-
-@router.post("/activate/simple/{player_id}", response_model=BarrierTechInfo)
-def simple_domain(
-    player_id: Annotated[int, Path()],
-    match_id: Annotated[int, Query()],
-    current_user: active_user,
-    session: session,
-    background: BackgroundTasks,
-    atp: atp,
-) -> BarrierTech:
-    """
-    \nActivates the simple domain effect for a player during an ongoing match. The simple domain interaction
-    modifies the opponent's capabilities based on their current domain status:
-        - If the opponent's domain expansion is inactive, it halves the effect of their vote per action.
-        - If the domain expansion is active, it weakens its effect.
-    \nParameters:
-            player_id (int): Unique identifier for the player whose simple domain is being activated.
-            match_id (int): The match identifier provided as a query parameter.
-            current_user (active_user): The currently authenticated user executing the action.
-            session (session): Database session for transactional operations and data retrieval.
-            background (BackgroundTasks): Background task manager to schedule asynchronous deactivation.
-            atp (atp): Configuration containing limitations, including limits on the number of activations
-                                 per match for the simple domain.
-    \nReturns:
-            BarrierTech: An updated BarrierTech object reflecting the current state and timing details of
-                                     the simple domain effect.
-    \nRaises:
-            HTTPException:
-                    - If the player has already reached the activation limit for the simple domain in the match.
-                    - If the simple domain is already active and the deactivation time has not passed.
-    \nNotes:
-            This function checks relevant conditions before activating the simple domain, including limits
-            and current activation status. When appropriate, it schedules a background task to automatically
-            deactivate the effect after its duration has elapsed.
-    """
-    match_none = session.get(Match, match_id)
-    player = session.get(Player, player_id)
-
-    barrier_tech, barrier_record, match, _ = conditions_for_barrier_tech(
-        player=player,
-        match=match_none,
-        player_id=player_id,
-        match_id=match_id,
-        current_user=current_user,
-        session=session,
-    )
-
-    if (
-        barrier_record is not None
-        and (count := barrier_record.simple_domain_counter) >= atp.limit_simple_domain
-    ):
-        # check if they have reached limit for simple domain in a match
-        if (
-            (end_time := barrier_tech.sd_end_time) is not None
-            and end_time <= datetime.now()
-            or barrier_tech.simple_domain is True
-        ):  # should have ended, but backgroud task failed
-            # deactivate domain
-            deactivate_simple_domain(barrier_tech, session)
-        raise HTTPException(
-            status.HTTP_423_LOCKED,
-            f"simple domain can only be activated {count} times per match",
-        )
-
-    elif (end_time := barrier_tech.sd_end_time) and barrier_tech.simple_domain is True:
-        # has a barrier tech; check if simple domain is currently active
-        # modify to accout for situations where one of them is True-ish/
-        # also if sd end time has passed, that means that simple domain should have ended but the backgroud task failed
-        if end_time <= datetime.now():  # should have ended, but backgroud task failed
-            barrier_tech = activate_simple_domain(
-                barrier_tech, barrier_record, match, session, atp
-            )
-            # schedule background task for deactivation
-            background.add_task(deactivate_simple_domain, barrier_tech, session)
-            return barrier_tech
-        else:  # active
-            raise HTTPException(
-                status.HTTP_409_CONFLICT,
-                f"Simple Domain is already active, deactivates in {
-                    round(
-                        (barrier_tech.sd_end_time - datetime.now()).total_seconds(), 1
-                    )
-                } seconds.",
-            )
-
-    else:  # no simple domain activated or no deactivation time
-        barrier_tech = activate_simple_domain(
-            barrier_tech, barrier_record, match, session, atp
-        )
-        # schedule background task for deactivation
-        background.add_task(deactivate_simple_domain, barrier_tech, session)
-        return barrier_tech
 
 
 @router.delete("/delete/{match_id}")

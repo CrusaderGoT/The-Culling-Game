@@ -1,7 +1,6 @@
 from typing import Annotated
 
 from fastapi import Body, Depends, HTTPException, status
-from fastapi.openapi.docs import get_redoc_html, get_swagger_ui_html
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel import or_, select
 
@@ -9,7 +8,7 @@ from app.api.settings import app
 from app.auth.credentials import PasswordAuth, authenticate_user, create_access_token
 from app.auth.models import Token
 from app.models.user import CreateUser, User, UserInfo
-from app.routers import admins, colonies, matches, players, users
+from app.routers import admins, colonies, matches, players, users, barriers
 from app.utils.config import Tag
 from app.utils.dependencies import session
 
@@ -21,6 +20,7 @@ app.include_router(players.router)
 app.include_router(matches.router)
 app.include_router(admins.router)
 app.include_router(colonies.router)
+app.include_router(barriers.router)
 
 
 # LOGIN
