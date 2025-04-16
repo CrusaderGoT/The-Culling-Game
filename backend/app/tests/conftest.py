@@ -85,7 +85,7 @@ def authenticated_admin_client(test_client) -> tuple[TestClient, dict]:
     test_user = create_test_user(test_client).json()
     code = os.getenv("CODE")
     super_uer_res = test_client.post(f"/admin/superuser/{test_user['id']}", params={"code": code})
-    assert super_uer_res.is_success == True
+    assert super_uer_res.is_success is True
     token = login_test_user(test_client, test_user["id"])
     client = setup_authenticated_client(test_client, token)
     return client, test_user
@@ -100,7 +100,7 @@ def match_players(module_test_client) -> list[tuple[TestClient, dict]]:
     for _ in range(2):
         # Create a new test user
         test_user = create_test_user(module_test_client)
-        assert test_user.is_success == True
+        assert test_user.is_success is True
         token = login_test_user(module_test_client, test_user.json()["id"])
         assert token
 

@@ -4,7 +4,7 @@ from datetime import datetime, timedelta, timezone
 import jwt
 from app.utils.dependencies import session
 from app.api.settings import SECRET_KEY, ALGORITHM
-from app.utils.logic import get_user
+from app.utils.user import get_user
 
 #write your credential auths here.
 

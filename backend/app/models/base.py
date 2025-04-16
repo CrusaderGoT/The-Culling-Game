@@ -301,8 +301,14 @@ class BaseMatch(SQLModel):
     part: int
     """
 
-    begin: datetime = Field(sa_column=Column(TIMESTAMP(timezone=True)))
-    end: datetime = Field(sa_column=Column(TIMESTAMP(timezone=True)))
+    begin: datetime = Field(
+        sa_column=Column(TIMESTAMP(timezone=True)),
+        description="The start time of the match",
+    )
+    end: datetime = Field(
+        sa_column=Column(TIMESTAMP(timezone=True)),
+        description="The end time of the match",
+    )
     part: int
 
 
