@@ -3,20 +3,22 @@
 from datetime import datetime
 from typing import Annotated
 
-from app.utils.logic import (
+from app.utils.barrier import (
     activate_domain,
     activate_simple_domain,
-    assign_match_winner,
     conditions_for_barrier_tech,
-    create_new_match,
     deactivate_domain,
     deactivate_simple_domain,
+)
+from app.utils.match import (
+    assign_match_winner,
+    create_new_match,
     get_last_created_match,
     get_match,
     get_player,
-    get_vote_point,
     ongoing_match,
 )
+from app.utils.vote import get_vote_point
 from fastapi import (
     APIRouter,
     BackgroundTasks,

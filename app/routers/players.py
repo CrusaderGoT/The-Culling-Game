@@ -16,12 +16,14 @@ from app.models.player import (
 )
 from app.utils.config import Tag, UserException
 from app.utils.dependencies import colony, session
-from app.utils.logic import (
+from app.utils.player import (
     calculate_points,
     get_player,
+    points_required_for_upgrade,
+)
+from app.utils.user import (
     get_user,
     id_name_email,
-    points_required_for_upgrade,
 )
 from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, status
 from sqlmodel import or_, select

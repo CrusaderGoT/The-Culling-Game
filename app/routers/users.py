@@ -1,13 +1,12 @@
 from typing import Annotated
 
 from app.models.user import EditUser, User, UserInfo
-from app.utils.logic import get_user, id_name_email
+from app.utils.user import get_user, id_name_email, usernamedb
 from fastapi import APIRouter, Body, Depends, HTTPException, status
 
 from ..auth.dependencies import active_user, oauth2_scheme
 from ..utils.config import Tag, UserException
 from ..utils.dependencies import session
-from ..utils.logic import usernamedb
 
 # USERS
 
@@ -71,7 +70,10 @@ def edit_user(
                 update_usernamedb["usernamedb"] = usernamedb(username)
                 # check if username already exists and is not their own
                 already_used = get_user(session, update_usernamedb["usernamedb"])
-                if already_used is not None and already_used.usernamedb != userdb.usernamedb:
+                if (
+                    already_used is not None
+                    and already_used.usernamedb != userdb.usernamedb
+                ):
                     err_msg = f"'{username}' already in use."
                     raise UserException(userdb, status.HTTP_406_NOT_ACCEPTABLE, err_msg)
             # check if email was changed, and if it already exist and is not their own

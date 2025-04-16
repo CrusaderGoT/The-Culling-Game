@@ -1,18 +1,19 @@
-from sqlmodel import or_, select
-from app.api.settings import app, sio
-from fastapi import Body, Depends, status, HTTPException
-from app.models.user import CreateUser, User, UserInfo
-from app.utils.dependencies import session
 from typing import Annotated
+
+from fastapi import Body, Depends, HTTPException, status
+from fastapi.openapi.docs import get_redoc_html, get_swagger_ui_html
+from fastapi.security import OAuth2PasswordRequestForm
+from sqlmodel import or_, select
+
+from app.api.settings import app
 from app.auth.credentials import PasswordAuth, authenticate_user, create_access_token
 from app.auth.models import Token
+from app.models.user import CreateUser, User, UserInfo
+from app.routers import admins, colonies, matches, players, users
 from app.utils.config import Tag
-from fastapi.security import OAuth2PasswordRequestForm
-from app.routers import admins, matches, players, users, colonies
-from ..utils.logic import usernamedb
+from app.utils.dependencies import session
 
-from fastapi.openapi.docs import get_swagger_ui_html, get_redoc_html
-
+from ..utils.user import usernamedb
 
 # ROUTERS
 app.include_router(users.router)
@@ -84,7 +85,7 @@ def create_user(
             hashed_pw = pw_auth.hash_password(user.password)
             update = {
                 "password": hashed_pw,  # store hashed password
-                "usernamedb": l_username,  # strore the usernamedb in lowercase
+                "usernamedb": l_username,  # store the usernamedb in lowercase
             }
             new_user_db = User.model_validate(user, update=update)
             session.add(new_user_db)
@@ -94,21 +95,3 @@ def create_user(
         else:
             err_msg = "passwords do not match"
             raise HTTPException(status.HTTP_412_PRECONDITION_FAILED, detail=err_msg)
-
-
-@app.get("/docs", include_in_schema=False)
-def overridden_swagger():
-    return get_swagger_ui_html(
-        openapi_url="/openapi.json",
-        title="The Culling Games",
-        swagger_favicon_url="C:/Users/DELL/Documents/my progamming folder/Projects/CG/backend/app/assests/images/Kogane.png",
-    )
-
-
-@app.get("/redoc", include_in_schema=False)
-def overridden_redoc():
-    return get_redoc_html(
-        openapi_url="/openapi.json",
-        title="The Culling Games",
-        redoc_favicon_url="/backend/app/assests/images/Kogane.png",
-    )
