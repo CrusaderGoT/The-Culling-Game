@@ -51,10 +51,10 @@ class Permission(BasePermission, table=True):
 
 
 # Model for client side
-class CreatePermission(BasePermission):
-    "for creating a permission; requires a model name, and a permission level"
+class PermissionRequest(BasePermission):
+    "Model for collecting A Permission request"
 
-    level: set[BasePermission.PermissionLevel]
+    levels: set[BasePermission.PermissionLevel]
 
 
 class AdminInfo(BaseAdminInfo):

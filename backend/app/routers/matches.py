@@ -55,6 +55,7 @@ async def create_match(
         .where(Permission.model == ModelName.match)  # type: ignore
         .where(Permission.level == Permission.PermissionLevel.CREATE)
     ).first()
+    
     if permission is not None:
         # check if admin user has permission
         if permission in admin.permissions or admin.is_superuser:

@@ -83,11 +83,11 @@ def authenticated_test_client(test_client) -> tuple[TestClient, dict]:
 def authenticated_admin_client(test_client) -> tuple[TestClient, dict]:
     'an aunthenticated admin client, that commits'
     test_user = create_test_user(test_client).json()
-    code = os.getenv("CODE")
-    super_uer_res = test_client.post(f"/admin/superuser/{test_user['id']}", params={"code": code})
-    assert super_uer_res.is_success is True
     token = login_test_user(test_client, test_user["id"])
     client = setup_authenticated_client(test_client, token)
+    code = os.getenv("CODE")
+    super_user_res = test_client.post(f"/admin/superuser/{test_user['id']}", params={"code": code})
+    assert super_user_res.is_success is True
     return client, test_user
 
 @pytest.fixture(scope="module")

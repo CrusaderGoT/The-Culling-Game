@@ -1,6 +1,11 @@
 from typing import Annotated
 
 from fastapi import Body, Depends, HTTPException, status
+from fastapi.openapi.docs import (
+    get_redoc_html,
+    get_swagger_ui_html,
+    get_swagger_ui_oauth2_redirect_html,
+)
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel import or_, select
 
@@ -8,19 +13,19 @@ from app.api.settings import app
 from app.auth.credentials import PasswordAuth, authenticate_user, create_access_token
 from app.auth.models import Token
 from app.models.user import CreateUser, User, UserInfo
-from app.routers import admins, colonies, matches, players, users, barriers
+from app.routers import admins, barriers, colonies, matches, players, users
 from app.utils.config import Tag
 from app.utils.dependencies import session
-
-from ..utils.user import usernamedb
+from app.utils.user import usernamedb
 
 # ROUTERS
 app.include_router(users.router)
 app.include_router(players.router)
+app.include_router(barriers.router)
+app.include_router(colonies.router)
 app.include_router(matches.router)
 app.include_router(admins.router)
-app.include_router(colonies.router)
-app.include_router(barriers.router)
+app.include_router(admins.superuser_router)
 
 
 # LOGIN
@@ -95,3 +100,20 @@ def create_user(
         else:
             err_msg = "passwords do not match"
             raise HTTPException(status.HTTP_412_PRECONDITION_FAILED, detail=err_msg)
+
+
+@app.get("/docs", include_in_schema=False)
+async def custom_swagger_ui_html():
+    return get_swagger_ui_html(
+        openapi_url=app.openapi_url,  # type: ignore
+        title=f"{app.title} - Swagger UI",
+        oauth2_redirect_url=app.swagger_ui_oauth2_redirect_url,
+        swagger_js_url="https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js",
+        swagger_css_url="https://unpkg.com/swagger-ui-dist@5/swagger-ui.css",
+        swagger_favicon_url="/static/images/Kogane.png",
+    )
+
+
+@app.get(app.swagger_ui_oauth2_redirect_url, include_in_schema=False)  # type: ignore
+async def swagger_ui_redirect():
+    return get_swagger_ui_oauth2_redirect_html()

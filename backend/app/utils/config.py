@@ -9,6 +9,7 @@ from fastapi import Request, status
 from fastapi.responses import JSONResponse
 
 from app.api.settings import app
+from app.models.admin import AdminInfo, AdminUser
 from app.models.user import User, UserInfo
 
 # configurations goes here
@@ -22,24 +23,40 @@ class UserException(Exception):
     def __init__(
         self,
         user: User,
-        code: int = status.HTTP_406_NOT_ACCEPTABLE,
-        detail: str | dict = {"msg": "An Error Occured with this User"},
+        code: int = status.HTTP_400_BAD_REQUEST,
+        detail: str | dict = {"detail": "An Error Occured with this User"},
         headers: dict[str, str] | None = None,
     ) -> None:
         self.user = UserInfo.model_validate(user)
-        self.err_msg = detail
+        self.detail = detail
         self.code = code
+        self.headers = headers
 
 
 @app.exception_handler(UserException)
 async def user_exception_handler(request: Request, exc: UserException):
-    return JSONResponse(status_code=exc.code, content=exc.err_msg)
+    return JSONResponse(status_code=exc.code, content=exc.detail)
 
 
-class PlayerException(Exception):
+class AdminException(Exception):
     """custom player exception"""
 
-    pass
+    def __init__(
+        self,
+        admin: AdminUser,
+        code: int = status.HTTP_400_BAD_REQUEST,
+        detail: str | dict = {"detail": "An Error Occured with this Admin"},
+        headers: dict[str, str] | None = None,
+    ) -> None:
+        self.user = AdminInfo.model_validate(admin)
+        self.detail = detail
+        self.code = code
+        self.headers = headers
+
+
+@app.exception_handler(AdminException)
+async def admin_exception_handler(request: Request, exc: UserException):
+    return JSONResponse(status_code=exc.code, content=exc.detail)
 
 
 # 2. TAGS for openapi, used to group path operators
