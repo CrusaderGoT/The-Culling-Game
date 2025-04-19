@@ -3,29 +3,36 @@
 import os
 from typing import Annotated
 
+from app.auth.dependencies import admin_user, get_admin_user, oauth2_scheme
+from app.models.admin import (
+    AdminInfo,
+    AdminUser,
+    Permission,
+    PermissionInfo,
+    PermissionRequest,
+)
+from app.models.base import ModelName
+from app.models.user import EditUser, UserInfo
+from app.utils.admin import admin_grant_permissions, superuser_grant_permissions
+from app.utils.config import AdminException, Tag, UserException
+from app.utils.dependencies import session
+from app.utils.user import edit_user_helper, get_user, id_name_email
 from dotenv import load_dotenv
 from fastapi import APIRouter, Body, Depends, HTTPException, Query, status
 from sqlmodel import select
 
-from ..auth.dependencies import admin_user
-from ..models.admin import (
-    AdminInfo,
-    AdminUser,
-    CreatePermission,
-    Permission,
-    PermissionInfo,
-)
-from ..utils.config import Tag, UserException
-from ..utils.dependencies import session
-from ..utils.user import get_user, id_name_email
-
-load_dotenv()
+load_dotenv()  # load for env used in this modules
 
 # Create your API routes here
 router = APIRouter(
     prefix="/admin",
     tags=[Tag.admin],
-    # dependencies=[Depends(admin_user)]
+    dependencies=[Depends(get_admin_user), Depends(oauth2_scheme)],
+)
+superuser_router = APIRouter(
+    prefix="/admin",
+    tags=[Tag.admin],
+    dependencies=[Depends(oauth2_scheme)],
 )
 
 
@@ -35,7 +42,7 @@ def create_admin(
     session: session,  # The database session
     p_admin: admin_user,  # The currently logged-in admin user (validated by dependencies)
     permissions: Annotated[
-        list[CreatePermission], Body()
+        list[PermissionRequest], Body()
     ],  # List of permissions to assign to the new admin
 ):
     """Creates an admin user with specified permissions."""
@@ -50,130 +57,74 @@ def create_admin(
             f"User '{user}' you want to make an admin doesn't exist.",
         )
 
-    # Prevent creating admin privileges for oneself
+    # Prevent creating admin privileges for oneself again
     if userdb == p_admin.user:
-        raise UserException(
-            p_admin.user,
+        raise AdminException(
+            p_admin,
             status.HTTP_409_CONFLICT,
             "Cannot make yourself an admin again.",
         )
 
     # Check if the user is already an admin
     if userdb.admin is not None:
-        raise UserException(
-            userdb,
+        raise AdminException(
+            userdb.admin,
             status.HTTP_417_EXPECTATION_FAILED,
             f"{userdb.username} is already an admin. Edit their admin profile instead.",
         )
 
-    # Initialize an empty list to hold the new permissions for the user
-    new_permissions: list[Permission] = []
-
     # Superuser logic: unrestricted permission assignment
     if p_admin.is_superuser:
-        # Superusers can assign any permissions without restrictions
-        for permission in permissions:
-            for level in permission.level:
-                # Try to find an existing permission in the database
-                try:
-                    stmt = select(Permission).where(
-                        Permission.model == permission.model, Permission.level == level
-                    )
-                    perm = session.exec(stmt).one()
-                except Exception:  # If the permission does not exist, create a new one
-                    name = f"can_perform_{level.name}_{level.value}_operations_on_{permission.model.name}"
-                    perm = Permission(model=permission.model, level=level, name=name)
+        new_permissions = superuser_grant_permissions(
+            permissions=permissions, session=session
+        )
+    # Regular admin logic: restricted permission assignment based on the current admin's permissions
+    else:
+        new_permissions = admin_grant_permissions(
+            admin=p_admin, permissions=permissions, session=session
+        )
 
-                # Avoid duplicate permissions
-                if perm.id:  # pemission already exist
-                    pass
-                else:
-                    new_permissions.append(perm)
+    if not new_permissions:
+        # Raise an error if no valid permissions were found
+        err_msg = (
+            f"{userdb.username}'s permissions are empty. "
+            f"All permissions sent cannot be granted by you '{p_admin.user.username}'."
+        )
+        raise AdminException(p_admin, status.HTTP_406_NOT_ACCEPTABLE, detail=err_msg)
 
-        # Once all permissions are processed, create the new admin user
-        new_admin = AdminUser(permissions=new_permissions, user=userdb)
-        session.add(new_admin)
-        session.commit()
-        session.refresh(new_admin)
-        return new_admin
-
-    # Regular admin logic: restricted permission assignment based on the current admin's level
-    elif p_admin:
-        # Filter permissions that the current admin can assign to others
-        for permission in permissions:
-            for level in permission.level:
-                # Check if the current admin has the permission to assign this specific permission level
-                stmt = (
-                    select(Permission)
-                    .join(AdminUser, AdminUser.id == p_admin.id)
-                    .where(Permission.model == permission.model)
-                    .where(Permission.level == level)
-                )
-
-                # Add only the permissions that the current admin is authorized to assign
-                perm = session.exec(stmt).first()
-
-                if perm and perm.id not in [p.id for p in new_permissions]:
-                    new_permissions.append(perm)
-
-        # After filtering, check if there are valid permissions to assign
-        if new_permissions:
-            # Create the new admin with the filtered permissions
-            new_admin = AdminUser(permissions=new_permissions, user=userdb)
-            session.add(new_admin)
-            session.commit()
-            session.refresh(new_admin)
-            return new_admin
-        else:
-            # Raise an error if no valid permissions were found
-            err_msg = (
-                f"{userdb.username}'s permissions are empty. "
-                f"All permissions sent cannot be granted by you '{p_admin.user.username}'."
-            )
-            raise UserException(
-                p_admin.user, status.HTTP_406_NOT_ACCEPTABLE, detail=err_msg
-            )
-
-    # Handle any unknown errors (this block is unlikely to run but serves as a safeguard)
-    raise HTTPException(
-        status.HTTP_400_BAD_REQUEST,
-        "An unknown error occurred while processing the request.",
-    )
+    # Once all permissions are processed, create the new admin user
+    # Create the new admin with the filtered permissions
+    new_admin = AdminUser(permissions=new_permissions, user=userdb)
+    session.add(new_admin)
+    session.commit()
+    session.refresh(new_admin)
+    return new_admin
 
 
-@router.post("/new/permission", response_model=list[PermissionInfo])
+@router.post("/new-permission", response_model=list[PermissionInfo])
 def new_permission(
     admin: admin_user,
-    permissions: Annotated[list[CreatePermission], Body()],
+    permissions: Annotated[list[PermissionRequest], Body()],
     session: session,
 ):
-    "for creating new permissions; only doable by a super user"
+    "for creating new permissions; only doable by a superuser"
     # check if the user is a super user
     if not admin.is_superuser:
-        raise UserException(
-            admin.user,
+        raise AdminException(
+            admin,
             status.HTTP_401_UNAUTHORIZED,
             "only super users can create permissions",
         )
-    # get any possible already existing permission
-    new_permissions: list[Permission] = list()
-    for permission in permissions:
-        for level in permission.level:
-            # Try to find an existing permission in the database
-            try:
-                stmt = select(Permission).where(
-                    Permission.model == permission.model, Permission.level == level
-                )
-                perm = session.exec(stmt).one()
-            except Exception:  # If the permission does not exist, create a new one
-                name = f"can_perform_{level.name}_{level.value}_operations_on_{permission.model.name}"
-                perm = Permission(model=permission.model, level=level, name=name)
 
-            # Avoid duplicate permissions
-            if perm.id:  # pemission already exist
-                pass
-            else:
-                new_permissions.append(perm)
+    # get or initialized permissions (i.e, both existing and not-existing permissions)
+    grant_permissions = superuser_grant_permissions(
+        permissions=permissions, session=session
+    )
+
+    # 🔑 Avoid duplicate permissions
+    # filter out existing pemissions (they will have an ID)
+    new_permissions = [p for p in grant_permissions if p.id is None]
+
     # check atleast one new perm exist
     if not new_permissions:
         raise HTTPException(
@@ -188,7 +139,64 @@ def new_permission(
     return new_permissions
 
 
-@router.post("/superuser/{user}")
+@router.patch("/grant-permisssion/{user}", response_model=AdminInfo)
+def grant_permission(
+    permissions: Annotated[
+        list[PermissionRequest], Body()
+    ],  # permissions to be granted (permissions)
+    p_admin: admin_user,  # admin user who wants to grant the permissions
+    user: id_name_email,  # user -> admin to be granted permissions
+    session: session,
+):
+    # process permissions
+    # it is done this way to keep the dot notation of GrantPermission
+
+    # check if user exist and is an admin
+    userdb = get_user(session=session, user_name_id_email=user)
+
+    if not userdb:
+        raise HTTPException(
+            status.HTTP_404_NOT_FOUND, f"User {id_name_email} not found"
+        )
+
+    if not userdb.admin:
+        raise UserException(
+            user=userdb,
+            code=status.HTTP_428_PRECONDITION_REQUIRED,
+            detail=f"'{userdb.username}' is not an Admin. Make them an Admin first",
+        )
+
+    # check if p_admin is a super user
+    if p_admin.is_superuser:  # unrestricted edit (mainly on permissions)
+        approved_permissions = superuser_grant_permissions(
+            permissions=permissions, session=session
+        )
+        print(approved_permissions, permissions)
+
+    # else p_admin is just an admin (admin_user dependency makes sure they are admin)
+    else:
+        # restricted edit (mainly on permissions)
+        approved_permissions = admin_grant_permissions(
+            admin=p_admin, permissions=permissions, session=session
+        )
+
+    # check if approved permissions is empty
+    if not approved_permissions:
+        raise AdminException(
+            admin=p_admin,
+            code=status.HTTP_411_LENGTH_REQUIRED,
+            detail=f"You '{p_admin.user.username}' cannot grant any of the permission(s) requested; length -> {len(approved_permissions)}",
+        )
+
+    # assign approved permissions to the user/admin
+    userdb.admin.permissions.extend(approved_permissions)
+    session.add(userdb)
+    session.commit()
+    session.refresh(userdb)
+    return userdb.admin
+
+
+@superuser_router.post("/superuser/{user}")
 def demo_superuser(
     user: id_name_email, code: Annotated[str, Query(default=...)], session: session
 ):
@@ -204,3 +212,54 @@ def demo_superuser(
     session.commit()
     session.refresh(admin_user)
     return admin_user
+
+
+# ADMIN CRUD OPERATIONS ON USERS
+@router.patch(
+    "/edit-user/{user}",
+    response_model=UserInfo,
+    response_description="Edited User",
+    summary="Edit a user.",
+    status_code=status.HTTP_200_OK,
+)
+def admin_edit_user(
+    user: id_name_email,
+    admin: admin_user,
+    edit_user: Annotated[EditUser, Body()],
+    session: session,
+):
+    # check if admin user has appropriate permission
+    permission = session.exec(
+        select(Permission)
+        .join(AdminUser, Permission.admins.any(id=admin.id))
+        .where(Permission.admins.any(id=admin.id))
+        .where(Permission.model == ModelName.user)
+        .where(Permission.level == Permission.PermissionLevel.UPDATE)
+    ).first()
+
+    if not permission:
+        raise AdminException(
+            admin=admin,
+            code=status.HTTP_401_UNAUTHORIZED,
+            detail=f"You '{admin.user.username}' do not have the permission for this action",
+        )
+
+    # get the user to edit
+    user_to_edit = get_user(session=session, user_name_id_email=user)
+
+    if not user_to_edit:  # raise http exception if no user
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"User {id_name_email} not found",
+        )
+
+    # update user
+    edited_user = edit_user_helper(
+        edit_user=edit_user, userdb=user_to_edit, session=session
+    )
+
+    # commit to save update
+    session.add(edited_user)
+    session.commit()
+    session.refresh(edited_user)
+    return edited_user

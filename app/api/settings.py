@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.routing import APIRoute
+from fastapi.staticfiles import StaticFiles
 
 # load .env
 load_dotenv()
@@ -20,8 +21,8 @@ app = FastAPI(
     title="The Culling Games API",
     description="",
     generate_unique_id_function=custom_generate_unique_id,
-    docs_url=None,
-    redoc_url=None,
+    #docs_url=None,
+    debug=True,
 )
 """
 The Global FastAPI app. To allow for use in multiple files.\n
@@ -55,7 +56,10 @@ ws_app = socketio.ASGIApp(sio)
 """The Websocket App, to be mounted on the main FastAI app."""
 
 # Mount the Socket.IO app to a specific route
-app.mount("/socket.io", ws_app)
+app.mount("/ws", ws_app)
+
+# Mount static files
+app.mount("/static", StaticFiles(directory="app/static"), name="staic")
 
 # MIDDLEWARE
 origins = [
