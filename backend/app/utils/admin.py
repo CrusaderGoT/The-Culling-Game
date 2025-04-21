@@ -1,10 +1,13 @@
+from fastapi import status
 from sqlmodel import select
 
+from app.auth.dependencies import admin_user
 from app.models.admin import AdminUser, Permission, PermissionRequest
+from app.utils.config import AdminException
 from app.utils.dependencies import session
 
 
-def superuser_grant_permissions(permissions: list[PermissionRequest], session: session):
+def superuser_allow_permissions(permissions: list[PermissionRequest], session: session):
     """
     Abstract helper for granting permissions as a **Superuser**.\n
     ## ⚠ No Check For Authorization Is Done In This Function
@@ -34,7 +37,7 @@ def superuser_grant_permissions(permissions: list[PermissionRequest], session: s
     return new_permissions
 
 
-def admin_grant_permissions(
+def admin_allow_permissions(
     admin: AdminUser, permissions: list[PermissionRequest], session: session
 ):
     """
@@ -54,7 +57,7 @@ def admin_grant_permissions(
             # Check if the current admin has the permission to assign this specific permission level
             stmt = (
                 select(Permission)
-                .join(AdminUser, AdminUser.id == admin.id)
+                .where(Permission.admins.any(id=admin.id))
                 .where(Permission.model == permission.model)
                 .where(Permission.level == level)
             )
@@ -66,3 +69,31 @@ def admin_grant_permissions(
                 new_permissions.append(perm)
 
     return new_permissions
+
+
+def check_if_admin_has_crud_permission(
+    session: session,
+    admin: AdminUser,
+    model_name: str,
+    permission_level: Permission.PermissionLevel,
+):
+    # check if admin user has appropriate permission
+    permission = session.exec(
+        select(Permission)
+        .where(Permission.admins.any(id=admin.id))
+        .where(Permission.model == model_name)
+        .where(Permission.level == permission_level)
+    ).first()
+
+    if permission:
+        return True
+
+    return False
+
+
+def ADMIN_UNAUTHORIZED_EXCEPTION(admin: admin_user):
+    return AdminException(
+        admin=admin,
+        code=status.HTTP_401_UNAUTHORIZED,
+        detail=f"You '{admin.user.username}' do not have the permission for this action",
+    )

@@ -268,6 +268,7 @@ class BasePermissionInfo(BasePermission):
     \n`name: str = Field(description="Permission name")`
     \n`level: BasePermission.PermissionLevel`"""
 
+    id: int
     name: str = Field(description="Permission name")
     level: BasePermission.PermissionLevel
 

@@ -67,6 +67,6 @@ class Tag(str, Enum):
     player = "players"
     auth = "auth"
     match = "matches"
-    admin = "admin"
+    admin = "admins"
     colony = "colonies"
     barrier = "barriers"
