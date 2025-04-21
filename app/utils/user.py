@@ -5,8 +5,8 @@ from fastapi import Path, status
 from sqlmodel import select
 
 from app.models.user import EditUser, User
-from app.utils.dependencies import session
 from app.utils.config import UserException
+from app.utils.dependencies import session
 
 
 def usernamedb(username: str):
@@ -63,9 +63,10 @@ def edit_user_helper(edit_user: EditUser, userdb: User, session: session) -> Use
     """
     Helper for editing a user.\n
     Takes the user data to edit, and the user to edit.
-    And makes neccessary checks().\n
+    And makes neccessary checks(e.g already in-use username).\n
     returns a User with updated info, **NOT YET COMMITTED TO A SESSION**.
     ## Add to a session and commit to save changes.
+    ### It raises an appropriate UserExecption in any checks fail
     """
     # get userdata, excluding unset
     user_data_to_edit = edit_user.model_dump(exclude_unset=True)

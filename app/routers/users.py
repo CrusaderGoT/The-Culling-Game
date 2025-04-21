@@ -1,12 +1,11 @@
 from typing import Annotated
 
+from app.auth.dependencies import active_user, oauth2_scheme
 from app.models.user import EditUser, User, UserInfo
-from app.utils.user import get_user, id_name_email, usernamedb
+from app.utils.config import Tag, UserException
+from app.utils.dependencies import session
+from app.utils.user import edit_user_helper, get_user, id_name_email
 from fastapi import APIRouter, Body, Depends, HTTPException, status
-
-from ..auth.dependencies import active_user, oauth2_scheme
-from ..utils.config import Tag, UserException
-from ..utils.dependencies import session
 
 # USERS
 
@@ -62,30 +61,7 @@ def edit_user(
             err_msg = "User can only edit themself"
             raise UserException(current_user, status.HTTP_401_UNAUTHORIZED, err_msg)
         else:
-            # get userdata, excluding unset
-            edited_user_data = edit_user.model_dump(exclude_unset=True)
-            # check if username was changed and update usernamedb too
-            update_usernamedb = dict()
-            if (username := edited_user_data.get("username")) is not None:
-                update_usernamedb["usernamedb"] = usernamedb(username)
-                # check if username already exists and is not their own
-                already_used = get_user(session, update_usernamedb["usernamedb"])
-                if (
-                    already_used is not None
-                    and already_used.usernamedb != userdb.usernamedb
-                ):
-                    err_msg = f"'{username}' already in use."
-                    raise UserException(userdb, status.HTTP_406_NOT_ACCEPTABLE, err_msg)
-            # check if email was changed, and if it already exist and is not their own
-            if (email := edited_user_data.get("email")) is not None:
-                already_used = get_user(session, email)
-                if already_used is not None and already_used.email != userdb.email:
-                    err_msg = f"'{email}' already in use."
-                    raise UserException(userdb, status.HTTP_406_NOT_ACCEPTABLE, err_msg)
-            # if all conditions have been meet, update the user
-            edited_user = userdb.sqlmodel_update(
-                edited_user_data, update=update_usernamedb
-            )
+            edited_user = edit_user_helper(edit_user, userdb, session)
             session.add(edited_user)
             session.commit()
             session.refresh(edited_user)
