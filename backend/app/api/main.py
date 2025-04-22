@@ -130,7 +130,14 @@ async def chat_html():
 @sio.event
 async def connect(sid, environ):
     print(f"Client connected: {sid}")
-    await sio.emit("message", {"msg": "Welcome!"}, to=sid)
+    await sio.emit("message", {"msg": f"Welcome {sid}!"}, to=sid)
+
+
+# Event: when a client disconnects
+@sio.event
+async def disconnect(sid):
+    print(f"Client disconnected: {sid}")
+    await sio.emit("message", {"msg": f"{sid} left!"})
 
 
 # Event: on receiving a chat message

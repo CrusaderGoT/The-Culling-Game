@@ -1,17 +1,14 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8">
+    <meta charset="utf-8" />
     <title>FastAPI Chat</title>
     <script src="https://cdn.socket.io/4.7.0/socket.io.min.js"></script>
   </head>
   <body>
     <ul id="messages"></ul>
-    <input id="input" autocomplete="off" placeholder="Type a message" /><button
-      onclick="send()"
-    >
-      Send
-    </button>
+    <input id="input" autocomplete="off" placeholder="Type a message" />
+    <button type="submit" onclick="send()">Send</button>
 
     <script>
       const socket = io({ path: "/ws" });
