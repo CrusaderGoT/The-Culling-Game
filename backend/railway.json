@@ -4,6 +4,6 @@
     "builder": "NIXPACKS"
   },
   "deploy": {
-    "startCommand": "fastapi run app/api/main.py --bind \"[::]:$PORT\""
+    "startCommand": "fastapi run app/api/main.py"
   }
 }
