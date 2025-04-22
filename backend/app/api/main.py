@@ -6,10 +6,11 @@ from fastapi.openapi.docs import (
     get_swagger_ui_html,
     get_swagger_ui_oauth2_redirect_html,
 )
+from fastapi.responses import HTMLResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel import or_, select
 
-from app.api.settings import app
+from app.api.settings import app, sio
 from app.auth.credentials import PasswordAuth, authenticate_user, create_access_token
 from app.auth.models import Token
 from app.models.user import CreateUser, User, UserInfo
@@ -117,3 +118,25 @@ async def custom_swagger_ui_html():
 @app.get(app.swagger_ui_oauth2_redirect_url, include_in_schema=False)  # type: ignore
 async def swagger_ui_redirect():
     return get_swagger_ui_oauth2_redirect_html()
+
+
+@app.get("/", response_class=HTMLResponse)
+async def chat_html():
+    with open("./app/api/index.html", "r") as fl:
+        return fl.read()
+
+
+# Event: when a client connects
+@sio.event
+async def connect(sid, environ):
+    print(f"Client connected: {sid}")
+    await sio.emit("message", {"msg": "Welcome!"}, to=sid)
+
+
+# Event: on receiving a chat message
+@sio.event
+async def message(sid, data):
+    msg = data.get("msg")
+    print(f"Message from {sid}: {msg}")
+    # Broadcast to all clients
+    await sio.emit("message", {"msg": msg})
