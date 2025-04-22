@@ -262,5 +262,3 @@ wsproto==1.2.0
     #   simple-websocket
 yarl==1.20.0
     # via aiohttp
-# for railway
-hypercorn
