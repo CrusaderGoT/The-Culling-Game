@@ -16,6 +16,8 @@ from typing import Annotated, Union
 from pydantic import EmailStr, StringConstraints
 from sqlmodel import TIMESTAMP, Column, Field, SQLModel
 
+from ..models.table_enum import ModelName
+
 # Get the base directory of the current script or project
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -229,17 +231,6 @@ class BaseColonyInfo(BaseColony):
     """
 
     id: int
-
-
-def load_table_names():
-    "Load the table names dict from the JSON file"
-    fp = os.path.join(BASE_DIR, "database", "table_names.json")
-    with open(fp, "r") as file:
-        data: dict[str, str] = json.load(file)
-    return data
-
-
-ModelName = Enum("ModelName", load_table_names())
 
 
 class BasePermission(SQLModel):

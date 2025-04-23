@@ -52,10 +52,10 @@ async def create_match(
     # first get the permission for creating match
     permission = session.exec(
         select(Permission)
-        .where(Permission.model == ModelName.match)  # type: ignore
+        .where(Permission.model == ModelName.MATCH)
         .where(Permission.level == Permission.PermissionLevel.CREATE)
     ).first()
-    
+
     if permission is not None:
         # check if admin user has permission
         if permission in admin.permissions or admin.is_superuser:
@@ -270,7 +270,7 @@ async def delete_match(
     # first get the permission for creating match
     permission = session.exec(
         select(Permission)
-        .where(Permission.model == ModelName.match)  # type: ignore
+        .where(Permission.model == ModelName.MATCH)
         .where(Permission.level == Permission.PermissionLevel.DELETE)
     ).first()
     if permission is not None:
