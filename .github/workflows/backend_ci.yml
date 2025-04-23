@@ -12,6 +12,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    env:
+      DB_URL: ${{ secrets.DATABASE_URL }}
+
     defaults:
       run:
         working-directory: backend
