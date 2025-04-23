@@ -5,6 +5,11 @@ on: [push, pull_request]
 jobs:
   build:
     runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: backend
+
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python
@@ -25,7 +30,7 @@ jobs:
         run: uv sync --locked --all-extras --dev
 
       - name: Generate ModelName enum
-        run: python backend/app/scripts/gen_table_enum.py
+        run: python app/scripts/gen_table_enum.py
 
       - name: Run migrations
         run: uv run alembic upgrade head
