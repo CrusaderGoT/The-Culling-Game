@@ -5,7 +5,14 @@ from sqlmodel import Session, and_, not_, select
 
 from app.models.base import MatchPlayerLink
 from app.models.match import Match
-from app.models.player import Player
+from app.models.player import (
+    CTApp,
+    CursedTechnique,
+    EditCT,
+    EditCTApp,
+    EditPlayer,
+    Player,
+)
 from app.utils.dependencies import session
 
 
@@ -92,3 +99,57 @@ def calculate_points(
     else:
         msg = f"not enough points; need {points_to_action}, have {player_points}"
         raise HTTPException(status.HTTP_428_PRECONDITION_REQUIRED, detail=msg)
+
+
+def edit_player_helper(
+    *,
+    playerdb: Player,
+    player: EditPlayer | None,
+    cursed_technique: EditCT | None,
+    applications: list[EditCTApp] | None,
+    session: session,
+):
+    """
+    Helper for editing a Player.\n
+    Takes the Player data to edit, and the Player to edit.
+    And makes neccessary checks(e.g none values).\n
+    returns a Player with updated info, **NOT YET COMMITTED TO A SESSION**.
+    ## Add to a session and commit to save changes.
+    """
+    if player is not None:
+        edit_player_data = player.model_dump(
+            exclude_unset=True,
+            exclude_defaults=True,
+            exclude_none=True,
+            warnings="error",
+        )
+        playerdb.sqlmodel_update(edit_player_data)
+    if cursed_technique is not None:
+        edit_ct_data = cursed_technique.model_dump(
+            exclude_unset=True,
+            exclude_defaults=True,
+            exclude_none=True,
+            warnings="error",
+        )
+        playerdb.cursed_technique.sqlmodel_update(edit_ct_data)
+    if applications is not None:
+        # get the list of ct apps to edit from db
+        # modify to use the same format used in voting, for quicker loops
+        app_numbers = [app.number for app in applications]
+        ctapps = session.exec(
+            select(CTApp)
+            .join(CursedTechnique)
+            .where(CTApp.ct_id == playerdb.cursed_technique.id)
+            .where(CTApp.number.in_(app_numbers))  # type: ignore
+        ).all()
+        for ct_app in ctapps:
+            for edit_ct_app in applications:
+                if edit_ct_app.number == ct_app.number:
+                    ct_app_data = edit_ct_app.model_dump(
+                        exclude_unset=True,
+                        exclude_defaults=True,
+                        exclude_none=True,
+                        warnings="error",
+                    )
+                    ct_app.sqlmodel_update(ct_app_data)
+    return playerdb
