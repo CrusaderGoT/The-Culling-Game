@@ -4,6 +4,7 @@
     "builder": "NIXPACKS"
   },
   "deploy": {
+    "preDeployCommand": ["alembic upgrade head"],
     "startCommand": "fastapi run app/api/main.py"
   }
 }
