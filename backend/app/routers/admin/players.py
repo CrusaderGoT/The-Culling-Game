@@ -43,7 +43,7 @@ def admin_edit_player(
     permission = check_if_admin_has_crud_permission(
         session=session,
         admin=admin,
-        model_name=ModelName.player, 
+        model_name=ModelName.PLAYER, 
         permission_level=BasePermission.PermissionLevel.UPDATE,
     )
 
@@ -86,7 +86,7 @@ def admin_delete_player(player_id: int, session: session, admin: admin_user):
     permission = check_if_admin_has_crud_permission(
         session=session,
         admin=admin,
-        model_name=ModelName.players, 
+        model_name=ModelName.PLAYER, 
         permission_level=BasePermission.PermissionLevel.UPDATE,
     )
 
