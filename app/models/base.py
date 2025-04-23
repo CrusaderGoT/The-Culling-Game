@@ -16,7 +16,7 @@ from typing import Annotated, Union
 from pydantic import EmailStr, StringConstraints
 from sqlmodel import TIMESTAMP, Column, Field, SQLModel
 
-from ..models.table_enum import ModelName
+from ..models.table import ModelName
 
 # Get the base directory of the current script or project
 BASE_DIR = Path(__file__).resolve().parent.parent
