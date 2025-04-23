@@ -20,3 +20,6 @@ jobs:
 
       - name: Run tests
         run: pytest
+
+      - name: Push Backend API to Production
+        run: git subtree push --prefix backend https://github.com/CrusaderGoT/The-Culling-Games-Backend.git principal
