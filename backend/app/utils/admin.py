@@ -10,8 +10,8 @@ from app.utils.dependencies import session
 def superuser_allow_permissions(permissions: list[PermissionRequest], session: session):
     """
     Abstract helper for granting permissions as a **Superuser**.\n
-    ## ⚠ No Check For Authorization Is Done In This Function
-    ## ⚠ Make Sure You Have Already Confirmed The User Is A Superuser Before Use
+    ### ⚠ No Check For Authorization Is Done In This Function.
+    ### ⚠ Make Sure You Have Already Confirmed The User Is A Superuser Before Use.
     This function returns a list of permission.\n
     **It instatiates Any Missing Valid Permission Also**.\n
     Add to session and commit to save.

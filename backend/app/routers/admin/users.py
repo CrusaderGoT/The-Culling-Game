@@ -89,7 +89,6 @@ def admin_delete_user(user: id_name_email, session: session, admin: admin_user):
         )
 
     # delete user
-
     session.delete(user_to_delete)
     session.commit()
     return user_to_delete  # user is already deleted
