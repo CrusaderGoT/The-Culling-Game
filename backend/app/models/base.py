@@ -16,7 +16,9 @@ from typing import Annotated, Union
 from pydantic import EmailStr, StringConstraints
 from sqlmodel import TIMESTAMP, Column, Field, SQLModel
 
-from ..models.table import ModelName # exception importation from auto generated enum class
+from ..models.table import (
+    ModelName,  # exception importation from auto generated enum class
+)
 
 # Get the base directory of the current script or project
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -34,7 +36,7 @@ class MatchPlayerLink(SQLModel, table=True):
     )
 
 
-username_pydantic_regex = Annotated[
+UsernameRegex = Annotated[
     str,
     StringConstraints(strip_whitespace=True, pattern=r"^[A-Za-z][A-Za-z0-9_-]{2,19}$"),
 ]
@@ -55,7 +57,7 @@ class BaseUser(SQLModel):
     `country: str | None = None`
     """
 
-    username: username_pydantic_regex = Field(
+    username: UsernameRegex = Field(
         index=True,
         unique=True,
         description="the username of the user",

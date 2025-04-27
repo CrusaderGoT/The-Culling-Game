@@ -11,8 +11,7 @@ from app.utils.barrier import (
     activate_domain,
     activate_simple_domain,
     conditions_for_barrier_tech,
-    deactivate_domain,
-    deactivate_simple_domain,
+    fix_barrier_deactivation_task_fail,
     schedule_deactivate_domain,
     schedule_deactivate_simple_domain,
 )
@@ -64,11 +63,7 @@ def domain_expansion(
     # then prevent activating domain expansion
     if barrier_tech.simple_domain is True and player.grade >= Player.Grade.SPECIAL:
         # check for pontential deactivate task fails
-        if (end_time := barrier_tech.sd_end_time) is not None and datetime.now(
-            UTC
-        ) >= end_time:  # should have ended, but backgroud task failed
-            # deactivate simple domain
-            deactivate_simple_domain(barrier_tech, session)
+        fix_barrier_deactivation_task_fail(barrier_tech, session)
 
         # simple domain is currently correctly active
         raise PlayerException(
@@ -85,15 +80,8 @@ def domain_expansion(
         and (count := barrier_record.domain_counter) >= atp.limit_domain_expansion
     ):
         # check for pontential deactivate task fails
-        if (
-            (
-                (end_time := barrier_tech.de_end_time) is not None
-                and datetime.now(UTC) >= end_time
-            )
-            or barrier_tech.domain_expansion is True
-        ):  # should have ended, but backgroud task failed
-            # deactivate domain
-            deactivate_domain(barrier_tech, session)
+        fix_barrier_deactivation_task_fail(barrier_tech, session)
+
         raise HTTPException(
             status.HTTP_423_LOCKED,
             f"domain can only be activated {count} times per match",
@@ -183,10 +171,7 @@ def simple_domain(
     # and prevent activating simple domain
     if barrier_tech.domain_expansion is True and player.grade >= Player.Grade.ONE:
         # check for potential DE end task fail
-        if (end_time := barrier_tech.de_end_time) is not None and datetime.now(
-            UTC
-        ) >= end_time:
-            deactivate_domain(barrier_tech, session)
+        fix_barrier_deactivation_task_fail(barrier_tech, session)
 
         raise PlayerException(
             player=player,
@@ -203,16 +188,8 @@ def simple_domain(
         barrier_record is not None
         and (count := barrier_record.simple_domain_counter) >= atp.limit_simple_domain
     ):
-        # limit has been passed
-        # check if their expected properties are correct (endtime = None, simple_domain = False)
-        # correct it if otherwise
-        if (
-            (end_time := barrier_tech.sd_end_time) is not None
-            and datetime.now(UTC) >= end_time
-            or barrier_tech.simple_domain is True
-        ):  # should have ended, but backgroud task failed
-            # deactivate simple domain
-            deactivate_simple_domain(barrier_tech, session)
+        # check for potential DE end task fail and fix
+        fix_barrier_deactivation_task_fail(barrier_tech, session)
 
         # raise limit reach error
         raise HTTPException(

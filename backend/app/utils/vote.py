@@ -18,6 +18,7 @@ def get_vote_point(
     "vote function for getting the vote point of a particular vote"
 
     vote_point = atp.vote_point
+    unchanged_vote_point = atp.vote_point  # for use in adding of technique buff
 
     # 1. limit vote of player with an active binding vow to three, for as long as it is active
     if (
@@ -63,14 +64,16 @@ def get_vote_point(
             and opposing_player_bt.simple_domain is True
         ):
             # players DE effect is reduced by half if so
-            vote_point *= atp.domain_expansion_point / 2
+            vote_point += (atp.domain_expansion_point * unchanged_vote_point) / 2
         else:  # opposing player doesn't have an activated simple domain
-            vote_point *= atp.domain_expansion_point  # increase vote points
+            vote_point += (
+                atp.domain_expansion_point * unchanged_vote_point
+            )  # increase vote points
 
     # 4. check if player 1 has a SD activated
     if player_bt and player_bt.simple_domain is True:
         # add simple domain points
-        vote_point *= atp.simple_domain_point
+        vote_point += atp.simple_domain_point * unchanged_vote_point
 
     # 5. Check if the opposing player has an active simple domain, outside of defending a DE
     if (  # check if opposing player has a barrier tech
@@ -86,7 +89,7 @@ def get_vote_point(
         )
     ):
         # if opponents simple domain is active, reduce vote points
-        vote_point /= atp.simple_domain_point
+        vote_point -= unchanged_vote_point / atp.simple_domain_point
 
     # 6. else no Player 1 BT shenanigans
     else:

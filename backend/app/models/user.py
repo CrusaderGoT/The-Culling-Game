@@ -10,8 +10,14 @@ from typing import TYPE_CHECKING, Annotated, Union
 from pydantic import EmailStr, StringConstraints, ValidationInfo, field_validator
 from sqlmodel import Field, Relationship, SQLModel
 
-from ..models.base import BaseAdminInfo, BasePlayerInfo, BaseUser, BaseUserInfo, Country
-from .base import username_pydantic_regex
+from ..models.base import (
+    BaseAdminInfo,
+    BasePlayerInfo,
+    BaseUser,
+    BaseUserInfo,
+    Country,
+    UsernameRegex,
+)
 
 if TYPE_CHECKING:
     from ..models.player import Player
@@ -84,7 +90,7 @@ class CreateUser(BaseUser):
 class EditUser(SQLModel):
     "For editing a User"
 
-    username: username_pydantic_regex | None = None
+    username: UsernameRegex | None = None
     email: EmailStr | None = None
     country: Country | None = None
 
