@@ -18,7 +18,7 @@ def get_vote_point(
     "vote function for getting the vote point of a particular vote"
 
     vote_point = atp.vote_point
-    # OPTIONS CONTROL FLOW if/if/...
+
     # 1. limit vote of player with an active binding vow to three, for as long as it is active
     if (
         player_bt
@@ -47,12 +47,10 @@ def get_vote_point(
         and player_bt.binding_vow is False
     ):
         # ALL THESE CLAUSES MUST BE MET, HENCE THE 'and' OPERATORS.
-        vote_point += binded_vow[
-            0
-        ]  # increase vote_point by binding vow accumulated points
+        # increase vote_point by binding vow accumulated points
+        vote_point += binded_vow[0]
 
-    # STRICT CONTROL FLOW if/elif/else; only one of them runs
-    # 3. check if domain is activated and p2 simple domain isn't activated
+    # 3. check if player 1 domain is activated
     if (  # confirm the player has a barrier technique
         player_bt
         # then confirm that their DE is active
@@ -69,17 +67,28 @@ def get_vote_point(
         else:  # opposing player doesn't have an activated simple domain
             vote_point *= atp.domain_expansion_point  # increase vote points
 
-    # 4. Check if the opposing player has an active simple domain, outside of defending a DE
-    # no need to check if player has their DE deactivated, since the above CONTROL FLOW
-    # would have run, skipping this one; for this one to run implies player no DE or BT.
-    elif (  # check if opposing player has a barrier tech
-        opposing_player_bt
-        # and their simple domain is activated
-        and opposing_player_bt.simple_domain is True
+    # 4. check if player 1 has a SD activated
+    if player_bt and player_bt.simple_domain is True:
+        # add simple domain points
+        vote_point *= atp.simple_domain_point
+
+    # 5. Check if the opposing player has an active simple domain, outside of defending a DE
+    if (  # check if opposing player has a barrier tech
+        (
+            opposing_player_bt
+            # and their simple domain is activated
+            and opposing_player_bt.simple_domain is True
+        )
+        and (  # player 1 DE isn't active (this confirms the opposing isn't defending a DE)
+            player_bt
+            # then confirm that their DE is false
+            and player_bt.domain_expansion is False
+        )
     ):
         # if opponents simple domain is active, reduce vote points
         vote_point /= atp.simple_domain_point
-    # 5. else no BT shenanigans
+
+    # 6. else no Player 1 BT shenanigans
     else:
         vote_point = vote_point
 

@@ -32,15 +32,15 @@ def get_players_not_in_part(colony_id: int, part: int, session: Session):
     # Subquery to get player IDs who have fought in the specified part
     part_matches_subquery = (
         select(MatchPlayerLink.player_id)
-        .join(Match, MatchPlayerLink.match_id == Match.id)  # type: ignore
-        .where(Match.id == part)
+        .join(Match, MatchPlayerLink.match_id == Match.id)
+        .where(Match.part == part)
     ).subquery()
 
     part_matches_select = select(part_matches_subquery.c.player_id)
 
     # Query to get players in the specified colony who haven't fought in the part
     players_not_in_part_query = select(Player).where(
-        and_(Player.colony_id == colony_id, not_(Player.id.in_(part_matches_select)))  # type: ignore
+        and_(Player.colony_id == colony_id, not_(Player.id.in_(part_matches_select)))
     )
 
     players_not_in_part = session.exec(players_not_in_part_query).all()
@@ -93,7 +93,7 @@ def calculate_points(
                 updated_points = round(player_points - points_to_action, 1)
             case _:
                 raise HTTPException(
-                    status.HTTP_400_BAD_REQUEST, "points error occured."
+                    status.HTTP_400_BAD_REQUEST, "player action points error occured."
                 )
         return updated_points
     else:

@@ -17,7 +17,7 @@ def test_new_permission(authenticated_admin_client: tuple[TestClient, dict]):
         BasePermission.PermissionLevel.CREATE,
         BasePermission.PermissionLevel.DELETE,
     }
-    modelname = ModelName.MATCH
+    modelname = ModelName.match
     payload = [PermissionRequest(model=modelname, levels=levels)]
     res = authenticated_admin_client[0].post("/admin/new-permission", json=je(payload))
     print(res.json())
