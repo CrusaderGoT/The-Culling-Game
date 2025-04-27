@@ -8,10 +8,12 @@ from app.models.barrier import BarrierTech, BarrierTechInfo
 from app.models.match import Match
 from app.models.player import Player
 from app.utils.barrier import (
+    activate_binding_vow,
     activate_domain,
     activate_simple_domain,
     conditions_for_barrier_tech,
     fix_barrier_deactivation_task_fail,
+    schedule_deactivate_binding_vow,
     schedule_deactivate_domain,
     schedule_deactivate_simple_domain,
 )
@@ -58,20 +60,28 @@ def domain_expansion(
         session=session,
     )
 
-    # check if player has an active simple domain active
-    # and their grade is lower than special grade (i.e player_grade(0-4) >= special_grade(0))
-    # then prevent activating domain expansion
-    if barrier_tech.simple_domain is True and player.grade >= Player.Grade.SPECIAL:
-        # check for pontential deactivate task fails
-        fix_barrier_deactivation_task_fail(barrier_tech, session)
+    # check for pontential deactivate task fails
+    fix_barrier_deactivation_task_fail(barrier_tech, session)
 
-        # simple domain is currently correctly active
+    if player.grade > Player.Grade.ONE:
+        # only special grades can use DE
+        raise PlayerException(
+            player,
+            status.HTTP_426_UPGRADE_REQUIRED,
+            "Only Players of Grade ONE or higher can use Domain Expansion. Upgrade your player",
+        )
+
+    # check if player has an active BT
+    # then prevent activating domain expansion
+    # check that their grade is lower than special grade (i.e player_grade(0-4) > special_grade(0))
+    if (
+        barrier_tech.binding_vow is True or barrier_tech.simple_domain is True
+    ) and player.grade > Player.Grade.SPECIAL:
         raise PlayerException(
             player=player,
             code=status.HTTP_409_CONFLICT,
-            detail="you cannot activate domain expansion, "
-            "because your simple domain is currently active. "
-            "only players of grade 0 (special) can do this.",
+            detail="You have another barrier technique currently active. "
+            "only special grade players can activate multiple barrier techniques at once.",
         )
 
     # check if they have reach limit for domain expansion in a match
@@ -79,9 +89,6 @@ def domain_expansion(
         barrier_record is not None
         and (count := barrier_record.domain_counter) >= atp.limit_domain_expansion
     ):
-        # check for pontential deactivate task fails
-        fix_barrier_deactivation_task_fail(barrier_tech, session)
-
         raise HTTPException(
             status.HTTP_423_LOCKED,
             f"domain can only be activated {count} times per match",
@@ -91,26 +98,15 @@ def domain_expansion(
     elif (
         end_time := barrier_tech.de_end_time
     ) is not None and barrier_tech.domain_expansion is True:
-        # if de end time has passed, that means that domain should have ended but the backgroud task failed
-        if end_time and end_time <= datetime.now(
-            UTC
-        ):  # should have ended, but backgroud task failed
-            barrier_tech = activate_domain(
-                barrier_tech, barrier_record, match, session, atp
-            )
-            # schedule background task for deactivation
-            background.add_task(schedule_deactivate_domain, barrier_tech, session)
-            return barrier_tech
-        else:  # active
-            raise HTTPException(
-                status.HTTP_409_CONFLICT,
-                f"Domain is already active, deactivates in {
-                    round(
-                        (end_time - datetime.now(UTC)).total_seconds(),
-                        1,
-                    )
-                } seconds.",
-            )
+        raise HTTPException(
+            status.HTTP_409_CONFLICT,
+            f"Domain is already active, deactivates in {
+                round(
+                    (end_time - datetime.now(UTC)).total_seconds(),
+                    1,
+                )
+            } seconds.",
+        )
 
     else:  # no domain activated or no deactivation time
         barrier_tech = activate_domain(
@@ -156,10 +152,10 @@ def simple_domain(
             deactivate the effect after its duration has elapsed.
     """
     match_none = session.get(Match, match_id)
-    player = session.get(Player, player_id)
+    player_none = session.get(Player, player_id)
 
     barrier_tech, barrier_record, match, player = conditions_for_barrier_tech(
-        player=player,
+        player=player_none,
         match=match_none,
         player_id=player_id,
         match_id=match_id,
@@ -167,19 +163,27 @@ def simple_domain(
         session=session,
     )
 
-    # check if player has an active domain active
-    # and prevent activating simple domain
-    if barrier_tech.domain_expansion is True and player.grade >= Player.Grade.ONE:
-        # check for potential DE end task fail
-        fix_barrier_deactivation_task_fail(barrier_tech, session)
+    # check for potential DE end task fail
+    fix_barrier_deactivation_task_fail(barrier_tech, session)
 
+    # only grade 2 and higher can use SD
+    if player.grade > Player.Grade.TWO:
+        raise PlayerException(
+            player,
+            status.HTTP_426_UPGRADE_REQUIRED,
+            "Only Players of Grade TWO or higher can use Simple Domain. Upgrade your player",
+        )
+
+    # check if player has an active barrier tech
+    # and prevent activating simple domain
+    if (
+        barrier_tech.domain_expansion is True or barrier_tech.binding_vow is True
+    ) and player.grade >= Player.Grade.SPECIAL:
         raise PlayerException(
             player=player,
             code=status.HTTP_409_CONFLICT,
-            detail="you cannot activate simple domain, "
-            "because your domain expansion is currently active. "
-            "only players of grade 1 or higher can do this. "
-            "try again later",
+            detail="You have another barrier technique currently active. "
+            "only special grade players can activate multiple barrier techniques at once.",
         )
 
     if (
@@ -188,9 +192,6 @@ def simple_domain(
         barrier_record is not None
         and (count := barrier_record.simple_domain_counter) >= atp.limit_simple_domain
     ):
-        # check for potential DE end task fail and fix
-        fix_barrier_deactivation_task_fail(barrier_tech, session)
-
         # raise limit reach error
         raise HTTPException(
             status.HTTP_423_LOCKED,
@@ -200,32 +201,17 @@ def simple_domain(
     elif (
         end_time := barrier_tech.sd_end_time
     ) is not None and barrier_tech.simple_domain is True:
-        # has a barrier tech; check if simple domain is currently active
-        # ? modify to accout for situations where one of them is True-ish/
-        # also if sd end time has passed, that means that simple domain should have ended but the backgroud task failed
-        if end_time <= datetime.now(
-            UTC
-        ):  # should have ended, but backgroud task failed; activate anyway
-            barrier_tech = activate_simple_domain(
-                barrier_tech, barrier_record, match, session, atp
-            )
-            # schedule background task for deactivation
-            background.add_task(
-                schedule_deactivate_simple_domain, barrier_tech, session
-            )
-            return barrier_tech
-        else:  # active
-            raise HTTPException(
-                status.HTTP_409_CONFLICT,
-                f"Simple Domain is already active, deactivates in {
-                    round(
-                        (end_time - datetime.now(UTC)).total_seconds(),
-                        1,
-                    )
-                } seconds.",
-            )
+        raise HTTPException(
+            status.HTTP_409_CONFLICT,
+            f"Simple Domain is already active, deactivates in {
+                round(
+                    (end_time - datetime.now(UTC)).total_seconds(),
+                    1,
+                )
+            } seconds.",
+        )
 
-    else:  # no simple domain activated or no deactivation time
+    else:  # no simple domain activated
         barrier_tech = activate_simple_domain(
             barrier_tech, barrier_record, match, session, atp
         )
@@ -234,6 +220,7 @@ def simple_domain(
         return barrier_tech
 
 
+@router.post("/activate/binding/{player_id}", response_model=BarrierTechInfo)
 def bindind_vow(
     player_id: Annotated[int, Path()],
     match_id: Annotated[int, Query()],
@@ -242,15 +229,74 @@ def bindind_vow(
     background: BackgroundTasks,
     atp: atp,
 ):
-    "activates a simple domain"
+    "activates a binding vow"
     match_none = session.get(Match, match_id)
-    player = session.get(Player, player_id)
+    player_none = session.get(Player, player_id)
 
     barrier_tech, barrier_record, match, player = conditions_for_barrier_tech(
-        player=player,
+        player=player_none,
         match=match_none,
         player_id=player_id,
         match_id=match_id,
         current_user=current_user,
         session=session,
     )
+
+    # fix any deactivation fails
+    fix_barrier_deactivation_task_fail(barrier_tech, session)
+
+    # only grade 3 and higher can use BV
+    if player.grade > Player.Grade.THREE:
+        raise PlayerException(
+            player,
+            status.HTTP_426_UPGRADE_REQUIRED,
+            "Only Players of Grade THREE or higher can use Simple Domain. Upgrade your player",
+        )
+
+    # check if player has an active barrier tech
+    # and prevent activating BV
+    if (
+        barrier_tech.domain_expansion is True or barrier_tech.simple_domain is True
+    ) and player.grade > Player.Grade.SPECIAL:
+        raise PlayerException(
+            player=player,
+            code=status.HTTP_409_CONFLICT,
+            detail="You have another barrier technique currently active. "
+            "only special grade players can activate multiple barrier techniques at once.",
+        )
+
+    # 1. check if they have a barrier record for this match
+    # and if they have reach their limit
+    if (
+        barrier_record
+        and (count := barrier_record.binding_vow_counter) >= atp.limit_binding_vow
+    ):
+        raise PlayerException(
+            player,
+            status.HTTP_423_LOCKED,
+            f"binding vow can only be activated {count} times per match",
+        )
+
+    # 2. check if their binding vow is currectly activated
+    elif (
+        barrier_tech.binding_vow is True
+        and (end_time := barrier_tech.bv_end_time) is not None
+    ):
+        raise PlayerException(
+            player,
+            status.HTTP_409_CONFLICT,
+            f"Binding Vow is already active, deactivates in {
+                round(
+                    (end_time - datetime.now(UTC)).total_seconds(),
+                    1,
+                )
+            } seconds.",
+        )
+
+    # 3. no binding vow activated
+    else:
+        barrier_tech = activate_binding_vow(
+            barrier_tech, barrier_record, match, session, atp
+        )
+        background.add_task(schedule_deactivate_binding_vow, barrier_tech, session)
+        return barrier_tech
