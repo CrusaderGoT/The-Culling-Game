@@ -11,7 +11,6 @@ TABLE_JSON = BASE / "database" / "table_names.json"
 # and delete the prev name existing file
 OUT_FILE = BASE / "models" / "table.py"
 
-
 # 2. Read the JSON mapping
 data: dict[str, str] = json.loads(TABLE_JSON.read_text())
 
@@ -25,5 +24,4 @@ with open(OUT_FILE, "w") as f:
     f.write('\t"""class for the enum of database table names."""\n\n')
 
     for member, value in data.items():
-        name = member.upper()
-        f.write(f'\t{name} = "{value}"\n')
+        f.write(f'\t{member} = "{value}"\n')

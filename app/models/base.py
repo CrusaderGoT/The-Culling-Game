@@ -16,7 +16,7 @@ from typing import Annotated, Union
 from pydantic import EmailStr, StringConstraints
 from sqlmodel import TIMESTAMP, Column, Field, SQLModel
 
-from ..models.table import ModelName
+from ..models.table import ModelName # exception importation from auto generated enum class
 
 # Get the base directory of the current script or project
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -333,6 +333,7 @@ class BaseBarrierTech(SQLModel):
     simple_domain: bool = Field(default=False, description="the player's simple domain")
 
     # the times are useful for know when to activate/deactivate the techniques
+    # they are None when not active or deactivated
     de_end_time: datetime | None = Field(
         default=None,
         sa_column=Column(TIMESTAMP(timezone=True)),
@@ -378,9 +379,9 @@ class ActionTimePoint(SQLModel):
     limit_domain_expansion: int = 5
     limit_simple_domain: int = 5
 
-    cost_binding_vow: float = 5.0
-    cost_domain_expansion: float = 10.0
-    cost_simple_domain: float = 7.0
+    cost_binding_vow: float = 2.0
+    cost_domain_expansion: float = 2.0
+    cost_simple_domain: float = 2.0
 
     vote_point: float = 0.2
     domain_expansion_point: float = 4.0

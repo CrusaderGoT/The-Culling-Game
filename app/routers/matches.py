@@ -7,7 +7,6 @@ from app.utils.match import (
     create_new_match,
     get_last_created_match,
     get_match,
-    get_player,
     ongoing_match,
 )
 from app.utils.vote import get_vote_point
@@ -30,7 +29,7 @@ from ..models.match import Match, MatchInfo
 from ..models.player import CTApp, CursedTechnique, Player
 from ..models.user import User
 from ..models.vote import CastVote, ClientVoteInfo, Vote
-from ..utils.config import Tag, UserException
+from ..utils.config import AdminException, Tag
 from ..utils.dependencies import atp, session
 
 # write you match api routes here
@@ -52,7 +51,7 @@ async def create_match(
     # first get the permission for creating match
     permission = session.exec(
         select(Permission)
-        .where(Permission.model == ModelName.MATCH)
+        .where(Permission.model == ModelName.match)
         .where(Permission.level == Permission.PermissionLevel.CREATE)
     ).first()
 
@@ -85,8 +84,8 @@ async def create_match(
                 session.refresh(new_match)
                 return new_match
         else:  # admin doesn't have permission to create match
-            raise UserException(
-                admin.user,
+            raise AdminException(
+                admin,
                 code=status.HTTP_401_UNAUTHORIZED,
                 detail=f"{admin.user.username} doesn't have permission to create a match.",
             )
@@ -191,8 +190,10 @@ def vote(
                             v.ct_app_id for v in new_votes
                         ] and vote.ct_app_id not in [v.ct_app_id for v in prev_votes]:
                             # Add points to the player, based on barrier techniques active
-                            player = get_player(session, vote.player_id)
-                            if player is not None:
+                            player = [
+                                p for p in match.players if p.id == vote.player_id
+                            ][0]
+                            if player:
                                 # get the opposing player, for their BT check against player
                                 opposing_player = [
                                     p for p in match.players if p.id != player.id
@@ -241,7 +242,7 @@ async def delete_match(
     admin: admin_user,
 ):
     """
-    Deletes a match from the database given its ID after verifying delete permissions.
+    Deletes a match from the database given its ID after verifying delete permissions.\f
 
     This endpoint operation checks whether the specified administrative user has the
     required permission to delete a match. First, it looks up the permission for deletion
@@ -264,13 +265,13 @@ async def delete_match(
     Raises:
         HTTPException: If the match does not exist (404 Not Found) or the deletion permission
                        is not defined (403 Forbidden).
-        UserException: If the admin does not have the authorization to delete the match
+        AdminException: If the admin does not have the authorization to delete the match
                        (401 Unauthorized).
     """
     # first get the permission for creating match
     permission = session.exec(
         select(Permission)
-        .where(Permission.model == ModelName.MATCH)
+        .where(Permission.model == ModelName.match)
         .where(Permission.level == Permission.PermissionLevel.DELETE)
     ).first()
     if permission is not None:
@@ -287,8 +288,8 @@ async def delete_match(
                     status.HTTP_404_NOT_FOUND, f"Match with Id: {match_id}, Not Found"
                 )
         else:  # admin doesn't have permission to create match
-            raise UserException(
-                admin.user,
+            raise AdminException(
+                admin,
                 code=status.HTTP_401_UNAUTHORIZED,
                 detail=f"{admin.user.username} doesn't have permission to create a match.",
             )

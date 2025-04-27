@@ -33,7 +33,7 @@ def admin_edit_user(
     permission = check_if_admin_has_crud_permission(
         session=session,
         admin=admin,
-        model_name=ModelName.USER,
+        model_name=ModelName.user,
         permission_level=Permission.PermissionLevel.UPDATE,
     )
 
@@ -73,7 +73,7 @@ def admin_delete_user(user: id_name_email, session: session, admin: admin_user):
     permission = check_if_admin_has_crud_permission(
         session=session,
         admin=admin,
-        model_name=ModelName.USER,
+        model_name=ModelName.user,
         permission_level=Permission.PermissionLevel.DELETE,
     )
 

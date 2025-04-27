@@ -20,7 +20,7 @@ from app.utils.player import (
 )
 
 
-def get_match(session: session, match_id: int):
+def get_match(session: session, match_id: int) -> Match | None:
     "function for getting a match via its ID."
     match = session.exec(select(Match).where(Match.id == match_id)).first()
     return match
