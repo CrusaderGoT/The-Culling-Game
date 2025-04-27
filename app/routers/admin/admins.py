@@ -196,7 +196,7 @@ def grant_permission(
         raise AdminException(
             admin=p_admin,
             code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=f"Admin '{userdb.username}' already has sent permission(s)",
+            detail=f"Admin '{userdb.username}' already has all of the sent permission(s) or you '{p_admin.user.username}' cannot grant some of the permission.",
         )
 
     # assign approved permissions to the user/admin
@@ -269,7 +269,7 @@ def remove_permission(
 
 @superuser_router.post("/superuser/{user}")
 def demo_superuser(
-    user: id_name_email, code: Annotated[str, Query(default=...)], session: session
+    user: id_name_email, code: Annotated[str, Query()], session: session
 ):
     # get the user
     userdb = get_user(session, user)

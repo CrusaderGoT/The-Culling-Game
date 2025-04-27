@@ -1,5 +1,5 @@
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime, timezone
 from typing import Literal
 
 from fastapi import HTTPException, status
@@ -234,3 +234,26 @@ def activate_barrier_tech(
             activate_simple_domain(barrier_tech, barrier_record, match, session, atp)
         case "domain_expansion":
             activate_domain(barrier_tech, barrier_record, match, session, atp)
+
+
+def fix_barrier_deactivation_task_fail(
+    barrier_tech: BarrierTech | None, session: session
+):
+    """
+    checks and deactivates any barrier activations, that their end tasks failed.
+    """
+    if barrier_tech is not None:
+        # for DE
+        if (end_time := barrier_tech.de_end_time) is not None and datetime.now(
+            UTC
+        ) >= end_time:
+            deactivate_domain(barrier_tech, session)
+
+        # for SD
+        if (end_time := barrier_tech.sd_end_time) is not None and datetime.now(
+            UTC
+        ) >= end_time:  # should have ended, but backgroud task failed
+            # deactivate simple domain
+            deactivate_simple_domain(barrier_tech, session)
+    else:
+        pass

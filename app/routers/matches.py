@@ -2,6 +2,7 @@
 
 from typing import Annotated
 
+from app.utils.barrier import fix_barrier_deactivation_task_fail
 from app.utils.match import (
     assign_match_winner,
     create_new_match,
@@ -87,7 +88,7 @@ async def create_match(
             raise AdminException(
                 admin,
                 code=status.HTTP_401_UNAUTHORIZED,
-                detail=f"{admin.user.username} doesn't have permission to create a match.",
+                detail=f"{admin.user.username} doesn't have permission to create a {ModelName.match}.",
             )
     else:
         raise HTTPException(
@@ -198,6 +199,12 @@ def vote(
                                 opposing_player = [
                                     p for p in match.players if p.id != player.id
                                 ][0]
+
+                                # deactive any potential barrier end task fails
+                                fix_barrier_deactivation_task_fail(
+                                    player.barrier_technique, session
+                                )
+
                                 # get the vote point
                                 vote_point = get_vote_point(
                                     match,

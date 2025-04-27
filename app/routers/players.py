@@ -14,6 +14,7 @@ from app.models.player import (
     Player,
     PlayerInfo,
 )
+from app.utils.barrier import fix_barrier_deactivation_task_fail
 from app.utils.config import Tag, UserException
 from app.utils.dependencies import colony, session
 from app.utils.player import (
@@ -101,6 +102,8 @@ def my_player(session: session, current_user: active_user):
     if current_user.player and type(current_user.player.id) is int:
         player = get_player(session, current_user.player.id)
         if player:
+            # deactive any potential barrier end task fails
+            fix_barrier_deactivation_task_fail(player.barrier_technique, session)
             return player
         else:
             err_msg = "User has no Player"
@@ -154,6 +157,8 @@ def get_players(
 def a_player(player_id: Annotated[int, Path()], session: session):
     player = get_player(session, player_id)
     if player:
+        # deactive any potential barrier end task fails
+        fix_barrier_deactivation_task_fail(player.barrier_technique, session)
         return player
     else:
         err_msg = f"player ID '{player_id}' not found"
