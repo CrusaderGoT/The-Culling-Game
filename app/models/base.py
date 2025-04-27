@@ -374,6 +374,7 @@ class ActionTimePoint(SQLModel):
     match_duration: timedelta = timedelta(minutes=10)
     domain_duration: timedelta = timedelta(minutes=5)
     simple_domain_duration: timedelta = timedelta(minutes=5)
+    binding_vow_duration: timedelta = timedelta(minutes=5)
 
     vote_binding_vow_limit: int = 3
 

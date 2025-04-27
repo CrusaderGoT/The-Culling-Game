@@ -199,6 +199,14 @@ def deactivate_simple_domain(barrier_tech: BarrierTech, session: session):
 
 def schedule_deactivate_simple_domain(barrier_tech: BarrierTech, session: session):
     "function for the background task of deactivating a simple domain"
+    
+    # Ensure end_time is timezone-aware (UTC); if not, make it so
+    if (barrier_tech.bv_end_time) and (
+        barrier_tech.bv_end_time.tzinfo is None
+        or barrier_tech.bv_end_time.tzinfo.utcoffset(barrier_tech.bv_end_time) is None
+    ):
+        barrier_tech.bv_end_time = barrier_tech.bv_end_time.replace(tzinfo=timezone.utc)
+
     active = True
     while active:
         now = datetime.now(timezone.utc)  # the current time
@@ -215,6 +223,72 @@ def schedule_deactivate_simple_domain(barrier_tech: BarrierTech, session: sessio
             if remaining_time < 0:
                 continue  # loop here to avoid negative float being supplied to time.sleep
 
+            time.sleep(remaining_time // 2)  # remaining time divide by 2
+            continue  # loop again
+
+
+def activate_binding_vow(
+    barrier_tech: BarrierTech,
+    barrier_record: BarrierRecord | None,
+    match,
+    session: session,
+    atp: atp,
+):
+    barrier_tech.binding_vow = True
+    barrier_tech.bv_end_time = datetime.now(timezone.utc) + atp.binding_vow_duration
+
+    # deduct points
+    barrier_tech.player.points = calculate_points(
+        barrier_tech.player.points, atp.cost_binding_vow, "minus"
+    )
+    # add/record the detail
+    # the barrier detail should commited here
+    if barrier_record is not None:
+        barrier_record.binding_vow_counter += 1
+        session.add(barrier_record)
+    else:  # no barrier detail
+        new_barrier_detail = BarrierRecord(
+            binding_vow_counter=1, match=match, barrier_tech=barrier_tech
+        )
+        session.add(new_barrier_detail)
+    # commits
+    session.add(barrier_tech)
+    session.commit()
+    session.refresh(barrier_tech)
+    return barrier_tech
+
+
+def deactivate_binding_vow(barrier_tech: BarrierTech, session: session):
+    barrier_tech.binding_vow = False
+    barrier_tech.bv_end_time = None
+    session.add(barrier_tech)
+    session.commit()
+
+
+def schedule_deactivate_binding_vow(barrier_tech: BarrierTech, session: session):
+    "function for the background task of deactivating a binding vow"
+    # Ensure end_time is timezone-aware (UTC); if not, make it so
+    if (barrier_tech.bv_end_time) and (
+        barrier_tech.bv_end_time.tzinfo is None
+        or barrier_tech.bv_end_time.tzinfo.utcoffset(barrier_tech.bv_end_time) is None
+    ):
+        barrier_tech.bv_end_time = barrier_tech.bv_end_time.replace(tzinfo=timezone.utc)
+
+    active = True
+    while active:
+        now = datetime.now(timezone.utc)  # the current time
+        # check if there is no end time for the specified barrier tech BV
+        # and see if time for deactivation has reached
+        if (barrier_tech.bv_end_time is None) or (now >= barrier_tech.bv_end_time):
+            # deactivate binding vow
+            deactivate_binding_vow(barrier_tech, session)
+            active = False
+            break
+        else:
+            # add a time pause if deactivation time is still further
+            remaining_time = (barrier_tech.bv_end_time - now).total_seconds()
+            if remaining_time < 0:
+                continue  # loop here to avoid negative float being supplied to time.sleep
             time.sleep(remaining_time // 2)  # remaining time divide by 2
             continue  # loop again
 
