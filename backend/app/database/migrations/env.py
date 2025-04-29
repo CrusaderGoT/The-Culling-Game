@@ -1,17 +1,12 @@
+import json
+import os
 from logging.config import fileConfig
-
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
+from pathlib import Path
 
 from alembic import context
-
-from sqlmodel import SQLModel
-
-import json
-
 from dotenv import load_dotenv
-import os
-from pathlib import Path
+from sqlalchemy import engine_from_config, pool
+from sqlmodel import SQLModel
 
 # Get the base directory of the current script or project
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -37,14 +32,27 @@ if not database_url:
 # Replace the sqlalchemy.url in the alembic.ini file dynamically
 config.set_main_option("sqlalchemy.url", database_url)
 
+
+# for preventing empty revision
+# for typing purposes
+from collections.abc import Iterable
+
+from alembic.environment import MigrationContext
+
+# this typing-only import requires alembic  1.12.1 or above
+from alembic.operations import MigrationScript
+
 # add your model's MetaData object here
 # for 'autogenerate' support
 # from myapp import mymodel
-from app.models.colony import *
-from app.models.user import *
-from app.models.player import *
-from app.models.match import *
 from app.models.admin import *
+from app.models.barrier import *
+from app.models.colony import *
+from app.models.match import *
+from app.models.player import *
+from app.models.user import *
+from app.models.vote import *
+
 # target_metadata = mymodel.Base.metadata
 target_metadata = SQLModel.metadata
 # other values from the config, defined by the needs of env.py,
@@ -54,6 +62,21 @@ target_metadata = SQLModel.metadata
 
 # my table json file path
 fp = os.path.join(BASE_DIR, "table_names.json")
+
+
+def process_revision_directives(
+    context: MigrationContext,
+    revision: str | Iterable[str | None] | Iterable[str],
+    directives: list[MigrationScript],
+):
+    "thi function prevents alembic generating empty migrations"
+    assert config.cmd_opts is not None
+    if getattr(config.cmd_opts, "autogenerate", False):
+        script = directives[0]
+        assert script.upgrade_ops is not None
+        if script.upgrade_ops.is_empty():
+            directives[:] = []
+
 
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.
@@ -69,7 +92,9 @@ def run_migrations_offline() -> None:
     """
     # write table names to json file, useful for getting the names of database tables
     with open(fp, "w") as fl:
-        names_dict = dict([(d,d) for d in target_metadata.tables.keys() if "link" not in d])
+        names_dict = dict(
+            [(d, d) for d in target_metadata.tables.keys() if "link" not in d]
+        )
         json.dump(names_dict, fl)
 
     url = config.get_main_option("sqlalchemy.url")
@@ -78,6 +103,7 @@ def run_migrations_offline() -> None:
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
+        process_revision_directives=process_revision_directives,
     )
 
     with context.begin_transaction():
@@ -93,7 +119,9 @@ def run_migrations_online() -> None:
     """
     # write table names to json file, useful for getting the names of database tables
     with open(fp, "w") as fl:
-        names_dict = dict([(d,d) for d in target_metadata.tables.keys() if "link" not in d])
+        names_dict = dict(
+            [(d, d) for d in target_metadata.tables.keys() if "link" not in d]
+        )
         json.dump(names_dict, fl)
 
     connectable = engine_from_config(
@@ -104,7 +132,9 @@ def run_migrations_online() -> None:
 
     with connectable.connect() as connection:
         context.configure(
-            connection=connection, target_metadata=target_metadata
+            connection=connection,
+            target_metadata=target_metadata,
+            process_revision_directives=process_revision_directives,
         )
 
         with context.begin_transaction():
