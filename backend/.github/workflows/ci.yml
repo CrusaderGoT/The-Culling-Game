@@ -1,12 +1,6 @@
 name: CI
 
-on:
-  push:
-    paths:
-      - 'backend/**'
-  pull_request:
-    paths:
-      - 'backend/**'
+on: [push, pull_request]
 
 jobs:
   build:
@@ -14,6 +8,12 @@ jobs:
 
     env:
       DB_URL: ${{ secrets.DATABASE_URL }}
+      
+      ALGORITHM: ${{ secrets.ALGORITHM }}
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      # test variables
+      SQLITE_DB_URL: ${{ vars.SQLITE_DB_URL }}
+      CODE: ${{ vars.CODE }}
 
     defaults:
       run:
@@ -21,7 +21,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -41,6 +41,9 @@ jobs:
 
       - name: Generate ModelName enum
         run: python app/scripts/gen_table_enum.py
+
+      - name: Run Alembic Upgrade Head
+        run: alembic upgrade head
 
       - name: Run tests
         run: uv run pytest
