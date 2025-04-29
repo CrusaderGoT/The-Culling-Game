@@ -137,7 +137,6 @@ def schedule_deactivate_domain(barrier_tech: BarrierTech, session: session):
         or barrier_tech.de_end_time.tzinfo.utcoffset(barrier_tech.de_end_time) is None
     ):
         barrier_tech.de_end_time = barrier_tech.de_end_time.replace(tzinfo=timezone.utc)
-
     active = True
     while active:
         now = datetime.now(timezone.utc)  # the current time
@@ -201,11 +200,11 @@ def schedule_deactivate_simple_domain(barrier_tech: BarrierTech, session: sessio
     "function for the background task of deactivating a simple domain"
     
     # Ensure end_time is timezone-aware (UTC); if not, make it so
-    if (barrier_tech.bv_end_time) and (
-        barrier_tech.bv_end_time.tzinfo is None
-        or barrier_tech.bv_end_time.tzinfo.utcoffset(barrier_tech.bv_end_time) is None
+    if (barrier_tech.sd_end_time) and (
+        barrier_tech.sd_end_time.tzinfo is None
+        or barrier_tech.sd_end_time.tzinfo.utcoffset(barrier_tech.sd_end_time) is None
     ):
-        barrier_tech.bv_end_time = barrier_tech.bv_end_time.replace(tzinfo=timezone.utc)
+        barrier_tech.sd_end_time = barrier_tech.sd_end_time.replace(tzinfo=timezone.utc)
 
     active = True
     while active:
