@@ -113,6 +113,11 @@ def test_domain_expansion(match_players: list[tuple[TestClient, dict]]):
     res0 = match_players[0][0].post(
         f"/barrier/activate/domain/{player1['id']}", params={"match_id": 1}
     )
-    assert res0.is_success is True, (
-        f"Couldn't activate domain for player 1: {res0.json()}"
-    )
+    if player1["grade"] > PlayerInfo.Grade.ONE:
+        assert res0.is_success is False, (
+            f"Falsely Activated Domain for Player 1: {res0.json()}"
+        )
+    elif player1["grade"] <= PlayerInfo.Grade.ONE:
+        assert res0.is_success is True, (
+            f"Couldn't Activate Domain for Player 1: {res0.json()}"
+        )
