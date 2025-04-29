@@ -14,19 +14,21 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
-          persist-credentials: true
+          fetch-depth: 0 # needed for subtree splitting
+          persist-credentials: false # we’ll supply our own creds
 
       - name: Set Git user
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
+      - name: Add backend remote with PAT
+        run: |
+          git remote add backend \
+            https://x-access-token:${{ secrets.SUBTREE_TOKEN }}@github.com/CrusaderGoT/The-Culling-Games-Backend.git
+
       - name: Push backend subtree to remote
         # avoid rerunning this job on subtree push:
         if: github.event_name != 'workflow_dispatch'
         run: |
-          git subtree push \
-            --prefix backend \
-            https://github.com/CrusaderGoT/The-Culling-Games-Backend.git \
-            principal
+          git subtree push git subtree push --prefix backend backend principal
