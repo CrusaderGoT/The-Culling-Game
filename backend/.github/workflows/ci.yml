@@ -38,4 +38,4 @@ jobs:
         run: python app/scripts/gen_table_enum.py
 
       - name: Run Tests
-        run: uv run pytest
+        run: pytest -v
