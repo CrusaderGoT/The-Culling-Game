@@ -42,9 +42,6 @@ jobs:
       - name: Generate ModelName enum
         run: python app/scripts/gen_table_enum.py
 
-      - name: Run migrations
-        run: uv run alembic upgrade head
-
       - name: Run tests
         run: uv run pytest
 
