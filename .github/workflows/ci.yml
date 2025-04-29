@@ -1,0 +1,13 @@
+name: BACKEND CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: PUSH TO REMOTE BACKEND
+        run: git subtree push --prefix backend https://github.com/CrusaderGoT/The-Culling-Games-Backend.git principal
