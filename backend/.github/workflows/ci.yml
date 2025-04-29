@@ -37,11 +37,5 @@ jobs:
       - name: Generate ModelName enum
         run: python app/scripts/gen_table_enum.py
 
-      - name: Run Alembic Upgrade Head
-        run: alembic upgrade head
-
-      - name: Run tests
+      - name: Run Tests
         run: uv run pytest
-
-      - name: Push Backend API to Production
-        run: git subtree push --prefix backend https://github.com/CrusaderGoT/The-Culling-Games-Backend.git principal
