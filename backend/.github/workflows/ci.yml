@@ -8,16 +8,11 @@ jobs:
 
     env:
       DB_URL: ${{ secrets.DATABASE_URL }}
-      
       ALGORITHM: ${{ secrets.ALGORITHM }}
       SECRET_KEY: ${{ secrets.SECRET_KEY }}
       # test variables
       SQLITE_DB_URL: ${{ vars.SQLITE_DB_URL }}
       CODE: ${{ vars.CODE }}
-
-    defaults:
-      run:
-        working-directory: backend
 
     steps:
       - uses: actions/checkout@v4
