@@ -36,7 +36,7 @@ and then use that helper in both `sio`,`router`or`app`.
 
 app = FastAPI(
     title="The Culling Games API",
-    description="",
+    description="The API Docs for The Culling Games",
     generate_unique_id_function=custom_generate_unique_id,
     docs_url=None,
     debug=True,
