@@ -3,8 +3,6 @@ name: ROOT CI
 on:
   push:
     branches: [principal]
-    paths:
-      - "backend/**"
   pull_request:
     branches: [principal]
 
