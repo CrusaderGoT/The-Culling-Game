@@ -10,6 +10,10 @@ on:
 
 jobs:
   build:
+    permissions:
+      contents: read
+      pull-requests: write
+
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -28,6 +32,5 @@ jobs:
             https://x-access-token:${{ secrets.SUBTREE_TOKEN }}@github.com/CrusaderGoT/The-Culling-Games-Backend.git
 
       - name: Push backend subtree to remote
-        # avoid rerunning this job on subtree push:
         run: |
           git subtree push git subtree push --prefix backend backend principal
