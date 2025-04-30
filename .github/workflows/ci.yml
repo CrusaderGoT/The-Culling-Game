@@ -24,11 +24,6 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Add backend remote with PAT
-        run: |
-          git remote add backend \
-            https://x-access-token:${{ secrets.SUBTREE_TOKEN }}@github.com/CrusaderGoT/The-Culling-Games-Backend.git
-
       - name: Push backend subtree to remote
         run: |
-          git subtree push git subtree push --prefix backend backend principal
+          git subtree push git subtree push --prefix backend https://x-access-token:${{ secrets.SUBTREE_TOKEN }}@github.com/CrusaderGoT/The-Culling-Games-Backend.git principal
