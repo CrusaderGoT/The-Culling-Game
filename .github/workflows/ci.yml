@@ -29,6 +29,5 @@ jobs:
 
       - name: Push backend subtree to remote
         # avoid rerunning this job on subtree push:
-        if: github.event_name != 'workflow_dispatch'
         run: |
           git subtree push git subtree push --prefix backend backend principal
