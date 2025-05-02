@@ -38,7 +38,7 @@ app = FastAPI(
     title="The Culling Games API",
     description="The API Docs for The Culling Games",
     generate_unique_id_function=custom_generate_unique_id,
-    docs_url=None,
+    #docs_url=None,
     debug=True,
 )
 """
@@ -59,7 +59,7 @@ socket_app = socketio.ASGIApp(sio, app, socketio_path="/ws")
 app.mount("/ws", socket_app)
 
 # Mount static files
-app.mount("/static", StaticFiles(directory="app/static"), name="staic")
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 # MIDDLEWARE
 origins = [

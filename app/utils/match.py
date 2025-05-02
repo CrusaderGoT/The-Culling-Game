@@ -1,7 +1,7 @@
 # util functions for mainly used for a match
 
 import time
-from collections import defaultdict
+from collections import Counter
 from datetime import datetime, timezone
 from random import choice, sample
 from typing import Sequence
@@ -104,7 +104,24 @@ def random_players_for_match(
     return [player1, player2]
 
 
-def assign_match_winner(*, match_id: int, session: session, atp: atp):
+def colonies_with_players_available_for_part(session: session, part: int):
+    "Main query to get colonies IDs with at least one player who hasn't fought in the specified part"
+    subquery_select = select_players_fought_in_part(part=part)
+    statement = select(Colony.id).where(
+        exists(
+            select(Player.id).where(
+                and_(
+                    Player.colony_id == Colony.id,
+                    not_(Player.id.in_(subquery_select)),  # type: ignore
+                )
+            )
+        )
+    )
+    result = session.exec(statement).all()
+    return result
+
+
+def schedule_assign_match_winner(*, match_id: int, session: session, atp: atp):
     "for assigning the winner of a match, after it ends"
     match = get_match(session=session, match_id=match_id)
     if match is None:  # match doesn't exit
@@ -124,55 +141,52 @@ def assign_match_winner(*, match_id: int, session: session, atp: atp):
         continue  # run loop again after sleep
 
     else:  # runs after the match is ended
-        # Aggregate vote points by player_id in one pass
-        player_votes = defaultdict(float)
+        winner = get_match_winner(match, session)
+        if not winner:
+            return
+        else:
+            # Assign winner extra points and update the match record
+            match.winner = winner
+            winner.points += atp.winner_point
+            session.add(match)
+            session.commit()
+
+
+def assign_match_winner(match_id: int, session: session, atp: atp):
+    match = get_match(session, match_id)
+    if match:
+        winner = get_match_winner(match, session)
+        if not winner:
+            print("NO WINNER!!")
+        else:
+            player = Player.model_validate(winner)
+            print(player.model_dump())
+
+
+def get_match_winner(match: Match, session: session):
+    """
+    return the player that won the match, else return None
+    """
+
+    if match.votes:
+        cnt = Counter()  # initialize counter dict
+        # aggregate players vote points
         for vote in match.votes:
-            player_votes[vote.player_id] += vote.point
+            cnt[vote.player_id] += vote.point  # type: ignore ; counter is meant for int but doesn't discrimate float
 
-        # Make sure every player in the match is present—even if they received 0 votes
-        for player in match.players:
-            player_votes.setdefault(player.id, 0)
+        # get the player with most votes
+        most_votes = cnt.most_common(1)[0]  # (player_id: int, vote_points: float)
 
-        # If no votes were cast (or all are zero) then implement draw logic
-        if not player_votes or max(player_votes.values()) == min(player_votes.values()):
-            # implement draw logic here
-            return
+        # get the player with least votes
+        n = 1  # n least common
+        least_votes = cnt.most_common(1)[: -n - 1 : -1][
+            0
+        ]  # (player_id: int, vote_points: float)
 
-        # Identify the player(s) with the highest vote total
-        max_points = max(player_votes.values())
-        winner_ids = [
-            pid for pid, points in player_votes.items() if points == max_points
-        ]
-
-        # If there is more than one top scorer, that is a draw
-        if len(winner_ids) != 1:
-            # implement draw logic here
-            return
-
-        winner_id = winner_ids[0]
-        winner = get_player(session=session, player_id=winner_id)
-        if winner is None:
-            return
-
-        # Assign winner extra points and update the match record
-        winner.points += atp.winner_point
-        match.winner = winner
-        session.add(match)
-        session.commit()
-
-
-def colonies_with_players_available_for_part(session: session, part: int):
-    "Main query to get colonies IDs with at least one player who hasn't fought in the specified part"
-    subquery_select = select_players_fought_in_part(part=part)
-    statement = select(Colony.id).where(
-        exists(
-            select(Player.id).where(
-                and_(
-                    Player.colony_id == Colony.id,
-                    not_(Player.id.in_(subquery_select)),  # type: ignore
-                )
-            )
-        )
-    )
-    result = session.exec(statement).all()
-    return result
+        if most_votes[1] == least_votes[1]:
+            return None
+        else:
+            winner = get_player(session, player_id=most_votes[0])
+            return winner
+    else:
+        return None
