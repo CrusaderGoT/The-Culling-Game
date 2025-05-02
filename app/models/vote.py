@@ -2,8 +2,7 @@ from typing import TYPE_CHECKING
 
 from sqlmodel import Field, Relationship, SQLModel
 
-from app.models.base import BaseVote
-from app.models.base import BaseVoteInfo
+from app.models.base import BaseVote, BaseVoteInfo
 
 if TYPE_CHECKING:
     from app.models.match import Match
@@ -29,6 +28,7 @@ class ClientVoteInfo(SQLModel):
     """
 
     message: str
+    extra_info: list[str] | None
     votes: list[BaseVoteInfo]
 
 
