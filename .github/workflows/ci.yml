@@ -7,11 +7,11 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      DB_URL: ${{ secrets.DATABASE_URL }}
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
       ALGORITHM: ${{ secrets.ALGORITHM }}
       SECRET_KEY: ${{ secrets.SECRET_KEY }}
       # test variables
-      SQLITE_DB_URL: ${{ vars.SQLITE_DB_URL }}
+      SQLITE_DATABASE_URL: ${{ vars.SQLITE_DATABASE_URL }}
       CODE: ${{ vars.CODE }}
 
     steps:
@@ -38,4 +38,4 @@ jobs:
         run: python app/scripts/gen_table_enum.py
 
       - name: Run Tests
-        run: pytest -v
+        run: uv run pytest -v
