@@ -158,7 +158,7 @@ async def vote(
             ).all()
             if (
                 vote_count := len(prev_votes)
-            ) >= 5:  # if it has exceeded 5 votes, no more votes
+            ) >= atp.vote_limit:  # if it has exceeded vote limt, no more votes
                 raise HTTPException(
                     status.HTTP_423_LOCKED, f"{vote_count} votes limit reached"
                 )
@@ -176,9 +176,10 @@ async def vote(
                     if player_id not in fighters_dict and player_id is not None:
                         fighters_dict[player_id] = []
                     fighters_dict[player_id].append(ct_app_id)
-                new_votes: list[Vote] = (
-                    list()
-                )  # votes to be added and commited to session
+                # votes to be added and commited to session
+                new_votes: list[Vote] = list()
+                # message for player with binding vow limit
+                binding_vow_limit_msg: list[str] = list()
                 # now iterate over the votes and cast them for correct player ct app
                 for vote in votes:
                     # Check if the player_id exists and if the ct_app_id is in their list of ct_app_ids
@@ -204,7 +205,6 @@ async def vote(
                                 fix_barrier_deactivation_task_fail(
                                     player.barrier_technique, session
                                 )
-
                                 # get the vote point
                                 vote_point = get_vote_point(
                                     match,
@@ -213,26 +213,38 @@ async def vote(
                                     opposing_player.barrier_technique,
                                     atp,
                                 )
-                                # Create and add the vote
-                                update_vote = {
-                                    "user": voter,
-                                    "match": match,
-                                    "point": vote_point,
-                                    "has_been_added": True,
-                                }
-                                casted_vote = Vote.model_validate(
-                                    vote, update=update_vote
-                                )
-                                new_votes.append(casted_vote)
-                                # add the vote points to players points
-                                player.points = round(player.points + vote_point, 1)
+                                # account for 0 vote_point, because of binding vows
+                                if vote_point > 0:
+                                    # Create and add the vote
+                                    update_vote = {
+                                        "user": voter,
+                                        "match": match,
+                                        "point": vote_point,
+                                        "has_been_added": True,
+                                    }
+                                    casted_vote = Vote.model_validate(
+                                        vote, update=update_vote
+                                    )
+                                    new_votes.append(casted_vote)
+                                    # add the vote points to players points
+                                    player.points = round(player.points + vote_point, 1)
+                                else:
+                                    binding_vow_limit_msg.append(
+                                        f"{player.name} binding vow vote limit reached."
+                                    )
 
                 else:  # runs after the loop
                     session.add_all(new_votes)
                     session.commit()  # this commit the increased player points also
                     [session.refresh(v) for v in new_votes]
                     msg = f"{len(new_votes)} out of {len(votes)} was successful"
-                    vote_info = {"message": msg, "votes": new_votes}
+                    vote_info = {
+                        "message": msg,
+                        "votes": new_votes,
+                        "extra_info": binding_vow_limit_msg
+                        if binding_vow_limit_msg
+                        else None,
+                    }
                     info = ClientVoteInfo.model_validate(vote_info)
                     return info
 

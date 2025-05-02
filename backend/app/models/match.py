@@ -45,6 +45,7 @@ class Match(BaseMatch, table=True):
         back_populates="matches", link_model=MatchPlayerLink
     )
     votes: list["Vote"] = Relationship(back_populates="match")
+    # typically only one per player, if barrier tech is used
     barrier_records: list["BarrierRecord"] = Relationship(back_populates="match")
 
 
