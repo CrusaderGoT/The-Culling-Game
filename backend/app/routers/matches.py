@@ -4,11 +4,11 @@ from typing import Annotated
 
 from app.utils.barrier import fix_barrier_deactivation_task_fail
 from app.utils.match import (
-    assign_match_winner,
     create_new_match,
     get_last_created_match,
     get_match,
     ongoing_match,
+    schedule_assign_match_winner,
 )
 from app.utils.vote import get_vote_point
 from fastapi import (
@@ -72,11 +72,11 @@ async def create_match(
                     session.commit()
                     session.refresh(new_match)
                     background.add_task(
-                        assign_match_winner,
+                        schedule_assign_match_winner,
                         match_id=new_match.id,  # type: ignore
                         session=session,
                         atp=atp,
-                    )  # type: ignore
+                    )
                     return new_match
             else:  # Not a single match have been create; Create match anyway
                 new_match = create_new_match(session, part, atp)
@@ -98,7 +98,7 @@ async def create_match(
 
 
 @router.get("/all", response_model=list[MatchInfo])
-def get_matches(
+async def get_matches(
     session: session,
     offset: Annotated[int, Query(ge=0)] = 0,
     limit: Annotated[int, Query(le=30)] = 10,
@@ -113,7 +113,7 @@ def get_matches(
 
 
 @router.get("/latest", response_model=MatchInfo)
-def get_lastest_match(
+async def get_lastest_match(
     session: session,
     ongoing: Annotated[bool, Query(description="should be an ongoing match")] = False,
 ):
@@ -131,7 +131,7 @@ def get_lastest_match(
 
 
 @router.post("/vote/{match_id}", response_model=ClientVoteInfo)
-def vote(
+async def vote(
     session: session,
     match_id: Annotated[int, Path()],
     voter: active_user,
