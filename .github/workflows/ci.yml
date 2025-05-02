@@ -1,0 +1,41 @@
+name: BACKEND CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      ALGORITHM: ${{ secrets.ALGORITHM }}
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      # test variables
+      SQLITE_DATABASE_URL: ${{ vars.SQLITE_DATABASE_URL }}
+      CODE: ${{ vars.CODE }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          # Install a specific version of uv.
+          version: "0.6.11"
+          enable-cache: true
+          # invalidate it when the lockfile changes
+          cache-dependency-glob: "uv.lock"
+
+      - name: Install dependencies
+        run: uv sync --locked --all-extras --dev
+
+      - name: Generate ModelName enum
+        run: python app/scripts/gen_table_enum.py
+
+      - name: Run Tests
+        run: uv run pytest -v

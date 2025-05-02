@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="description"
+      content="A simple chat interface powered by FastAPI and Socket.IO."
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>FastAPI Chat</title>
+    <!-- Load Socket.IO client from CDN -->
+    <script
+      src="https://cdn.socket.io/4.7.0/socket.io.min.js"
+      integrity="sha384-..."
+      crossorigin="anonymous"
+    ></script>
+    <!-- You can add your custom styles here -->
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 2rem;
+        background-color: #f9f9f9;
+        color: #333;
+      }
+      header {
+        margin-bottom: 1.5rem;
+      }
+      h1 {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+      }
+      #chat-container {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 1rem;
+        background-color: #fff;
+        max-width: 600px;
+        margin: 0 auto;
+      }
+      #messages {
+        list-style-type: none;
+        padding: 0;
+        max-height: 300px;
+        overflow-y: auto;
+        margin-bottom: 1rem;
+      }
+      #messages li {
+        padding: 0.5rem;
+        border-bottom: 1px solid #eee;
+      }
+      #input-area {
+        display: flex;
+        gap: 0.5rem;
+      }
+      #input {
+        flex: 1;
+        padding: 0.5rem;
+        font-size: 1rem;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+      #send-button {
+        padding: 0.5rem 1rem;
+        font-size: 1rem;
+        border: none;
+        border-radius: 4px;
+        background-color: #007bff;
+        color: #fff;
+        cursor: pointer;
+      }
+      #send-button:disabled {
+        background-color: #aaa;
+        cursor: not-allowed;
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <h1>FastAPI Chat Application</h1>
+      <p>
+        Welcome to the real-time chat powered by FastAPI and Socket.IO. Type
+        your message below and hit <strong>Send</strong> or press
+        <strong>Enter</strong>.
+      </p>
+    </header>
+
+    <section id="chat-container" aria-label="Chat message area">
+      <!-- Message list -->
+      <ul id="messages" aria-live="polite"></ul>
+
+      <!-- Input and send button -->
+      <div id="input-area">
+        <label for="input" class="visually-hidden">Your message:</label>
+        <input
+          id="input"
+          type="text"
+          autocomplete="off"
+          placeholder="Enter your message here..."
+          aria-label="Message input"
+        />
+        <button
+          id="send-button"
+          type="button"
+          onclick="send()"
+          disabled
+          aria-disabled="true"
+        >
+          Send
+        </button>
+      </div>
+    </section>
+
+    <script>
+      // Initialize Socket.IO client with custom path
+      const socket = io({ path: "/ws" });
+
+      const messagesEl = document.getElementById("messages");
+      const inputEl = document.getElementById("input");
+      const sendBtn = document.getElementById("send-button");
+
+      // Enable send button only when there's text
+      inputEl.addEventListener("input", () => {
+        const hasText = inputEl.value.trim().length > 0;
+        sendBtn.disabled = !hasText;
+        sendBtn.setAttribute("aria-disabled", String(!hasText));
+      });
+
+      // Allow pressing Enter key to send message
+      inputEl.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          if (!sendBtn.disabled) send();
+        }
+      });
+
+      // Listen for incoming messages from the server
+      socket.on("message", (data) => {
+        const li = document.createElement("li");
+        li.textContent = data.msg;
+        messagesEl.appendChild(li);
+        // Scroll to the latest message
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+      });
+
+      /**
+       * send()
+       * Emit the current input value as a 'message' event to the server,
+       * then clear and refocus the input field.
+       */
+      function send() {
+        const message = inputEl.value.trim();
+        if (!message) return;
+
+        socket.emit("message", { msg: message });
+        inputEl.value = "";
+        inputEl.focus();
+        sendBtn.disabled = true;
+        sendBtn.setAttribute("aria-disabled", "true");
+      }
+
+      // Automatically focus the input on page load
+      window.addEventListener("load", () => {
+        inputEl.focus();
+      });
+    </script>
+  </body>
+</html>

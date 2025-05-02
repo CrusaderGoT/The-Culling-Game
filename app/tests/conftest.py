@@ -1,33 +1,38 @@
-'''configuraturations for test, i.e, fixtures, dependecy overrides, etc.'''
-import pytest
-from sqlmodel import SQLModel, Session
-from sqlalchemy import create_engine
-from fastapi.testclient import TestClient
+"""configuraturations for test, i.e, fixtures, dependecy overrides, etc."""
 
-from app.tests.utils_test import (
-    create_test_player, create_test_user, login_test_user,
-    override_dependencies, setup_authenticated_client
-    )
-from ..api.main import app
-from dotenv import load_dotenv
 import os
+
+import pytest
+from dotenv import load_dotenv
+from fastapi.testclient import TestClient
+from sqlalchemy import create_engine
+from sqlmodel import Session, SQLModel
+
+from app.api.main import app
+from app.tests.utils_test import (
+    create_test_player,
+    create_test_user,
+    login_test_user,
+    override_dependencies,
+    setup_authenticated_client,
+)
 
 
 @pytest.fixture(scope="session", autouse=True)
 def test_env():
-    'load enviroment file'
+    "load enviroment file"
     return load_dotenv(".env.test")
 
 
 @pytest.fixture(scope="session")
 def test_engine():
-    'create sqlalchemy/sqlmodel engine.\n the test engine'
+    "create sqlalchemy/sqlmodel engine.\n the test engine"
     _test_engine = create_engine(
         os.getenv("SQLITE_DATABASE_URL", "sqlite:///./test.db"),
         connect_args={"check_same_thread": False},
     )
     return _test_engine
-    
+
 
 @pytest.fixture(scope="session", autouse=True)
 def setup_test_database(test_engine):
@@ -48,18 +53,20 @@ def test_session(test_engine):
     """
     with Session(test_engine) as session:
         yield session
-        
+
 
 @pytest.fixture(scope="module", autouse=True)
 def override_app_dependencies(test_session):
     yield override_dependencies(test_session)
     app.dependency_overrides = {}
 
+
 @pytest.fixture(scope="function")
 def test_client():
     "create a test client that uses the test_session"
     with TestClient(app) as tst_cli:
         yield tst_cli
+
 
 @pytest.fixture(scope="module")
 def module_test_client():
@@ -70,25 +77,30 @@ def module_test_client():
     with TestClient(app) as tst_cli:
         yield tst_cli
 
+
 @pytest.fixture(scope="function")
 def authenticated_test_client(test_client) -> tuple[TestClient, dict]:
-    'an aunthenticated client that their session commits'
+    "an aunthenticated client that their session commits"
     #  use test client to create a user and then login them in to get access token
     test_user = create_test_user(test_client).json()
     token = login_test_user(test_client, test_user["id"])
     client = setup_authenticated_client(test_client, token)
     return client, test_user
 
+
 @pytest.fixture(scope="function")
 def authenticated_admin_client(test_client) -> tuple[TestClient, dict]:
-    'an aunthenticated admin client, that commits'
+    "an aunthenticated admin client, that commits"
     test_user = create_test_user(test_client).json()
-    code = os.getenv("CODE")
-    super_uer_res = test_client.post(f"/admin/superuser/{test_user['id']}", params={"code": code})
-    assert super_uer_res.is_success == True
     token = login_test_user(test_client, test_user["id"])
     client = setup_authenticated_client(test_client, token)
+    code = os.getenv("CODE")
+    super_user_res = test_client.post(
+        f"/admin/superuser/{test_user['id']}", params={"code": code}
+    )
+    assert super_user_res.is_success is True
     return client, test_user
+
 
 @pytest.fixture(scope="module")
 def match_players(module_test_client) -> list[tuple[TestClient, dict]]:
@@ -100,7 +112,7 @@ def match_players(module_test_client) -> list[tuple[TestClient, dict]]:
     for _ in range(2):
         # Create a new test user
         test_user = create_test_user(module_test_client)
-        assert test_user.is_success == True
+        assert test_user.is_success is True
         token = login_test_user(module_test_client, test_user.json()["id"])
         assert token
 

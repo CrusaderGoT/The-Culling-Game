@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.routing import APIRoute
+from fastapi.staticfiles import StaticFiles
 
 # load .env
 load_dotenv()
@@ -16,23 +17,10 @@ def custom_generate_unique_id(route: APIRoute):
     return f"{route.name}"
 
 
-app = FastAPI(
-    title="The Culling Games API", generate_unique_id_function=custom_generate_unique_id
-)
-"""
-The Global FastAPI app. To allow for use in multiple files.\n
-* ### Everything needed for the initailization of the app instance, should be made in the same directory as where this app is instantiated. Eg. CORS, Middleware, etc.\n
-#### example:
->>> from api.settings import app
->>> @app.get('/')
->>> # rest of your code
-"""
-
-
 # Create a Socket.IO server with asyncio
 sio = socketio.AsyncServer(
     async_mode="asgi",
-    cors_allowed_origins=["http://localhost:3000"],
+    cors_allowed_origins="*",
 )
 """
 The Global Socket.io server. To allow for use in multiple files.\n
@@ -46,12 +34,32 @@ and then use that helper in both `sio`,`router`or`app`.
         _sub_helper()
 """
 
+app = FastAPI(
+    title="The Culling Games API",
+    description="The API Docs for The Culling Games",
+    generate_unique_id_function=custom_generate_unique_id,
+    docs_url=None,
+    debug=True,
+)
+"""
+The Global FastAPI app. To allow for use in multiple files.\n
+* ### Everything needed for the initailization of the app instance, should be made in the same directory as where this app is instantiated. Eg. CORS, Middleware, etc.\n
+#### example:
+>>> from api.settings import app
+>>> @app.get('/')
+>>> # rest of your code
+"""
+
+
 # Wrap the Socket.IO server with ASGIApp
-ws_app = socketio.ASGIApp(sio)
+socket_app = socketio.ASGIApp(sio, app, socketio_path="/ws")
 """The Websocket App, to be mounted on the main FastAI app."""
 
 # Mount the Socket.IO app to a specific route
-app.mount("/socket.io", ws_app)
+app.mount("/ws", socket_app)
+
+# Mount static files
+app.mount("/static", StaticFiles(directory="app/static"), name="staic")
 
 # MIDDLEWARE
 origins = [

@@ -14,14 +14,18 @@ from app.models.player import (
     Player,
     PlayerInfo,
 )
+from app.utils.barrier import fix_barrier_deactivation_task_fail
 from app.utils.config import Tag, UserException
 from app.utils.dependencies import colony, session
-from app.utils.logic import (
+from app.utils.player import (
     calculate_points,
+    edit_player_helper,
     get_player,
+    points_required_for_upgrade,
+)
+from app.utils.user import (
     get_user,
     id_name_email,
-    points_required_for_upgrade,
 )
 from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, status
 from sqlmodel import or_, select
@@ -98,6 +102,8 @@ def my_player(session: session, current_user: active_user):
     if current_user.player and type(current_user.player.id) is int:
         player = get_player(session, current_user.player.id)
         if player:
+            # deactive any potential barrier end task fails
+            fix_barrier_deactivation_task_fail(player.barrier_technique, session)
             return player
         else:
             err_msg = "User has no Player"
@@ -151,6 +157,8 @@ def get_players(
 def a_player(player_id: Annotated[int, Path()], session: session):
     player = get_player(session, player_id)
     if player:
+        # deactive any potential barrier end task fails
+        fix_barrier_deactivation_task_fail(player.barrier_technique, session)
         return player
     else:
         err_msg = f"player ID '{player_id}' not found"
@@ -182,46 +190,17 @@ def edit_player(
         if playerdb.user_id != current_user.id:
             raise UserException(current_user, detail="Can only edit your own player.")
         else:  # update database infos
-            if player is not None:
-                edit_player_data = player.model_dump(
-                    exclude_unset=True,
-                    exclude_defaults=True,
-                    exclude_none=True,
-                    warnings="error",
-                )
-                playerdb.sqlmodel_update(edit_player_data)
-            if cursed_technique is not None:
-                edit_ct_data = cursed_technique.model_dump(
-                    exclude_unset=True,
-                    exclude_defaults=True,
-                    exclude_none=True,
-                    warnings="error",
-                )
-                playerdb.cursed_technique.sqlmodel_update(edit_ct_data)
-            if applications is not None:
-                # get the list of ct apps to edit from db
-                # modify to use the same format used in voting, for quicker loops
-                app_numbers = [app.number for app in applications]
-                ctapps = session.exec(
-                    select(CTApp)
-                    .join(CursedTechnique)
-                    .where(CTApp.ct_id == playerdb.cursed_technique.id)
-                    .where(CTApp.number.in_(app_numbers))  # type: ignore
-                ).all()
-                for ct_app in ctapps:
-                    for edit_ct_app in applications:
-                        if edit_ct_app.number == ct_app.number:
-                            ct_app_data = edit_ct_app.model_dump(
-                                exclude_unset=True,
-                                exclude_defaults=True,
-                                exclude_none=True,
-                                warnings="error",
-                            )
-                            ct_app.sqlmodel_update(ct_app_data)
-            # add playerdb to session, and commit to update infos
-            session.add(playerdb)
+            edited_player = edit_player_helper(
+                playerdb=playerdb,
+                player=player,
+                cursed_technique=cursed_technique,
+                applications=applications,
+                session=session,
+            )
+            # add edited_player to session, and commit to update infos
+            session.add(edited_player)
             session.commit()
-            session.refresh(playerdb)
+            session.refresh(edited_player)
             return playerdb
     else:
         raise HTTPException(

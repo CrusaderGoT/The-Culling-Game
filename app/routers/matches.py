@@ -1,22 +1,16 @@
 """module for the match routers"""
 
-from datetime import datetime
 from typing import Annotated
 
-from app.utils.logic import (
-    activate_domain,
-    activate_simple_domain,
+from app.utils.barrier import fix_barrier_deactivation_task_fail
+from app.utils.match import (
     assign_match_winner,
-    conditions_for_barrier_tech,
     create_new_match,
-    deactivate_domain,
-    deactivate_simple_domain,
     get_last_created_match,
     get_match,
-    get_player,
-    get_vote_point,
     ongoing_match,
 )
+from app.utils.vote import get_vote_point
 from fastapi import (
     APIRouter,
     BackgroundTasks,
@@ -31,12 +25,12 @@ from sqlmodel import select
 
 from ..auth.dependencies import active_user, admin_user, oauth2_scheme
 from ..models.admin import Permission
-from ..models.barrier import BarrierTech, BarrierTechInfo
 from ..models.base import ModelName
-from ..models.match import CastVote, ClientVoteInfo, Match, MatchInfo, Vote
+from ..models.match import Match, MatchInfo
 from ..models.player import CTApp, CursedTechnique, Player
 from ..models.user import User
-from ..utils.config import Tag, UserException
+from ..models.vote import CastVote, ClientVoteInfo, Vote
+from ..utils.config import AdminException, Tag
 from ..utils.dependencies import atp, session
 
 # write you match api routes here
@@ -58,9 +52,10 @@ async def create_match(
     # first get the permission for creating match
     permission = session.exec(
         select(Permission)
-        .where(Permission.model == ModelName.match)  # type: ignore
+        .where(Permission.model == ModelName.match)
         .where(Permission.level == Permission.PermissionLevel.CREATE)
     ).first()
+
     if permission is not None:
         # check if admin user has permission
         if permission in admin.permissions or admin.is_superuser:
@@ -90,10 +85,10 @@ async def create_match(
                 session.refresh(new_match)
                 return new_match
         else:  # admin doesn't have permission to create match
-            raise UserException(
-                admin.user,
+            raise AdminException(
+                admin,
                 code=status.HTTP_401_UNAUTHORIZED,
-                detail=f"{admin.user.username} doesn't have permission to create a match.",
+                detail=f"{admin.user.username} doesn't have permission to create a {ModelName.match}.",
             )
     else:
         raise HTTPException(
@@ -196,12 +191,20 @@ def vote(
                             v.ct_app_id for v in new_votes
                         ] and vote.ct_app_id not in [v.ct_app_id for v in prev_votes]:
                             # Add points to the player, based on barrier techniques active
-                            player = get_player(session, vote.player_id)
-                            if player is not None:
+                            player = [
+                                p for p in match.players if p.id == vote.player_id
+                            ][0]
+                            if player:
                                 # get the opposing player, for their BT check against player
                                 opposing_player = [
                                     p for p in match.players if p.id != player.id
                                 ][0]
+
+                                # deactive any potential barrier end task fails
+                                fix_barrier_deactivation_task_fail(
+                                    player.barrier_technique, session
+                                )
+
                                 # get the vote point
                                 vote_point = get_vote_point(
                                     match,
@@ -239,174 +242,6 @@ def vote(
         raise HTTPException(status.HTTP_404_NOT_FOUND, "match doesn't exist")
 
 
-@router.post("/activate/domain/{player_id}", response_model=BarrierTechInfo)
-def domain_expansion(
-    player_id: Annotated[int, Path()],
-    match_id: Annotated[int, Query()],
-    current_user: active_user,
-    session: session,
-    background: BackgroundTasks,
-    atp: atp,
-) -> BarrierTech:
-    """Activates the domain of a player in an ongoing match.\n
-    Buffs the vote to x4 per vote.\n
-    Weakend by simple domain"""
-    # first get the match, check if it is ongoing
-    match = session.get(Match, match_id)
-    player = session.get(Player, player_id)
-
-    # get the condition necessary for a BT
-    barrier_tech, barrier_record, match, _ = conditions_for_barrier_tech(
-        player=player,
-        match=match,
-        player_id=player_id,
-        match_id=match_id,
-        current_user=current_user,
-        session=session,
-    )
-
-    if (
-        barrier_record is not None
-        and (count := barrier_record.domain_counter) >= atp.limit_domain_expansion
-    ):
-        # check if they have reach limit for domain expansion in a match
-        if (
-            (end_time := barrier_tech.de_end_time) is not None
-            and end_time <= datetime.now()
-            or barrier_tech.domain_expansion is True
-        ):  # should have ended, but backgroud task failed
-            # deactivate domain
-            deactivate_domain(barrier_tech, session)
-        raise HTTPException(
-            status.HTTP_423_LOCKED,
-            f"domain can only be activated {count} times per match",
-        )
-
-    elif (
-        end_time := barrier_tech.de_end_time
-    ) and barrier_tech.domain_expansion is True:
-        # has a barrier tech; check if domain is currently active
-        # modify to accout for situations where one of them is True-ish/
-        # also if de end time has passed, that means that domain should have ended but the backgroud task failed
-        if end_time <= datetime.now():  # should have ended, but backgroud task failed
-            barrier_tech = activate_domain(
-                barrier_tech, barrier_record, match, session, atp
-            )
-            # schedule background task for deactivation
-            background.add_task(deactivate_domain, barrier_tech, session)
-            return barrier_tech
-        else:  # active
-            raise HTTPException(
-                status.HTTP_409_CONFLICT,
-                f"Domain is already active, deactivates in {
-                    round(
-                        (barrier_tech.de_end_time - datetime.now()).total_seconds(), 1
-                    )
-                } seconds.",
-            )
-
-    else:  # no domain activated or no deactivation time
-        barrier_tech = activate_domain(
-            barrier_tech, barrier_record, match, session, atp
-        )
-        # schedule background task for deactivation
-        background.add_task(deactivate_domain, barrier_tech, session)
-        return barrier_tech
-
-
-@router.post("/activate/simple/{player_id}", response_model=BarrierTechInfo)
-def simple_domain(
-    player_id: Annotated[int, Path()],
-    match_id: Annotated[int, Query()],
-    current_user: active_user,
-    session: session,
-    background: BackgroundTasks,
-    atp: atp,
-) -> BarrierTech:
-    """
-    \nActivates the simple domain effect for a player during an ongoing match. The simple domain interaction
-    modifies the opponent's capabilities based on their current domain status:
-        - If the opponent's domain expansion is inactive, it halves the effect of their vote per action.
-        - If the domain expansion is active, it weakens its effect.
-    \nParameters:
-            player_id (int): Unique identifier for the player whose simple domain is being activated.
-            match_id (int): The match identifier provided as a query parameter.
-            current_user (active_user): The currently authenticated user executing the action.
-            session (session): Database session for transactional operations and data retrieval.
-            background (BackgroundTasks): Background task manager to schedule asynchronous deactivation.
-            atp (atp): Configuration containing limitations, including limits on the number of activations
-                                 per match for the simple domain.
-    \nReturns:
-            BarrierTech: An updated BarrierTech object reflecting the current state and timing details of
-                                     the simple domain effect.
-    \nRaises:
-            HTTPException:
-                    - If the player has already reached the activation limit for the simple domain in the match.
-                    - If the simple domain is already active and the deactivation time has not passed.
-    \nNotes:
-            This function checks relevant conditions before activating the simple domain, including limits
-            and current activation status. When appropriate, it schedules a background task to automatically
-            deactivate the effect after its duration has elapsed.
-    """
-    match_none = session.get(Match, match_id)
-    player = session.get(Player, player_id)
-
-    barrier_tech, barrier_record, match, _ = conditions_for_barrier_tech(
-        player=player,
-        match=match_none,
-        player_id=player_id,
-        match_id=match_id,
-        current_user=current_user,
-        session=session,
-    )
-
-    if (
-        barrier_record is not None
-        and (count := barrier_record.simple_domain_counter) >= atp.limit_simple_domain
-    ):
-        # check if they have reached limit for simple domain in a match
-        if (
-            (end_time := barrier_tech.sd_end_time) is not None
-            and end_time <= datetime.now()
-            or barrier_tech.simple_domain is True
-        ):  # should have ended, but backgroud task failed
-            # deactivate domain
-            deactivate_simple_domain(barrier_tech, session)
-        raise HTTPException(
-            status.HTTP_423_LOCKED,
-            f"simple domain can only be activated {count} times per match",
-        )
-
-    elif (end_time := barrier_tech.sd_end_time) and barrier_tech.simple_domain is True:
-        # has a barrier tech; check if simple domain is currently active
-        # modify to accout for situations where one of them is True-ish/
-        # also if sd end time has passed, that means that simple domain should have ended but the backgroud task failed
-        if end_time <= datetime.now():  # should have ended, but backgroud task failed
-            barrier_tech = activate_simple_domain(
-                barrier_tech, barrier_record, match, session, atp
-            )
-            # schedule background task for deactivation
-            background.add_task(deactivate_simple_domain, barrier_tech, session)
-            return barrier_tech
-        else:  # active
-            raise HTTPException(
-                status.HTTP_409_CONFLICT,
-                f"Simple Domain is already active, deactivates in {
-                    round(
-                        (barrier_tech.sd_end_time - datetime.now()).total_seconds(), 1
-                    )
-                } seconds.",
-            )
-
-    else:  # no simple domain activated or no deactivation time
-        barrier_tech = activate_simple_domain(
-            barrier_tech, barrier_record, match, session, atp
-        )
-        # schedule background task for deactivation
-        background.add_task(deactivate_simple_domain, barrier_tech, session)
-        return barrier_tech
-
-
 @router.delete("/delete/{match_id}")
 async def delete_match(
     match_id: Annotated[int, Path()],
@@ -414,7 +249,7 @@ async def delete_match(
     admin: admin_user,
 ):
     """
-    Deletes a match from the database given its ID after verifying delete permissions.
+    Deletes a match from the database given its ID after verifying delete permissions.\f
 
     This endpoint operation checks whether the specified administrative user has the
     required permission to delete a match. First, it looks up the permission for deletion
@@ -437,13 +272,13 @@ async def delete_match(
     Raises:
         HTTPException: If the match does not exist (404 Not Found) or the deletion permission
                        is not defined (403 Forbidden).
-        UserException: If the admin does not have the authorization to delete the match
+        AdminException: If the admin does not have the authorization to delete the match
                        (401 Unauthorized).
     """
     # first get the permission for creating match
     permission = session.exec(
         select(Permission)
-        .where(Permission.model == ModelName.match)  # type: ignore
+        .where(Permission.model == ModelName.match)
         .where(Permission.level == Permission.PermissionLevel.DELETE)
     ).first()
     if permission is not None:
@@ -460,8 +295,8 @@ async def delete_match(
                     status.HTTP_404_NOT_FOUND, f"Match with Id: {match_id}, Not Found"
                 )
         else:  # admin doesn't have permission to create match
-            raise UserException(
-                admin.user,
+            raise AdminException(
+                admin,
                 code=status.HTTP_401_UNAUTHORIZED,
                 detail=f"{admin.user.username} doesn't have permission to create a match.",
             )

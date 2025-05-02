@@ -9,7 +9,7 @@ from app.api.settings import ALGORITHM, SECRET_KEY
 from app.auth.models import TokenData
 from app.models.user import User
 from app.utils.dependencies import session
-from app.utils.logic import get_user
+from app.utils.user import get_user
 
 from ..models.admin import AdminUser
 
