@@ -2,6 +2,7 @@
 
 import {
     CreatePlayerFormProvider,
+    CursedTechniqueInputs,
     PlayerInputs,
     createPlayerSchema,
     useCreatePlayerForm,
@@ -111,7 +112,7 @@ export function CreatePlayerForm() {
                             }
                             allowStepSelect={shouldAllowSelectStep(1)}
                         >
-                            Step 2 content: Verify email
+                            <CursedTechniqueInputs />
                         </Stepper.Step>
 
                         <Stepper.Step

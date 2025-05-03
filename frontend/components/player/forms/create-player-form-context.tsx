@@ -6,7 +6,14 @@ import { zCreateCt, zCreateCtApp, zCreatePlayer } from "@/api/client/zod.gen";
 
 import { GENDERS } from "@/lib/constants/GENDERS";
 
-import { Group, NumberInput, Select, Stack, TextInput } from "@mantine/core";
+import {
+    Group,
+    NumberInput,
+    Select,
+    Stack,
+    Textarea,
+    TextInput,
+} from "@mantine/core";
 
 export const createPlayerSchema = z.object({
     player: zCreatePlayer,
@@ -32,6 +39,7 @@ export function PlayerInputs() {
                     label="Player Name"
                     key={form.key("player.name")}
                     {...form.getInputProps("player.name")}
+                    withAsterisk
                 />
 
                 <TextInput
@@ -63,6 +71,28 @@ export function PlayerInputs() {
                     {...form.getInputProps("player.gender")}
                 />
             </Group>
+        </Stack>
+    );
+}
+
+export function CursedTechniqueInputs() {
+    const form = useCreatePlayerFormContext();
+
+    return (
+        <Stack>
+            <TextInput
+                label="Cursed Technique Name"
+                key={form.key("cursed_technique.name")}
+                {...form.getInputProps("cursed_technique.name")}
+                withAsterisk
+            />
+
+            <Textarea
+                label="Cursed Technique Name"
+                key={form.key("cursed_technique.definition")}
+                {...form.getInputProps("cursed_technique.definition")}
+                withAsterisk
+            />
         </Stack>
     );
 }
