@@ -131,6 +131,7 @@ export function CreatePlayerForm() {
                         </Stepper.Step>
 
                         <Stepper.Completed>
+                            Check for errors here.
                             Completed, click back button to get to previous step
                         </Stepper.Completed>
                     </Stepper>
