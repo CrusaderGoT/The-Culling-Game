@@ -23,7 +23,7 @@ import {
     Stack,
     Text,
     TextInput,
-    Title
+    Title,
 } from "@mantine/core";
 
 import { z } from "zod";
@@ -55,9 +55,13 @@ export function CreateUserForm() {
         });
     };
 
+    const handleSubmit = (data: zCreateUserType) => {
+        console.log(data);
+    };
+
     return (
         <Box flex={1}>
-            <form onSubmit={form.onSubmit((values) => console.log(values))}>
+            <form onSubmit={form.onSubmit(handleSubmit)}>
                 <Stack>
                     <TextInput
                         withAsterisk
@@ -108,7 +112,9 @@ export function CreateUserForm() {
 
                     <Divider label="or" />
 
-                    <Button onClick={() => window.location.href = "/login"}>Log In</Button>
+                    <Button onClick={() => (window.location.href = "/login")}>
+                        Log In
+                    </Button>
                 </Stack>
             </form>
         </Box>
