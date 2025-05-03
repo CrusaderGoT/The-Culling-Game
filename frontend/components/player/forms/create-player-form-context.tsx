@@ -6,9 +6,12 @@ import { zCreateCt, zCreateCtApp, zCreatePlayer } from "@/api/client/zod.gen";
 
 import { GENDERS } from "@/lib/constants/GENDERS";
 
+import { randomId } from "@mantine/hooks";
+
 import {
     Group,
     NumberInput,
+    Paper,
     Select,
     Stack,
     Textarea,
@@ -60,6 +63,7 @@ export function PlayerInputs() {
                     label="Age"
                     key={form.key("player.age")}
                     {...form.getInputProps("player.age")}
+                    withAsterisk
                 />
 
                 <Select
@@ -69,6 +73,7 @@ export function PlayerInputs() {
                     label="Gender"
                     key={form.key("player.gender")}
                     {...form.getInputProps("player.gender")}
+                    withAsterisk
                 />
             </Group>
         </Stack>
@@ -88,11 +93,56 @@ export function CursedTechniqueInputs() {
             />
 
             <Textarea
-                label="Cursed Technique Name"
+                label="Cursed Technique Definition"
                 key={form.key("cursed_technique.definition")}
                 {...form.getInputProps("cursed_technique.definition")}
+                autosize
+                minRows={5}
+                maxRows={10}
                 withAsterisk
             />
         </Stack>
+    );
+}
+
+export function ApplicationsInputs() {
+    const form = useCreatePlayerFormContext();
+
+    const applicationsField = form.getValues().applications.map((_, index) => {
+        return (
+            <Paper key={randomId()} withBorder p={"xs"} miw={400}>
+                <Stack>
+                    <TextInput
+                        withAsterisk
+                        label={`Application ${index + 1} - Name`}
+                        key={form.key(`applications.${index}.name`)}
+                        {...form.getInputProps(`applications.${index}.name`)}
+                    />
+
+                    <Textarea
+                        label={`Application ${index + 1} - Description`}
+                        key={form.key(`applications.${index}.application`)}
+                        {...form.getInputProps(
+                            `applications.${index}.application`
+                        )}
+                        autosize
+                        minRows={7}
+                        maxRows={15}
+                        withAsterisk
+                    />
+                </Stack>
+            </Paper>
+        );
+    });
+
+    return (
+        <Group
+            preventGrowOverflow={false}
+            gap={"xl"}
+            grow
+            justify="space-evenly"
+        >
+            {applicationsField}
+        </Group>
     );
 }
