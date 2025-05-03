@@ -10,13 +10,14 @@ import {
     MantineProvider,
     createTheme,
     mantineHtmlProps,
+    rem,
 } from "@mantine/core";
 
 import {
     charcoalColor,
     deepRedColor,
     goldColor,
-} from "@/constants/themeColors";
+} from "@/lib/constants/themeColors";
 
 import Naluka from "@/fonts/NalukaFont";
 import Neuropol from "@/fonts/NeuropolFont";
@@ -41,6 +42,13 @@ const theme = createTheme({
     fontFamily: `${Neuropol.style.fontFamily}, ${DEFAULT_THEME.fontFamily}`,
     headings: {
         fontFamily: `${Naluka.style.fontFamily}, ${DEFAULT_THEME.fontFamily}`,
+    },
+    fontSizes: {
+        xs: rem(10),
+        sm: rem(11),
+        md: rem(14),
+        lg: rem(16),
+        xl: rem(20),
     },
 });
 

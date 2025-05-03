@@ -25,6 +25,7 @@ export function ModeToggle() {
             variant="default"
             radius={"lg"}
             size="xl"
+            m={"xs"}
             aria-label="Toggle color scheme"
         >
             <IconSun className={cx(classes.icon, classes.light)} stroke={1.5} />

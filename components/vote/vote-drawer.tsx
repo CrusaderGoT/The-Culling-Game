@@ -38,7 +38,7 @@ export function VoteDrawer({ players }: VoteDrawerProp) {
                     position="top"
                     transitionProps={{ transition: "pop" }}
                     offset={10}
-                    
+                    size={"xs"}
                     overlayProps={{ backgroundOpacity: 0.5, blur: 4 }}
                 >
                     <Text>

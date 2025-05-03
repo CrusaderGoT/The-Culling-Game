@@ -1,11 +1,16 @@
-import { CreateUserForm } from "@/components/user/forms/create-user-form";
-import { Group, Paper } from "@mantine/core";
+import { LoginForm } from "@/components/user/forms/login-user-form";
+
+import { Box, Title } from "@mantine/core";
+
+import { IconFish } from "@tabler/icons-react";
 
 export default async function LoginPage() {
     return (
-        <Paper withBorder p={"md"}>
-            <CreateUserForm />
-        </Paper>
-    
-);
+        <Box>
+            <Title ta={"center"} order={2}>
+                Welcome Back <IconFish size={26} />
+            </Title>
+            <LoginForm />
+        </Box>
+    );
 }
