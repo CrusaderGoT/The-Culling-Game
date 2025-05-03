@@ -1,0 +1,25 @@
+.voteCard {
+  border: 1px solid var(--mantine-color-gray-3);
+  padding: var(--mantine-spacing-xs) var(--mantine-spacing-sm);
+  border-radius: var(--mantine-radius-md);
+  font-weight: 500;
+  transition: color 500ms ease, background-color 500ms ease,
+    border-color 500ms ease;
+  cursor: pointer;
+}
+
+.voteCard[data-checked] {
+  color: var(--mantine-color-white);
+}
+
+.voteCard * {
+  pointer-events: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  .voteCard {
+    border: 1px solid var(--mantine-color-dark-4);
+  }
+}
