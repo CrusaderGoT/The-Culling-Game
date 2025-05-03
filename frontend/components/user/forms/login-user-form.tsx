@@ -4,7 +4,7 @@ import {
     LoginFormProvider,
     loginUserSchema,
     useLoginForm,
-} from "@/components/user/forms/login-form-context";
+} from "@/components/user/forms/login-user-form-context";
 
 import {
     Button,
@@ -17,8 +17,11 @@ import {
 } from "@mantine/core";
 
 import { zodResolver } from "mantine-form-zod-resolver";
+import { useRouter } from "next/navigation";
 
 export function LoginForm() {
+    const router = useRouter();
+
     const form = useLoginForm({
         mode: "uncontrolled",
         validate: zodResolver(loginUserSchema),
@@ -53,7 +56,12 @@ export function LoginForm() {
 
                         <Divider label="or" />
 
-                        <Button color="green">Signup</Button>
+                        <Button
+                            color="green"
+                            onClick={() => router.push("/signup")}
+                        >
+                            Signup
+                        </Button>
                     </Stack>
                 </form>
             </Paper>
