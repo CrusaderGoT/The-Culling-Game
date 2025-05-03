@@ -51,8 +51,8 @@ export function CreatePlayerForm() {
             player: {
                 name: "",
                 role: "",
-                age: undefined,
-                gender: undefined,
+                age: 0,
+                gender: "male",
             },
             cursed_technique: {
                 name: "",
@@ -131,8 +131,8 @@ export function CreatePlayerForm() {
                         </Stepper.Step>
 
                         <Stepper.Completed>
-                            Check for errors here.
-                            Completed, click back button to get to previous step
+                            Check for errors here. Completed, click back button
+                            to get to previous step
                         </Stepper.Completed>
                     </Stepper>
 
