@@ -37,12 +37,9 @@ export function CreatePlayerForm() {
         // validate current section before moving to next step
         const key = fieldKeys[active] as string;
         form.validateField(key);
-        const errors = form.errors;
-        console.log(errors, key, !(key in errors));
-        if (!(key in errors)) {
-            setActive(nextStep);
-            setHighestStepVisited((hSC) => Math.max(hSC, nextStep));
-        }
+
+        setActive(nextStep);
+        setHighestStepVisited((hSC) => Math.max(hSC, nextStep));
     };
 
     // Allow the user to freely go back and forth between visited steps.
@@ -148,9 +145,7 @@ export function CreatePlayerForm() {
                             </Button>
                         )}
 
-                        <Button
-                            onClick={() => handleStepChange(active + 1)}
-                        >
+                        <Button onClick={() => handleStepChange(active + 1)}>
                             Next step
                         </Button>
                     </Group>
