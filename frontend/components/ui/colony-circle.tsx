@@ -8,8 +8,8 @@ export function ColonyCircle() {
         <Flex className={`${circleClasses.colonyContainer}`}>
             <AspectRatio
                 ratio={1}
-                h={{ base: 300, md: 600, lg: 700 }}
-                w={{ base: 300, md: 600, lg: 700 }}
+                h={{ base: 500, md: 600, lg: 700 }}
+                w={{ base: 500, md: 600, lg: 700 }}
                 className={`${circleClasses.colonyCircle}`}
             >
                 <CircleContent />
