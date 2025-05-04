@@ -6,7 +6,17 @@ import { zCreateCt, zCreateCtApp, zCreatePlayer } from "@/api/client/zod.gen";
 
 import { GENDERS } from "@/lib/constants/GENDERS";
 
-import { Group, NumberInput, Select, Stack, TextInput } from "@mantine/core";
+import { randomId } from "@mantine/hooks";
+
+import {
+    Group,
+    NumberInput,
+    Paper,
+    Select,
+    Stack,
+    Textarea,
+    TextInput,
+} from "@mantine/core";
 
 export const createPlayerSchema = z.object({
     player: zCreatePlayer,
@@ -32,6 +42,7 @@ export function PlayerInputs() {
                     label="Player Name"
                     key={form.key("player.name")}
                     {...form.getInputProps("player.name")}
+                    withAsterisk
                 />
 
                 <TextInput
@@ -52,6 +63,7 @@ export function PlayerInputs() {
                     label="Age"
                     key={form.key("player.age")}
                     {...form.getInputProps("player.age")}
+                    withAsterisk
                 />
 
                 <Select
@@ -61,8 +73,76 @@ export function PlayerInputs() {
                     label="Gender"
                     key={form.key("player.gender")}
                     {...form.getInputProps("player.gender")}
+                    withAsterisk
                 />
             </Group>
         </Stack>
+    );
+}
+
+export function CursedTechniqueInputs() {
+    const form = useCreatePlayerFormContext();
+
+    return (
+        <Stack>
+            <TextInput
+                label="Cursed Technique Name"
+                key={form.key("cursed_technique.name")}
+                {...form.getInputProps("cursed_technique.name")}
+                withAsterisk
+            />
+
+            <Textarea
+                label="Cursed Technique Definition"
+                key={form.key("cursed_technique.definition")}
+                {...form.getInputProps("cursed_technique.definition")}
+                autosize
+                minRows={5}
+                maxRows={10}
+                withAsterisk
+            />
+        </Stack>
+    );
+}
+
+export function ApplicationsInputs() {
+    const form = useCreatePlayerFormContext();
+
+    const applicationsField = form.getValues().applications.map((_, index) => {
+        return (
+            <Paper key={randomId()} withBorder p={"xs"}>
+                <Stack>
+                    <TextInput
+                        withAsterisk
+                        label={`Application ${index + 1} - Name`}
+                        key={form.key(`applications.${index}.name`)}
+                        {...form.getInputProps(`applications.${index}.name`)}
+                    />
+
+                    <Textarea
+                        label={`Application ${index + 1} - Description`}
+                        key={form.key(`applications.${index}.application`)}
+                        {...form.getInputProps(
+                            `applications.${index}.application`
+                        )}
+                        autosize
+                        minRows={7}
+                        maxRows={15}
+                        withAsterisk
+                    />
+                </Stack>
+            </Paper>
+        );
+    });
+
+    return (
+        <Group
+            preventGrowOverflow={false}
+            gap={"xl"}
+            grow
+            justify="space-evenly"
+        >
+            {applicationsField}
+        </Group>
     );
 }

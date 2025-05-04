@@ -1,12 +1,20 @@
 "use client";
 
 import {
+    ApplicationsInputs,
     CreatePlayerFormProvider,
+    CursedTechniqueInputs,
     PlayerInputs,
     createPlayerSchema,
     useCreatePlayerForm,
 } from "@/components/player/forms/create-player-form-context";
-import { Button, Group, Paper, Stepper } from "@mantine/core";
+import {
+    Button,
+    Group,
+    Paper,
+    ScrollAreaAutosize,
+    Stepper,
+} from "@mantine/core";
 import {
     IconBuildingCarousel,
     IconCircleCheck,
@@ -37,12 +45,9 @@ export function CreatePlayerForm() {
         // validate current section before moving to next step
         const key = fieldKeys[active] as string;
         form.validateField(key);
-        const errors = form.errors;
-        console.log(errors, key, !(key in errors));
-        if (!(key in errors)) {
-            setActive(nextStep);
-            setHighestStepVisited((hSC) => Math.max(hSC, nextStep));
-        }
+
+        setActive(nextStep);
+        setHighestStepVisited((hSC) => Math.max(hSC, nextStep));
     };
 
     // Allow the user to freely go back and forth between visited steps.
@@ -98,7 +103,9 @@ export function CreatePlayerForm() {
                             }
                             allowStepSelect={shouldAllowSelectStep(0)}
                         >
-                            <PlayerInputs />
+                            <ScrollAreaAutosize mah={400}>
+                                <PlayerInputs />
+                            </ScrollAreaAutosize>
                         </Stepper.Step>
 
                         <Stepper.Step
@@ -114,7 +121,9 @@ export function CreatePlayerForm() {
                             }
                             allowStepSelect={shouldAllowSelectStep(1)}
                         >
-                            Step 2 content: Verify email
+                            <ScrollAreaAutosize mah={400}>
+                                <CursedTechniqueInputs />
+                            </ScrollAreaAutosize>
                         </Stepper.Step>
 
                         <Stepper.Step
@@ -130,11 +139,34 @@ export function CreatePlayerForm() {
                             }
                             allowStepSelect={shouldAllowSelectStep(2)}
                         >
-                            <PlayerInputs />
+                            <ScrollAreaAutosize mah={400}>
+                                <ApplicationsInputs />
+                            </ScrollAreaAutosize>
                         </Stepper.Step>
 
                         <Stepper.Completed>
-                            Completed, click back button to get to previous step
+                            {Object.keys(form.errors).length > 0 ? (
+                                <div>
+                                    <p>
+                                        Some fields have errors. Please review
+                                        your inputs:
+                                    </p>
+                                    <ul>
+                                        {Object.entries(form.errors).map(
+                                            ([field, error]) => (
+                                                <li key={field}>
+                                                    {field}: {error}
+                                                </li>
+                                            )
+                                        )}
+                                    </ul>
+                                </div>
+                            ) : (
+                                <p>
+                                    All steps completed successfully! You can go
+                                    back to review or submit the form.
+                                </p>
+                            )}
                         </Stepper.Completed>
                     </Stepper>
 
@@ -148,10 +180,8 @@ export function CreatePlayerForm() {
                             </Button>
                         )}
 
-                        <Button
-                            onClick={() => handleStepChange(active + 1)}
-                        >
-                            Next step
+                        <Button onClick={() => handleStepChange(active + 1)}>
+                            Next
                         </Button>
                     </Group>
                 </form>
