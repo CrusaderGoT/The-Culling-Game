@@ -35,8 +35,8 @@ export function ColonyCircle() {
             <AspectRatio
                 ref={ref}
                 ratio={1}
-                h={{ base: 300, md: 400, lg: 500 }}
-                w={{ base: 300, md: 400, lg: 500 }}
+                h={{ base: 300, sm: 400, md: 500, lg: 600 }}
+                w={{ base: 300, sm: 400, md: 500, lg: 600 }}
                 className={`${circleClasses.colonyCircle}`}
             >
                 <BackgroundImage
@@ -89,9 +89,9 @@ function CircleContent({ circleHovered, scaleImage }: CircleContentProp) {
                 title={!loading ? "enter" : "making vows..."}
                 loading={loading}
                 onClick={() => {
-                    //router.push("/match");
-                    //setLoading(true);
+                    setLoading(true);
                     scaleImage((prev) => !prev);
+                    router.push("/match");
                 }}
             >
                 <MantineImage
