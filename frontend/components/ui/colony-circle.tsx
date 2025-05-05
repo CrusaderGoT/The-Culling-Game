@@ -72,8 +72,7 @@ function CircleContent({ circleHovered, setScaleImage }: CircleContentProp) {
 
     useEffect(() => {
         router.prefetch("/match");
-        if (!circleHovered) setLoading(false);
-    }, [router, circleHovered, setLoading]);
+    }, [router]);
 
     return (
         <Stack justify="center" align="center">
