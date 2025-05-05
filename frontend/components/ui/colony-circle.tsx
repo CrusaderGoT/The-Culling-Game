@@ -70,17 +70,24 @@ function CircleContent({ circleHovered, setScaleImage }: CircleContentProp) {
 
     const [loading, setLoading] = useState(false);
 
+    useEffect(() => {
+        router.prefetch("/match");
+        if (!circleHovered) setLoading(false);
+    }, [router, circleHovered, setLoading]);
+
     return (
         <Stack justify="center" align="center">
             <Title order={2} className={`${circleClasses.colonyText}`}>
                 COLONY
             </Title>
 
-            <Text className={`${circleClasses.colonyWarning}`}>
-                {circleHovered
-                    ? "a dangerous game known as the culling games is going on inside. where players kill each other in a battle royale. do you still wish to enter?"
-                    : ""}
-            </Text>
+            {circleHovered && (
+                <Text className={`${circleClasses.colonyWarning}`}>
+                    a dangerous game known as the culling games is going on
+                    inside. where players kill each other in a battle royale. do
+                    you still wish to enter?
+                </Text>
+            )}
 
             <ActionIcon
                 variant="transparent"
