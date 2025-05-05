@@ -4,9 +4,9 @@ import circleClasses from "@/styles/colony-circle.module.css";
 import {
     ActionIcon,
     AspectRatio,
+    Avatar,
     BackgroundImage,
     Flex,
-    Image as MantineImage,
     Overlay,
     Stack,
     Text,
@@ -14,7 +14,7 @@ import {
 } from "@mantine/core";
 
 import { useHover } from "@mantine/hooks";
-import Image from "next/image";
+import { IconDoorEnter } from "@tabler/icons-react";
 
 import { useRouter } from "next/navigation";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
@@ -22,11 +22,11 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 export function ColonyCircle() {
     const { hovered, ref } = useHover();
 
-    const [scaled, setScaled] = useState(false);
+    const [scaleImage, setScaleImage] = useState(false);
 
     useEffect(() => {
         if (!hovered) {
-            setScaled(false);
+            setScaleImage(false);
         }
     }, [hovered]);
 
@@ -43,7 +43,7 @@ export function ColonyCircle() {
                     src="/images/skyline-4.jpg"
                     className={`${circleClasses.circleImage}`}
                     style={{
-                        transform: scaled
+                        transform: scaleImage
                             ? "scale3d(2.5, 2.0, 2.3)"
                             : "scale3d(1, 1, 1)",
                     }}
@@ -51,7 +51,10 @@ export function ColonyCircle() {
                     <Overlay className={`${circleClasses.circleOverlay}`} />
                 </BackgroundImage>
 
-                <CircleContent circleHovered={hovered} scaleImage={setScaled} />
+                <CircleContent
+                    circleHovered={hovered}
+                    setScaleImage={setScaleImage}
+                />
             </AspectRatio>
         </Flex>
     );
@@ -59,10 +62,10 @@ export function ColonyCircle() {
 
 type CircleContentProp = {
     circleHovered: boolean;
-    scaleImage: Dispatch<SetStateAction<boolean>>;
+    setScaleImage: Dispatch<SetStateAction<boolean>>;
 };
 
-function CircleContent({ circleHovered, scaleImage }: CircleContentProp) {
+function CircleContent({ circleHovered, setScaleImage }: CircleContentProp) {
     const router = useRouter();
 
     const [loading, setLoading] = useState(false);
@@ -90,19 +93,18 @@ function CircleContent({ circleHovered, scaleImage }: CircleContentProp) {
                 loading={loading}
                 onClick={() => {
                     setLoading(true);
-                    scaleImage((prev) => !prev);
+                    setScaleImage((prev) => !prev);
                     router.push("/match");
                 }}
             >
-                <MantineImage
-                    component={Image}
-                    src={"/images/Kogane.png"}
-                    alt="kogane.jpg"
-                    width={325}
-                    height={275}
-                    className={`${circleClasses.enterBtnImage}`}
-                    fallbackSrc={"/images/HiromiKogane.png"}
-                />
+                <Avatar
+                    variant="transparent"
+                    color="deepred"
+                    src={"/images/HiromiKogane.png"}
+                    alt={"enter button"}
+                >
+                    <IconDoorEnter />
+                </Avatar>
             </ActionIcon>
         </Stack>
     );
