@@ -111,7 +111,7 @@ export function ApplicationsInputs() {
     const applicationsField = form.getValues().applications.map((_, index) => {
         return (
             <Paper key={randomId()} withBorder p={"xs"}>
-                <Stack>
+                <Stack key={randomId()}>
                     <TextInput
                         withAsterisk
                         label={`Application ${index + 1} - Name`}

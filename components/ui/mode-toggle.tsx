@@ -22,10 +22,11 @@ export function ModeToggle() {
                     computedColorScheme === "light" ? "dark" : "light"
                 )
             }
-            variant="default"
-            radius={"lg"}
-            size="xl"
-            m={"xs"}
+            variant="subtle"
+            radius={"xl"}
+            size="md"
+            my={"xs"}
+            color="dark"
             aria-label="Toggle color scheme"
         >
             <IconSun className={cx(classes.icon, classes.light)} stroke={1.5} />

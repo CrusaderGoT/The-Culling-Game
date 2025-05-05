@@ -1,12 +1,5 @@
-import { LiveMatch } from "@/components/match/live-match";
-import { Container } from "@mantine/core";
-
-import { mockMatch, mockPlayers } from "@/lib/constants/mockData";
+import { ColonyCircle } from "@/components/ui/colony-circle";
 
 export default async function HomePage() {
-    return (
-        <Container size={"xl"}>
-            <LiveMatch players={mockPlayers} match={mockMatch} />
-        </Container>
-    );
+    return <ColonyCircle />;
 }
