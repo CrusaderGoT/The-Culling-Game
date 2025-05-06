@@ -10,13 +10,16 @@ import { randomId } from "@mantine/hooks";
 
 import {
     Group,
+    List,
     NumberInput,
     Paper,
     Select,
     Stack,
+    Text,
     Textarea,
-    TextInput,
+    TextInput
 } from "@mantine/core";
+
 
 export const createPlayerSchema = z.object({
     player: zCreatePlayer,
@@ -144,5 +147,58 @@ export function ApplicationsInputs() {
         >
             {applicationsField}
         </Group>
+    );
+}
+
+export function PlayerInfoList() {
+    const player = useCreatePlayerFormContext().getValues().player;
+    return (
+        <List>
+            <Text>Player Info</Text>
+            <List withPadding listStyleType="disc" spacing={"xs"}>
+                <List.Item>Name: {player.name}</List.Item>
+                <List.Item>Age: {player.age}</List.Item>
+                <List.Item>Gender: {player.gender}</List.Item>
+                <List.Item>Role: {player.role}</List.Item>
+            </List>
+        </List>
+    );
+}
+
+export function CTInfoList() {
+    const cursed_technique =
+        useCreatePlayerFormContext().getValues().cursed_technique;
+    return (
+        <List>
+            Cursed Technique
+            <List withPadding>
+                <List.Item>Name: {cursed_technique.name}</List.Item>
+                <List.Item>Definition: {cursed_technique.definition}</List.Item>
+            </List>
+        </List>
+    );
+}
+
+export function CTAPPInfoList() {
+    const applications = useCreatePlayerFormContext().getValues().applications;
+    const appList = applications.map((app, index) => {
+        return (
+            <List withPadding key={randomId()}>
+                Application {index + 1}
+                <List withPadding>
+                    <List.Item>Name: {app.name}</List.Item>
+                    <List.Item>Application: {app.application}</List.Item>
+                </List>
+            </List>
+        );
+    });
+
+    return (
+        <Stack>
+            <Text ta={"center"}>Cursed Technique Applications</Text>
+            <List>
+                <Group>{appList}</Group>
+            </List>
+        </Stack>
     );
 }

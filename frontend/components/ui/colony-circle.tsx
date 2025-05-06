@@ -15,6 +15,7 @@ import {
 
 import { useHover } from "@mantine/hooks";
 import { IconDoorEnter } from "@tabler/icons-react";
+import Link from "next/link";
 
 import { useRouter } from "next/navigation";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
@@ -66,13 +67,7 @@ type CircleContentProp = {
 };
 
 function CircleContent({ circleHovered, setScaleImage }: CircleContentProp) {
-    const router = useRouter();
-
     const [loading, setLoading] = useState(false);
-
-    useEffect(() => {
-        router.prefetch("/match");
-    }, [router]);
 
     return (
         <Stack justify="center" align="center">
@@ -80,13 +75,12 @@ function CircleContent({ circleHovered, setScaleImage }: CircleContentProp) {
                 COLONY
             </Title>
 
-            {circleHovered && (
-                <Text className={`${circleClasses.colonyWarning}`}>
-                    a dangerous game known as the culling games is going on
+            <Text className={`${circleClasses.colonyWarning}`}>
+                {circleHovered &&
+                    `a dangerous game known as the culling games is going on
                     inside. where players kill each other in a battle royale. do
-                    you still wish to enter?
-                </Text>
-            )}
+                    you still wish to enter?`}
+            </Text>
 
             <ActionIcon
                 variant="transparent"
@@ -97,10 +91,11 @@ function CircleContent({ circleHovered, setScaleImage }: CircleContentProp) {
                 className={`${circleClasses.colonyEnterBtn}`}
                 title={!loading ? "enter" : "making vows..."}
                 loading={loading}
+                component={Link}
+                href={"/match"}
                 onClick={() => {
                     setLoading(true);
                     setScaleImage((prev) => !prev);
-                    router.push("/match");
                 }}
             >
                 <Avatar
