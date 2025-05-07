@@ -15,6 +15,7 @@ import {
     Stack,
     TextInput,
 } from "@mantine/core";
+import { IconLockPassword, IconUser } from "@tabler/icons-react";
 
 import { zodResolver } from "mantine-form-zod-resolver";
 import { useRouter } from "next/navigation";
@@ -41,6 +42,7 @@ export function LoginForm() {
                             label="Username"
                             key={form.key("username")}
                             {...form.getInputProps("username")}
+                            leftSection={<IconUser size={18} />}
                         />
 
                         <PasswordInput
@@ -48,6 +50,7 @@ export function LoginForm() {
                             label="Password"
                             key={form.key("password")}
                             {...form.getInputProps("password")}
+                            leftSection={<IconLockPassword size={18} />}
                         />
                     </Flex>
 

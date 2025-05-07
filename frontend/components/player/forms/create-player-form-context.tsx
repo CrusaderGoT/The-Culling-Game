@@ -8,6 +8,7 @@ import { GENDERS } from "@/lib/constants/GENDERS";
 
 import { randomId } from "@mantine/hooks";
 
+import Naluka from "@/fonts/NalukaFont";
 import {
     Group,
     List,
@@ -17,9 +18,9 @@ import {
     Stack,
     Text,
     Textarea,
-    TextInput
+    TextInput,
+    Title,
 } from "@mantine/core";
-
 
 export const createPlayerSchema = z.object({
     player: zCreatePlayer,
@@ -35,7 +36,7 @@ export const [
     useCreatePlayerForm,
 ] = createFormContext<CreatePlayerSchemaType>();
 
-export function PlayerInputs() {
+export function PlayerFormInputs() {
     const form = useCreatePlayerFormContext();
 
     return (
@@ -83,7 +84,7 @@ export function PlayerInputs() {
     );
 }
 
-export function CursedTechniqueInputs() {
+export function CursedTechniqueFormInputs() {
     const form = useCreatePlayerFormContext();
 
     return (
@@ -108,13 +109,13 @@ export function CursedTechniqueInputs() {
     );
 }
 
-export function ApplicationsInputs() {
+export function ApplicationsFormInputs() {
     const form = useCreatePlayerFormContext();
 
     const applicationsField = form.getValues().applications.map((_, index) => {
         return (
-            <Paper key={randomId()} withBorder p={"xs"}>
-                <Stack key={randomId()}>
+            <Paper key={index} withBorder p={"xs"}>
+                <Stack key={index}>
                     <TextInput
                         withAsterisk
                         label={`Application ${index + 1} - Name`}
@@ -150,44 +151,66 @@ export function ApplicationsInputs() {
     );
 }
 
-export function PlayerInfoList() {
+export function PlayerInfoFormList() {
     const player = useCreatePlayerFormContext().getValues().player;
     return (
         <List>
-            <Text>Player Info</Text>
+            <Title ff={`${Naluka.style.fontFamily}`} order={3} ta={"center"}>
+                Player Info
+            </Title>
             <List withPadding listStyleType="disc" spacing={"xs"}>
-                <List.Item>Name: {player.name}</List.Item>
-                <List.Item>Age: {player.age}</List.Item>
-                <List.Item>Gender: {player.gender}</List.Item>
-                <List.Item>Role: {player.role}</List.Item>
+                <List.Item>
+                    Name: <Text c={"orange"}>{player.name}</Text>
+                </List.Item>
+                <List.Item>
+                    Age: <Text c={"blue"}>{player.age}</Text>
+                </List.Item>
+                <List.Item>
+                    Gender: <Text c={"green"}>{player.gender}</Text>
+                </List.Item>
+                <List.Item>
+                    Role: <Text c={"red"}>{player.role}</Text>
+                </List.Item>
             </List>
         </List>
     );
 }
 
-export function CTInfoList() {
+export function CursedTechniqueFormList() {
     const cursed_technique =
         useCreatePlayerFormContext().getValues().cursed_technique;
     return (
         <List>
-            Cursed Technique
-            <List withPadding>
-                <List.Item>Name: {cursed_technique.name}</List.Item>
-                <List.Item>Definition: {cursed_technique.definition}</List.Item>
+            <Title ff={`${Naluka.style.fontFamily}`} order={3} ta={"center"}>
+                Cursed Technique
+            </Title>
+            <List withPadding listStyleType="disc" spacing={"xs"}>
+                <List.Item>
+                    Name: <Text c={"lime"}>{cursed_technique.name}</Text>
+                </List.Item>
+                <List.Item>
+                    Definition:{" "}
+                    <Text c={"deepred"}>{cursed_technique.definition}</Text>
+                </List.Item>
             </List>
         </List>
     );
 }
 
-export function CTAPPInfoList() {
+export function ApplicationFormList() {
     const applications = useCreatePlayerFormContext().getValues().applications;
     const appList = applications.map((app, index) => {
         return (
-            <List withPadding key={randomId()}>
-                Application {index + 1}
-                <List withPadding>
-                    <List.Item>Name: {app.name}</List.Item>
-                    <List.Item>Application: {app.application}</List.Item>
+            <List key={randomId()}>
+                <Title order={6}>Application {index + 1}</Title>
+
+                <List withPadding listStyleType="disc" spacing={"xs"}>
+                    <List.Item>
+                        Name: <Text c={"lime"}>{app.name}</Text>
+                    </List.Item>
+                    <List.Item>
+                        Application: <Text c={"cyan"}> {app.application}</Text>
+                    </List.Item>
                 </List>
             </List>
         );
@@ -195,9 +218,13 @@ export function CTAPPInfoList() {
 
     return (
         <Stack>
-            <Text ta={"center"}>Cursed Technique Applications</Text>
-            <List>
-                <Group>{appList}</Group>
+            <Title ff={`${Naluka.style.fontFamily}`} order={3} ta={"center"}>
+                Applications
+            </Title>
+            <List spacing={"xs"}>
+                <Group align="flex-start" justify="space-between">
+                    {appList}
+                </Group>
             </List>
         </Stack>
     );
