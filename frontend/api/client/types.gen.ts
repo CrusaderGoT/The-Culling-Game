@@ -11,7 +11,17 @@ export type AdminInfo = {
 };
 
 /**
- * the class for a barrier technique info
+ * Represents barrier technique information for client-side.
+ *
+ * Attributes:
+ * id (int): Unique identifier for the barrier technique.
+ * domain_expansion: bool = Field(default=False, description="the player's domain expansion")
+ * binding_vow: bool = Field(default=False, description="the player's binding vow")
+ * simple_domain: bool = Field(default=False, description="the player's simple domain")
+ * The times are useful for know when to activate/deactivate the techniques
+ * de_end_time: datetime | None = Field(default=None, description="the time a player cast their domain")
+ * bv_end_time: datetime | None = Field(default=None, description="the time a player cast their binding_vow")
+ * sd_end_time: datetime | None = Field(default=None, description="the time a player cast their simple_domain")
  */
 export type BarrierTechInfo = {
     /**
@@ -107,7 +117,13 @@ export type BaseColonyInfo = {
  * `winner: Union[BasePlayerInfo, None]`
  */
 export type BaseMatchInfo = {
+    /**
+     * The start time of the match
+     */
     begin: string;
+    /**
+     * The end time of the match
+     */
     end: string;
     part: number;
     id: number;
@@ -126,6 +142,7 @@ export type BasePermissionInfo = {
      * The model the permission applies to
      */
     model: ModelName;
+    id: number;
     /**
      * Permission name
      */
@@ -243,8 +260,16 @@ export type CastVote = {
     ct_app_id: number;
 };
 
+/**
+ * Represents information about a client's vote in a match.
+ *
+ * Attributes:
+ * message (str): A message associated with the client's vote.
+ * votes (list[BaseVoteInfo]): A list of vote information objects related to the client.
+ */
 export type ClientVoteInfo = {
     message: string;
+    extra_info: Array<string> | null;
     votes: Array<BaseVoteInfo>;
 };
 
@@ -487,17 +512,6 @@ export type CreateCtApp = {
 };
 
 /**
- * for creating a permission; requires a model name, and a permission level
- */
-export type CreatePermission = {
-    /**
-     * The model the permission applies to
-     */
-    model: ModelName;
-    level: Array<PermissionLevel>;
-};
-
-/**
  * For creating a Player
  */
 export type CreatePlayer = {
@@ -631,7 +645,13 @@ export type HttpValidationError = {
  * match info for client side
  */
 export type MatchInfo = {
+    /**
+     * The start time of the match
+     */
     begin: string;
+    /**
+     * The end time of the match
+     */
     end: string;
     part: number;
     id: number;
@@ -640,18 +660,24 @@ export type MatchInfo = {
     colony: BaseColonyInfo;
 };
 
-export type ModelName = 'colony' | 'user' | 'barriertech' | 'barrierrecord' | 'player' | 'cursedtechnique' | 'ctapp' | 'match' | 'vote' | 'adminuser' | 'permission';
+/**
+ * class for the enum of database table names.
+ */
+export type ModelName = 'colony' | 'user' | 'barriertech' | 'barrierrecord' | 'vote' | 'player' | 'cursedtechnique' | 'ctapp' | 'match' | 'adminuser' | 'permission';
 
+/**
+ * class for the enum of database table names.
+ */
 export const ModelName = {
     COLONY: 'colony',
     USER: 'user',
     BARRIERTECH: 'barriertech',
     BARRIERRECORD: 'barrierrecord',
+    VOTE: 'vote',
     PLAYER: 'player',
     CURSEDTECHNIQUE: 'cursedtechnique',
     CTAPP: 'ctapp',
     MATCH: 'match',
-    VOTE: 'vote',
     ADMINUSER: 'adminuser',
     PERMISSION: 'permission'
 } as const;
@@ -661,12 +687,12 @@ export type PermissionInfo = {
      * The model the permission applies to
      */
     model: ModelName;
+    id: number;
     /**
      * Permission name
      */
     name: string;
     level: PermissionLevel;
-    id: number;
 };
 
 export type PermissionLevel = 1 | 2 | 3 | 4;
@@ -677,6 +703,17 @@ export const PermissionLevel = {
     3: 3,
     4: 4
 } as const;
+
+/**
+ * Model for collecting A Permission request
+ */
+export type PermissionRequest = {
+    /**
+     * The model the permission applies to
+     */
+    model: ModelName;
+    levels: Array<PermissionLevel>;
+};
 
 /**
  * Player info with cursed technique, user, and colony info
@@ -1154,6 +1191,31 @@ export type VoteResponses = {
 
 export type VoteResponse = VoteResponses[keyof VoteResponses];
 
+export type DeleteMatchData = {
+    body?: never;
+    path: {
+        match_id: number;
+    };
+    query?: never;
+    url: '/match/delete/{match_id}';
+};
+
+export type DeleteMatchErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type DeleteMatchError = DeleteMatchErrors[keyof DeleteMatchErrors];
+
+export type DeleteMatchResponses = {
+    /**
+     * Successful Response
+     */
+    200: unknown;
+};
+
 export type DomainExpansionData = {
     body?: never;
     path: {
@@ -1162,7 +1224,7 @@ export type DomainExpansionData = {
     query: {
         match_id: number;
     };
-    url: '/match/activate/domain/{player_id}';
+    url: '/barrier/activate/domain/{player_id}';
 };
 
 export type DomainExpansionErrors = {
@@ -1191,7 +1253,7 @@ export type SimpleDomainData = {
     query: {
         match_id: number;
     };
-    url: '/match/activate/simple/{player_id}';
+    url: '/barrier/activate/simple/{player_id}';
 };
 
 export type SimpleDomainErrors = {
@@ -1212,33 +1274,65 @@ export type SimpleDomainResponses = {
 
 export type SimpleDomainResponse = SimpleDomainResponses[keyof SimpleDomainResponses];
 
-export type DeleteMatchData = {
+export type BindindVowData = {
     body?: never;
     path: {
+        player_id: number;
+    };
+    query: {
         match_id: number;
     };
-    query?: never;
-    url: '/match/delete/{match_id}';
+    url: '/barrier/activate/binding/{player_id}';
 };
 
-export type DeleteMatchErrors = {
+export type BindindVowErrors = {
     /**
      * Validation Error
      */
     422: HttpValidationError;
 };
 
-export type DeleteMatchError = DeleteMatchErrors[keyof DeleteMatchErrors];
+export type BindindVowError = BindindVowErrors[keyof BindindVowErrors];
 
-export type DeleteMatchResponses = {
+export type BindindVowResponses = {
     /**
      * Successful Response
      */
-    200: unknown;
+    200: BarrierTechInfo;
 };
 
+export type BindindVowResponse = BindindVowResponses[keyof BindindVowResponses];
+
+export type GetColoniesData = {
+    body?: never;
+    path?: never;
+    query?: {
+        offset?: number;
+        limit?: number;
+    };
+    url: '/colony/all';
+};
+
+export type GetColoniesErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type GetColoniesError = GetColoniesErrors[keyof GetColoniesErrors];
+
+export type GetColoniesResponses = {
+    /**
+     * Successful Response
+     */
+    200: Array<ColonyInfo>;
+};
+
+export type GetColoniesResponse = GetColoniesResponses[keyof GetColoniesResponses];
+
 export type CreateAdminData = {
-    body: Array<CreatePermission>;
+    body: Array<PermissionRequest>;
     path: {
         /**
          * The user's Id, Username, or Email
@@ -1268,10 +1362,10 @@ export type CreateAdminResponses = {
 export type CreateAdminResponse = CreateAdminResponses[keyof CreateAdminResponses];
 
 export type NewPermissionData = {
-    body: Array<CreatePermission>;
+    body: Array<PermissionRequest>;
     path?: never;
     query?: never;
-    url: '/admin/new/permission';
+    url: '/admin/new-permission';
 };
 
 export type NewPermissionErrors = {
@@ -1291,6 +1385,66 @@ export type NewPermissionResponses = {
 };
 
 export type NewPermissionResponse = NewPermissionResponses[keyof NewPermissionResponses];
+
+export type GrantPermissionData = {
+    body: Array<PermissionRequest>;
+    path: {
+        /**
+         * The user's Id, Username, or Email
+         */
+        user: number | string;
+    };
+    query?: never;
+    url: '/admin/grant-permission/{user}';
+};
+
+export type GrantPermissionErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type GrantPermissionError = GrantPermissionErrors[keyof GrantPermissionErrors];
+
+export type GrantPermissionResponses = {
+    /**
+     * Successful Response
+     */
+    200: AdminInfo;
+};
+
+export type GrantPermissionResponse = GrantPermissionResponses[keyof GrantPermissionResponses];
+
+export type RemovePermissionData = {
+    body: Array<PermissionRequest>;
+    path: {
+        /**
+         * The user's Id, Username, or Email
+         */
+        user: number | string;
+    };
+    query?: never;
+    url: '/admin/remove-permission/{user}';
+};
+
+export type RemovePermissionErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type RemovePermissionError = RemovePermissionErrors[keyof RemovePermissionErrors];
+
+export type RemovePermissionResponses = {
+    /**
+     * Successful Response
+     */
+    200: AdminInfo;
+};
+
+export type RemovePermissionResponse = RemovePermissionResponses[keyof RemovePermissionResponses];
 
 export type DemoSuperuserData = {
     body?: never;
@@ -1321,34 +1475,6 @@ export type DemoSuperuserResponses = {
      */
     200: unknown;
 };
-
-export type GetColoniesData = {
-    body?: never;
-    path?: never;
-    query?: {
-        offset?: number;
-        limit?: number;
-    };
-    url: '/colony/all';
-};
-
-export type GetColoniesErrors = {
-    /**
-     * Validation Error
-     */
-    422: HttpValidationError;
-};
-
-export type GetColoniesError = GetColoniesErrors[keyof GetColoniesErrors];
-
-export type GetColoniesResponses = {
-    /**
-     * Successful Response
-     */
-    200: Array<ColonyInfo>;
-};
-
-export type GetColoniesResponse = GetColoniesResponses[keyof GetColoniesResponses];
 
 export type CreateTokenData = {
     body: BodyCreateToken;
@@ -1402,6 +1528,22 @@ export type CreateUserResponses = {
 };
 
 export type CreateUserResponse = CreateUserResponses[keyof CreateUserResponses];
+
+export type ChatHtmlData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/';
+};
+
+export type ChatHtmlResponses = {
+    /**
+     * Successful Response
+     */
+    200: string;
+};
+
+export type ChatHtmlResponse = ChatHtmlResponses[keyof ChatHtmlResponses];
 
 export type ClientOptions = {
     baseUrl: 'http://localhost:8000' | (string & {});

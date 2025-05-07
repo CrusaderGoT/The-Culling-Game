@@ -17,10 +17,12 @@ import {
     Button,
     Divider,
     Group,
+    List,
     Paper,
     ScrollAreaAutosize,
     Stack,
     Stepper,
+    Text,
 } from "@mantine/core";
 
 import {
@@ -160,21 +162,28 @@ export function CreatePlayerForm() {
 
                         <Stepper.Completed>
                             {Object.keys(form.errors).length > 0 ? (
-                                <div>
-                                    <p>
+                                <ScrollAreaAutosize mah={300}>
+                                    <Text>
                                         Some fields have errors. Please review
                                         your inputs:
-                                    </p>
-                                    <ul>
+                                    </Text>
+                                    <List>
                                         {Object.entries(form.errors).map(
                                             ([field, error], index) => (
-                                                <li key={`${field}+${index}`}>
-                                                    {field}: {error}
-                                                </li>
+                                                <List.Item
+                                                    key={`${field}+${index}`}
+                                                >
+                                                    <Text c={"red.9"}>
+                                                        {field}
+                                                    </Text>
+                                                    <List withPadding>
+                                                        <Text>{error}</Text>
+                                                    </List>
+                                                </List.Item>
                                             )
                                         )}
-                                    </ul>
-                                </div>
+                                    </List>
+                                </ScrollAreaAutosize>
                             ) : (
                                 <Stack>
                                     <Divider label="confirm your player information" />

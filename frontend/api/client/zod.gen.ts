@@ -10,14 +10,15 @@ export const zAdminInfo = z.object({
             'user',
             'barriertech',
             'barrierrecord',
+            'vote',
             'player',
             'cursedtechnique',
             'ctapp',
             'match',
-            'vote',
             'adminuser',
             'permission'
         ]),
+        id: z.number().int(),
         name: z.string(),
         level: z.unknown()
     })),
@@ -258,14 +259,15 @@ export const zBaseAdminInfo = z.object({
             'user',
             'barriertech',
             'barrierrecord',
+            'vote',
             'player',
             'cursedtechnique',
             'ctapp',
             'match',
-            'vote',
             'adminuser',
             'permission'
         ]),
+        id: z.number().int(),
         name: z.string(),
         level: z.unknown()
     }))
@@ -520,14 +522,15 @@ export const zBasePermissionInfo = z.object({
         'user',
         'barriertech',
         'barrierrecord',
+        'vote',
         'player',
         'cursedtechnique',
         'ctapp',
         'match',
-        'vote',
         'adminuser',
         'permission'
     ]),
+    id: z.number().int(),
     name: z.string(),
     level: z.unknown()
 });
@@ -874,6 +877,10 @@ export const zCastVote = z.object({
 
 export const zClientVoteInfo = z.object({
     message: z.string(),
+    extra_info: z.union([
+        z.array(z.string()),
+        z.null()
+    ]),
     votes: z.array(zBaseVoteInfo)
 });
 
@@ -1289,23 +1296,6 @@ export const zCreateCtApp = z.object({
     application: z.string().min(100).max(500)
 });
 
-export const zCreatePermission = z.object({
-    model: z.enum([
-        'colony',
-        'user',
-        'barriertech',
-        'barrierrecord',
-        'player',
-        'cursedtechnique',
-        'ctapp',
-        'match',
-        'vote',
-        'adminuser',
-        'permission'
-    ]),
-    level: z.array(z.unknown())
-});
-
 export const zCreatePlayer = z.object({
     name: z.string().min(2).max(50),
     gender: z.enum([
@@ -1426,23 +1416,28 @@ export const zModelName = z.enum([
     'user',
     'barriertech',
     'barrierrecord',
+    'vote',
     'player',
     'cursedtechnique',
     'ctapp',
     'match',
-    'vote',
     'adminuser',
     'permission'
 ]);
 
 export const zPermissionInfo = z.object({
     model: zModelName,
+    id: z.number().int(),
     name: z.string(),
-    level: z.unknown(),
-    id: z.number().int()
+    level: z.unknown()
 });
 
 export const zPermissionLevel = z.unknown();
+
+export const zPermissionRequest = z.object({
+    model: zModelName,
+    levels: z.array(zPermissionLevel)
+});
 
 export const zPlayerInfo = z.object({
     name: z.string().min(2).max(50),
@@ -1539,12 +1534,20 @@ export const zDomainExpansionResponse = zBarrierTechInfo;
 
 export const zSimpleDomainResponse = zBarrierTechInfo;
 
+export const zBindindVowResponse = zBarrierTechInfo;
+
+export const zGetColoniesResponse = z.array(zColonyInfo);
+
 export const zCreateAdminResponse = zAdminInfo;
 
 export const zNewPermissionResponse = z.array(zPermissionInfo);
 
-export const zGetColoniesResponse = z.array(zColonyInfo);
+export const zGrantPermissionResponse = zAdminInfo;
+
+export const zRemovePermissionResponse = zAdminInfo;
 
 export const zCreateTokenResponse = zToken;
 
 export const zCreateUserResponse = zUserInfo;
+
+export const zChatHtmlResponse = z.string();

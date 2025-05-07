@@ -15,5 +15,5 @@ import { createClientConfig } from '../hey-api';
 export type CreateClientConfig<T extends DefaultClientOptions = ClientOptions> = (override?: Config<DefaultClientOptions & T>) => Config<Required<DefaultClientOptions> & T>;
 
 export const client = createClient(createClientConfig(createConfig<ClientOptions>({
-    baseUrl: process.env.BACKEND_HOST || 'http://localhost:8000'
+    baseUrl: 'http://localhost:8000'
 })));

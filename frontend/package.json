@@ -7,10 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "openapi-ts": "dotenvx run openapi-ts"
+    "openapi-ts": "openapi-ts"
   },
   "dependencies": {
-    "@dotenvx/dotenvx": "^1.39.0",
     "@hey-api/client-next": "^0.2.4",
     "@mantine/charts": "^7.17.3",
     "@mantine/core": "^7.17.3",

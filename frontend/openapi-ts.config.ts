@@ -1,6 +1,5 @@
 import { defineConfig } from "@hey-api/openapi-ts";
-import dotenvx from "@dotenvx/dotenvx"
-console.log(process.env.NODE_ENV)
+
 export default defineConfig({
     input: `${process.env.BACKEND_HOST}/openapi.json`,
     output: {

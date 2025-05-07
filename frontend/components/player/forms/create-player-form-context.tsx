@@ -221,11 +221,9 @@ export function ApplicationFormList() {
             <Title ff={`${Naluka.style.fontFamily}`} order={3} ta={"center"}>
                 Applications
             </Title>
-            <List spacing={"xs"}>
-                <Group align="flex-start" justify="space-between">
-                    {appList}
-                </Group>
-            </List>
+            <Group align="flex-start" justify="space-between">
+                {appList}
+            </Group>
         </Stack>
     );
 }
