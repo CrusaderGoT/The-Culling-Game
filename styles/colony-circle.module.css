@@ -1,126 +1,109 @@
 .colonyContainer {
   height: 80vh;
+  display: flex;
   justify-content: center;
   align-items: center;
   margin: auto;
 }
 
 .colonyCircle {
-  padding: 1.25rem; /* p-5 */
-  overflow: hidden; /* overflow-hidden */
-  border-radius: 50%; /* rounded-full */
-  cursor: default; /* cursor-default */
+  overflow: hidden;
+  clip-path: circle(50% at 50% 50%);
+  cursor: default;
   display: flex;
-  align-items: center; /* items-center */
-  justify-content: center; /* justify-center */
-  background-color: hsla(0, 0%, 0%, 97%); /* bg-[hsla(0,0%,0%,97%)] */
-  transition: background-color 0.5s ease-in-out;
-  margin: auto;
+  align-items: center;
+  justify-content: center;
   position: relative;
-}
-
-.colonyCircle:hover {
-  background-color: hsla(0, 0%, 0%, 80%);
-  transition: background-color 0.5s ease-in-out;
+  z-index: 5;
+  perspective: 800;
 }
 
 .colonyText {
-  font-family: "Courier New", Courier, monospace;
-  transition: letter-spacing 1.4s ease-out, top 1.4s ease-in-out;
-  font-weight: 600; /* font-semibold */
-  letter-spacing: 10px; /* tracking-[10px] */
-  font-size: 1.125rem; /* text-lg */
-  position: absolute; /* absolute */
-  top: 50%; /* top-1/2 */
-  transform: translateY(-50%);
+  font-family: "Courier New", monospace;
+  font-weight: 700;
+  font-size: 1.1rem;
+  letter-spacing: 30px;
+  position: absolute;
+  top: 50%;
+  color: #fff;
+  transform: translateY(-50%) translateX(15px);
+  transition: letter-spacing 1.4s ease-out, top 1.4s ease-in-out,
+    transform 1.4s ease-out;
 }
 
-/* small screens and up (sm: ≥640px) */
 @media (min-width: 640px) {
   .colonyText {
-    font-weight: 700; /* sm:font-bold */
-    font-size: 1.5rem; /* sm:text-2xl */
+    letter-spacing: 40px;
+    transform: translateX(20px);
   }
 }
 
-/* medium screens and up (md: ≥768px) */
 @media (min-width: 768px) {
   .colonyText {
-    letter-spacing: 20px; /* md:tracking-[20px] */
-    font-size: 1.875rem; /* md:text-3xl */
-  }
-}
-
-/* large screens and up (lg: ≥1024px) */
-@media (min-width: 1024px) {
-  .colonyText {
-    font-weight: 800; /* lg:font-extrabold */
-    letter-spacing: 30px; /* lg:tracking-[30px] */
+    letter-spacing: 60px;
+    transform: translateX(30px);
   }
 }
 
 .colonyCircle:hover .colonyText {
   letter-spacing: 0.2em;
   top: 10%;
+  transform: translateX(0);
 }
 
 .colonyWarning {
-  position: absolute; /* absolute */
-  bottom: 1.5rem; /* bottom-2 */
-  font-size: 10px; /* text-[10px] */
-  line-height: 0.75rem; /* leading-3 */
-  text-align: center; /* text-center */
-  width: 66%; /* w-2/3 */
-  color: #dc2626; /* text-red-600 */
-  font-weight: 100;
-  transition: bottom 1s ease;
+  position: absolute;
+  bottom: 30%;
   margin: 10px;
+  font-size: 10px;
+  line-height: 1.5rem;
+  text-align: center;
+  color: #dc2626;
+  font-weight: 400;
+  opacity: 0;
+  transition: opacity 3s ease-in;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  max-height: 50%;
 }
 
-/* small screens and up (sm: ≥640px) */
 @media (min-width: 640px) {
   .colonyWarning {
-    font-size: 0.75rem; /* sm:text-xs */
+    bottom: 40%;
   }
 }
 
 .colonyCircle:hover .colonyWarning {
-  color: #dfdc35; /* text-red-600 */
-  bottom: 50%;
+  opacity: 1;
 }
 
-.colonyBtn {
-  opacity: 0; /* opacity-0 */
-  position: absolute; /* absolute */
-  bottom: 25%; /* bottom-[25%] */
-  height: 12px; /* h-[12px] */
-  width: 32px; /* w-[32px] */
-  border-radius: 9999px; /* rounded-full */
-  font-size: 9px; /* text-[9px] */
-  font-weight: 600; /* font-semibold */
-  letter-spacing: 0.05em; /* tracking-wider */
-  display: flex; /* flex */
-  align-items: center; /* items-center */
-  justify-content: center; /* justify-center */
+.colonyEnterBtn {
+  position: absolute;
+  bottom: 15%;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 3s ease-in-out;
 }
 
-/* small screens and up (sm: ≥640px) */
-@media (min-width: 640px) {
-  .colonyBtn {
-    height: 20px; /* sm:h-[20px] */
-    width: 50px; /* sm:w-[50px] */
-    font-size: 12px; /* sm:text-[12px] */
-  }
+.colonyCircle:hover .colonyEnterBtn {
+  opacity: 1;
+  pointer-events: all;
 }
 
-/* medium screens and up (md: ≥768px) */
-@media (min-width: 768px) {
-  .colonyBtn {
-    font-size: 1rem; /* md:text-base */
-  }
+.circleOverlay {
+  background-color: rgba(0, 0, 0, 1);
+  transition: background-color 3s ease-in-out;
 }
 
-.colonyCircle:hover .colonyBtn {
-  opacity: 100%;
-  transition: opacity 3s ease-in;
+.colonyCircle:hover .circleOverlay {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+.circleImage {
+  position: absolute;
+  z-index: -5;
+  border-radius: 50%;
+  transform-style: preserve-3d;
+  transform-origin: center center;
+  transition: transform 3s ease-in-out;
 }

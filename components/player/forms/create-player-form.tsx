@@ -2,19 +2,26 @@
 
 import {
     ApplicationsInputs,
+    CTAPPInfoList,
+    CTInfoList,
     CreatePlayerFormProvider,
     CursedTechniqueInputs,
+    PlayerInfoList,
     PlayerInputs,
     createPlayerSchema,
     useCreatePlayerForm,
 } from "@/components/player/forms/create-player-form-context";
+
 import {
+    Box,
     Button,
+    Grid,
     Group,
     Paper,
     ScrollAreaAutosize,
     Stepper,
 } from "@mantine/core";
+
 import {
     IconBuildingCarousel,
     IconCircleCheck,
@@ -22,7 +29,9 @@ import {
     IconFishBoneFilled,
     IconYinYangFilled,
 } from "@tabler/icons-react";
+
 import { zodResolver } from "mantine-form-zod-resolver";
+
 import { useState } from "react";
 
 export function CreatePlayerForm() {
@@ -36,7 +45,7 @@ export function CreatePlayerForm() {
     const [highestStepVisited, setHighestStepVisited] = useState(active);
 
     const handleStepChange = (nextStep: number) => {
-        const isOutOfBounds = nextStep > 3 || nextStep < 0;
+        const isOutOfBounds = nextStep > fieldKeys.length || nextStep < 0;
 
         if (isOutOfBounds) {
             return;
@@ -103,7 +112,7 @@ export function CreatePlayerForm() {
                             }
                             allowStepSelect={shouldAllowSelectStep(0)}
                         >
-                            <ScrollAreaAutosize mah={400}>
+                            <ScrollAreaAutosize mah={300}>
                                 <PlayerInputs />
                             </ScrollAreaAutosize>
                         </Stepper.Step>
@@ -121,7 +130,7 @@ export function CreatePlayerForm() {
                             }
                             allowStepSelect={shouldAllowSelectStep(1)}
                         >
-                            <ScrollAreaAutosize mah={400}>
+                            <ScrollAreaAutosize mah={300}>
                                 <CursedTechniqueInputs />
                             </ScrollAreaAutosize>
                         </Stepper.Step>
@@ -139,7 +148,7 @@ export function CreatePlayerForm() {
                             }
                             allowStepSelect={shouldAllowSelectStep(2)}
                         >
-                            <ScrollAreaAutosize mah={400}>
+                            <ScrollAreaAutosize mah={300}>
                                 <ApplicationsInputs />
                             </ScrollAreaAutosize>
                         </Stepper.Step>
@@ -162,10 +171,30 @@ export function CreatePlayerForm() {
                                     </ul>
                                 </div>
                             ) : (
-                                <p>
-                                    All steps completed successfully! You can go
-                                    back to review or submit the form.
-                                </p>
+                                <Box>
+                                    <Grid
+                                        gutter={{
+                                            base: "sm",
+                                            xs: "md",
+                                            md: "lg",
+                                            xl: "xl",
+                                        }}
+                                        grow
+                                    >
+                                        <Grid.Col
+                                            span={"content"}
+                                            aria-disabled
+                                        >
+                                            <PlayerInfoList />
+                                        </Grid.Col>
+                                        <Grid.Col span={"content"}>
+                                            <CTInfoList />
+                                        </Grid.Col>
+                                        <Grid.Col span={"content"}>
+                                            <CTAPPInfoList />
+                                        </Grid.Col>
+                                    </Grid>
+                                </Box>
                             )}
                         </Stepper.Completed>
                     </Stepper>
@@ -180,9 +209,13 @@ export function CreatePlayerForm() {
                             </Button>
                         )}
 
-                        <Button onClick={() => handleStepChange(active + 1)}>
-                            Next
-                        </Button>
+                        {active < fieldKeys.length && (
+                            <Button
+                                onClick={() => handleStepChange(active + 1)}
+                            >
+                                Next
+                            </Button>
+                        )}
                     </Group>
                 </form>
             </CreatePlayerFormProvider>
