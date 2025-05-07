@@ -8,7 +8,7 @@
 
 .colonyCircle {
   overflow: hidden;
-  border-radius: 50%;
+  clip-path: circle(50% at 50% 50%);
   cursor: default;
   display: flex;
   align-items: center;
