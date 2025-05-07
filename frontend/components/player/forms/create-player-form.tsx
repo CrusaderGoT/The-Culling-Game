@@ -162,8 +162,8 @@ export function CreatePlayerForm() {
                                     </p>
                                     <ul>
                                         {Object.entries(form.errors).map(
-                                            ([field, error]) => (
-                                                <li key={field}>
+                                            ([field, error], index) => (
+                                                <li key={`${field}+${index}`}>
                                                     {field}: {error}
                                                 </li>
                                             )
