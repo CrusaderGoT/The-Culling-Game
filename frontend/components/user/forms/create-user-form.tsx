@@ -36,7 +36,6 @@ import {
     IconLockPassword,
     IconUser,
 } from "@tabler/icons-react";
-
 import { useRouter } from "next/navigation";
 
 import { useCreateUser, useLoginUser } from "@/lib/hooks/users";
