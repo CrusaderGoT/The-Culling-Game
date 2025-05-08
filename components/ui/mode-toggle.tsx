@@ -25,7 +25,7 @@ export function ModeToggle() {
             variant="subtle"
             radius={"xl"}
             size="md"
-            my={"xs"}
+            mb={"xs"}
             color="dark"
             aria-label="Toggle color scheme"
         >

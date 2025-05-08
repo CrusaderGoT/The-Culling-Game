@@ -21,6 +21,7 @@ import {
 
 import Naluka from "@/fonts/NalukaFont";
 import Neuropol from "@/fonts/NeuropolFont";
+import Nexarust from "@/fonts/NexarustFont";
 
 import { ModeToggle } from "@/components/ui/mode-toggle";
 
@@ -38,10 +39,10 @@ const theme = createTheme({
         deepred: deepRedColor,
         charcoal: charcoalColor,
     },
-    primaryColor: "deepred",
-    fontFamily: `${Neuropol.style.fontFamily}, ${DEFAULT_THEME.fontFamily}`,
+    primaryColor: "gold",
+    fontFamily: `${Neuropol.style.fontFamily}, ${Nexarust.style.fontFamily}, ${DEFAULT_THEME.fontFamily}`,
     headings: {
-        fontFamily: `${Naluka.style.fontFamily}, ${DEFAULT_THEME.fontFamily}`,
+        fontFamily: `${Nexarust.style.fontFamily}, ${Naluka.style.fontFamily}, ${DEFAULT_THEME.fontFamily}`,
     },
     fontSizes: {
         xs: rem(10),

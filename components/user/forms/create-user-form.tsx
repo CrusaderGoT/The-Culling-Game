@@ -28,6 +28,14 @@ import {
 
 import { z } from "zod";
 
+import Naluka from "@/fonts/NalukaFont";
+import {
+    IconAt,
+    IconFishOff,
+    IconLocationPin,
+    IconLockPassword,
+    IconUser,
+} from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
 
 export function CreateUserForm() {
@@ -73,6 +81,8 @@ export function CreateUserForm() {
                         placeholder="Not Your Player Name"
                         key={form.key("username")}
                         {...form.getInputProps("username")}
+                        leftSection={<IconUser size={18} />}
+                        rightSection={<IconFishOff size={18} />}
                     />
                     <TextInput
                         withAsterisk
@@ -80,6 +90,7 @@ export function CreateUserForm() {
                         placeholder="youremail@example.com"
                         key={form.key("email")}
                         {...form.getInputProps("email")}
+                        leftSection={<IconAt size={18} />}
                     />
 
                     <Select
@@ -89,6 +100,7 @@ export function CreateUserForm() {
                         filter={searchOptionsFilter}
                         searchable
                         nothingFoundMessage="No country with that name..."
+                        leftSection={<IconLocationPin size={18} />}
                     />
 
                     <PasswordInput
@@ -98,6 +110,7 @@ export function CreateUserForm() {
                         key={form.key("password")}
                         {...form.getInputProps("password")}
                         required
+                        leftSection={<IconLockPassword size={18} />}
                     />
                     <PasswordInput
                         withAsterisk
@@ -106,6 +119,7 @@ export function CreateUserForm() {
                         key={form.key("confirm_password")}
                         {...form.getInputProps("confirm_password")}
                         required
+                        leftSection={<IconLockPassword size={18} />}
                     />
                 </Stack>
 
@@ -150,7 +164,12 @@ function SignUpCard() {
                     zIndex: 1,
                 }}
             >
-                <Title order={4} c={"gold"} ta={"center"}>
+                <Title
+                    ff={`${Naluka.style.fontFamily}`}
+                    order={4}
+                    c={"gold"}
+                    ta={"center"}
+                >
                     Welcome to the Culling Games
                 </Title>
 

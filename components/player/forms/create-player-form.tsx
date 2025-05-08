@@ -1,25 +1,28 @@
 "use client";
 
 import {
-    ApplicationsInputs,
-    CTAPPInfoList,
-    CTInfoList,
+    ApplicationFormList,
+    ApplicationsFormInputs,
     CreatePlayerFormProvider,
-    CursedTechniqueInputs,
-    PlayerInfoList,
-    PlayerInputs,
+    CursedTechniqueFormInputs,
+    CursedTechniqueFormList,
+    PlayerFormInputs,
+    PlayerInfoFormList,
     createPlayerSchema,
     useCreatePlayerForm,
+    type CreatePlayerSchemaType,
 } from "@/components/player/forms/create-player-form-context";
 
 import {
-    Box,
     Button,
-    Grid,
+    Divider,
     Group,
+    List,
     Paper,
     ScrollAreaAutosize,
+    Stack,
     Stepper,
+    Text,
 } from "@mantine/core";
 
 import {
@@ -68,8 +71,8 @@ export function CreatePlayerForm() {
             player: {
                 name: "",
                 role: "",
-                age: 0,
-                gender: "male",
+                age: 18,
+                gender: "non-binary",
             },
             cursed_technique: {
                 name: "",
@@ -89,10 +92,14 @@ export function CreatePlayerForm() {
         validateInputOnBlur: true,
     });
 
+    function handleSubmit(data: CreatePlayerSchemaType) {
+        console.log(data);
+    }
+
     return (
-        <Paper radius="md" p="md" withBorder mih={400}>
+        <Paper radius="md" p="md" withBorder>
             <CreatePlayerFormProvider form={form}>
-                <form>
+                <form onSubmit={form.onSubmit(handleSubmit)}>
                     <Stepper
                         size="sm"
                         active={active}
@@ -113,7 +120,7 @@ export function CreatePlayerForm() {
                             allowStepSelect={shouldAllowSelectStep(0)}
                         >
                             <ScrollAreaAutosize mah={300}>
-                                <PlayerInputs />
+                                <PlayerFormInputs />
                             </ScrollAreaAutosize>
                         </Stepper.Step>
 
@@ -131,7 +138,7 @@ export function CreatePlayerForm() {
                             allowStepSelect={shouldAllowSelectStep(1)}
                         >
                             <ScrollAreaAutosize mah={300}>
-                                <CursedTechniqueInputs />
+                                <CursedTechniqueFormInputs />
                             </ScrollAreaAutosize>
                         </Stepper.Step>
 
@@ -149,52 +156,50 @@ export function CreatePlayerForm() {
                             allowStepSelect={shouldAllowSelectStep(2)}
                         >
                             <ScrollAreaAutosize mah={300}>
-                                <ApplicationsInputs />
+                                <ApplicationsFormInputs />
                             </ScrollAreaAutosize>
                         </Stepper.Step>
 
                         <Stepper.Completed>
                             {Object.keys(form.errors).length > 0 ? (
-                                <div>
-                                    <p>
+                                <ScrollAreaAutosize mah={300}>
+                                    <Text>
                                         Some fields have errors. Please review
                                         your inputs:
-                                    </p>
-                                    <ul>
+                                    </Text>
+                                    <List>
                                         {Object.entries(form.errors).map(
-                                            ([field, error]) => (
-                                                <li key={field}>
-                                                    {field}: {error}
-                                                </li>
+                                            ([field, error], index) => (
+                                                <List.Item
+                                                    key={`${field}+${index}`}
+                                                >
+                                                    <Text c={"red.9"}>
+                                                        {field}
+                                                    </Text>
+                                                    <List withPadding>
+                                                        <Text>{error}</Text>
+                                                    </List>
+                                                </List.Item>
                                             )
                                         )}
-                                    </ul>
-                                </div>
+                                    </List>
+                                </ScrollAreaAutosize>
                             ) : (
-                                <Box>
-                                    <Grid
-                                        gutter={{
-                                            base: "sm",
-                                            xs: "md",
-                                            md: "lg",
-                                            xl: "xl",
-                                        }}
-                                        grow
-                                    >
-                                        <Grid.Col
-                                            span={"content"}
-                                            aria-disabled
-                                        >
-                                            <PlayerInfoList />
-                                        </Grid.Col>
-                                        <Grid.Col span={"content"}>
-                                            <CTInfoList />
-                                        </Grid.Col>
-                                        <Grid.Col span={"content"}>
-                                            <CTAPPInfoList />
-                                        </Grid.Col>
-                                    </Grid>
-                                </Box>
+                                <Stack>
+                                    <Divider label="confirm your player information" />
+
+                                    <PlayerInfoFormList />
+
+                                    <Divider label="confirm your cursed technique definition" />
+
+                                    <CursedTechniqueFormList />
+
+                                    <Divider label="confirm all cursed technique applications" />
+
+                                    <ApplicationFormList />
+
+                                    <Button type="submit">Create Player</Button>
+                                </Stack>
                             )}
                         </Stepper.Completed>
                     </Stepper>
