@@ -13,6 +13,8 @@ import {
     rem,
 } from "@mantine/core";
 
+import TanstackProviders from "@/lib/query-client/providers";
+
 import {
     charcoalColor,
     deepRedColor,
@@ -64,12 +66,14 @@ export default function RootLayout({
                 <ColorSchemeScript />
             </head>
             <body>
-                <MantineProvider theme={theme}>
-                    <Container size={"lg"} my={40}>
-                        <ModeToggle />
-                        {children}
-                    </Container>
-                </MantineProvider>
+                <TanstackProviders>
+                    <MantineProvider theme={theme}>
+                        <Container size={"lg"} my={40}>
+                            <ModeToggle />
+                            {children}
+                        </Container>
+                    </MantineProvider>
+                </TanstackProviders>
             </body>
         </html>
     );
