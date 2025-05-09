@@ -6,7 +6,6 @@ import {
 
 import { useMutation, useQuery } from "@tanstack/react-query";
 
-import { createSession } from "../auth/session";
 
 export const useCreateUser = () => {
     const mutation = useMutation({
@@ -26,9 +25,6 @@ export const useCreateUser = () => {
 export const useLoginUser = () => {
     const mutation = useMutation({
         ...createTokenMutation(),
-        onSuccess: async (tokenData) => {
-            await createSession(tokenData.access_token);
-        },
     });
 
     return mutation;

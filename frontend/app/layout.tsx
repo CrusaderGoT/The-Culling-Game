@@ -68,7 +68,7 @@ export default function RootLayout({
             <body>
                 <TanstackProviders>
                     <MantineProvider theme={theme}>
-                        <Container size={"lg"} my={40}>
+                        <Container size={"lg"}>
                             <ModeToggle />
                             {children}
                         </Container>
