@@ -6,6 +6,7 @@ import {
 
 import { useMutation, useQuery } from "@tanstack/react-query";
 
+import { notifications } from "@mantine/notifications";
 
 export const useCreateUser = () => {
     const mutation = useMutation({
@@ -15,7 +16,10 @@ export const useCreateUser = () => {
                 "An error occurred while creating your account.",
                 error
             );
-            alert(error);
+            notifications.show({
+                title: "An error occurred while creating your account.",
+                message: error.detail?.map((d) => d.msg),
+            });
         },
     });
 

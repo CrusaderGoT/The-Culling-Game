@@ -5,6 +5,7 @@ import { cookies } from "next/headers";
 export async function createSession(token: string) {
     const cookieStore = await cookies();
 
+    // match token expire in fastapi
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
     cookieStore.set("session", token, {
@@ -17,20 +18,20 @@ export async function createSession(token: string) {
 }
 
 export async function updateSession() {
-    const session = (await cookies()).get("session")?.value;
+    const token = (await cookies()).get("session")?.value;
 
-    if (!session) return null;
+    if (!token) return null;
 
     const updateExpires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
     // FASTAPI to actually update/refresh the token
-    // mutaute async refresh token
+    // use sdk here/ no tansstack
     // fail return null
     // else session = newSession
 
     const cookieStore = await cookies();
 
-    cookieStore.set("session", session, {
+    cookieStore.set("session", token, {
         httpOnly: true,
         secure: true,
         expires: updateExpires,

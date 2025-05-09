@@ -2,6 +2,7 @@
 // All packages except `@mantine/hooks` require styles imports
 import "@mantine/charts/styles.css";
 import "@mantine/core/styles.css";
+import "@mantine/notifications/styles.css";
 
 import {
     ColorSchemeScript,
@@ -12,6 +13,8 @@ import {
     mantineHtmlProps,
     rem,
 } from "@mantine/core";
+
+import { Notifications } from "@mantine/notifications";
 
 import TanstackProviders from "@/lib/query-client/providers";
 
@@ -68,6 +71,7 @@ export default function RootLayout({
             <body>
                 <TanstackProviders>
                     <MantineProvider theme={theme}>
+                        <Notifications />
                         <Container size={"lg"}>
                             <ModeToggle />
                             {children}
