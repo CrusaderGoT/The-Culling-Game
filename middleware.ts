@@ -1,0 +1,44 @@
+import { NextRequest, NextResponse } from "next/server";
+
+import { cookies } from "next/headers";
+
+// 1. Specify protected and public routes
+const protectedRoutes = ["/match", "/create-player"];
+const publicRoutes = ["/login", "/signup", "/"];
+
+/**
+ * for performing optimistic checks.
+ * it's a good way to centralize redirect logic and pre-filter unauthorized users.
+ * protect static routes that share data between users (e.g. content behind a paywall).
+ */
+export default async function middleware(req: NextRequest) {
+    // 2. Check if the current route is protected or public
+    const path = req.nextUrl.pathname;
+    const isProtectedRoute = protectedRoutes.includes(path);
+    const isPublicRoute = publicRoutes.includes(path);
+
+    // 3. get the session from the cookie
+    const session = (await cookies()).get("session")?.value;
+
+    // 4. Redirect to /login if the user is not authenticated
+    if (isProtectedRoute && !session) {
+        return NextResponse.redirect(new URL("/login", req.nextUrl));
+    }
+
+    // 5. Redirect to /match if the user is authenticated
+    // consider if user want to be in the public route/ check for prev routes?
+    if (
+        isPublicRoute &&
+        session &&
+        !req.nextUrl.pathname.startsWith("/match")
+    ) {
+        return NextResponse.redirect(new URL("/match", req.nextUrl));
+    }
+
+    return NextResponse.next();
+}
+
+// Routes Middleware should not run on
+export const config = {
+    matcher: ["/((?!api|_next/static|_next/image|.*\\.png$).*)"],
+};

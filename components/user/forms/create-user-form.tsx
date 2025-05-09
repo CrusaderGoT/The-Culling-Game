@@ -38,6 +38,8 @@ import {
 } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
 
+import { useCreateUser, useLoginUser } from "@/lib/hooks/users";
+
 export function CreateUserForm() {
     const router = useRouter();
 
@@ -67,8 +69,42 @@ export function CreateUserForm() {
         });
     };
 
-    const handleSubmit = (data: zCreateUserType) => {
-        console.log(data);
+    const {
+        error: createUserError,
+        isPending: createUserIsPending,
+        isSuccess: createUserIsSuccess,
+        mutateAsync: createUserAsync,
+    } = useCreateUser();
+
+    const { isSuccess: loginUserIsSuccess, mutateAsync: loginUserAsync } =
+        useLoginUser();
+
+    const handleSubmit = async (data: zCreateUserType) => {
+        try {
+            const createUserResult = await createUserAsync({
+                body: { ...data },
+            });
+
+            if (createUserResult) {
+                // login user
+                const loginUserResult = await loginUserAsync({
+                    body: { username: data.username, password: data.password },
+                });
+                if (!loginUserResult) {
+                    // hard login
+                    router.push("/login");
+                } else {
+                    // success; take to match page
+                    router.push("/match");
+                }
+            } else {
+                // redirect to login
+                router.push("/login");
+            }
+        } catch (e) {
+            console.error("Error creating user:", e);
+            // notification replace
+        }
     };
 
     return (
@@ -124,7 +160,11 @@ export function CreateUserForm() {
                 </Stack>
 
                 <Stack my={"md"}>
-                    <Button color="green" type="submit">
+                    <Button
+                        color="green"
+                        type="submit"
+                        disabled={createUserIsPending}
+                    >
                         Create User
                     </Button>
 
