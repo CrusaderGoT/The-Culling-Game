@@ -67,6 +67,7 @@ app.mount("/static", StaticFiles(directory="app/static"), name="static")
 origins = [
     "http://localhost:3000",
     "https://the-culling-games.vercel.app",
+    "https://the-culling-games.up.railway.app"
 ]
 
 allowed_hosts = [
