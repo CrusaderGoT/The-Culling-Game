@@ -43,7 +43,6 @@ import { redirect, useRouter } from "next/navigation";
 
 import { DisplayAPIError } from "@/components/ui/display-api-error";
 import { useCreateUser, useLoginUser } from "@/lib/hooks/users";
-import { notifications } from "@mantine/notifications";
 
 export function CreateUserForm() {
     const router = useRouter();

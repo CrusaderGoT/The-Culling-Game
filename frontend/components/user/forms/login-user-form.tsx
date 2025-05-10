@@ -21,7 +21,6 @@ import {
     Stack,
     TextInput,
 } from "@mantine/core";
-import { notifications } from "@mantine/notifications";
 import {
     IconAlertCircle,
     IconLockPassword,
