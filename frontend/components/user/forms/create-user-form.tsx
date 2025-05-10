@@ -43,7 +43,6 @@ import { redirect, useRouter } from "next/navigation";
 
 import { DisplayAPIError } from "@/components/ui/display-api-error";
 import { useCreateUser, useLoginUser } from "@/lib/hooks/users";
-import { createSession } from "@/lib/auth/session";
 import { notifications } from "@mantine/notifications";
 
 export function CreateUserForm() {
@@ -78,14 +77,13 @@ export function CreateUserForm() {
     const {
         error: createUserError,
         isPending: createUserIsPending,
-        isSuccess: createUserIsSuccess,
         mutateAsync: createUserAsync,
     } = useCreateUser();
 
     const {
-        isSuccess: loginUserIsSuccess,
         isPending: loginUserIsPending,
         mutateAsync: loginUserAsync,
+        isSuccess: loginUserIsSuccess,
     } = useLoginUser();
 
     const handleSubmit = async (data: zCreateUserType) => {
@@ -99,30 +97,32 @@ export function CreateUserForm() {
         });
 
         if (!token.access_token) {
-            notifications.show({
-                message: `"login not successful"`,
-            });
+            // token somehow wasn't available; hard login
             redirect("/login");
         } else {
-            notifications.show({
-                message: "login successful",
-            });
             redirect("/match");
         }
     };
 
     return (
-        <Box flex={1} pos="relative">
+        <Box flex={1}>
             <LoadingOverlay
-                visible={loginUserIsPending}
+                visible={loginUserIsPending || loginUserIsSuccess}
                 zIndex={600}
                 overlayProps={{ radius: "sm", blur: 0 }}
                 loaderProps={{ type: "bars" }}
             />
             <LoadingOverlay
-                visible={loginUserIsPending}
+                visible={loginUserIsPending || loginUserIsSuccess}
                 overlayProps={{ radius: "sm", blur: 2 }}
-                loaderProps={{ children: "Logging In New User...", pt: 100 }}
+                loaderProps={{
+                    children: loginUserIsPending
+                        ? "Logging In New User..."
+                        : loginUserIsSuccess
+                        ? "Redirecting to match"
+                        : "Please Wait...",
+                    pt: 100,
+                }}
             />
             {createUserError && (
                 <Alert

@@ -10,6 +10,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 
 import { notifications } from "@mantine/notifications";
 import { createSession } from "../auth/session";
+import { redirect } from "next/navigation";
 
 export const useCreateUser = () => {
     const mutation = useMutation({
@@ -38,6 +39,10 @@ export const useLoginUser = () => {
         },
         onSuccess: (token) => {
             createSession(token.access_token);
+            notifications.show({
+                message: "login successful",
+                color: "green",
+            });
         },
     });
 
