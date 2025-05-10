@@ -10,11 +10,12 @@
     "openapi-ts": "openapi-ts"
   },
   "dependencies": {
-    "@hey-api/client-next": "^0.2.4",
+    "@hey-api/client-next": "^0.3.0",
     "@mantine/charts": "^7.17.3",
     "@mantine/core": "^7.17.3",
     "@mantine/form": "^7.17.3",
     "@mantine/hooks": "^7.17.3",
+    "@mantine/notifications": "^7.17.3",
     "@tabler/icons-react": "^3.31.0",
     "@tanstack/react-query": "^5.75.5",
     "@tanstack/react-query-devtools": "^5.75.5",
@@ -27,7 +28,7 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
-    "@hey-api/openapi-ts": "^0.64.15",
+    "@hey-api/openapi-ts": "^0.67.3",
     "@tanstack/eslint-plugin-query": "^5.74.7",
     "@types/node": "^20",
     "@types/react": "19.0.12",
