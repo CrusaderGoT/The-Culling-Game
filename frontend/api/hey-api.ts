@@ -2,5 +2,5 @@ import type { CreateClientConfig } from "@/api/client/client.gen";
 
 export const createClientConfig: CreateClientConfig = (config) => ({
     ...config,
-    baseUrl: process.env.BACKEND_HOST || "http://localhost:8000",
+    baseUrl: "https://the-culling-games.up.railway.app",
 });
