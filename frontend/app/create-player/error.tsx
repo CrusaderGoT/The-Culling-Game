@@ -19,7 +19,7 @@ export default function Error({
         <Stack gap={"xl"} justify="space-around" align="center">
             <Title>Something went wrong.</Title>
             <Text>
-                Make sure you have good internet connection: {error.message}
+                Make sure you have good internet connection
             </Text>
             <Button
                 onClick={
