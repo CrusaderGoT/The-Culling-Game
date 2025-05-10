@@ -79,6 +79,7 @@ app.add_middleware(TrustedHostMiddleware, allowed_hosts=allowed_hosts)
 origins = [
     "http://localhost:3000",
     "https://the-culling-games.vercel.app",
+    "https://the-culling-games.up.railway.app",
 ]
 
 app.add_middleware(
