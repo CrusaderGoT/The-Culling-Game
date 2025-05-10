@@ -1,5 +1,5 @@
 .colonyContainer {
-  height: 80vh;
+  height: 90vh;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -31,10 +31,21 @@
     transform 1.4s ease-out;
 }
 
+.colonyCircle:hover .colonyText {
+  letter-spacing: 0.2em;
+  top: 12%;
+  transform: translateX(0);
+}
+
 @media (min-width: 640px) {
   .colonyText {
     letter-spacing: 40px;
     transform: translateX(20px);
+  }
+
+  .colonyCircle:hover .colonyText {
+    letter-spacing: 0.5em;
+    top: 7%;
   }
 }
 
@@ -43,12 +54,11 @@
     letter-spacing: 60px;
     transform: translateX(30px);
   }
-}
 
-.colonyCircle:hover .colonyText {
-  letter-spacing: 0.2em;
-  top: 10%;
-  transform: translateX(0);
+  .colonyCircle:hover .colonyText {
+    letter-spacing: 0.8em;
+    top: 5%;
+  }
 }
 
 .colonyWarning {
@@ -102,7 +112,7 @@
 .circleImage {
   position: absolute;
   z-index: -5;
-  border-radius: 50%;
+  clip-path: circle(50% at 50% 50%);
   transform-style: preserve-3d;
   transform-origin: center center;
   transition: transform 3s ease-in-out;
