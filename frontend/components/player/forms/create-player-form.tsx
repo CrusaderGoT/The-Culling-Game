@@ -92,7 +92,7 @@ export function CreatePlayerForm() {
         validateInputOnBlur: true,
     });
 
-    async function handleSubmit(data: CreatePlayerSchemaType) {
+    function handleSubmit(data: CreatePlayerSchemaType) {
         console.log(data);
     }
 

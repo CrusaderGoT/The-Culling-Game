@@ -1,9 +1,7 @@
 import { defineConfig } from "@hey-api/openapi-ts";
 
 export default defineConfig({
-    input:
-        `${process.env.NEXT_PUBLIC_BACKEND_HOST}/openapi.json` ||
-        "https://the-culling-games.up.railway.app/openapi.json",
+    input: `${process.env.BACKEND_HOST}/openapi.json` || "http://localhost:8000/openapi.json",
     output: {
         format: "prettier",
         lint: "eslint",

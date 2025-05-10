@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 import { cache } from "react";
 
 export const verifySession = cache(async () => {
-    const token = (await cookies()).get("session")?.value;
+    const token = (await cookies()).get("token")?.value;
 
     if (!token) {
         redirect("/login");
@@ -37,6 +37,8 @@ export const sessionUser = cache(async (redirected: boolean = false) => {
 
 export const sessionPlayer = cache(async (redirected: boolean = false) => {
     const token = await verifySession();
+
+    // get current user
 
     const { data } = await PlayersService.myPlayer({
         headers: { Authorization: `Bearer ${token}` },
