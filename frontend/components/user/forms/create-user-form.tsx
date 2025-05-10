@@ -8,12 +8,14 @@ import { zCreateUser } from "@/api/client/zod.gen";
 
 import { COUNTRIES } from "@/lib/constants/COUNTRIES";
 import {
+    Alert,
     Box,
     Button,
     Card,
     ComboboxItem,
     Divider,
     Flex,
+    LoadingOverlay,
     OptionsFilter,
     Overlay,
     Paper,
@@ -30,15 +32,19 @@ import { z } from "zod";
 
 import Naluka from "@/fonts/NalukaFont";
 import {
+    IconAlertCircle,
     IconAt,
     IconFishOff,
     IconLocationPin,
     IconLockPassword,
     IconUser,
 } from "@tabler/icons-react";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 
+import { DisplayAPIError } from "@/components/ui/display-api-error";
 import { useCreateUser, useLoginUser } from "@/lib/hooks/users";
+import { createSession } from "@/lib/auth/session";
+import { notifications } from "@mantine/notifications";
 
 export function CreateUserForm() {
     const router = useRouter();
@@ -76,39 +82,57 @@ export function CreateUserForm() {
         mutateAsync: createUserAsync,
     } = useCreateUser();
 
-    const { isSuccess: loginUserIsSuccess, mutateAsync: loginUserAsync } =
-        useLoginUser();
+    const {
+        isSuccess: loginUserIsSuccess,
+        isPending: loginUserIsPending,
+        mutateAsync: loginUserAsync,
+    } = useLoginUser();
 
     const handleSubmit = async (data: zCreateUserType) => {
-        try {
-            const createUserResult = await createUserAsync({
-                body: { ...data },
-            });
+        await createUserAsync({
+            body: data,
+        });
 
-            if (createUserResult) {
-                // login user
-                const loginUserResult = await loginUserAsync({
-                    body: { username: data.username, password: data.password },
-                });
-                if (!loginUserResult) {
-                    // hard login
-                    router.push("/login");
-                } else {
-                    // success; take to match page
-                    router.push("/match");
-                }
-            } else {
-                // redirect to login
-                router.push("/login");
-            }
-        } catch (e) {
-            console.error("Error creating user:", e);
-            // notification replace
+        // login user
+        const token = await loginUserAsync({
+            body: { username: data.username, password: data.password },
+        });
+
+        if (!token.access_token) {
+            notifications.show({
+                message: `"login not successful"`,
+            });
+            redirect("/login");
+        } else {
+            notifications.show({
+                message: "login successful",
+            });
+            redirect("/match");
         }
     };
 
     return (
-        <Box flex={1}>
+        <Box flex={1} pos="relative">
+            <LoadingOverlay
+                visible={loginUserIsPending}
+                zIndex={600}
+                overlayProps={{ radius: "sm", blur: 0 }}
+                loaderProps={{ type: "bars" }}
+            />
+            <LoadingOverlay
+                visible={loginUserIsPending}
+                overlayProps={{ radius: "sm", blur: 2 }}
+                loaderProps={{ children: "Logging In New User...", pt: 100 }}
+            />
+            {createUserError && (
+                <Alert
+                    title="An Error Occured"
+                    color="red"
+                    icon={<IconAlertCircle />}
+                >
+                    <DisplayAPIError error={createUserError} />
+                </Alert>
+            )}
             <form onSubmit={form.onSubmit(handleSubmit)}>
                 <Stack>
                     <TextInput
@@ -163,14 +187,17 @@ export function CreateUserForm() {
                     <Button
                         color="green"
                         type="submit"
-                        disabled={createUserIsPending}
+                        disabled={createUserIsPending || loginUserIsPending}
                     >
                         Create User
                     </Button>
 
                     <Divider label="or" />
 
-                    <Button onClick={() => router.push("/login")}>
+                    <Button
+                        disabled={createUserIsPending || loginUserIsPending}
+                        onClick={() => router.push("/login")}
+                    >
                         Log In
                     </Button>
                 </Stack>

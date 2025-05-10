@@ -1,3 +1,5 @@
+"use client";
+
 import {
     createTokenMutation,
     createUserMutation,
@@ -7,18 +9,16 @@ import {
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 import { notifications } from "@mantine/notifications";
+import { createSession } from "../auth/session";
 
 export const useCreateUser = () => {
     const mutation = useMutation({
         ...createUserMutation(),
         onError: (error) => {
-            console.log(
-                "An error occurred while creating your account.",
-                error
-            );
+            console.log(JSON.stringify(error.detail));
             notifications.show({
-                title: "An error occurred while creating your account.",
-                message: error.detail?.map((d) => d.msg),
+                message: "An error occurred while creating your account.",
+                color: "red",
             });
         },
     });
@@ -29,6 +29,16 @@ export const useCreateUser = () => {
 export const useLoginUser = () => {
     const mutation = useMutation({
         ...createTokenMutation(),
+        onError: (error) => {
+            console.log(JSON.stringify(error));
+            notifications.show({
+                message: "An error occurred while logging in",
+                color: "red",
+            });
+        },
+        onSuccess: (token) => {
+            createSession(token.access_token);
+        },
     });
 
     return mutation;

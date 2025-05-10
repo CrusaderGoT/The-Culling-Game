@@ -70,7 +70,7 @@ export const aUserOptions = (options: Options<AuserData>) => {
     });
 };
 
-export const editUserMutation = (options?: Partial<Options<EditUserData>>) => {
+export const editUserMutation = (options?: Partial<Options<EditUserData>>): UseMutationOptions<EditUserResponse, EditUserError, Options<EditUserData>> => {
     const mutationOptions: UseMutationOptions<EditUserResponse, EditUserError, Options<EditUserData>> = {
         mutationFn: async (localOptions) => {
             const { data } = await UsersService.editUser({
@@ -84,7 +84,7 @@ export const editUserMutation = (options?: Partial<Options<EditUserData>>) => {
     return mutationOptions;
 };
 
-export const deleteUserMutation = (options?: Partial<Options<DeleteUserData>>) => {
+export const deleteUserMutation = (options?: Partial<Options<DeleteUserData>>): UseMutationOptions<DeleteUserResponse, DeleteUserError, Options<DeleteUserData>> => {
     const mutationOptions: UseMutationOptions<DeleteUserResponse, DeleteUserError, Options<DeleteUserData>> = {
         mutationFn: async (localOptions) => {
             const { data } = await UsersService.deleteUser({
@@ -115,7 +115,7 @@ export const createPlayerOptions = (options: Options<CreatePlayerData>) => {
     });
 };
 
-export const createPlayerMutation = (options?: Partial<Options<CreatePlayerData>>) => {
+export const createPlayerMutation = (options?: Partial<Options<CreatePlayerData>>): UseMutationOptions<CreatePlayerResponse, CreatePlayerError, Options<CreatePlayerData>> => {
     const mutationOptions: UseMutationOptions<CreatePlayerResponse, CreatePlayerError, Options<CreatePlayerData>> = {
         mutationFn: async (localOptions) => {
             const { data } = await PlayersService.createPlayer({
@@ -235,7 +235,7 @@ export const aPlayerOptions = (options: Options<APlayerData>) => {
     });
 };
 
-export const editPlayerMutation = (options?: Partial<Options<EditPlayerData>>) => {
+export const editPlayerMutation = (options?: Partial<Options<EditPlayerData>>): UseMutationOptions<EditPlayerResponse, EditPlayerError, Options<EditPlayerData>> => {
     const mutationOptions: UseMutationOptions<EditPlayerResponse, EditPlayerError, Options<EditPlayerData>> = {
         mutationFn: async (localOptions) => {
             const { data } = await PlayersService.editPlayer({
@@ -249,7 +249,7 @@ export const editPlayerMutation = (options?: Partial<Options<EditPlayerData>>) =
     return mutationOptions;
 };
 
-export const deletePlayerMutation = (options?: Partial<Options<DeletePlayerData>>) => {
+export const deletePlayerMutation = (options?: Partial<Options<DeletePlayerData>>): UseMutationOptions<DeletePlayerResponse, DeletePlayerError, Options<DeletePlayerData>> => {
     const mutationOptions: UseMutationOptions<DeletePlayerResponse, DeletePlayerError, Options<DeletePlayerData>> = {
         mutationFn: async (localOptions) => {
             const { data } = await PlayersService.deletePlayer({
@@ -280,7 +280,7 @@ export const upgradePlayerOptions = (options: Options<UpgradePlayerData>) => {
     });
 };
 
-export const upgradePlayerMutation = (options?: Partial<Options<UpgradePlayerData>>) => {
+export const upgradePlayerMutation = (options?: Partial<Options<UpgradePlayerData>>): UseMutationOptions<UpgradePlayerResponse, UpgradePlayerError, Options<UpgradePlayerData>> => {
     const mutationOptions: UseMutationOptions<UpgradePlayerResponse, UpgradePlayerError, Options<UpgradePlayerData>> = {
         mutationFn: async (localOptions) => {
             const { data } = await PlayersService.upgradePlayer({
@@ -311,7 +311,7 @@ export const createMatchOptions = (options: Options<CreateMatchData>) => {
     });
 };
 
-export const createMatchMutation = (options?: Partial<Options<CreateMatchData>>) => {
+export const createMatchMutation = (options?: Partial<Options<CreateMatchData>>): UseMutationOptions<CreateMatchResponse, CreateMatchError, Options<CreateMatchData>> => {
     const mutationOptions: UseMutationOptions<CreateMatchResponse, CreateMatchError, Options<CreateMatchData>> = {
         mutationFn: async (localOptions) => {
             const { data } = await MatchesService.createMatch({
@@ -402,7 +402,7 @@ export const voteOptions = (options: Options<VoteData>) => {
     });
 };
 
-export const voteMutation = (options?: Partial<Options<VoteData>>) => {
+export const voteMutation = (options?: Partial<Options<VoteData>>): UseMutationOptions<VoteResponse, VoteError, Options<VoteData>> => {
     const mutationOptions: UseMutationOptions<VoteResponse, VoteError, Options<VoteData>> = {
         mutationFn: async (localOptions) => {
             const { data } = await MatchesService.vote({
@@ -416,7 +416,7 @@ export const voteMutation = (options?: Partial<Options<VoteData>>) => {
     return mutationOptions;
 };
 
-export const deleteMatchMutation = (options?: Partial<Options<DeleteMatchData>>) => {
+export const deleteMatchMutation = (options?: Partial<Options<DeleteMatchData>>): UseMutationOptions<unknown, DeleteMatchError, Options<DeleteMatchData>> => {
     const mutationOptions: UseMutationOptions<unknown, DeleteMatchError, Options<DeleteMatchData>> = {
         mutationFn: async (localOptions) => {
             const { data } = await MatchesService.deleteMatch({
@@ -447,7 +447,7 @@ export const domainExpansionOptions = (options: Options<DomainExpansionData>) =>
     });
 };
 
-export const domainExpansionMutation = (options?: Partial<Options<DomainExpansionData>>) => {
+export const domainExpansionMutation = (options?: Partial<Options<DomainExpansionData>>): UseMutationOptions<DomainExpansionResponse, DomainExpansionError, Options<DomainExpansionData>> => {
     const mutationOptions: UseMutationOptions<DomainExpansionResponse, DomainExpansionError, Options<DomainExpansionData>> = {
         mutationFn: async (localOptions) => {
             const { data } = await BarriersService.domainExpansion({
@@ -478,7 +478,7 @@ export const simpleDomainOptions = (options: Options<SimpleDomainData>) => {
     });
 };
 
-export const simpleDomainMutation = (options?: Partial<Options<SimpleDomainData>>) => {
+export const simpleDomainMutation = (options?: Partial<Options<SimpleDomainData>>): UseMutationOptions<SimpleDomainResponse, SimpleDomainError, Options<SimpleDomainData>> => {
     const mutationOptions: UseMutationOptions<SimpleDomainResponse, SimpleDomainError, Options<SimpleDomainData>> = {
         mutationFn: async (localOptions) => {
             const { data } = await BarriersService.simpleDomain({
@@ -509,7 +509,7 @@ export const bindindVowOptions = (options: Options<BindindVowData>) => {
     });
 };
 
-export const bindindVowMutation = (options?: Partial<Options<BindindVowData>>) => {
+export const bindindVowMutation = (options?: Partial<Options<BindindVowData>>): UseMutationOptions<BindindVowResponse, BindindVowError, Options<BindindVowData>> => {
     const mutationOptions: UseMutationOptions<BindindVowResponse, BindindVowError, Options<BindindVowData>> = {
         mutationFn: async (localOptions) => {
             const { data } = await BarriersService.bindindVow({
@@ -583,7 +583,7 @@ export const createAdminOptions = (options: Options<CreateAdminData>) => {
     });
 };
 
-export const createAdminMutation = (options?: Partial<Options<CreateAdminData>>) => {
+export const createAdminMutation = (options?: Partial<Options<CreateAdminData>>): UseMutationOptions<CreateAdminResponse, CreateAdminError, Options<CreateAdminData>> => {
     const mutationOptions: UseMutationOptions<CreateAdminResponse, CreateAdminError, Options<CreateAdminData>> = {
         mutationFn: async (localOptions) => {
             const { data } = await AdminsService.createAdmin({
@@ -614,7 +614,7 @@ export const newPermissionOptions = (options: Options<NewPermissionData>) => {
     });
 };
 
-export const newPermissionMutation = (options?: Partial<Options<NewPermissionData>>) => {
+export const newPermissionMutation = (options?: Partial<Options<NewPermissionData>>): UseMutationOptions<NewPermissionResponse, NewPermissionError, Options<NewPermissionData>> => {
     const mutationOptions: UseMutationOptions<NewPermissionResponse, NewPermissionError, Options<NewPermissionData>> = {
         mutationFn: async (localOptions) => {
             const { data } = await AdminsService.newPermission({
@@ -628,7 +628,7 @@ export const newPermissionMutation = (options?: Partial<Options<NewPermissionDat
     return mutationOptions;
 };
 
-export const grantPermissionMutation = (options?: Partial<Options<GrantPermissionData>>) => {
+export const grantPermissionMutation = (options?: Partial<Options<GrantPermissionData>>): UseMutationOptions<GrantPermissionResponse, GrantPermissionError, Options<GrantPermissionData>> => {
     const mutationOptions: UseMutationOptions<GrantPermissionResponse, GrantPermissionError, Options<GrantPermissionData>> = {
         mutationFn: async (localOptions) => {
             const { data } = await AdminsService.grantPermission({
@@ -642,7 +642,7 @@ export const grantPermissionMutation = (options?: Partial<Options<GrantPermissio
     return mutationOptions;
 };
 
-export const removePermissionMutation = (options?: Partial<Options<RemovePermissionData>>) => {
+export const removePermissionMutation = (options?: Partial<Options<RemovePermissionData>>): UseMutationOptions<RemovePermissionResponse, RemovePermissionError, Options<RemovePermissionData>> => {
     const mutationOptions: UseMutationOptions<RemovePermissionResponse, RemovePermissionError, Options<RemovePermissionData>> = {
         mutationFn: async (localOptions) => {
             const { data } = await AdminsService.removePermission({
@@ -673,7 +673,7 @@ export const demoSuperuserOptions = (options: Options<DemoSuperuserData>) => {
     });
 };
 
-export const demoSuperuserMutation = (options?: Partial<Options<DemoSuperuserData>>) => {
+export const demoSuperuserMutation = (options?: Partial<Options<DemoSuperuserData>>): UseMutationOptions<unknown, DemoSuperuserError, Options<DemoSuperuserData>> => {
     const mutationOptions: UseMutationOptions<unknown, DemoSuperuserError, Options<DemoSuperuserData>> = {
         mutationFn: async (localOptions) => {
             const { data } = await AdminsService.demoSuperuser({
@@ -704,7 +704,7 @@ export const createTokenOptions = (options: Options<CreateTokenData>) => {
     });
 };
 
-export const createTokenMutation = (options?: Partial<Options<CreateTokenData>>) => {
+export const createTokenMutation = (options?: Partial<Options<CreateTokenData>>): UseMutationOptions<CreateTokenResponse, CreateTokenError, Options<CreateTokenData>> => {
     const mutationOptions: UseMutationOptions<CreateTokenResponse, CreateTokenError, Options<CreateTokenData>> = {
         mutationFn: async (localOptions) => {
             const { data } = await AuthService.createToken({
@@ -735,7 +735,7 @@ export const createUserOptions = (options: Options<CreateUserData>) => {
     });
 };
 
-export const createUserMutation = (options?: Partial<Options<CreateUserData>>) => {
+export const createUserMutation = (options?: Partial<Options<CreateUserData>>): UseMutationOptions<CreateUserResponse, CreateUserError, Options<CreateUserData>> => {
     const mutationOptions: UseMutationOptions<CreateUserResponse, CreateUserError, Options<CreateUserData>> = {
         mutationFn: async (localOptions) => {
             const { data } = await UsersService.createUser({
