@@ -40,7 +40,7 @@ app = FastAPI(
     title="The Culling Games API",
     description="The API Docs for The Culling Games",
     generate_unique_id_function=custom_generate_unique_id,
-    #docs_url=None,
+    docs_url=None,
     debug=os.getenv("ENVIROMENT") == "developement",
 )
 """
@@ -90,8 +90,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-if (os.getenv("ENVIROMENT") == "developement") is False:
-    app.add_middleware(HTTPSRedirectMiddleware)
 
 
 # to get a string like this run:
