@@ -5,7 +5,7 @@ import { sessionPlayer } from "@/lib/auth/dal";
 import { redirect } from "next/navigation";
 
 export default async function CreatePlayerPage() {
-    const player = await sessionPlayer(true);
+    const player = await sessionPlayer();
 
     if (player) redirect("/edit-player");
 

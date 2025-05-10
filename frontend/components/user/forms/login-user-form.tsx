@@ -61,7 +61,7 @@ export function LoginForm() {
 
     return (
         <LoginFormProvider form={form}>
-            <Paper radius="md" p="md" withBorder>
+            <Paper radius="md" p="md" withBorder pos={"relative"}>
                 {loginUserError && (
                     <Alert
                         title="An Error Occured"

@@ -104,7 +104,7 @@ export function CreateUserForm() {
     };
 
     return (
-        <Box flex={1}>
+        <Box flex={1} pos={"relative"}>
             <LoadingOverlay
                 visible={loginUserIsPending || loginUserIsSuccess}
                 zIndex={600}
