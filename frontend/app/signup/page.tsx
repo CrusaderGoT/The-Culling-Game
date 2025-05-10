@@ -5,7 +5,7 @@ export default async function SignupPage() {
     return (
         <Box>
             <Title ta={"center"} order={2}>
-                Create a User Account
+                Register to Play
             </Title>
             <CreateUserPaper />
         </Box>
