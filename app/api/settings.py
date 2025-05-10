@@ -64,16 +64,21 @@ app.mount("/ws", socket_app)
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 # MIDDLEWARE
+
+allowed_hosts = [
+    "localhost",  # for developement
+    "testserver",  # for testing
+    "the-culling-games.up.railway.app",
+    "the-culling-games.vercel.app",
+    "github.com",  # for actions
+]
+
+app.add_middleware(TrustedHostMiddleware, allowed_hosts=allowed_hosts)
+
+
 origins = [
     "http://localhost:3000",
     "https://the-culling-games.vercel.app",
-    "https://the-culling-games.up.railway.app"
-]
-
-allowed_hosts = [
-    "localhost",
-    "the-culling-games.up.railway.app",
-    "the-culling-games.vercel.app",
 ]
 
 app.add_middleware(
@@ -87,7 +92,6 @@ app.add_middleware(
 if (os.getenv("ENVIROMENT") == "developement") is False:
     app.add_middleware(HTTPSRedirectMiddleware)
 
-app.add_middleware(TrustedHostMiddleware, allowed_hosts=allowed_hosts)
 
 # to get a string like this run:
 # openssl rand -hex 32 in bash $
