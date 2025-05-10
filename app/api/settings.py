@@ -6,6 +6,8 @@ import socketio
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.routing import APIRoute
 from fastapi.staticfiles import StaticFiles
 
@@ -39,7 +41,7 @@ app = FastAPI(
     description="The API Docs for The Culling Games",
     generate_unique_id_function=custom_generate_unique_id,
     docs_url=None,
-    debug=True,
+    debug=os.getenv("ENVIROMENT") == "developement",
 )
 """
 The Global FastAPI app. To allow for use in multiple files.\n
@@ -64,7 +66,13 @@ app.mount("/static", StaticFiles(directory="app/static"), name="static")
 # MIDDLEWARE
 origins = [
     "http://localhost:3000",
-    "https://the-culling-games.onrender.com",
+    "https://the-culling-games.vercel.app",
+]
+
+allowed_hosts = [
+    "localhost",
+    "the-culling-games.up.railway.app",
+    "the-culling-games.vercel.app",
 ]
 
 app.add_middleware(
@@ -74,6 +82,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+if (os.getenv("ENVIROMENT") == "developement") is False:
+    app.add_middleware(HTTPSRedirectMiddleware)
+
+app.add_middleware(TrustedHostMiddleware, allowed_hosts=allowed_hosts)
 
 # to get a string like this run:
 # openssl rand -hex 32 in bash $
