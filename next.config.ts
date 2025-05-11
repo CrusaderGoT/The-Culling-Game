@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
     experimental: {
         optimizePackageImports: ["@mantine/core", "@mantine/hooks"],
     },
+    crossOrigin: "use-credentials",
 };
 
 export default nextConfig;

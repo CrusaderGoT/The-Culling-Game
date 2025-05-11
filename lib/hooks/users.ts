@@ -32,7 +32,7 @@ export const useLoginUser = () => {
         onError: (error) => {
             console.log(JSON.stringify(error));
             notifications.show({
-                message: "An error occurred while logging in",
+                message: "An error occurred during logging in",
                 color: "red",
             });
         },

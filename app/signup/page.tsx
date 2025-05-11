@@ -3,7 +3,7 @@ import { Stack, Title } from "@mantine/core";
 
 export default async function SignupPage() {
     return (
-        <Stack pos="relative">
+        <Stack>
             <Title ta={"center"} order={2}>
                 Register to Play
             </Title>
