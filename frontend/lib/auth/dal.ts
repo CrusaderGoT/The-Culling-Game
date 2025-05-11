@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 import { cache } from "react";
 
 export const verifySession = cache(async () => {
-    const token = (await cookies()).get("token")?.value;
+    const token = (await cookies()).get("session")?.value;
 
     if (!token) {
         redirect("/login");
