@@ -3,6 +3,7 @@
 from typing import Annotated
 from uuid import UUID
 
+from app.api.settings import settings
 from app.auth.dependencies import admin_user, get_admin_user, oauth2_scheme
 from app.models.admin import (
     AdminInfo,
@@ -15,7 +16,7 @@ from app.utils.admin import (
     admin_allow_permissions,
     superuser_allow_permissions,
 )
-from app.utils.config import AdminException, Tag, UserException, settings
+from app.utils.config import AdminException, Tag, UserException
 from app.utils.dependencies import session
 from app.utils.user import get_user, id_name_email
 from dotenv import load_dotenv

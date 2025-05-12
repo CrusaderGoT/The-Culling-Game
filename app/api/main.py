@@ -11,7 +11,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel import or_, select
 
-from app.api.settings import app, sio
+from app.api.settings import app, settings, sio
 from app.auth.credentials import (
     PasswordAuth,
     authenticate_user,
@@ -22,7 +22,7 @@ from app.auth.credentials import (
 from app.auth.models import Token, TokenData
 from app.models.user import CreateUser, User, UserInfo
 from app.routers import admin, barriers, colonies, matches, players, users
-from app.utils.config import Tag, settings
+from app.utils.config import Tag
 from app.utils.dependencies import session
 from app.utils.user import get_user, update_user_refresh_key, usernamedb
 
