@@ -36,13 +36,19 @@ export async function updateSession() {
 
     const refresh_token = cookieStore.get("refresh_token")?.value;
 
-    if (!refresh_token) redirect("/login");
+    if (!refresh_token) {
+        await deleteSession();
+        redirect("/login");
+    }
 
     const { data } = await AuthService.refreshToken({
         body: { refresh_token },
     });
 
-    if (!data) redirect("/login");
+    if (!data) {
+        await deleteSession();
+        redirect("/login");
+    }
 
     await createSession(data);
 
