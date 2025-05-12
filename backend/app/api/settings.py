@@ -1,17 +1,31 @@
 """settings for the api"""
 
+from uuid import UUID
+
 import socketio
-from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.routing import APIRoute
 from fastapi.staticfiles import StaticFiles
+from pydantic_settings import BaseSettings
 
-from app.utils.config import settings
 
-# load .env
-load_dotenv()
+class Settings(BaseSettings):
+    "class for env or default settings."
+
+    database_url: str = "postgresql://postgres:crusader@localhost/CullingGamesDB"
+    secret_key: str = "7f820bef39dd81f92e9935b30f029a74af7b7d1c5d8c85c855d6b22d093d485c"
+    algorithm: str = "HS256"
+    code: UUID = UUID("a24cd617-5d2e-4317-970d-162f315d0397")
+    debug: bool = False
+    access_token_expire: int = 900_000
+    "in milliseconds"
+    refresh_token_expire: int = 604_800_000
+    "in milliseconds"
+
+
+settings = Settings()
 
 
 def custom_generate_unique_id(route: APIRoute):
@@ -34,6 +48,7 @@ and then use that helper in both `sio`,`router`or`app`.
 >>> def my_event:
         _sub_helper()
 """
+
 
 app = FastAPI(
     title="The Culling Games API",

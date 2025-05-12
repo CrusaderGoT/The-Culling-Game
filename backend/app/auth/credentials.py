@@ -7,9 +7,9 @@ import jwt
 from fastapi import HTTPException, status
 from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
 
+from app.api.settings import settings
 from app.auth.models import TokenData
 from app.models.user import User
-from app.utils.config import settings
 from app.utils.dependencies import session
 from app.utils.user import get_user
 

@@ -534,12 +534,6 @@ export class AuthService {
      */
     public static refreshToken<ThrowOnError extends boolean = false>(options: Options<RefreshTokenData, ThrowOnError>) {
         return (options.client ?? _heyApiClient).post<RefreshTokenResponse, RefreshTokenError, ThrowOnError>({
-            security: [
-                {
-                    scheme: 'bearer',
-                    type: 'http'
-                }
-            ],
             url: '/refresh-token',
             ...options,
             headers: {
@@ -559,12 +553,6 @@ export class AuthService {
      */
     public static verifyToken<ThrowOnError extends boolean = false>(options: Options<VerifyTokenData, ThrowOnError>) {
         return (options.client ?? _heyApiClient).post<VerifyTokenResponse, VerifyTokenError, ThrowOnError>({
-            security: [
-                {
-                    scheme: 'bearer',
-                    type: 'http'
-                }
-            ],
             url: '/verify-token',
             ...options,
             headers: {

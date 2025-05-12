@@ -757,6 +757,7 @@ export type Token = {
     refresh_token: string;
     token_type: string;
     expires_in: number;
+    refresh_expires_in: number;
 };
 
 /**
@@ -1621,5 +1622,5 @@ export type ChatHtmlResponses = {
 export type ChatHtmlResponse = ChatHtmlResponses[keyof ChatHtmlResponses];
 
 export type ClientOptions = {
-    baseUrl: 'https://the-culling-games.up.railway.app' | (string & {});
+    baseUrl: 'http://localhost:8000' | (string & {});
 };

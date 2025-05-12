@@ -555,7 +555,8 @@ export const zToken = z.object({
     access_token: z.string(),
     refresh_token: z.string(),
     token_type: z.string(),
-    expires_in: z.number().int()
+    expires_in: z.number().int(),
+    refresh_expires_in: z.number().int()
 });
 
 export const zTokenData = z.object({
