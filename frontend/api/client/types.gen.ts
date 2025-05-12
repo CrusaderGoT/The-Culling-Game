@@ -252,6 +252,14 @@ export type BodyEditPlayer = {
     applications?: Array<EditCtApp> | null;
 };
 
+export type BodyRefreshToken = {
+    refresh_token: string;
+};
+
+export type BodyVerifyToken = {
+    token: string;
+};
+
 /**
  * model for collecting data to cast a vote
  */
@@ -740,9 +748,26 @@ export type PlayerInfo = {
     matches: Array<BaseMatchInfo>;
 };
 
+/**
+ * model for encoded access token, resfresh token,
+ * and acces token expires time
+ */
 export type Token = {
     access_token: string;
+    refresh_token: string;
     token_type: string;
+    expires_in: number;
+};
+
+/**
+ * response model for decoded token
+ */
+export type TokenData = {
+    sub: string;
+    refresh_token_key?: string | null;
+    exp: string;
+    iat: string;
+    scopes?: Array<string>;
 };
 
 /**
@@ -1501,6 +1526,56 @@ export type CreateTokenResponses = {
 
 export type CreateTokenResponse = CreateTokenResponses[keyof CreateTokenResponses];
 
+export type RefreshTokenData = {
+    body: BodyRefreshToken;
+    path?: never;
+    query?: never;
+    url: '/refresh-token';
+};
+
+export type RefreshTokenErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type RefreshTokenError = RefreshTokenErrors[keyof RefreshTokenErrors];
+
+export type RefreshTokenResponses = {
+    /**
+     * An Updated Token
+     */
+    200: Token;
+};
+
+export type RefreshTokenResponse = RefreshTokenResponses[keyof RefreshTokenResponses];
+
+export type VerifyTokenData = {
+    body: BodyVerifyToken;
+    path?: never;
+    query?: never;
+    url: '/verify-token';
+};
+
+export type VerifyTokenErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type VerifyTokenError = VerifyTokenErrors[keyof VerifyTokenErrors];
+
+export type VerifyTokenResponses = {
+    /**
+     * A Verified Token
+     */
+    200: TokenData;
+};
+
+export type VerifyTokenResponse = VerifyTokenResponses[keyof VerifyTokenResponses];
+
 export type CreateUserData = {
     /**
      * The details for creating a User
@@ -1546,5 +1621,5 @@ export type ChatHtmlResponses = {
 export type ChatHtmlResponse = ChatHtmlResponses[keyof ChatHtmlResponses];
 
 export type ClientOptions = {
-    baseUrl: 'http://localhost:8000' | (string & {});
+    baseUrl: 'https://the-culling-games.up.railway.app' | (string & {});
 };

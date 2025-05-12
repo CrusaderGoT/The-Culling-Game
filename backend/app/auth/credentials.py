@@ -7,9 +7,9 @@ import jwt
 from fastapi import HTTPException, status
 from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
 
-from app.api.settings import ALGORITHM, SECRET_KEY
 from app.auth.models import TokenData
 from app.models.user import User
+from app.utils.config import settings
 from app.utils.dependencies import session
 from app.utils.user import get_user
 
@@ -53,24 +53,23 @@ class PasswordAuth:
         return bcrypt.checkpw(password.encode("utf-8"), hashed.encode("utf-8"))
 
 
-ACCESS_TOKEN_EXPIRE_MINUTES = 300
-"constant for expiration of access token"
-
-
 def create_access_token(
     data: dict,
-    expires_delta: timedelta = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
+    expires_delta: timedelta = timedelta(milliseconds=settings.access_token_expire),
 ):
     """
     creates an access token.
-    \n`expires_delta` default `ACCESS_TOKEN_EXPIRE_MINUTES` is 60mins
+    \n`data: dict`
+    \n`expires_delta: timedelta`
     """
     to_encode = data.copy()
     issued_at = datetime.now(UTC)
     expires = datetime.now(timezone.utc) + expires_delta
 
     to_encode.update({"exp": expires, "iat": issued_at})
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    encoded_jwt = jwt.encode(
+        to_encode, settings.secret_key, algorithm=settings.algorithm
+    )
     return encoded_jwt
 
 
@@ -93,7 +92,9 @@ def decode_access_token(token: str) -> TokenData:
     raise HTTPException if fail.
     """
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(
+            token, settings.secret_key, algorithms=[settings.algorithm]
+        )
         return TokenData.model_validate(payload)
     except ExpiredSignatureError:
         raise HTTPException(
@@ -109,10 +110,12 @@ def decode_access_token(token: str) -> TokenData:
         )
 
 
-def create_refresh_token(user: User, expires_in: int, key):
+def create_refresh_token(
+    user: User, key, refresh_expires_in: int = settings.refresh_token_expire
+):
     "create refresh token"
     refresh_token = create_access_token(
         data={"sub": user.usernamedb, "refresh_token_key": key},
-        expires_delta=timedelta(milliseconds=expires_in),
+        expires_delta=timedelta(milliseconds=refresh_expires_in),
     )
     return refresh_token

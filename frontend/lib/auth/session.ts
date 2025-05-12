@@ -1,46 +1,56 @@
 "use server";
 
-import { cookies } from "next/headers";
+import { AuthService, Token } from "@/api/client";
 
-export async function createSession(token: string) {
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+
+export async function createSession(token: Token) {
     const cookieStore = await cookies();
 
-    // match token expire in fastapi
-    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    const tokenExpiresAt = new Date(Date.now() + token.expires_in);
 
-    cookieStore.set("session", token, {
+    const refreshTokenExpiresAt = new Date(
+        Date.now() + token.refresh_expires_in
+    );
+
+    cookieStore.set("session", token.access_token, {
         httpOnly: true,
         secure: true,
-        expires: expiresAt,
+        expires: tokenExpiresAt,
+        sameSite: "lax",
+        path: "/",
+    });
+
+    cookieStore.set("refresh_token", token.refresh_token, {
+        httpOnly: true,
+        secure: true,
+        expires: refreshTokenExpiresAt,
         sameSite: "lax",
         path: "/",
     });
 }
 
 export async function updateSession() {
-    const token = (await cookies()).get("session")?.value;
-
-    if (!token) return null;
-
-    const updateExpires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-
-    // FASTAPI to actually update/refresh the token
-    // use sdk here/ no tansstack
-    // fail return null
-    // else session = newSession
-
     const cookieStore = await cookies();
 
-    cookieStore.set("session", token, {
-        httpOnly: true,
-        secure: true,
-        expires: updateExpires,
-        sameSite: "lax",
-        path: "/",
+    const refresh_token = cookieStore.get("refresh_token")?.value;
+
+    if (!refresh_token) redirect("/login");
+
+    const { data } = await AuthService.refreshToken({
+        body: { refresh_token },
     });
+
+    if (!data) redirect("/login");
+
+    await createSession(data);
+
+    return data;
 }
 
 export async function deleteSession() {
     const cookieStore = await cookies();
     cookieStore.delete("session");
+    cookieStore.delete("refresh_token");
 }

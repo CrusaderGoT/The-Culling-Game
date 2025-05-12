@@ -39,6 +39,7 @@ dependencies = [
     "psycopg2-binary==2.9.9",
     "pydantic==2.8.2",
     "pydantic-core==2.20.1",
+    "pydantic-settings>=2.9.1",
     "pygments==2.18.0",
     "pyjwt==2.8.0",
     "pyproject-hooks==1.1.0",

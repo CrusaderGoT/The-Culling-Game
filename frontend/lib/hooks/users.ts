@@ -37,7 +37,7 @@ export const useLoginUser = () => {
             });
         },
         onSuccess: async (token) => {
-            await createSession(token.access_token);
+            await createSession(token);
             notifications.show({
                 message: "login successful",
                 color: "green",

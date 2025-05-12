@@ -1,15 +1,14 @@
 """settings for the api"""
 
-import os
-
 import socketio
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.routing import APIRoute
 from fastapi.staticfiles import StaticFiles
+
+from app.utils.config import settings
 
 # load .env
 load_dotenv()
@@ -41,7 +40,7 @@ app = FastAPI(
     description="The API Docs for The Culling Games",
     generate_unique_id_function=custom_generate_unique_id,
     docs_url=None,
-    debug=os.getenv("ENVIRONMENT") == "developement",
+    debug=settings.debug,
 )
 """
 The Global FastAPI app. To allow for use in multiple files.\n
@@ -89,8 +88,3 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# to get a string like this run:
-# openssl rand -hex 32 in bash $
-SECRET_KEY = os.getenv("SECRET_KEY")
-ALGORITHM = os.getenv("ALGORITHM", "HS256")
