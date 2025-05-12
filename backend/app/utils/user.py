@@ -1,4 +1,5 @@
 from typing import Annotated
+from uuid import UUID
 
 from email_validator import EmailNotValidError, validate_email
 from fastapi import Path, status
@@ -89,3 +90,11 @@ def edit_user_helper(edit_user: EditUser, userdb: User, session: session) -> Use
     edited_user = userdb.sqlmodel_update(user_data_to_edit, update=update_usernamedb)
 
     return edited_user
+
+
+async def update_user_refresh_key(user: User, key, session: session):
+    "update user refresh key"
+    key = UUID(key)
+    user.refresh_token_key = key
+    session.add(user)
+    session.commit()
