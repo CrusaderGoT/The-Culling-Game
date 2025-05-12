@@ -19,11 +19,10 @@ from app.auth.credentials import (
     create_refresh_token,
     decode_access_token,
 )
-from app.auth.dependencies import oauth2_scheme
 from app.auth.models import Token, TokenData
 from app.models.user import CreateUser, User, UserInfo
 from app.routers import admin, barriers, colonies, matches, players, users
-from app.utils.config import Tag
+from app.utils.config import Tag, settings
 from app.utils.dependencies import session
 from app.utils.user import get_user, update_user_refresh_key, usernamedb
 
@@ -61,11 +60,10 @@ async def create_token(
 
     access_token = create_access_token(data={"sub": user.usernamedb})
 
-    expires_in = (
-        604_800_000  # 7 days in milliseconds! (for Next.js(JS) session DateTime)
-    )
     key = jsonable_encoder(uuid5(uuid4(), user.usernamedb))  # refresh token key
-    refresh_token = create_refresh_token(user, expires_in, key)
+    refresh_token = create_refresh_token(
+        user=user, refresh_expires_in=settings.refresh_token_expire, key=key
+    )
 
     # update user refresh key
     await update_user_refresh_key(user, key, session)
@@ -74,7 +72,8 @@ async def create_token(
         access_token=access_token,
         refresh_token=refresh_token,
         token_type="Bearer",
-        expires_in=expires_in,
+        expires_in=settings.access_token_expire,
+        refresh_expires_in=settings.refresh_token_expire,
     )
     return token
 
@@ -87,9 +86,6 @@ async def create_token(
     tags=[Tag.auth],
     summary="refreshes/updates a token",
     response_description="An Updated Token",
-    dependencies=[
-        Depends(oauth2_scheme),
-    ],
 )
 async def refresh_token(
     session: session,
@@ -123,11 +119,10 @@ async def refresh_token(
     # 3. Issue new tokens
     access_token = create_access_token(data={"sub": user.usernamedb})
 
-    expires_in = (
-        604_800_000  # 7 days in milliseconds! (for Next.js(JS) session DateTime)
-    )
     new_key = jsonable_encoder(uuid5(uuid4(), user.usernamedb))  # refresh token key
-    new_refresh_token = create_refresh_token(user, expires_in, new_key)
+    new_refresh_token = create_refresh_token(
+        user=user, refresh_expires_in=settings.refresh_token_expire, key=new_key
+    )
 
     # 4. update user refresh key
     await update_user_refresh_key(user, new_key, session)
@@ -136,7 +131,8 @@ async def refresh_token(
         access_token=access_token,
         refresh_token=new_refresh_token,
         token_type="Bearer",
-        expires_in=expires_in,
+        expires_in=settings.access_token_expire,
+        refresh_expires_in=settings.refresh_token_expire,
     )
     return token
 
@@ -149,9 +145,6 @@ async def refresh_token(
     tags=[Tag.auth],
     summary="verifies a token",
     response_description="A Verified Token",
-    dependencies=[
-        Depends(oauth2_scheme),
-    ],
 )
 def verify_token(token: Annotated[str, Body(embed=True)]):
     """
