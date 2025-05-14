@@ -9,6 +9,7 @@ import {
 } from "@/components/user/forms/login-user-form-context";
 
 import { useLoginUser } from "@/lib/hooks/users";
+import { cleanString } from "@/lib/utils";
 
 import {
     Alert,
@@ -29,6 +30,7 @@ import {
 
 import { zodResolver } from "mantine-form-zod-resolver";
 import { redirect, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export function LoginForm() {
     const router = useRouter();
@@ -49,13 +51,22 @@ export function LoginForm() {
         isSuccess: loginUserIsSuccess,
     } = useLoginUser();
 
+    const [nextUrl, setNextUrl] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (typeof window !== "undefined") {
+            const searchParams = new URLSearchParams(window.location.search);
+            setNextUrl(searchParams.get("next"));
+        }
+    }, []);
+
     const handleSubmit = async (data: LoginUserType) => {
         const token = await loginUserAsync({
             body: { username: data.username, password: data.password },
         });
 
         if (token.access_token) {
-            redirect("/match");
+            redirect(nextUrl ? nextUrl : "/match");
         }
     };
 
@@ -82,7 +93,9 @@ export function LoginForm() {
                     visible={loginUserIsSuccess}
                     overlayProps={{ radius: "sm", blur: 2 }}
                     loaderProps={{
-                        children: "Redirecting to match...",
+                        children: `Redirecting to ${
+                            nextUrl ? cleanString(nextUrl) : "match"
+                        }...`,
                         pt: 100,
                     }}
                 />

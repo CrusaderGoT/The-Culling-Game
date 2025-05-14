@@ -1,9 +1,9 @@
 "use server";
 
 import { AuthService, Token } from "@/api/client";
+import { redirect } from "next/navigation";
 
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 
 export async function createSession(token: Token) {
     const cookieStore = await cookies();
@@ -38,7 +38,7 @@ export async function updateSession() {
 
     if (!refresh_token) {
         await deleteSession();
-        redirect("/login");
+        return null;
     }
 
     const { data } = await AuthService.refreshToken({
@@ -47,7 +47,7 @@ export async function updateSession() {
 
     if (!data) {
         await deleteSession();
-        redirect("/login");
+        return null;
     }
 
     await createSession(data);
@@ -59,4 +59,12 @@ export async function deleteSession() {
     const cookieStore = await cookies();
     cookieStore.delete("session");
     cookieStore.delete("refresh_token");
+}
+
+export async function getSession() {
+    const token = (await cookies()).get("session")?.value;
+    if (!token) {
+        redirect(`/login`);
+    }
+    return token;
 }
