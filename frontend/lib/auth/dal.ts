@@ -2,8 +2,8 @@ import "server-only";
 
 import { AuthService, PlayersService, UsersService } from "@/api/client";
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 import { cache } from "react";
+import { redirect } from "next/navigation";
 
 export const verifySession = cache(async (path: string = "/match") => {
     const token = (await cookies()).get("session")?.value;
