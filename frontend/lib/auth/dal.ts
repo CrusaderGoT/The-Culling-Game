@@ -1,4 +1,4 @@
-import "server-only";
+"use server";
 
 import { AuthService, PlayersService, UsersService } from "@/api/client";
 import { getSession, updateSession } from "@/lib/auth/session";
