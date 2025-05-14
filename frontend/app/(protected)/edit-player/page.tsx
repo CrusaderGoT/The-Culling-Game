@@ -7,7 +7,7 @@ import { Text } from "@mantine/core";
 import { redirect } from "next/navigation";
 
 export default async function EditPlayerPage() {
-    const player = await sessionPlayer();
+    const player = await sessionPlayer("/edit-player");
 
     if (!player) {
         redirect("/create-player");

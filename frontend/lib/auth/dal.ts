@@ -1,19 +1,14 @@
-"use server";
+import "server-only";
 
 import { AuthService, PlayersService, UsersService } from "@/api/client";
-import { getSession, updateSession } from "@/lib/auth/session";
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import { cache } from "react";
 
-export const verifyUpdateSession = cache(async () => {
-    const cookieStore = await cookies();
-
-    const token = cookieStore.get("session")?.value;
-
+export const verifySession = cache(async (path: string = "/match") => {
+    const token = (await cookies()).get("session")?.value;
     if (!token) {
-        const newToken = await updateSession();
-        if (!newToken) return null;
-        return newToken.access_token;
+        redirect(`/api/auth/refresh?next=${path}`);
     }
 
     const { data } = await AuthService.verifyToken({
@@ -21,16 +16,14 @@ export const verifyUpdateSession = cache(async () => {
     });
 
     if (!data) {
-        const newToken = await updateSession();
-        if (!newToken) return null;
-        return newToken.access_token;
+        redirect(`/api/auth/refresh?next=${path}`);
     }
 
     return token;
 });
 
-export const sessionUser = cache(async () => {
-    const token = await getSession();
+export const sessionUser = cache(async (path: string) => {
+    const token = await verifySession(path);
 
     // get current user
     const { data, error } = await UsersService.currentUser({
@@ -52,8 +45,8 @@ export const sessionUser = cache(async () => {
     return data;
 });
 
-export const sessionPlayer = cache(async () => {
-    const token = await getSession();
+export const sessionPlayer = cache(async (path: string) => {
+    const token = await verifySession(path);
 
     // get current user
 
