@@ -38,7 +38,11 @@ export const sessionUser = cache(async () => {
     });
 
     if (error) {
-        throw new Error(error.detail ? error.detail : "Error Fetching Player");
+        const detail =
+            typeof error === "object" && error !== null && "detail" in error
+                ? (error as { detail?: string }).detail
+                : undefined;
+        throw new Error(detail ? detail : "Error Fetching User");
     }
 
     if (!data) {
@@ -58,7 +62,11 @@ export const sessionPlayer = cache(async () => {
     });
 
     if (error) {
-        throw new Error(error.detail ? error.detail : "Error Fetching Player");
+        const detail =
+            typeof error === "object" && error !== null && "detail" in error
+                ? (error as { detail?: string }).detail
+                : undefined;
+        throw new Error(detail ? detail : "Error Fetching Player");
     }
 
     if (!data) {
