@@ -3,10 +3,10 @@ import { Container } from "@mantine/core";
 
 import { mockMatch, mockPlayers } from "@/lib/constants/mockData";
 
-import { verifySession } from "@/lib/auth/dal";
+// Remove verifySession import and call from here
 
-export default async function MatchPage() {
-    await verifySession();
+export default function MatchPage() {
+    // Session verification should be handled in middleware or a server action
 
     return (
         <Container size={"xl"}>
