@@ -2,7 +2,7 @@
 
 import { type Options, UsersService, PlayersService, MatchesService, BarriersService, ColoniesService, AdminsService, AuthService, DefaultService } from '../sdk.gen';
 import { queryOptions, type UseMutationOptions, infiniteQueryOptions, type InfiniteData } from '@tanstack/react-query';
-import type { CurrentUserData, AuserData, EditUserData, EditUserError, EditUserResponse, DeleteUserData, DeleteUserError, DeleteUserResponse, CreatePlayerData, CreatePlayerError, CreatePlayerResponse, MyPlayerData, GetPlayersData, GetPlayersError, GetPlayersResponse, APlayerData, EditPlayerData, EditPlayerError, EditPlayerResponse, DeletePlayerData, DeletePlayerError, DeletePlayerResponse, UpgradePlayerData, UpgradePlayerError, UpgradePlayerResponse, CreateMatchData, CreateMatchError, CreateMatchResponse, GetMatchesData, GetMatchesError, GetMatchesResponse, GetLastestMatchData, VoteData, VoteError, VoteResponse, DeleteMatchData, DeleteMatchError, DomainExpansionData, DomainExpansionError, DomainExpansionResponse, SimpleDomainData, SimpleDomainError, SimpleDomainResponse, BindindVowData, BindindVowError, BindindVowResponse, GetColoniesData, GetColoniesError, GetColoniesResponse, CreateAdminData, CreateAdminError, CreateAdminResponse, NewPermissionData, NewPermissionError, NewPermissionResponse, GrantPermissionData, GrantPermissionError, GrantPermissionResponse, RemovePermissionData, RemovePermissionError, RemovePermissionResponse, DemoSuperuserData, DemoSuperuserError, CreateTokenData, CreateTokenError, CreateTokenResponse, CreateUserData, CreateUserError, CreateUserResponse, ChatHtmlData } from '../types.gen';
+import type { CurrentUserData, AuserData, EditUserData, EditUserError, EditUserResponse, DeleteUserData, DeleteUserError, DeleteUserResponse, CreatePlayerData, CreatePlayerError, CreatePlayerResponse, MyPlayerData, GetPlayersData, GetPlayersError, GetPlayersResponse, APlayerData, EditPlayerData, EditPlayerError, EditPlayerResponse, DeletePlayerData, DeletePlayerError, DeletePlayerResponse, UpgradePlayerData, UpgradePlayerError, UpgradePlayerResponse, CreateMatchData, CreateMatchError, CreateMatchResponse, GetMatchesData, GetMatchesError, GetMatchesResponse, GetLastestMatchData, VoteData, VoteError, VoteResponse, DeleteMatchData, DeleteMatchError, DomainExpansionData, DomainExpansionError, DomainExpansionResponse, SimpleDomainData, SimpleDomainError, SimpleDomainResponse, BindindVowData, BindindVowError, BindindVowResponse, GetColoniesData, GetColoniesError, GetColoniesResponse, CreateAdminData, CreateAdminError, CreateAdminResponse, NewPermissionData, NewPermissionError, NewPermissionResponse, GrantPermissionData, GrantPermissionError, GrantPermissionResponse, RemovePermissionData, RemovePermissionError, RemovePermissionResponse, DemoSuperuserData, DemoSuperuserError, CreateTokenData, CreateTokenError, CreateTokenResponse, RefreshTokenData, RefreshTokenError, RefreshTokenResponse, VerifyTokenData, VerifyTokenError, VerifyTokenResponse, CreateUserData, CreateUserError, CreateUserResponse, ChatHtmlData } from '../types.gen';
 import { client as _heyApiClient } from '../client.gen';
 
 export type QueryKey<TOptions extends Options> = [
@@ -708,6 +708,68 @@ export const createTokenMutation = (options?: Partial<Options<CreateTokenData>>)
     const mutationOptions: UseMutationOptions<CreateTokenResponse, CreateTokenError, Options<CreateTokenData>> = {
         mutationFn: async (localOptions) => {
             const { data } = await AuthService.createToken({
+                ...options,
+                ...localOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const refreshTokenQueryKey = (options: Options<RefreshTokenData>) => createQueryKey('refreshToken', options);
+
+export const refreshTokenOptions = (options: Options<RefreshTokenData>) => {
+    return queryOptions({
+        queryFn: async ({ queryKey, signal }) => {
+            const { data } = await AuthService.refreshToken({
+                ...options,
+                ...queryKey[0],
+                signal,
+                throwOnError: true
+            });
+            return data;
+        },
+        queryKey: refreshTokenQueryKey(options)
+    });
+};
+
+export const refreshTokenMutation = (options?: Partial<Options<RefreshTokenData>>): UseMutationOptions<RefreshTokenResponse, RefreshTokenError, Options<RefreshTokenData>> => {
+    const mutationOptions: UseMutationOptions<RefreshTokenResponse, RefreshTokenError, Options<RefreshTokenData>> = {
+        mutationFn: async (localOptions) => {
+            const { data } = await AuthService.refreshToken({
+                ...options,
+                ...localOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const verifyTokenQueryKey = (options: Options<VerifyTokenData>) => createQueryKey('verifyToken', options);
+
+export const verifyTokenOptions = (options: Options<VerifyTokenData>) => {
+    return queryOptions({
+        queryFn: async ({ queryKey, signal }) => {
+            const { data } = await AuthService.verifyToken({
+                ...options,
+                ...queryKey[0],
+                signal,
+                throwOnError: true
+            });
+            return data;
+        },
+        queryKey: verifyTokenQueryKey(options)
+    });
+};
+
+export const verifyTokenMutation = (options?: Partial<Options<VerifyTokenData>>): UseMutationOptions<VerifyTokenResponse, VerifyTokenError, Options<VerifyTokenData>> => {
+    const mutationOptions: UseMutationOptions<VerifyTokenResponse, VerifyTokenError, Options<VerifyTokenData>> = {
+        mutationFn: async (localOptions) => {
+            const { data } = await AuthService.verifyToken({
                 ...options,
                 ...localOptions,
                 throwOnError: true

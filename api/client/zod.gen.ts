@@ -429,6 +429,14 @@ export const zBodyEditPlayer = z.object({
     ]).optional()
 });
 
+export const zBodyRefreshToken = z.object({
+    refresh_token: z.string()
+});
+
+export const zBodyVerifyToken = z.object({
+    token: z.string()
+});
+
 export const zCastVote = z.object({
     player_id: z.number().int(),
     ct_app_id: z.number().int()
@@ -545,7 +553,21 @@ export const zPlayerInfo = z.object({
 
 export const zToken = z.object({
     access_token: z.string(),
-    token_type: z.string()
+    refresh_token: z.string(),
+    token_type: z.string(),
+    expires_in: z.number().int(),
+    refresh_expires_in: z.number().int()
+});
+
+export const zTokenData = z.object({
+    sub: z.string(),
+    refresh_token_key: z.union([
+        z.string().uuid(),
+        z.null()
+    ]).optional(),
+    exp: z.string().datetime(),
+    iat: z.string().datetime(),
+    scopes: z.array(z.string()).optional().default([])
 });
 
 export const zUserInfo = z.object({
@@ -617,6 +639,10 @@ export const zGrantPermissionResponse = zAdminInfo;
 export const zRemovePermissionResponse = zAdminInfo;
 
 export const zCreateTokenResponse = zToken;
+
+export const zRefreshTokenResponse = zToken;
+
+export const zVerifyTokenResponse = zTokenData;
 
 export const zCreateUserResponse = zUserInfo;
 
