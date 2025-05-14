@@ -26,17 +26,9 @@ export const sessionUser = cache(async (path: string) => {
     const token = await verifySession(path);
 
     // get current user
-    const { data, error } = await UsersService.currentUser({
+    const { data } = await UsersService.currentUser({
         headers: { Authorization: `Bearer ${token}` },
     });
-
-    if (error) {
-        const detail =
-            typeof error === "object" && error !== null && "detail" in error
-                ? (error as { detail?: string }).detail
-                : undefined;
-        throw new Error(detail ? detail : "Error Fetching User");
-    }
 
     if (!data) {
         return null;
@@ -50,18 +42,10 @@ export const sessionPlayer = cache(async (path: string) => {
 
     // get current user
 
-    const { data, error } = await PlayersService.myPlayer({
+    const { data } = await PlayersService.myPlayer({
         headers: { Authorization: `Bearer ${token}` },
     });
-
-    if (error) {
-        const detail =
-            typeof error === "object" && error !== null && "detail" in error
-                ? (error as { detail?: string }).detail
-                : undefined;
-        throw new Error(detail ? detail : "Error Fetching Player");
-    }
-
+ 
     if (!data) {
         return null;
     }
