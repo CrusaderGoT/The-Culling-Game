@@ -16,6 +16,7 @@ from typing import Annotated, Union
 from pydantic import EmailStr, StringConstraints
 from sqlmodel import TIMESTAMP, Column, Field, SQLModel
 
+from uuid import UUID
 from ..models.table import (
     ModelName,  # exception importation from auto generated enum class
 )
@@ -80,7 +81,7 @@ class BaseUserInfo(BaseUser):
 
     id: int
     created: date = Field(description="the date the account was created")
-refresh_token_key: str
+refresh_token_key: UUID
 
 
 # PLayer
