@@ -81,8 +81,9 @@ class BaseUserInfo(BaseUser):
 
     id: int
     created: date = Field(description="the date the account was created")
-refresh_token_key: UUID
-
+    refresh_token_key: UUID | None = (
+        None  # for validating and invalidating refresh tokens
+    )
 
 # PLayer
 class BasePlayer(SQLModel):
