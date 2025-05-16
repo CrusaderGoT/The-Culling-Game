@@ -80,6 +80,7 @@ class BaseUserInfo(BaseUser):
 
     id: int
     created: date = Field(description="the date the account was created")
+refresh_token_key: str
 
 
 # PLayer
