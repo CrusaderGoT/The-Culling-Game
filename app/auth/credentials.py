@@ -1,11 +1,15 @@
 """this module handles authentication"""
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta, timezone
 
 import bcrypt
 import jwt
+from fastapi import HTTPException, status
+from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
 
-from app.api.settings import ALGORITHM, SECRET_KEY
+from app.api.settings import settings
+from app.auth.models import TokenData
+from app.models.user import User
 from app.utils.dependencies import session
 from app.utils.user import get_user
 
@@ -49,27 +53,30 @@ class PasswordAuth:
         return bcrypt.checkpw(password.encode("utf-8"), hashed.encode("utf-8"))
 
 
-ACCESS_TOKEN_EXPIRE_MINUTES = 300
-"constant for expiration of access token"
-
-
 def create_access_token(
     data: dict,
-    expires_delta: timedelta = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
+    expires_delta: timedelta = timedelta(milliseconds=settings.access_token_expire),
 ):
-    """creates an access token.
-    \n`expires_delta` default `ACCESS_TOKEN_EXPIRE_MINUTES` is 60mins"""
+    """
+    creates an access token.
+    \n`data: dict`
+    \n`expires_delta: timedelta`
+    """
     to_encode = data.copy()
+    issued_at = datetime.now(UTC)
     expires = datetime.now(timezone.utc) + expires_delta
 
-    to_encode.update({"exp": expires})
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    to_encode.update({"exp": expires, "iat": issued_at})
+    encoded_jwt = jwt.encode(
+        to_encode, settings.secret_key, algorithm=settings.algorithm
+    )
     return encoded_jwt
 
 
 def authenticate_user(username: str, password: str, session: session):
     """Authenticates a user using their username and password.
     \nReturns a User if authenticated, else False"""
+
     user = get_user(session, username)
     if not user:
         return False
@@ -77,3 +84,38 @@ def authenticate_user(username: str, password: str, session: session):
     if not correct_pw:
         return False
     return user
+
+
+def decode_access_token(token: str) -> TokenData:
+    """try to decode an access token.
+    return TokenData.
+    raise HTTPException if fail.
+    """
+    try:
+        payload = jwt.decode(
+            token, settings.secret_key, algorithms=[settings.algorithm]
+        )
+        return TokenData.model_validate(payload)
+    except ExpiredSignatureError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token has expired",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    except InvalidTokenError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+
+def create_refresh_token(
+    user: User, key, refresh_expires_in: int = settings.refresh_token_expire
+):
+    "create refresh token"
+    refresh_token = create_access_token(
+        data={"sub": user.usernamedb, "refresh_token_key": key},
+        expires_delta=timedelta(milliseconds=refresh_expires_in),
+    )
+    return refresh_token

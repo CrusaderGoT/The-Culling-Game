@@ -16,6 +16,7 @@ from typing import Annotated, Union
 from pydantic import EmailStr, StringConstraints
 from sqlmodel import TIMESTAMP, Column, Field, SQLModel
 
+from uuid import UUID
 from ..models.table import (
     ModelName,  # exception importation from auto generated enum class
 )
@@ -80,7 +81,9 @@ class BaseUserInfo(BaseUser):
 
     id: int
     created: date = Field(description="the date the account was created")
-
+    refresh_token_key: UUID | None = (
+        None  # for validating and invalidating refresh tokens
+    )
 
 # PLayer
 class BasePlayer(SQLModel):
@@ -377,6 +380,7 @@ class ActionTimePoint(SQLModel):
     binding_vow_duration: timedelta = timedelta(minutes=5)
 
     vote_binding_vow_limit: int = 3
+    vote_limit: int = 5
 
     limit_binding_vow: int = 5
     limit_domain_expansion: int = 5

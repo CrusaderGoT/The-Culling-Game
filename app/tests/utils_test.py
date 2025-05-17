@@ -142,6 +142,7 @@ class ATPTest(SQLModel):
     simple_domain_duration: timedelta = timedelta(seconds=5)
 
     vote_binding_vow_limit: int = 3
+    vote_limit: int = 5
 
     limit_binding_vow: int = 5
     limit_domain_expansion: int = 5

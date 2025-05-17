@@ -1,16 +1,31 @@
 """settings for the api"""
 
-import os
+from uuid import UUID
 
 import socketio
-from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.routing import APIRoute
 from fastapi.staticfiles import StaticFiles
+from pydantic_settings import BaseSettings
 
-# load .env
-load_dotenv()
+
+class Settings(BaseSettings):
+    "class for env or default settings."
+
+    database_url: str = "postgresql://postgres:crusader@localhost/CullingGamesDB"
+    secret_key: str = "7f820bef39dd81f92e9935b30f029a74af7b7d1c5d8c85c855d6b22d093d485c"
+    algorithm: str = "HS256"
+    code: UUID = UUID("a24cd617-5d2e-4317-970d-162f315d0397")
+    debug: bool = False
+    access_token_expire: int = 900_000
+    "in milliseconds"
+    refresh_token_expire: int = 604_800_000
+    "in milliseconds"
+
+
+settings = Settings()
 
 
 def custom_generate_unique_id(route: APIRoute):
@@ -34,12 +49,13 @@ and then use that helper in both `sio`,`router`or`app`.
         _sub_helper()
 """
 
+
 app = FastAPI(
     title="The Culling Games API",
     description="The API Docs for The Culling Games",
     generate_unique_id_function=custom_generate_unique_id,
     docs_url=None,
-    debug=True,
+    debug=settings.debug,
 )
 """
 The Global FastAPI app. To allow for use in multiple files.\n
@@ -59,12 +75,25 @@ socket_app = socketio.ASGIApp(sio, app, socketio_path="/ws")
 app.mount("/ws", socket_app)
 
 # Mount static files
-app.mount("/static", StaticFiles(directory="app/static"), name="staic")
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 # MIDDLEWARE
+
+allowed_hosts = [
+    "localhost",  # for developement
+    "testserver",  # for testing
+    "the-culling-games.up.railway.app",
+    "the-culling-games.vercel.app",
+    "github.com",  # for actions
+]
+
+app.add_middleware(TrustedHostMiddleware, allowed_hosts=allowed_hosts)
+
+
 origins = [
     "http://localhost:3000",
-    "https://the-culling-games.onrender.com",
+    "https://the-culling-games.vercel.app",
+    "https://the-culling-games.up.railway.app",
 ]
 
 app.add_middleware(
@@ -74,8 +103,3 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# to get a string like this run:
-# openssl rand -hex 32 in bash $
-SECRET_KEY = os.getenv("SECRET_KEY")
-ALGORITHM = os.getenv("ALGORITHM", "HS256")

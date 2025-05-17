@@ -1,7 +1,5 @@
 from typing import Sequence
 
-from fastapi import HTTPException, status
-
 from app.models.barrier import BarrierTech
 from app.models.match import Match
 from app.models.vote import Vote
@@ -15,21 +13,32 @@ def get_vote_point(
     opposing_player_bt: BarrierTech | None,
     atp: atp,
 ) -> float:
-    "vote function for getting the vote point of a particular vote"
+    """
+    vote function for getting the vote point of a particular vote.\n
+    ⚠ if binding vow limit has been reached for a player, it returns 0
+    """
 
     vote_point = atp.vote_point
     unchanged_vote_point = atp.vote_point  # for use in adding of technique buff
 
-    # 1. limit vote of player with an active binding vow to three, for as long as it is active
+    # 1. limit vote of player with a binding vow to no of binding vows they have used
     if (
-        player_bt
-        and player_bt.binding_vow is True
-        and len(prev_votes) >= (limit := atp.vote_binding_vow_limit)
-    ):
-        raise HTTPException(
-            status.HTTP_425_TOO_EARLY,
-            f"binding vow active, cannot vote more than {limit} times",
+        player_bt  # player has a barrier tech
+        and (  # barrier records exist in this match
+            barrier_record := match.barrier_records
         )
+        and (  # binding vow has been used
+            binded_vow := [
+                br.binding_vow_counter
+                for br in barrier_record
+                if br.barrier_tech_id == player_bt.id
+            ]
+        )
+        and prev_votes  # they have prior votes
+    ):
+        binding_vow_limit = atp.vote_limit - binded_vow[0]
+        if len(prev_votes) >= binding_vow_limit:
+            return 0  # no more vote points/votes for them
 
     # 2. check if a player previously activated a binding vow that has paid off, in this match
     # then increment the vote_point, even if other BTs are active, except binding vow BT

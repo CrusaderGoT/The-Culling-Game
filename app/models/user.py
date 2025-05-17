@@ -6,6 +6,7 @@ import re
 from datetime import date
 from enum import Enum
 from typing import TYPE_CHECKING, Annotated, Union
+from uuid import UUID
 
 from pydantic import EmailStr, StringConstraints, ValidationInfo, field_validator
 from sqlmodel import Field, Relationship, SQLModel
@@ -50,6 +51,9 @@ class User(BaseUser, table=True):
     )
     votes: list["Vote"] = Relationship(back_populates="user")
     # logs: list["UserLog"] = Relationship(back_populates="user", cascade_delete=True)
+    refresh_token_key: UUID | None = (
+        None  # for validating and invalidating refresh tokens
+    )
 
 
 PASSWORD_PATTERN = re.compile(

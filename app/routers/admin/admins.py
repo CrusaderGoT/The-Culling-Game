@@ -1,8 +1,9 @@
 """routes for admin -> admins CRUD purposes"""
 
-import os
 from typing import Annotated
+from uuid import UUID
 
+from app.api.settings import settings
 from app.auth.dependencies import admin_user, get_admin_user, oauth2_scheme
 from app.models.admin import (
     AdminInfo,
@@ -269,14 +270,13 @@ def remove_permission(
 
 @superuser_router.post("/superuser/{user}")
 def demo_superuser(
-    user: id_name_email, code: Annotated[str, Query()], session: session
+    user: id_name_email, code: Annotated[UUID, Query()], session: session
 ):
     # get the user
     userdb = get_user(session, user)
-    CODE = os.getenv("CODE")
     if not userdb:
         raise HTTPException(status.HTTP_404_NOT_FOUND, f"user {user} not found")
-    if code != CODE:
+    if code != settings.code:
         raise HTTPException(status.HTTP_405_METHOD_NOT_ALLOWED, "invalid code")
     admin_user = AdminUser(is_superuser=True, user=userdb)
     session.add(admin_user)
