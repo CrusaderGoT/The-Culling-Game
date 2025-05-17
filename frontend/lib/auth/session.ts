@@ -39,12 +39,18 @@ export async function createSession(token: Token, res?: NextResponse) {
             name: tokenNames.access,
             value: token.access_token,
             httpOnly: true,
+            secure: true,
+            expires: tokenExpiresAt,
+            sameSite: "lax",
             path: "/",
         });
         cookieStore.set({
             name: tokenNames.refresh,
             value: token.refresh_token,
             httpOnly: true,
+            secure: true,
+            expires: refreshTokenExpiresAt,
+            sameSite: "lax",
             path: "/",
         });
     }

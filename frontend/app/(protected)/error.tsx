@@ -18,8 +18,10 @@ export default function Error({
     return (
         <Stack gap={"xl"} justify="space-around" align="center">
             <Title>Something went wrong.</Title>
-            <Text>
-                Make sure you have good internet connection: {error.message}
+            <Text ta={"center"}>
+                Make sure you have good internet connection{" "}
+                {process.env.NODE_ENV === "development" &&
+                    `-> ${error.message}`}
             </Text>
             <Button
                 onClick={

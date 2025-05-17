@@ -4,9 +4,10 @@ import { AuthService, PlayersService, UsersService } from "@/api/client";
 import { cookies } from "next/headers";
 import { cache } from "react";
 import { redirect } from "next/navigation";
+import { tokenNames } from "@/constants/tokenNames";
 
 export const verifySession = cache(async (path: string = "/match") => {
-    const token = (await cookies()).get("session")?.value;
+    const token = (await cookies()).get(tokenNames.access)?.value;
     if (!token) {
         redirect(`/api/auth/refresh?next=${path}`);
     }
