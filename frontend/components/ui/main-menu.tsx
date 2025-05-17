@@ -1,3 +1,4 @@
+"use client"
 import { UserInfo } from "@/api/client";
 import {
     Avatar,
