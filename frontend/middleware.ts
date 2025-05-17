@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 
-
 // 1. Specify protected and public routes
 const protectedRoutes = ["/match", "/create-player", "/edit-player"];
 const publicRoutes = ["/login", "/signup", "/"];
@@ -16,8 +15,8 @@ export default async function middleware(req: NextRequest) {
     const isProtectedRoute = protectedRoutes.includes(path);
     const isPublicRoute = publicRoutes.includes(path);
 
-    // 3. get the session from the cookie
-    const session = req.cookies.get("session")?.value;
+    // 3. check that refresh token exists in session
+    const session = req.cookies.has("refresh_token");
 
     // 4. Redirect to /login if the user is not authenticated
     if (isProtectedRoute && !session) {
