@@ -3,6 +3,7 @@
 import "@mantine/charts/styles.css";
 import "@mantine/core/styles.css";
 import "@mantine/notifications/styles.css";
+import "@mantine/nprogress/styles.css";
 
 import {
     ColorSchemeScript,
@@ -13,6 +14,8 @@ import {
     mantineHtmlProps,
     rem,
 } from "@mantine/core";
+
+import { NavigationProgress } from "@mantine/nprogress";
 
 import { Notifications } from "@mantine/notifications";
 
@@ -71,6 +74,7 @@ export default function RootLayout({
             <body>
                 <TanstackProviders>
                     <MantineProvider theme={theme}>
+                        <NavigationProgress />
                         <Notifications />
                         <Container size={"lg"}>
                             <ModeToggle />

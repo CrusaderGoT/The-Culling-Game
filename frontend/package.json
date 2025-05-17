@@ -16,6 +16,7 @@
     "@mantine/form": "^8.0.1",
     "@mantine/hooks": "^8.0.1",
     "@mantine/notifications": "^8.0.1",
+    "@mantine/nprogress": "^8.0.1",
     "@tabler/icons-react": "^3.31.0",
     "@tanstack/react-query": "^5.75.5",
     "@tanstack/react-query-devtools": "^5.75.5",
@@ -24,7 +25,7 @@
     "next": "15.2.4",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "recharts": "^2.15.2",
+    "recharts": "^2.15.3",
     "zod": "^3.24.2"
   },
   "devDependencies": {

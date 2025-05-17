@@ -14,6 +14,7 @@ export function UserMenu({ user }: { user: UserInfo }) {
 
             <Menu.Dropdown>
                 <Menu.Label>Hello, {user.username}</Menu.Label>
+                
             </Menu.Dropdown>
         </Menu>
     );
