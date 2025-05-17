@@ -2,7 +2,7 @@ import { UserMenu } from "@/components/ui/main-menu";
 import { Box, Group } from "@mantine/core";
 
 import { sessionUser } from "@/lib/auth/dal";
-import { redirect } from "next/navigation";
+import Link from "next/link";
 
 export default async function ProtectedLayout({
     children,
@@ -11,7 +11,13 @@ export default async function ProtectedLayout({
 }) {
     const user = await sessionUser("/match");
 
-    if (!user) redirect("/login");
+    if (!user)
+        return (
+            <Group justify="flex-end">
+                <Link href={"/login"}>Login</Link>
+                <Link href={"/signup"}>Create User</Link>
+            </Group>
+        );
 
     return (
         <Box>
