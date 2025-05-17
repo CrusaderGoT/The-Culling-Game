@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { verifyUpdateSession } from "./lib/auth/dal";
 
 // 1. Specify protected and public routes
 const protectedRoutes = ["/match", "/create-player", "/edit-player"];
@@ -18,12 +17,12 @@ export default async function middleware(req: NextRequest) {
     const isPublicRoute = publicRoutes.includes(path);
 
     // 3. get the session from the cookie
-    const session = await verifyUpdateSession();
+    const session = req.cookies.has("refresh_token");
 
     // 4. Redirect to /login if the user is not authenticated
     if (isProtectedRoute && !session) {
         const loginUrl = new URL("/login", req.nextUrl);
-        loginUrl.searchParams.set("next", (path));
+        loginUrl.searchParams.set("next", path);
         return NextResponse.redirect(loginUrl);
     }
 
@@ -34,13 +33,9 @@ export default async function middleware(req: NextRequest) {
         !req.nextUrl.pathname.startsWith("/match")
     ) {
         const nextUrl = req.nextUrl.searchParams.get("next");
-        
+
         const redirectUrl = nextUrl ? nextUrl : "/match";
         return NextResponse.redirect(new URL(redirectUrl, req.nextUrl));
-    }
-
-    if (session) {
-        req.headers.set("Authorization", `Bearer ${session}`);
     }
 
     return NextResponse.next();
