@@ -1,4 +1,4 @@
-import { UserMenu } from "@/components/ui/main-menu";
+import { UserMenu } from "@/components/ui/user-menu";
 import { Box, Group } from "@mantine/core";
 
 import { sessionUser } from "@/lib/auth/dal";

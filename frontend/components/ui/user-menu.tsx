@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { UserInfo } from "@/api/client";
 import {
     Avatar,
@@ -38,7 +38,13 @@ const UserButton = forwardRef<HTMLButtonElement, UserButtonProps>(
             {...others}
         >
             <Group>
-                <Avatar src={user.username} radius="xl" />
+                <Avatar
+                    src={
+                        "https://avatars.githubusercontent.com/u/133652764?v=4"
+                    }
+                    name={user.username}
+                    radius="xl"
+                />
                 <Box flex={1}>
                     <Text size="sm" fw={500}>
                         {user.username}
@@ -66,26 +72,6 @@ export function UserMenu({ user }: { user: UserInfo }) {
             </Menu.Target>
 
             <Menu.Dropdown>
-                <Menu.Item
-                    rightSection={<IconChevronRight size={16} stroke={1.5} />}
-                >
-                    <Group>
-                        <Avatar
-                            radius="xl"
-                            src="https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/avatars/avatar-7.png"
-                        />
-
-                        <div>
-                            <Text fw={500}>Nancy Eggshacker</Text>
-                            <Text size="xs" c="dimmed">
-                                neggshaker@mantine.dev
-                            </Text>
-                        </div>
-                    </Group>
-                </Menu.Item>
-
-                <Menu.Divider />
-
                 <Menu.Item
                     leftSection={
                         <IconHeart
