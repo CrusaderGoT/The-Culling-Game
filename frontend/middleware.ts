@@ -1,3 +1,4 @@
+import { tokenNames } from "@/constants/tokenNames";
 import { NextRequest, NextResponse } from "next/server";
 
 // 1. Specify protected and public routes
@@ -16,7 +17,7 @@ export default async function middleware(req: NextRequest) {
     const isPublicRoute = publicRoutes.includes(path);
 
     // 3. check that refresh token exists in session
-    const session = req.cookies.has("refresh_token");
+    const session = req.cookies.has(tokenNames.refresh);
 
     // 4. Redirect to /login if the user is not authenticated
     if (isProtectedRoute && !session) {

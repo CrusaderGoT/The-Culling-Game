@@ -1,17 +1,18 @@
 import { AuthService } from "@/api/client";
+import { tokenNames } from "@/constants/tokenNames";
 import { createSession, deleteSession } from "@/lib/auth/session";
 
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(req: NextRequest) {
-    const refreshToken = req.cookies.get("refresh_token")?.value;
+export async function GET(req: NextRequest, res: NextResponse) {
+    const refreshToken = req.cookies.get(tokenNames.refresh)?.value;
 
-    const path = req.nextUrl.searchParams.get("next");
+    const nextPath = req.nextUrl.searchParams.get("next");
 
     if (!refreshToken) {
-        await deleteSession();
+        await deleteSession(res);
         const loginUrl = new URL("/login", req.nextUrl);
-        loginUrl.searchParams.set("next", path ? path : "/match");
+        loginUrl.searchParams.set("next", nextPath ? nextPath : "/match");
         return NextResponse.redirect(loginUrl);
     }
 
@@ -20,14 +21,14 @@ export async function GET(req: NextRequest) {
     });
 
     if (!data) {
-        await deleteSession();
+        await deleteSession(res);
         const loginUrl = new URL("/login", req.nextUrl);
-        loginUrl.searchParams.set("next", path ? path : "/match");
+        loginUrl.searchParams.set("next", nextPath ? nextPath : "/match");
         return NextResponse.redirect(loginUrl);
     }
 
-    await createSession(data);
-
-    const loginUrl = new URL(path ? path : "/match", req.nextUrl);
-    return NextResponse.redirect(loginUrl);
+    const okNext = new URL(nextPath ? nextPath : "/match", req.nextUrl);
+    const okRes = NextResponse.redirect(okNext);
+    createSession(data, okRes);
+    return okRes;
 }
