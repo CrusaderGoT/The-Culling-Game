@@ -1,13 +1,12 @@
-"use client"
-import { AuthContext } from "@/lib/auth/auth-provider";
-import { useCurrentPlayer } from "@/lib/hooks/users";
-import { useContext } from "react";
+"use client";
+import { useAuth } from "@/lib/auth/auth-provider";
+import { useCurrentPlayer } from "@/lib/hooks/players";
+import { Skeleton } from "@mantine/core";
 import { CreatePlayerForm } from "./create-player-form";
 import { EditPlayerForm } from "./edit-player-form";
-import { Skeleton } from "@mantine/core";
 
 export function PlayerForm() {
-    const token = useContext(AuthContext);
+    const token = useAuth();
 
     const player = useCurrentPlayer(token);
 

@@ -7,7 +7,6 @@ import { cookies } from "next/headers";
 
 import { AuthService, Token } from "@/api/client";
 import { tokenNames } from "@/constants/tokenNames";
-import { redirect } from "next/navigation";
 import { cache } from "react";
 
 export async function createSession(token: Token, res?: NextResponse) {
@@ -71,7 +70,7 @@ export async function deleteSession(res?: NextResponse) {
 export const verifySession = cache(async (path: string = "/match") => {
     const token = (await cookies()).get(tokenNames.access)?.value;
     if (!token) {
-        redirect(`/api/auth/refresh?next=${path}`);
+        return null;
     }
 
     const { data } = await AuthService.verifyToken({
@@ -79,7 +78,7 @@ export const verifySession = cache(async (path: string = "/match") => {
     });
 
     if (!data) {
-        redirect(`/api/auth/refresh?next=${path}`);
+        return null;
     }
 
     return token;

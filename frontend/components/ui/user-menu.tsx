@@ -27,9 +27,9 @@ import {
     IconUserEdit,
 } from "@tabler/icons-react";
 
-import { forwardRef, useContext } from "react";
+import { forwardRef } from "react";
 
-import { AuthContext } from "@/lib/auth/auth-provider";
+import { useAuth } from "@/lib/auth/auth-provider";
 import { deleteSession } from "@/lib/auth/session";
 import { useCurrentUser } from "@/lib/hooks/users";
 import classes from "@/styles/user-menu.module.css";
@@ -78,7 +78,7 @@ export function UserMenu() {
 
     const router = useRouter();
 
-    const token = useContext(AuthContext);
+    const token = useAuth();
 
     const { data: user, isPending } = useCurrentUser(token);
 

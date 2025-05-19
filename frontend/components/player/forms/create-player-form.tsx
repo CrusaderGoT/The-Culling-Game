@@ -13,7 +13,7 @@ import {
     useCreatePlayerForm,
 } from "@/components/player/forms/create-player-form-context";
 import { DisplayAPIError } from "@/components/ui/display-api-error";
-import { AuthContext } from "@/lib/auth/auth-provider";
+import { useAuth } from "@/lib/auth/auth-provider";
 import { useCreatePlayer } from "@/lib/hooks/players";
 import { useCurrentUser } from "@/lib/hooks/users";
 
@@ -27,7 +27,7 @@ import {
     ScrollAreaAutosize,
     Stack,
     Stepper,
-    Text
+    Text,
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 
@@ -36,16 +36,16 @@ import {
     IconCircleCheck,
     IconExclamationCircle,
     IconFishBoneFilled,
-    IconYinYangFilled
+    IconYinYangFilled,
 } from "@tabler/icons-react";
 
 import { zodResolver } from "mantine-form-zod-resolver";
 import { useRouter } from "next/navigation";
 
-import { useContext, useState } from "react";
+import { useState } from "react";
 
 export function CreatePlayerForm() {
-    const token = useContext(AuthContext);
+    const token = useAuth();
 
     const router = useRouter();
 
@@ -114,6 +114,7 @@ export function CreatePlayerForm() {
     async function handleSubmit(data: CreatePlayerSchemaType) {
         if (user) {
             const newPlayer = await createPlayerMutate({
+                // @ts-ignore: applications are always 5
                 body: { ...data },
                 path: { user: user.id },
             });

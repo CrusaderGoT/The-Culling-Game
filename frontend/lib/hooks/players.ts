@@ -1,6 +1,9 @@
-import { createPlayerMutation } from "@/api/client/@tanstack/react-query.gen";
+import {
+    createPlayerMutation,
+    myPlayerOptions,
+} from "@/api/client/@tanstack/react-query.gen";
 import { notifications } from "@mantine/notifications";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 export const useCreatePlayer = (token: string) => {
     const mutation = useMutation({
@@ -23,4 +26,18 @@ export const useCreatePlayer = (token: string) => {
     });
 
     return mutation;
+};
+
+export const useCurrentPlayer = (token: string) => {
+    const query = useQuery({
+        ...myPlayerOptions({
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        }),
+        // for unnecessary refetch, when you want to use a error state for UI
+        refetchOnWindowFocus: false,
+    });
+
+    return query;
 };

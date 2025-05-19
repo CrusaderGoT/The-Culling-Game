@@ -8,7 +8,11 @@ function makeQueryClient() {
     return new QueryClient({
         defaultOptions: {
             queries: {
-                staleTime: 60 * 1000,
+                // consider data fresh for most of the token lifetime
+                // to prevent unnecessary fetches
+                staleTime: 12 * 60 * 1000,
+                // Retry count set to 3 in development mode
+                retry: process.env.NODE_ENV === "development" ? 3 : false,
             },
             dehydrate: {
                 // include pending queries in dehydration

@@ -73,15 +73,7 @@ export function LoginForm() {
     return (
         <LoginFormProvider form={form}>
             <Paper radius="md" p="md" withBorder pos={"relative"}>
-                {loginUserError && (
-                    <Alert
-                        title="An Error Occured"
-                        color="red"
-                        icon={<IconAlertCircle />}
-                    >
-                        <DisplayAPIError error={loginUserError} />
-                    </Alert>
-                )}
+                {loginUserError && <DisplayAPIError error={loginUserError} />}
 
                 <LoadingOverlay
                     visible={loginUserIsSuccess}
