@@ -2,8 +2,8 @@
 import { useAuth } from "@/lib/auth/auth-provider";
 import { useCurrentPlayer } from "@/lib/hooks/players";
 import { Skeleton } from "@mantine/core";
-import { CreatePlayerForm } from "./create-player-form";
-import { EditPlayerForm } from "./edit-player-form";
+import { CreatePlayerForm } from "@/components/player/forms/create-player-form";
+import { EditPlayerForm } from "@/components/player/forms/edit-player-form";
 
 export function PlayerForm() {
     const token = useAuth();
@@ -16,9 +16,7 @@ export function PlayerForm() {
 
     if (!player.data) {
         return <CreatePlayerForm />;
-    }
-
-    if (player.data) {
+    } else {
         return <EditPlayerForm />;
     }
 }

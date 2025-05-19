@@ -6,7 +6,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 
 import { AuthService, Token } from "@/api/client";
-import { tokenNames } from "@/constants/tokenNames";
+import { tokenNames } from "@/lib/constants/tokenNames";
 import { cache } from "react";
 
 export async function createSession(token: Token, res?: NextResponse) {

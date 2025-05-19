@@ -5,7 +5,7 @@ import { createContext, ReactNode, useContext } from "react";
 
 import { verifySession } from "@/lib/auth/session";
 
-import queryClient from "@/constants/queryClient";
+import { queryClient } from "@/lib/query-client/get-query-client";
 import { useQuery } from "@tanstack/react-query";
 
 import { usePathname, useRouter } from "next/navigation";

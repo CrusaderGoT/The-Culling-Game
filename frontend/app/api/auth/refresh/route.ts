@@ -1,5 +1,5 @@
 import { AuthService } from "@/api/client";
-import { tokenNames } from "@/constants/tokenNames";
+import { tokenNames } from "@/lib/constants/tokenNames";
 import { createSession, deleteSession } from "@/lib/auth/session";
 
 import { NextRequest, NextResponse } from "next/server";
