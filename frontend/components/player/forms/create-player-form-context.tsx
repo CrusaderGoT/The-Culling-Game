@@ -6,8 +6,6 @@ import { zCreateCt, zCreateCtApp, zCreatePlayer } from "@/api/client/zod.gen";
 
 import { GENDERS } from "@/lib/constants/GENDERS";
 
-import { randomId } from "@mantine/hooks";
-
 import Naluka from "@/fonts/NalukaFont";
 import {
     Group,
@@ -140,14 +138,9 @@ export function ApplicationsFormInputs() {
     });
 
     return (
-        <Group
-            preventGrowOverflow={false}
-            gap={"xl"}
-            grow
-            justify="space-evenly"
-        >
+        <Stack gap={"xl"} justify="space-evenly">
             {applicationsField}
-        </Group>
+        </Stack>
     );
 }
 
@@ -201,14 +194,12 @@ export function ApplicationFormList() {
     const applications = useCreatePlayerFormContext().getValues().applications;
     const appList = applications.map((app, index) => {
         return (
-            <List key={randomId()}>
+            <List key={index}>
                 <Title order={6}>Application {index + 1}</Title>
 
                 <List withPadding listStyleType="disc" spacing={"xs"}>
                     <List.Item>
                         Name: <Text c={"lime"}>{app.name}</Text>
-                    </List.Item>
-                    <List.Item>
                         Application: <Text c={"cyan"}> {app.application}</Text>
                     </List.Item>
                 </List>

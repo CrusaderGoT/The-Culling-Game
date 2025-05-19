@@ -1,11 +1,14 @@
 import { HttpValidationError } from "@/api/client";
-import { Stack, Text } from "@mantine/core";
+import { Alert, Stack, Text } from "@mantine/core";
+import { IconAlertCircle } from "@tabler/icons-react";
 
 type DisplayAPIErrorProp = {
-    error: HttpValidationError;
+    error: HttpValidationError | Error;
 };
-export function DisplayAPIError({ error }: DisplayAPIErrorProp) {
-    if (typeof error.detail === "string") {
+function ErrorAlert({ error }: DisplayAPIErrorProp) {
+    if (error instanceof Error) {
+        return <Text>{error.message}</Text>;
+    } else if (typeof error.detail === "string") {
         return <Text>{error.detail}</Text>;
     } else if (typeof error.detail === "object") {
         return (
@@ -18,4 +21,17 @@ export function DisplayAPIError({ error }: DisplayAPIErrorProp) {
     } else {
         return <Text>API Error Occured</Text>;
     }
+}
+
+export function DisplayAPIError({ error }: DisplayAPIErrorProp) {
+    return (
+        <Alert
+            title="An Error Occured"
+            color="red"
+            icon={<IconAlertCircle />}
+            my={"xs"}
+        >
+            <ErrorAlert error={error} />
+        </Alert>
+    );
 }

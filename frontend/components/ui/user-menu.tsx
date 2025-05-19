@@ -24,7 +24,7 @@ import {
     IconLogout,
     IconSettings,
     IconTrash,
-    IconUserEdit
+    IconUserEdit,
 } from "@tabler/icons-react";
 
 import { forwardRef, useContext } from "react";
@@ -152,6 +152,7 @@ export function UserMenu() {
                     leftSection={<IconLogout size={16} stroke={1.5} />}
                     onClick={async () => {
                         await deleteSession();
+                        router.push("/");
                     }}
                 >
                     Logout

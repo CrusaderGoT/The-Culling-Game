@@ -26,7 +26,7 @@ jobs:
 
       - name: Push backend subtree to remote
         run: |
-          git subtree push --prefix backend https://x-access-token:${{ secrets.SUBTREE_TOKEN }}@github.com/CrusaderGoT/The-Culling-Games-Backend.git principal
+          git subtree push --prefix backend https://x-access-token:${{ secrets.SUBTREE_TOKEN }}@github.com/CrusaderGoT/The-Culling-Games-git principal
 
       - name: Push frontend subtree to remote
         run: |

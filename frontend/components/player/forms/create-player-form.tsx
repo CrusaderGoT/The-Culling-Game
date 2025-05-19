@@ -4,17 +4,22 @@ import {
     ApplicationFormList,
     ApplicationsFormInputs,
     CreatePlayerFormProvider,
+    createPlayerSchema,
+    CreatePlayerSchemaType,
     CursedTechniqueFormInputs,
     CursedTechniqueFormList,
     PlayerFormInputs,
     PlayerInfoFormList,
-    createPlayerSchema,
     useCreatePlayerForm,
-    type CreatePlayerSchemaType,
 } from "@/components/player/forms/create-player-form-context";
+import { DisplayAPIError } from "@/components/ui/display-api-error";
+import { AuthContext } from "@/lib/auth/auth-provider";
+import { useCreatePlayer } from "@/lib/hooks/players";
+import { useCurrentUser } from "@/lib/hooks/users";
 
 import {
     Button,
+    Center,
     Divider,
     Group,
     List,
@@ -22,22 +27,28 @@ import {
     ScrollAreaAutosize,
     Stack,
     Stepper,
-    Text,
+    Text
 } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
 
 import {
     IconBuildingCarousel,
     IconCircleCheck,
     IconExclamationCircle,
     IconFishBoneFilled,
-    IconYinYangFilled,
+    IconYinYangFilled
 } from "@tabler/icons-react";
 
 import { zodResolver } from "mantine-form-zod-resolver";
+import { useRouter } from "next/navigation";
 
-import { useState } from "react";
+import { useContext, useState } from "react";
 
 export function CreatePlayerForm() {
+    const token = useContext(AuthContext);
+
+    const router = useRouter();
+
     const fieldKeys = [
         "player", // step 0
         "cursed_technique", // step 1
@@ -92,12 +103,36 @@ export function CreatePlayerForm() {
         validateInputOnBlur: true,
     });
 
-    function handleSubmit(data: CreatePlayerSchemaType) {
-        console.log(data);
+    const { data: user, error: userError } = useCurrentUser(token);
+
+    const {
+        isPending: createPlayerIsPending,
+        mutateAsync: createPlayerMutate,
+        error: createPlayerError,
+    } = useCreatePlayer(token);
+
+    async function handleSubmit(data: CreatePlayerSchemaType) {
+        if (user) {
+            const newPlayer = await createPlayerMutate({
+                body: { ...data },
+                path: { user: user.id },
+            });
+
+            if (newPlayer) {
+                router.push("/player");
+            }
+        } else {
+            notifications.show({
+                message: "Error Loading User...Refresh Page",
+                color: "red",
+            });
+        }
     }
 
     return (
         <Paper radius="md" p="md" withBorder>
+            {userError && <DisplayAPIError error={userError} />}
+
             <CreatePlayerFormProvider form={form}>
                 <form onSubmit={form.onSubmit(handleSubmit)}>
                     <Stepper
@@ -155,50 +190,70 @@ export function CreatePlayerForm() {
                             }
                             allowStepSelect={shouldAllowSelectStep(2)}
                         >
-                            <ScrollAreaAutosize mah={300}>
+                            <ScrollAreaAutosize mah={300} offsetScrollbars>
                                 <ApplicationsFormInputs />
                             </ScrollAreaAutosize>
                         </Stepper.Step>
 
                         <Stepper.Completed>
                             {Object.keys(form.errors).length > 0 ? (
-                                <ScrollAreaAutosize mah={300}>
-                                    <Text>
-                                        Some fields have errors. Please review
-                                        your inputs:
-                                    </Text>
-                                    <List>
-                                        {Object.entries(form.errors).map(
-                                            ([field, error], index) => (
-                                                <List.Item
-                                                    key={`${field}+${index}`}
-                                                >
-                                                    <Text c={"red.9"}>
-                                                        {field}
-                                                    </Text>
-                                                    <List withPadding>
-                                                        <Text>{error}</Text>
-                                                    </List>
-                                                </List.Item>
-                                            )
-                                        )}
-                                    </List>
-                                </ScrollAreaAutosize>
+                                <Center>
+                                    <ScrollAreaAutosize mah={300}>
+                                        <Text>
+                                            Some fields have errors. Please
+                                            review your inputs:
+                                        </Text>
+                                        <List>
+                                            <Stack>
+                                                {Object.entries(
+                                                    form.errors
+                                                ).map(
+                                                    ([field, error], index) => (
+                                                        <List.Item
+                                                            key={`${field}+${index}`}
+                                                        >
+                                                            <Text c={"red.9"}>
+                                                                {field}
+                                                            </Text>
+                                                            <List withPadding>
+                                                                <Text>
+                                                                    {error}
+                                                                </Text>
+                                                            </List>
+                                                        </List.Item>
+                                                    )
+                                                )}
+                                            </Stack>
+                                        </List>
+                                    </ScrollAreaAutosize>
+                                </Center>
                             ) : (
-                                <Stack>
-                                    <Divider label="confirm your player information" />
+                                <Stack style={{ textWrap: "wrap" }}>
+                                    <ScrollAreaAutosize mah={"10%"}>
+                                        <Divider label="confirm your player information" />
 
-                                    <PlayerInfoFormList />
+                                        <PlayerInfoFormList />
 
-                                    <Divider label="confirm your cursed technique definition" />
+                                        <Divider label="confirm your cursed technique definition" />
 
-                                    <CursedTechniqueFormList />
+                                        <CursedTechniqueFormList />
 
-                                    <Divider label="confirm all cursed technique applications" />
+                                        <Divider label="confirm all cursed technique applications" />
 
-                                    <ApplicationFormList />
+                                        <ApplicationFormList />
 
-                                    <Button type="submit">Create Player</Button>
+                                        {createPlayerError && (
+                                            <DisplayAPIError
+                                                error={createPlayerError}
+                                            />
+                                        )}
+                                    </ScrollAreaAutosize>
+                                    <Button
+                                        type="submit"
+                                        disabled={createPlayerIsPending}
+                                    >
+                                        Create Player
+                                    </Button>
                                 </Stack>
                             )}
                         </Stepper.Completed>

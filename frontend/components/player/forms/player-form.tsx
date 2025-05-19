@@ -4,6 +4,7 @@ import { useCurrentPlayer } from "@/lib/hooks/users";
 import { useContext } from "react";
 import { CreatePlayerForm } from "./create-player-form";
 import { EditPlayerForm } from "./edit-player-form";
+import { Skeleton } from "@mantine/core";
 
 export function PlayerForm() {
     const token = useContext(AuthContext);
@@ -11,7 +12,7 @@ export function PlayerForm() {
     const player = useCurrentPlayer(token);
 
     if (player.isPending) {
-        return <div>Loading</div>;
+        return <Skeleton width={"100%"} height={400} mx={"auto"} />;
     }
 
     if (!player.data) {
