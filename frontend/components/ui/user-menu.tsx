@@ -22,23 +22,19 @@ import {
     IconFish,
     IconFishOff,
     IconLogout,
-    IconMessage,
-    IconPlayerPause,
     IconSettings,
-    IconStar,
-    IconSwitchHorizontal,
     IconTrash,
-    IconUserEdit,
+    IconUserEdit
 } from "@tabler/icons-react";
 
 import { forwardRef, useContext } from "react";
 
 import { AuthContext } from "@/lib/auth/auth-provider";
+import { deleteSession } from "@/lib/auth/session";
 import { useCurrentUser } from "@/lib/hooks/users";
 import classes from "@/styles/user-menu.module.css";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { deleteSession } from "@/lib/auth/session";
 
 interface UserButtonProps extends React.ComponentPropsWithoutRef<"button"> {
     user: UserInfo;
@@ -144,12 +140,6 @@ export function UserMenu() {
                 >
                     {user.player ? "Edit Player" : "Create Player"}
                 </Menu.Item>
-
-                <Menu.Sub>
-                    <Menu.Sub.Target>
-                        Match
-                    </Menu.Sub.Target>
-                </Menu.Sub>
 
                 <Menu.Label>Settings</Menu.Label>
                 <Menu.Item
