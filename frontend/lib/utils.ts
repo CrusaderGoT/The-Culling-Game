@@ -1,3 +1,3 @@
-export function cleanString(input: string): string {
+export function cleanString(input: string) {
     return input.replace(/\//g, "").replace(/-/g, " ");
 }

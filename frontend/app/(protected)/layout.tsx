@@ -1,30 +1,26 @@
-import { UserMenu } from "@/components/ui/user-menu";
-import { Box, Group } from "@mantine/core";
+// app/(protected)/layout.tsx
 
-import { sessionUser } from "@/lib/auth/dal";
-import Link from "next/link";
+import { verifySession } from "@/lib/auth/session";
+
+import { UserMenu } from "@/components/ui/user-menu";
+import { AuthProvider } from "@/lib/auth/auth-provider";
+import { Group, Stack } from "@mantine/core";
 
 export default async function ProtectedLayout({
     children,
 }: {
     children: React.ReactNode;
 }) {
-    const user = await sessionUser("/match");
-
-    if (!user)
-        return (
-            <Group justify="flex-end">
-                <Link href={"/login"}>Login</Link>
-                <Link href={"/signup"}>Create User</Link>
-            </Group>
-        );
+    const token = await verifySession();
 
     return (
-        <Box>
-            <Group justify="flex-end">
-                <UserMenu user={user} />
-            </Group>
-            {children}
-        </Box>
+        <AuthProvider token={token}>
+            <Stack>
+                <Group justify="flex-end">
+                    <UserMenu />
+                </Group>
+                {children}
+            </Stack>
+        </AuthProvider>
     );
 }

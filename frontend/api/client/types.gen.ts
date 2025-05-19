@@ -199,6 +199,7 @@ export type BaseUserInfo = {
      * the date the account was created
      */
     created: string;
+    refresh_token_key?: string | null;
 };
 
 /**
@@ -792,6 +793,7 @@ export type UserInfo = {
      * the date the account was created
      */
     created: string;
+    refresh_token_key?: string | null;
     player?: BasePlayerInfo | null;
     admin?: BaseAdminInfo | null;
 };

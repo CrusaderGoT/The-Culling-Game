@@ -1,17 +1,26 @@
 "use client";
+
 import { UserInfo } from "@/api/client";
+
 import {
+    ActionIcon,
+    Anchor,
     Avatar,
     Box,
+    Divider,
     Group,
+    Indicator,
     Menu,
+    Skeleton,
     Text,
     UnstyledButton,
     useMantineTheme,
 } from "@mantine/core";
+
 import {
-    IconChevronRight,
-    IconHeart,
+    IconDotsVertical,
+    IconFish,
+    IconFishOff,
     IconLogout,
     IconMessage,
     IconPlayerPause,
@@ -19,43 +28,40 @@ import {
     IconStar,
     IconSwitchHorizontal,
     IconTrash,
+    IconUserEdit,
 } from "@tabler/icons-react";
-import { forwardRef } from "react";
+
+import { forwardRef, useContext } from "react";
+
+import { AuthContext } from "@/lib/auth/auth-provider";
+import { useCurrentUser } from "@/lib/hooks/users";
+import classes from "@/styles/user-menu.module.css";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { deleteSession } from "@/lib/auth/session";
+
 interface UserButtonProps extends React.ComponentPropsWithoutRef<"button"> {
     user: UserInfo;
-    icon?: React.ReactNode;
 }
 
 const UserButton = forwardRef<HTMLButtonElement, UserButtonProps>(
-    ({ user, icon, ...others }: UserButtonProps, ref) => (
-        <UnstyledButton
-            ref={ref}
-            style={{
-                padding: "var(--mantine-spacing-md)",
-                color: "var(--mantine-color-text)",
-                borderRadius: "var(--mantine-radius-sm)",
-            }}
-            {...others}
-        >
+    ({ user, ...others }: UserButtonProps, ref) => (
+        <UnstyledButton ref={ref} {...others}>
             <Group>
-                <Avatar
-                    src={
-                        "https://avatars.githubusercontent.com/u/133652764?v=4"
-                    }
-                    name={user.username}
-                    radius="xl"
-                />
+                <Avatar name={user.username} />
                 <Box flex={1}>
-                    <Text size="sm" fw={500}>
-                        {user.username}
-                    </Text>
+                    <Group>
+                        <Text size="sm" fw={500}>
+                            {user.username}
+                        </Text>
+                        {user?.player && <Indicator color="green" />}
+                    </Group>
 
                     <Text c="dimmed" size="xs">
-                        {user.email}
+                        {user.email}{" "}
+                        {user?.country ? `• ${user.country}` : null}
                     </Text>
                 </Box>
-
-                {icon || <IconChevronRight size={16} />}
             </Group>
         </UnstyledButton>
     )
@@ -63,48 +69,87 @@ const UserButton = forwardRef<HTMLButtonElement, UserButtonProps>(
 
 UserButton.displayName = "UserButton";
 
-export function UserMenu({ user }: { user: UserInfo }) {
-    const theme = useMantineTheme();
+function UserButtonAlt() {
     return (
-        <Menu withArrow>
+        <ActionIcon variant="transparent" className={classes.menuAlt}>
+            <IconDotsVertical />
+        </ActionIcon>
+    );
+}
+
+export function UserMenu() {
+    const theme = useMantineTheme();
+
+    const router = useRouter();
+
+    const token = useContext(AuthContext);
+
+    const { data: user, isPending } = useCurrentUser(token);
+
+    if (isPending)
+        return (
+            <Box>
+                <Skeleton height={38} width={220} className={classes.menu} />
+
+                <Skeleton
+                    height={28}
+                    width={5}
+                    mr={"sm"}
+                    className={classes.menuAlt}
+                />
+            </Box>
+        );
+
+    if (!user) return <AnonMenu />;
+
+    return (
+        <Menu
+            withArrow
+            transitionProps={{ transition: "rotate-left", duration: 150 }}
+        >
             <Menu.Target>
-                <UserButton user={user} />
+                <Group>
+                    <UserButton user={user} className={classes.menu} />
+                    <UserButtonAlt />
+                </Group>
             </Menu.Target>
 
             <Menu.Dropdown>
                 <Menu.Item
                     leftSection={
-                        <IconHeart
-                            size={16}
-                            stroke={1.5}
-                            color={theme.colors.red[6]}
-                        />
-                    }
-                >
-                    Liked posts
-                </Menu.Item>
-                <Menu.Item
-                    leftSection={
-                        <IconStar
+                        <IconUserEdit
                             size={16}
                             stroke={1.5}
                             color={theme.colors.yellow[6]}
                         />
                     }
                 >
-                    Saved posts
+                    Edit User
                 </Menu.Item>
+
                 <Menu.Item
                     leftSection={
-                        <IconMessage
+                        <IconFish
                             size={16}
                             stroke={1.5}
-                            color={theme.colors.blue[6]}
+                            color={
+                                user.player
+                                    ? theme.colors.blue[5]
+                                    : theme.colors.green[7]
+                            }
                         />
                     }
+                    component={Link}
+                    href="/player/form"
                 >
-                    Your comments
+                    {user.player ? "Edit Player" : "Create Player"}
                 </Menu.Item>
+
+                <Menu.Sub>
+                    <Menu.Sub.Target>
+                        Match
+                    </Menu.Sub.Target>
+                </Menu.Sub>
 
                 <Menu.Label>Settings</Menu.Label>
                 <Menu.Item
@@ -112,32 +157,59 @@ export function UserMenu({ user }: { user: UserInfo }) {
                 >
                     Account settings
                 </Menu.Item>
+
                 <Menu.Item
-                    leftSection={
-                        <IconSwitchHorizontal size={16} stroke={1.5} />
-                    }
+                    leftSection={<IconLogout size={16} stroke={1.5} />}
+                    onClick={async () => {
+                        await deleteSession();
+                    }}
                 >
-                    Change account
-                </Menu.Item>
-                <Menu.Item leftSection={<IconLogout size={16} stroke={1.5} />}>
                     Logout
                 </Menu.Item>
 
                 <Menu.Divider />
+                <Menu.Label>Danger</Menu.Label>
 
-                <Menu.Label>Danger zone</Menu.Label>
                 <Menu.Item
-                    leftSection={<IconPlayerPause size={16} stroke={1.5} />}
-                >
-                    Pause subscription
-                </Menu.Item>
-                <Menu.Item
+                    leftSection={
+                        <IconTrash
+                            size={16}
+                            stroke={1.5}
+                            color={theme.colors.red[6]}
+                        />
+                    }
                     color="red"
-                    leftSection={<IconTrash size={16} stroke={1.5} />}
                 >
-                    Delete account
+                    Delete User
+                </Menu.Item>
+
+                <Menu.Item
+                    leftSection={
+                        <IconFishOff
+                            size={16}
+                            stroke={1.5}
+                            color={theme.colors.red[6]}
+                        />
+                    }
+                    color="red"
+                >
+                    Delete Player
                 </Menu.Item>
             </Menu.Dropdown>
         </Menu>
+    );
+}
+
+function AnonMenu() {
+    return (
+        <Group>
+            <Anchor component={Link} href={"/login"}>
+                Login
+            </Anchor>
+            <Divider label="or" orientation="horizontal" />
+            <Anchor component={Link} href={"/signup"}>
+                Create User
+            </Anchor>
+        </Group>
     );
 }

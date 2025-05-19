@@ -5,8 +5,10 @@ import { NextResponse } from "next/server";
 
 import { cookies } from "next/headers";
 
-import { Token } from "@/api/client";
+import { AuthService, Token } from "@/api/client";
 import { tokenNames } from "@/constants/tokenNames";
+import { redirect } from "next/navigation";
+import { cache } from "react";
 
 export async function createSession(token: Token, res?: NextResponse) {
     const tokenExpiresAt = new Date(Date.now() + token.expires_in);
@@ -66,3 +68,19 @@ export async function deleteSession(res?: NextResponse) {
         cookieStore.delete(tokenNames.refresh); // deletes by sending Set-Cookie with maxAge=0 :contentReference[oaicite:1]{index=1}
     }
 }
+export const verifySession = cache(async (path: string = "/match") => {
+    const token = (await cookies()).get(tokenNames.access)?.value;
+    if (!token) {
+        redirect(`/api/auth/refresh?next=${path}`);
+    }
+
+    const { data } = await AuthService.verifyToken({
+        body: { token: token },
+    });
+
+    if (!data) {
+        redirect(`/api/auth/refresh?next=${path}`);
+    }
+
+    return token;
+});

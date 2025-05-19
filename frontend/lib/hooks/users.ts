@@ -4,6 +4,7 @@ import {
     createTokenMutation,
     createUserMutation,
     currentUserOptions,
+    myPlayerOptions,
 } from "@/api/client/@tanstack/react-query.gen";
 
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -51,6 +52,18 @@ export const useLoginUser = () => {
 export const useCurrentUser = (token: string) => {
     const query = useQuery({
         ...currentUserOptions({
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        }),
+    });
+
+    return query;
+};
+
+export const useCurrentPlayer = (token: string) => {
+    const query = useQuery({
+        ...myPlayerOptions({
             headers: {
                 Authorization: `Bearer ${token}`,
             },
