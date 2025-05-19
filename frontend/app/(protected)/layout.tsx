@@ -13,10 +13,9 @@ export default async function ProtectedLayout({
 }: {
     children: React.ReactNode;
 }) {
-    const token = await verifySession();
 
     return (
-        <AuthProvider token={token}>
+        <AuthProvider>
             <Stack>
                 <Group justify="flex-end" align="center" gap={"xl"}>
                     <ActionIcon
