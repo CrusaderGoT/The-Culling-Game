@@ -76,7 +76,7 @@ export default function RootLayout({
                     <MantineProvider theme={theme}>
                         <NavigationProgress />
                         <Notifications />
-                        <Container size={"lg"} py={"md"}>
+                        <Container size={"lg"}>
                             <ModeToggle />
                             {children}
                         </Container>
