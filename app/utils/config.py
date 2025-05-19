@@ -9,7 +9,7 @@ from typing import Any
 from fastapi import Request, status
 from fastapi.responses import JSONResponse
 
-from app.api.settings import app
+from app.api.setting import app
 from app.models.admin import AdminInfo, AdminUser
 from app.models.player import Player, PlayerInfo
 from app.models.user import User, UserInfo
@@ -30,7 +30,7 @@ class UserException(Exception):
         headers: dict[str, str] | None = None,
     ) -> None:
         self.user = UserInfo.model_validate(user)
-        self.detail = detail
+        self.detail = {"detail": detail}
         self.code = code
         self.headers = headers
 
@@ -51,7 +51,7 @@ class AdminException(Exception):
         headers: dict[str, str] | None = None,
     ) -> None:
         self.admin = AdminInfo.model_validate(admin)
-        self.detail = detail
+        self.detail = {"detail": detail}
         self.code = code
         self.headers = headers
 
@@ -72,7 +72,7 @@ class PlayerException(Exception):
         headers: dict[str, str] | None = None,
     ) -> None:
         self.player = PlayerInfo.model_validate(player)
-        self.detail = detail
+        self.detail = {"detail": detail}
         self.code = code
         self.headers = headers
 

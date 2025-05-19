@@ -3,7 +3,7 @@ The engine object can be import from this module"""
 
 from sqlmodel import create_engine
 
-from app.api.settings import settings
+from app.api.setting import settings
 
 #
 # create engine variable

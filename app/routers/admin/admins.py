@@ -3,7 +3,7 @@
 from typing import Annotated
 from uuid import UUID
 
-from app.api.settings import settings
+from app.api.setting import settings
 from app.auth.dependencies import admin_user, get_admin_user, oauth2_scheme
 from app.models.admin import (
     AdminInfo,

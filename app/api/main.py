@@ -11,7 +11,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel import or_, select
 
-from app.api.settings import app, settings, sio
+from app.api.setting import app, settings, sio
 from app.auth.credentials import (
     PasswordAuth,
     authenticate_user,
