@@ -19,13 +19,13 @@ import { NavigationProgress } from "@mantine/nprogress";
 
 import { Notifications } from "@mantine/notifications";
 
-import TanstackProviders from "@/lib/query-client/providers";
-
 import {
     charcoalColor,
     deepRedColor,
     goldColor,
 } from "@/lib/constants/THEMECOLORS";
+
+import TanstackProviders from "@/lib/query-client/providers";
 
 import Naluka from "@/fonts/NalukaFont";
 import Neuropol from "@/fonts/NeuropolFont";
