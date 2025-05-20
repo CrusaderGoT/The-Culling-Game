@@ -1,4 +1,4 @@
-import { tokenNames } from "@/lib/constants/tokenNames";
+import { tokenNames } from "@/lib/constants/AUTHCONSTANTS";
 import { NextRequest, NextResponse } from "next/server";
 
 // 1. Specify protected and public routes

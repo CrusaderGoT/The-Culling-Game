@@ -7,13 +7,38 @@ import { MatchStatusHeader } from "@/components/match/match-status-header";
 import { MatchVoteChart } from "@/components/match/match-vote-chart";
 import { VoteDrawer } from "@/components/vote/vote-drawer";
 
-import { MatchInfo, PlayerInfo } from "@/api/client";
+import { useAuth } from "@/lib/auth/auth-provider";
+import { useLatestMatch } from "@/lib/hooks/match";
+import { useGetPlayers } from "@/lib/hooks/players";
+import { DisplayAPIError } from "../ui/display-api-error";
 
-type LiveMatchProp = {
-    players: PlayerInfo[];
-    match: MatchInfo;
-};
-export function LiveMatch({ players, match }: LiveMatchProp) {
+export function LiveMatch() {
+    const token = useAuth();
+
+    const {
+        data: match,
+        isPending: matchIsPending,
+        error: matchError,
+    } = useLatestMatch(token);
+
+    // Extract player IDs from match data safely
+    const playerIds = match?.players?.map((player) => player.id) || [];
+
+    const {
+        data: players,
+        isPending: playersIsPending,
+        error: playersError,
+        refetchFailed,
+    } = useGetPlayers(token, playerIds);
+
+    if (matchIsPending) {
+        return <div>Loading</div>;
+    }
+
+    if (matchError) {
+        return <DisplayAPIError error={matchError} />;
+    }
+
     return (
         <Card padding={"xs"}>
             <CardSection p={"xs"}>
@@ -27,7 +52,13 @@ export function LiveMatch({ players, match }: LiveMatchProp) {
             </CardSection>
 
             <CardSection mx={"auto"} p={"xs"}>
-                <VoteDrawer players={players} />
+                {!playersIsPending && (
+                    <VoteDrawer
+                        players={players}
+                        errors={playersError}
+                        refetchFailed={refetchFailed}
+                    />
+                )}
             </CardSection>
         </Card>
     );

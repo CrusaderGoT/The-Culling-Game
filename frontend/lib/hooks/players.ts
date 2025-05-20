@@ -1,17 +1,19 @@
 import {
+    aPlayerOptions,
     createPlayerMutation,
+    currentUserQueryKey,
     myPlayerOptions,
     myPlayerQueryKey,
-    currentUserQueryKey,
 } from "@/api/client/@tanstack/react-query.gen";
+import { authHeader } from "@/lib/constants/AUTHCONSTANTS";
 import { queryClient } from "@/lib/query-client/get-query-client";
 import { notifications } from "@mantine/notifications";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQueries, useQuery } from "@tanstack/react-query";
 
 export const useCreatePlayer = (token: string) => {
     const mutation = useMutation({
         ...createPlayerMutation({
-            headers: { Authorization: `Bearer ${token}` },
+            headers: authHeader(token),
         }),
         onError: (error) => {
             console.error(JSON.stringify(error));
@@ -28,14 +30,10 @@ export const useCreatePlayer = (token: string) => {
             queryClient.invalidateQueries({
                 queryKey: [
                     myPlayerQueryKey({
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
+                        headers: authHeader(token),
                     }),
                     currentUserQueryKey({
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
+                        headers: authHeader(token),
                     }),
                 ],
             });
@@ -48,13 +46,86 @@ export const useCreatePlayer = (token: string) => {
 export const useCurrentPlayer = (token: string) => {
     const query = useQuery({
         ...myPlayerOptions({
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
+            headers: authHeader(token),
         }),
         // for unnecessary refetch, when you want to use a error state for UI
         refetchOnWindowFocus: false,
     });
 
     return query;
+};
+
+export const useGetPlayer = (token: string, playerId: number) => {
+    const query = useQuery({
+        ...aPlayerOptions({
+            headers: authHeader(token),
+            path: { player_id: playerId },
+        }),
+        // for unnecessary refetch, when you want to use a error state for UI
+        refetchOnWindowFocus: false,
+    });
+
+    return query;
+};
+
+// Custom hook for fetching multiple players
+export const useGetPlayers = (token: string, playerIds: number[]) => {
+    // Filter out any invalid IDs (0, null, undefined)
+    const validPlayerIds = playerIds.filter((id) => id && id !== 0);
+
+    // Use TanStack's useQueries to fetch multiple players in parallel
+    const playerQueries = useQueries({
+        queries: validPlayerIds.map((playerId) => ({
+            ...aPlayerOptions({
+                headers: authHeader(token),
+                path: { player_id: playerId },
+            }),
+            enabled: !!token && !!playerId, // Only run query if we have both token and playerId
+            staleTime: Infinity,
+            retry: process.env.NODE_ENV === "development" ? Infinity : 5,
+        })),
+        combine: (results) => {
+            return {
+                data: results.map((result) => result.data),
+                error: results.some((result) => result.error),
+                isPending: results.some((result) => result.isPending),
+                isLoading: results.some((result) => result.isLoading),
+
+                // Add refetch functionality for all queries
+                refetch: async () => {
+                    const refetchPromises = results.map((result) =>
+                        result.refetch()
+                    );
+                    return Promise.all(refetchPromises);
+                },
+                // Add individual refetch for each player
+                refetchPlayer: async (playerId: number) => {
+                    const playerIndex = validPlayerIds.indexOf(playerId);
+                    if (playerIndex >= 0 && results[playerIndex]) {
+                        return results[playerIndex].refetch();
+                    }
+                    return Promise.reject(
+                        new Error(`Player ID ${playerId} not found`)
+                    );
+                },
+                // Add refetch for failed queries only
+                refetchFailed: async () => {
+                    const failedQueries = results
+                        .map((result, index) => ({
+                            result,
+                            playerId: validPlayerIds[index],
+                        }))
+                        .filter(({ result }) => result.error);
+
+                    return Promise.all(
+                        failedQueries.map(({ result }) => result.refetch())
+                    );
+                },
+                // Return the raw results array for advanced use cases
+                rawResults: results,
+            };
+        },
+    });
+
+    return playerQueries;
 };

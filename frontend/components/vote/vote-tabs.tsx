@@ -2,46 +2,22 @@
 
 import { PlayerInfo } from "@/api/client";
 import { VoteCards } from "@/components/vote/vote-cards";
-import { Avatar, MantineColor, ScrollArea, Tabs, Text } from "@mantine/core";
+import { getColorFromId } from "@/lib/utils";
+import { Avatar, ScrollArea, Tabs, Text } from "@mantine/core";
 import { Dispatch, SetStateAction } from "react";
 
 export function VoteTabs({ players, value, setValue }: VoteTabsProp) {
-    const colors: MantineColor[] = [
-        "dark",
-        "gray",
-        "red",
-        "pink",
-        "grape",
-        "violet",
-        "indigo",
-        "blue",
-        "cyan",
-        "teal",
-        "green",
-        "lime",
-        "yellow",
-        "orange",
-    ];
-
-    const getColorFromId = (id: PlayerInfo["id"]): MantineColor => {
-        const hash = Array.from(id.toString()).reduce(
-            (acc, char) => acc + char.charCodeAt(0),
-            0
-        );
-        return colors[hash % colors.length] || "gray";
-    };
-
     return (
         <Tabs
             data-autofocus
             variant="pills"
-            defaultValue={players[0]?.name || "default"}
+            defaultValue={players[0]?.id ? `${players[0].id}` : "default"}
         >
             <Tabs.List grow>
                 {players.map((player) => (
                     <Tabs.Tab
                         key={player.id}
-                        value={player.name}
+                        value={`${player.id}`}
                         leftSection={<Avatar name={player.name} size={18} />}
                         color={getColorFromId(player.id)}
                     >
@@ -53,7 +29,7 @@ export function VoteTabs({ players, value, setValue }: VoteTabsProp) {
             {players.map((player) => (
                 <Tabs.Panel
                     key={player.id}
-                    value={player.name}
+                    value={`${player.id}`}
                     p={"sm"}
                     component={ScrollArea}
                     h={285}

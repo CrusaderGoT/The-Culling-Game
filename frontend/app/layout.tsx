@@ -25,7 +25,7 @@ import {
     charcoalColor,
     deepRedColor,
     goldColor,
-} from "@/lib/constants/themeColors";
+} from "@/lib/constants/THEMECOLORS";
 
 import Naluka from "@/fonts/NalukaFont";
 import Neuropol from "@/fonts/NeuropolFont";

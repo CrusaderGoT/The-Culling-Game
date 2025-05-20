@@ -4,6 +4,7 @@ import { CastVote, PlayerInfo } from "@/api/client";
 import { VoteForm } from "@/components/vote/forms/vote-form";
 import { VoteTabs } from "@/components/vote/vote-tabs";
 import {
+    Alert,
     Box,
     Button,
     Dialog,
@@ -15,10 +16,13 @@ import {
 import { useMemo, useState } from "react";
 
 import exceedVoteClasses from "@/styles/exceed-vote.module.css";
-import { IconAlertCircle } from "@tabler/icons-react";
+import { IconAlertCircle, IconAlertTriangle } from "@tabler/icons-react";
+import { QueryObserverResult } from "@tanstack/react-query";
 import cx from "clsx";
 
-export function VoteDrawer({ players }: VoteDrawerProp) {
+export function VoteDrawer({ players, errors, refetchFailed }: VoteDrawerProp) {
+    const validPlayers = players.filter((player) => player !== undefined);
+
     const stack = useDrawersStack(["voting-info", "vote-tab", "confirm-vote"]);
 
     const [selectedVotes, setSelectedVotes] = useState<string[]>([]);
@@ -70,10 +74,28 @@ export function VoteDrawer({ players }: VoteDrawerProp) {
                     offset={10}
                     overlayProps={{ backgroundOpacity: 0.5, blur: 4 }}
                 >
+                    {errors && (
+                        <Alert
+                            color="yellow.5"
+                            my={"xs"}
+                            icon={<IconAlertTriangle />}
+                        >
+                            <Group justify="space-around" align="flex-start">
+                                <Text>Some Player Were Not Loaded</Text>
+                                <Button
+                                    size="xs"
+                                    onClick={async () => await refetchFailed()}
+                                >
+                                    reload
+                                </Button>
+                            </Group>
+                        </Alert>
+                    )}
+
                     <VoteTabs
                         value={selectedVotes}
                         setValue={setSelectedVotes}
-                        players={players}
+                        players={validPlayers}
                     />
 
                     <Button
@@ -151,5 +173,7 @@ export function VoteDrawer({ players }: VoteDrawerProp) {
     );
 }
 export type VoteDrawerProp = {
-    players: PlayerInfo[];
+    players: (PlayerInfo | undefined)[];
+    errors: boolean;
+    refetchFailed: () => Promise<QueryObserverResult<PlayerInfo, Error>[]>;
 };
