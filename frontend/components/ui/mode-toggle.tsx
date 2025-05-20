@@ -25,7 +25,6 @@ export function ModeToggle() {
             variant="subtle"
             radius={"xl"}
             size="md"
-            mb={"xs"}
             color="dark"
             aria-label="Toggle color scheme"
             className={classes.iconPosition}
