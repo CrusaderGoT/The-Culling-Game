@@ -22,6 +22,7 @@ export function getColorFromId(id: PlayerInfo["id"]): MantineColor {
         "orange",
         "gold",
         "deepred",
+        "charcoal",
     ];
 
     const hash = Array.from(id.toString()).reduce(
