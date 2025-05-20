@@ -23,7 +23,7 @@ import {
     charcoalColor,
     deepRedColor,
     goldColor,
-} from "@/lib/constants/themeColors";
+} from "@/lib/constants/THEMECOLORS";
 
 import TanstackProviders from "@/lib/query-client/providers";
 
