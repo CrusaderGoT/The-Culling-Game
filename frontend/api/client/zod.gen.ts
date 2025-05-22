@@ -232,11 +232,7 @@ export const zBaseUserInfo = z.object({
         z.null()
     ]).optional(),
     id: z.number().int(),
-    created: z.string().date(),
-    refresh_token_key: z.union([
-        z.string().uuid(),
-        z.null()
-    ]).optional()
+    created: z.string().date()
 });
 
 export const zAdminInfo = z.object({
@@ -583,10 +579,6 @@ export const zUserInfo = z.object({
     ]).optional(),
     id: z.number().int(),
     created: z.string().date(),
-    refresh_token_key: z.union([
-        z.string().uuid(),
-        z.null()
-    ]).optional(),
     player: z.union([
         zBasePlayerInfo,
         z.null()
