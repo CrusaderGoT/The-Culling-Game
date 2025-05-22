@@ -19,7 +19,7 @@ import {
     ReactNode,
     useContext,
     useEffect,
-    useState
+    useState,
 } from "react";
 
 export const AuthContext = createContext<string>("");

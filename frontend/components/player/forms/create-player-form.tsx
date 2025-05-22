@@ -22,9 +22,9 @@ import {
     Center,
     Divider,
     Group,
-    List,
     Paper,
     ScrollAreaAutosize,
+    Skeleton,
     Stack,
     Stepper,
     Text,
@@ -40,37 +40,55 @@ import {
 } from "@tabler/icons-react";
 
 import { zodResolver } from "mantine-form-zod-resolver";
-import { useRouter } from "next/navigation";
+import { redirect } from "next/navigation";
 
 import { useState } from "react";
 
 export function CreatePlayerForm() {
-    const token = useAuth();
-
-    const router = useRouter();
-
-    const fieldKeys = [
+    // Constants
+    const FIELD_KEYS = [
         "player", // step 0
         "cursed_technique", // step 1
         "applications", // step 2
-    ];
+    ] as const;
+
+    const INITIAL_APPLICATIONS = Array.from({ length: 5 }, () => ({
+        name: "",
+        application: "",
+    }));
+
+    const token = useAuth();
 
     const [active, setActive] = useState(0);
     const [highestStepVisited, setHighestStepVisited] = useState(active);
 
     const handleStepChange = (nextStep: number) => {
-        const isOutOfBounds = nextStep > fieldKeys.length || nextStep < 0;
+        const isOutOfBounds = nextStep > FIELD_KEYS.length || nextStep < 0;
+        if (isOutOfBounds) return;
 
-        if (isOutOfBounds) {
-            return;
+        // Validate current section before moving forward
+        if (nextStep > active) {
+            const currentFieldKey = FIELD_KEYS[active] as
+                | "player"
+                | "cursed_technique"
+                | "applications";
+            const validationResult = form.validateField(currentFieldKey);
+
+            // Prevent navigation if current step has validation errors
+            if (validationResult.hasError) {
+                notifications.show({
+                    message: `Please fix errors in ${currentFieldKey.replace(
+                        "_",
+                        " "
+                    )} section`,
+                    color: "orange",
+                });
+                return;
+            }
         }
 
-        // validate current section before moving to next step
-        const key = fieldKeys[active] as string;
-        form.validateField(key);
-
         setActive(nextStep);
-        setHighestStepVisited((hSC) => Math.max(hSC, nextStep));
+        setHighestStepVisited((prev) => Math.max(prev, nextStep));
     };
 
     // Allow the user to freely go back and forth between visited steps.
@@ -89,13 +107,7 @@ export function CreatePlayerForm() {
                 name: "",
                 definition: "",
             },
-            applications: [
-                { name: "", application: "" },
-                { name: "", application: "" },
-                { name: "", application: "" },
-                { name: "", application: "" },
-                { name: "", application: "" },
-            ],
+            applications: INITIAL_APPLICATIONS,
         },
         initialErrors: { player: "must be completed" },
         mode: "uncontrolled",
@@ -103,7 +115,12 @@ export function CreatePlayerForm() {
         validateInputOnBlur: true,
     });
 
-    const { data: user, error: userError } = useCurrentUser(token);
+    const {
+        data: user,
+        error: userError,
+        refetch: refetchUser,
+        isLoading: userIsLoading,
+    } = useCurrentUser(token);
 
     const {
         isPending: createPlayerIsPending,
@@ -112,28 +129,56 @@ export function CreatePlayerForm() {
     } = useCreatePlayer(token);
 
     async function handleSubmit(data: CreatePlayerSchemaType) {
-        if (user) {
+        try {
+            if (!user) {
+                notifications.show({
+                    message:
+                        "User information not available. Please refresh and try again.",
+                    color: "red",
+                });
+                return;
+            }
+
             const newPlayer = await createPlayerMutate({
-                // @ts-ignore: applications are always 5
-                body: { ...data },
+                body: data,
                 path: { user: user.id },
             });
 
             if (newPlayer) {
-                router.push("/player");
+                notifications.show({
+                    message: "Player created successfully!",
+                    color: "green",
+                });
+                redirect("/player");
             }
-        } else {
+        } catch (error) {
+            console.error("Error creating player:", error);
             notifications.show({
-                message: "Error Loading User...Refresh Page",
+                message: "Failed to create player. Please try again.",
                 color: "red",
             });
         }
     }
 
+    // Loading state
+    if (userIsLoading) {
+        return <Skeleton width="100%" height={400} mx="auto" />;
+    }
+
+    // Error state
+    if (userError || !user) {
+        return (
+            <Stack>
+                {userError && <DisplayAPIError error={userError} />}
+                <Button onClick={() => refetchUser()}>
+                    Retry Loading User
+                </Button>
+            </Stack>
+        );
+    }
+
     return (
         <Paper radius="md" p="md" withBorder>
-            {userError && <DisplayAPIError error={userError} />}
-
             <CreatePlayerFormProvider form={form}>
                 <form onSubmit={form.onSubmit(handleSubmit)}>
                     <Stepper
@@ -200,47 +245,60 @@ export function CreatePlayerForm() {
                             {Object.keys(form.errors).length > 0 ? (
                                 <Center>
                                     <ScrollAreaAutosize mah={300}>
-                                        <Text>
+                                        <Text c="red" fw={500} mb="md">
                                             Some fields have errors. Please
                                             review your inputs:
                                         </Text>
-                                        <List>
-                                            <Stack>
-                                                {Object.entries(
-                                                    form.errors
-                                                ).map(
-                                                    ([field, error], index) => (
-                                                        <List.Item
-                                                            key={`${field}+${index}`}
+                                        <Stack gap="xs">
+                                            {Object.entries(form.errors).map(
+                                                ([field, error], index) => (
+                                                    <Paper
+                                                        key={`${field}+${index}`}
+                                                        p="xs"
+                                                        withBorder
+                                                    >
+                                                        <Text
+                                                            size="sm"
+                                                            fw={500}
+                                                            c="red.9"
                                                         >
-                                                            <Text c={"red.9"}>
-                                                                {field}
-                                                            </Text>
-                                                            <List withPadding>
-                                                                <Text>
-                                                                    {error}
-                                                                </Text>
-                                                            </List>
-                                                        </List.Item>
-                                                    )
-                                                )}
-                                            </Stack>
-                                        </List>
+                                                            {field.replace(
+                                                                "_",
+                                                                " "
+                                                            )}
+                                                            :
+                                                        </Text>
+                                                        <Text
+                                                            size="sm"
+                                                            c="dimmed"
+                                                        >
+                                                            {String(error)}
+                                                        </Text>
+                                                    </Paper>
+                                                )
+                                            )}
+                                        </Stack>
                                     </ScrollAreaAutosize>
                                 </Center>
                             ) : (
-                                <Stack style={{ textWrap: "wrap" }}>
-                                    <ScrollAreaAutosize mah={"10%"}>
-                                        <Divider label="confirm your player information" />
-
+                                <Stack>
+                                    <ScrollAreaAutosize mah="60vh">
+                                        <Divider
+                                            label="Confirm your player information"
+                                            mb="md"
+                                        />
                                         <PlayerInfoFormList />
 
-                                        <Divider label="confirm your cursed technique definition" />
-
+                                        <Divider
+                                            label="Confirm your cursed technique definition"
+                                            my="md"
+                                        />
                                         <CursedTechniqueFormList />
 
-                                        <Divider label="confirm all cursed technique applications" />
-
+                                        <Divider
+                                            label="Confirm all cursed technique applications"
+                                            my="md"
+                                        />
                                         <ApplicationFormList />
 
                                         {createPlayerError && (
@@ -249,9 +307,11 @@ export function CreatePlayerForm() {
                                             />
                                         )}
                                     </ScrollAreaAutosize>
+
                                     <Button
                                         type="submit"
-                                        disabled={createPlayerIsPending}
+                                        loading={createPlayerIsPending}
+                                        size="md"
                                     >
                                         Create Player
                                     </Button>
@@ -265,14 +325,16 @@ export function CreatePlayerForm() {
                             <Button
                                 variant="default"
                                 onClick={() => handleStepChange(active - 1)}
+                                disabled={createPlayerIsPending}
                             >
                                 Back
                             </Button>
                         )}
 
-                        {active < fieldKeys.length && (
+                        {active < FIELD_KEYS.length && (
                             <Button
                                 onClick={() => handleStepChange(active + 1)}
+                                disabled={createPlayerIsPending}
                             >
                                 Next
                             </Button>
