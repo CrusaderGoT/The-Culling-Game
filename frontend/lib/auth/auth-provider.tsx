@@ -9,7 +9,7 @@ import {
     useState,
 } from "react";
 
-import { createSession, getClientCookie } from "@/lib/auth/session";
+import { createSession, getClientCookie, deleteSession } from "@/lib/auth/session";
 import { queryClient } from "@/lib/query-client/get-query-client";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
@@ -70,7 +70,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const { isPending, mutate } = useMutation({
         ...refreshTokenMutation(),
-        onError: (e) => {
+        onError: async (e) => {
+            await deleteSession()
             console.error(e);
             notifications.show({
                 message: "Session Expired Log In To Continue",
