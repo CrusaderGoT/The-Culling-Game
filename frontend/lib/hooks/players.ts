@@ -48,8 +48,8 @@ export const useCurrentPlayer = (token: string) => {
         ...myPlayerOptions({
             headers: authHeader(token),
         }),
-        // for unnecessary refetch, when you want to use a error state for UI
-        refetchOnWindowFocus: false,
+        refetchOnWindowFocus: false, // to avoid unwanted refretch
+        enabled: !!token, // run only if token is available
     });
 
     return query;
@@ -61,8 +61,8 @@ export const useGetPlayer = (token: string, playerId: number) => {
             headers: authHeader(token),
             path: { player_id: playerId },
         }),
-        // for unnecessary refetch, when you want to use a error state for UI
-        refetchOnWindowFocus: false,
+        refetchOnWindowFocus: false, // to avoid unwanted refretch
+        enabled: !!token, // run only if token is available
     });
 
     return query;

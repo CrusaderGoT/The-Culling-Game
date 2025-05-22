@@ -45,7 +45,7 @@ export function LiveMatch() {
                 <MatchStatusHeader match={match} />
             </CardSection>
 
-            <MatchPlayers />
+            <MatchPlayers players={players} />
 
             <CardSection p={"xs"} pr={"xl"}>
                 <MatchVoteChart />

@@ -83,3 +83,8 @@ export const verifySession = cache(async (path: string = "/match") => {
 
     return token;
 });
+
+export const getClientCookie = async (name: string) => {
+    const token = (await cookies()).get(name)?.value;
+    return token;
+};

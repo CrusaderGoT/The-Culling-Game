@@ -8,6 +8,7 @@ export const useLatestMatch = (token: string, ongoing: boolean = false) => {
             query: { ongoing: ongoing },
             headers: authHeader(token),
         }),
+        enabled: !!token, // run only if token is available
     });
     return query;
 };

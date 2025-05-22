@@ -1,51 +1,94 @@
 // auth/auth-provider.tsx
 "use client";
 
-import { createContext, ReactNode, useContext } from "react";
+import {
+    createContext,
+    ReactNode,
+    useContext,
+    useEffect,
+    useState,
+} from "react";
 
-import { verifySession } from "@/lib/auth/session";
-
+import { createSession, getClientCookie } from "@/lib/auth/session";
 import { queryClient } from "@/lib/query-client/get-query-client";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
-import { usePathname, useRouter } from "next/navigation";
+import {
+    refreshTokenMutation,
+    verifyTokenOptions,
+} from "@/api/client/@tanstack/react-query.gen";
+import { tokenNames } from "@/lib/constants/AUTHCONSTANTS";
+import { notifications } from "@mantine/notifications";
+import { redirect, usePathname } from "next/navigation";
 
 export const AuthContext = createContext<string>("");
 
 export function AuthProvider({ children }: { children: ReactNode }) {
     const path = usePathname() || "/match";
 
-    const router = useRouter();
+    const [token, setToken] = useState<string>("");
+    const [refreshToken, setRefreshToken] = useState<string>("");
 
-    const redirectToRefresh = () => {
-        router.push(`/api/auth/refresh?next=${encodeURIComponent(path)}`);
-    };
+    // Load both tokens in a single useEffect
+    useEffect(() => {
+        let canceled = false;
 
-    const { data: token = "" } = useQuery({
-        queryKey: ["auth-token"],
-        queryFn: async () => {
+        async function loadTokens() {
             try {
-                const t = await verifySession();
-                if (!t) {
-                    console.error(
-                        `No Verified Token\nContext: AuthProvider\npath: ${path}`
-                    );
-                    redirectToRefresh();
-                    throw new Error("No Verified Token");
+                const [accessToken, refreshTokenValue] = await Promise.all([
+                    getClientCookie(tokenNames.access),
+                    getClientCookie(tokenNames.refresh),
+                ]);
+
+                if (!canceled) {
+                    if (accessToken) setToken(accessToken);
+                    if (refreshTokenValue) setRefreshToken(refreshTokenValue);
                 }
-                return t;
-            } catch (e) {
-                console.error(
-                    `Error during await of verifySession\nContext: AuthProvider\npath: ${path}\n${e}`
-                );
-                redirectToRefresh();
+            } catch (err) {
+                if (!canceled) {
+                    console.error(err);
+                }
             }
-        },
-        // refresh every 13 mins
-        // The interval is set to 13 minutes because tokens typically expire after 15 minutes.
-        // This ensures the token is refreshed slightly before expiration to avoid authentication issues.
-        refetchInterval: 13 * 60 * 1000,
+        }
+
+        loadTokens();
+
+        return () => {
+            canceled = true;
+        };
+    }, []);
+
+    const { isError } = useQuery({
+        ...verifyTokenOptions({ body: { token: token } }),
+        enabled: !!token, // only run query when token is available
+        refetchInterval: 13 * 60 * 1000, // refresh every 13 mins
     });
+
+    const { isPending, mutate } = useMutation({
+        ...refreshTokenMutation(),
+        onError: (e) => {
+            console.error(e);
+            notifications.show({
+                message: "Session Expired Log In To Continue",
+                color: "yellow",
+            });
+            redirect(`/login?next=${encodeURIComponent(path)}`);
+        },
+        onSuccess: async (t) => {
+            await createSession(t);
+            setToken(t.access_token);
+            setRefreshToken(t.refresh_token);
+        },
+    });
+
+    // refresh logic into useEffect to prevent infinite renders
+    useEffect(() => {
+        if (isError && refreshToken && !isPending && !token) {
+            mutate({
+                body: { refresh_token: refreshToken },
+            });
+        }
+    }, [isError, refreshToken, isPending, mutate, token]);
 
     return (
         <AuthContext.Provider value={token}>{children}</AuthContext.Provider>

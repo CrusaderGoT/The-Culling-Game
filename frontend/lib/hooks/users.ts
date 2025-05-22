@@ -57,6 +57,7 @@ export const useCurrentUser = (token: string) => {
         ...currentUserOptions({
             headers: authHeader(token),
         }),
+        enabled: !!token, // run only if token is available
     });
 
     return query;
