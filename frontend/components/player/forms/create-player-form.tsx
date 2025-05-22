@@ -140,6 +140,7 @@ export function CreatePlayerForm() {
             }
 
             const newPlayer = await createPlayerMutate({
+                // @ts-ignore: applications are always 5
                 body: data,
                 path: { user: user.id },
             });

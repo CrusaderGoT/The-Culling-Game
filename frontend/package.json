@@ -10,7 +10,7 @@
     "openapi-ts": "openapi-ts"
   },
   "dependencies": {
-    "@hey-api/client-next": "^0.3.0",
+    "@hey-api/client-next": "^0.3.1",
     "@mantine/charts": "^8.0.1",
     "@mantine/core": "^8.0.1",
     "@mantine/form": "^8.0.1",
@@ -29,7 +29,7 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
-    "@hey-api/openapi-ts": "^0.67.3",
+    "@hey-api/openapi-ts": "^0.67.5",
     "@tanstack/eslint-plugin-query": "^5.74.7",
     "@types/node": "^20",
     "@types/react": "19.0.12",
