@@ -95,6 +95,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
     }, [isError, refreshToken, isPending, mutate, token]);
 
+    // redirect to login if no token and no refresh token
+    useEffect(() => {
+        if (isError && !refreshToken && !isPending && !token) {
+            redirect(`/login?next=${encodeURIComponent(path)}`)
+        }
+    }, [isError, refreshToken, isPending, token]);
+
+
     return (
         <AuthContext.Provider value={token}>{children}</AuthContext.Provider>
     );
