@@ -19,11 +19,7 @@ import { NavigationProgress } from "@mantine/nprogress";
 
 import { Notifications } from "@mantine/notifications";
 
-import {
-    charcoalColor,
-    deepRedColor,
-    goldColor,
-} from "@/lib/constants/themes";
+import { charcoalColor, deepRedColor, goldColor } from "@/lib/constants/themes";
 
 import TanstackProviders from "@/lib/query-client/providers";
 
