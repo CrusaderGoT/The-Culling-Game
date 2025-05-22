@@ -1,33 +1,35 @@
 // auth/auth-provider.tsx
 "use client";
-
+import {
+    refreshTokenMutation,
+    verifyTokenOptions,
+} from "@/api/client/@tanstack/react-query.gen";
+import {
+    createSession,
+    deleteSession,
+    getClientCookie,
+} from "@/lib/auth/session";
+import { tokenNames } from "@/lib/constants/AUTHCONSTANTS";
+import { useMounted } from "@mantine/hooks";
+import { notifications } from "@mantine/notifications";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { redirect, usePathname } from "next/navigation";
 import {
     createContext,
     ReactNode,
     useContext,
     useEffect,
-    useState,
+    useState
 } from "react";
-
-import { createSession, getClientCookie, deleteSession } from "@/lib/auth/session";
-import { queryClient } from "@/lib/query-client/get-query-client";
-import { useMutation, useQuery } from "@tanstack/react-query";
-
-import {
-    refreshTokenMutation,
-    verifyTokenOptions,
-} from "@/api/client/@tanstack/react-query.gen";
-import { tokenNames } from "@/lib/constants/AUTHCONSTANTS";
-import { notifications } from "@mantine/notifications";
-import { redirect, usePathname } from "next/navigation";
 
 export const AuthContext = createContext<string>("");
 
 export function AuthProvider({ children }: { children: ReactNode }) {
     const path = usePathname() || "/match";
-
     const [token, setToken] = useState<string>("");
     const [refreshToken, setRefreshToken] = useState<string>("");
+    const [tokensLoaded, setTokensLoaded] = useState(false);
+    const mountedRef = useMounted();
 
     // Load both tokens in a single useEffect
     useEffect(() => {
@@ -40,13 +42,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                     getClientCookie(tokenNames.refresh),
                 ]);
 
-                if (!canceled) {
-                    if (accessToken) setToken(accessToken);
-                    if (refreshTokenValue) setRefreshToken(refreshTokenValue);
+                if (!canceled && mountedRef) {
+                    setToken(accessToken || "");
+                    setRefreshToken(refreshTokenValue || "");
+                    setTokensLoaded(true);
                 }
             } catch (err) {
-                if (!canceled) {
-                    console.error(err);
+                if (!canceled && mountedRef) {
+                    console.error("Error loading tokens:", err);
+                    setTokensLoaded(true); // Still mark as loaded to prevent infinite loading
                 }
             }
         }
@@ -56,23 +60,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return () => {
             canceled = true;
         };
-    }, []);
+    }, [mountedRef]);
 
-    const { isError } = useQuery({
+    // Always run verify query when tokens are loaded (even with empty token)
+    const { isError, isLoading } = useQuery({
         ...verifyTokenOptions({ body: { token: token } }),
-        refetchInterval: 13 * 60 * 1000, // refresh every 13 mins
-        // retry 2 times and only if token hasn't been removed from session
+        enabled: tokensLoaded, // Run as soon as tokens are loaded
+        refetchInterval: token ? 13 * 60 * 1000 : false, // Only auto-refresh if we have a token
         retry: (failureCount) => {
-            if (failureCount < 2 && !!token) return true;
+            if (failureCount < 2 && !!token && mountedRef) return true;
             return false;
         },
     });
 
-    const { isPending, mutate } = useMutation({
+    const { isPending: isRefreshing, mutate } = useMutation({
         ...refreshTokenMutation(),
         onError: async (e) => {
-            await deleteSession()
-            console.error(e);
+            if (!mountedRef) return;
+
+            await deleteSession();
+            console.error("Refresh token error:", e);
             notifications.show({
                 message: "Session Expired Log In To Continue",
                 color: "yellow",
@@ -80,28 +87,58 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             redirect(`/login?next=${encodeURIComponent(path)}`);
         },
         onSuccess: async (t) => {
+            if (!mountedRef) return;
+
             await createSession(t);
             setToken(t.access_token);
             setRefreshToken(t.refresh_token);
         },
     });
 
-    // refresh logic into useEffect to prevent infinite renders
+    // Refresh logic - handle both error states and missing token scenarios
     useEffect(() => {
-        if (isError && refreshToken && !isPending && !token) {
+        if (!tokensLoaded || isRefreshing || !mountedRef) return;
+
+        // Scenario 1: Verify failed and we have refresh token
+        // Scenario 2: No access token but we have refresh token (token removed from session)
+        const shouldRefresh =
+            refreshToken && ((isError && !isLoading) || (!token && !isLoading));
+
+        if (shouldRefresh) {
             mutate({
                 body: { refresh_token: refreshToken },
             });
         }
-    }, [isError, refreshToken, isPending, mutate, token]);
+    }, [
+        isError,
+        refreshToken,
+        isRefreshing,
+        isLoading,
+        mutate,
+        tokensLoaded,
+        token,
+        mountedRef,
+    ]);
 
-    // redirect to login if no token and no refresh token
+    // Redirect logic - improved to handle all no-auth scenarios
     useEffect(() => {
-        if (isError && !refreshToken && !isPending && !token) {
-            redirect(`/login?next=${encodeURIComponent(path)}`)
-        }
-    }, [isError, refreshToken, isPending, token]);
+        if (!tokensLoaded) return; // Wait for tokens to load
 
+        const hasNoTokens = !token && !refreshToken;
+        const hasFailedAuth = isError && !refreshToken && !isRefreshing;
+
+        if ((hasNoTokens || hasFailedAuth) && mountedRef) {
+            redirect(`/login?next=${encodeURIComponent(path)}`);
+        }
+    }, [
+        tokensLoaded,
+        token,
+        refreshToken,
+        isError,
+        isRefreshing,
+        path,
+        mountedRef,
+    ]);
 
     return (
         <AuthContext.Provider value={token}>{children}</AuthContext.Provider>
@@ -110,10 +147,4 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 export function useAuth() {
     return useContext(AuthContext);
-}
-
-export function useRefreshAuth() {
-    return () => {
-        return queryClient.invalidateQueries({ queryKey: ["auth-token"] });
-    };
 }
