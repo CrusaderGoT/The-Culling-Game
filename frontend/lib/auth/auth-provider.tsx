@@ -60,8 +60,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const { isError } = useQuery({
         ...verifyTokenOptions({ body: { token: token } }),
-        enabled: !!token, // only run query when token is available
         refetchInterval: 13 * 60 * 1000, // refresh every 13 mins
+        // retry 2 times and only if token hasn't been removed from session
+        retry: (failureCount) => {
+            if (failureCount < 2 && !!token) return true;
+            return false;
+        },
     });
 
     const { isPending, mutate } = useMutation({

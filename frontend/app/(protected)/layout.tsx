@@ -1,6 +1,5 @@
 // app/(protected)/layout.tsx
 
-import { verifySession } from "@/lib/auth/session";
 
 import { UserMenu } from "@/components/ui/user-menu";
 import { AuthProvider } from "@/lib/auth/auth-provider";
@@ -13,10 +12,9 @@ export default async function ProtectedLayout({
 }: {
     children: React.ReactNode;
 }) {
-
     return (
         <AuthProvider>
-            <Stack>
+            <Stack mt={"15px"}>
                 <Group justify="flex-end" align="center" gap={"xl"}>
                     <ActionIcon
                         variant="transparent"
