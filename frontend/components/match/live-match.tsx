@@ -1,6 +1,6 @@
 "use client";
 
-import { Center, Paper, Skeleton, Stack } from "@mantine/core";
+import { Box, Center, Paper, Skeleton, Stack } from "@mantine/core";
 
 import { MatchPlayers } from "@/components/match/match-players";
 import { MatchStatusHeader } from "@/components/match/match-status-header";
@@ -48,7 +48,7 @@ export function LiveMatch() {
         return (
             <Stack>
                 <DisplayAPIError error={matchError} />
-                <Skeleton h={500} />;
+                <Skeleton h={500} />
             </Stack>
         );
     }
@@ -71,7 +71,14 @@ export function LiveMatch() {
                 </Stack>
             </Paper>
 
-            <MatchVoteChart />
+            {validPlayers && match.votes.length > 0 && (
+                <Box p={"md"}>
+                    <MatchVoteChart
+                        players={validPlayers}
+                        votes={match.votes}
+                    />
+                </Box>
+            )}
 
             {!playersIsPending && validPlayers && (
                 <Center>

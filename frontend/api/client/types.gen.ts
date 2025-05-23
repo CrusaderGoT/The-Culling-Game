@@ -666,6 +666,7 @@ export type MatchInfo = {
     winner: BasePlayerInfo | null;
     players: Array<BasePlayerInfo>;
     colony: BaseColonyInfo;
+    votes: Array<BaseVoteInfo>;
 };
 
 /**
