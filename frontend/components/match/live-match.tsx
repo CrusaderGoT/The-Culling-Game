@@ -1,6 +1,6 @@
 "use client";
 
-import { Card, CardSection, Center, Paper, Stack } from "@mantine/core";
+import { Center, Paper, Skeleton, Stack } from "@mantine/core";
 
 import { MatchPlayers } from "@/components/match/match-players";
 import { MatchStatusHeader } from "@/components/match/match-status-header";
@@ -40,12 +40,17 @@ export function LiveMatch() {
         }
     }, [players, playersIsFetched]);
 
-    if (matchIsPending || !validPlayers) {
-        return <div>Loading</div>;
+    if (matchIsPending || (!validPlayers && playerIds.length > 0)) {
+        return <Skeleton h={500} />;
     }
 
     if (matchError) {
-        return <DisplayAPIError error={matchError} />;
+        return (
+            <Stack>
+                <DisplayAPIError error={matchError} />
+                <Skeleton h={500} />;
+            </Stack>
+        );
     }
 
     return (
@@ -54,13 +59,21 @@ export function LiveMatch() {
                 <Stack>
                     <MatchStatusHeader match={match} />
 
-                    <MatchPlayers players={validPlayers} />
+                    {validPlayers ? (
+                        <MatchPlayers players={validPlayers} />
+                    ) : (
+                        <Stack>
+                            {Array.from({ length: 2 }).map((_, index) => (
+                                <Skeleton key={index} />
+                            ))}
+                        </Stack>
+                    )}
                 </Stack>
             </Paper>
 
             <MatchVoteChart />
 
-            {!playersIsPending && (
+            {!playersIsPending && validPlayers && (
                 <Center>
                     <VoteDrawer
                         players={validPlayers}
