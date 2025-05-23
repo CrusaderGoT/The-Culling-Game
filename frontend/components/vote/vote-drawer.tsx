@@ -27,8 +27,6 @@ export function VoteDrawer({
     refetchFailed,
     matchId,
 }: VoteDrawerProp) {
-    const validPlayers = players.filter((player) => player !== undefined);
-
     const stack = useDrawersStack(["voting-info", "vote-tab", "confirm-vote"]);
 
     const [selectedVotes, setSelectedVotes] = useState<string[]>([]);
@@ -101,7 +99,7 @@ export function VoteDrawer({
                     <VoteTabs
                         value={selectedVotes}
                         setValue={setSelectedVotes}
-                        players={validPlayers}
+                        players={players}
                     />
 
                     <Button
@@ -186,7 +184,7 @@ export function VoteDrawer({
     );
 }
 export type VoteDrawerProp = {
-    players: (PlayerInfo | undefined)[];
+    players: PlayerInfo[];
     errors: boolean;
     refetchFailed: () => Promise<QueryObserverResult<PlayerInfo, Error>[]>;
     matchId: number;

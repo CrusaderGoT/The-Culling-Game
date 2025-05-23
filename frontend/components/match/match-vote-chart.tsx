@@ -1,6 +1,6 @@
 import { BarChart } from "@mantine/charts";
 
-
+type MatchVoteChartProp = {};
 export function MatchVoteChart() {
     const data = [
         { player: "Ethan", Smartphones: 1200, Laptops: 900, Tablets: 700 },
@@ -29,7 +29,7 @@ export function MatchVoteChart() {
             gridAxis="y"
             xAxisLabel="Points"
             tooltipAnimationDuration={200}
-            withBarValueLabel
-            barChartProps={{ maxBarSize: 50 }} />
+            barChartProps={{ maxBarSize: 50 }}
+        />
     );
 }

@@ -241,7 +241,7 @@ async def vote(
                     )  # incase prev vote is > 5; i.e e_l results in a negative number
                     new_votes = new_votes[:real_limit]
                     session.add_all(new_votes)
-                    session.commit()  # this commit the increased player points also
+                    session.commit()  # this commit increases player points also
                     [session.refresh(v) for v in new_votes]
                     msg = f"{len(new_votes)} out of {len(votes)} was successful"
                     vote_info = {

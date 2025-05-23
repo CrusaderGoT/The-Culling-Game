@@ -90,6 +90,7 @@ export const useGetPlayers = (token: string, playerIds: number[]) => {
                 error: results.some((result) => result.error),
                 isPending: results.some((result) => result.isPending),
                 isLoading: results.some((result) => result.isLoading),
+                isFetched: results.some((result) => result.isFetched),
 
                 // Add refetch functionality for all queries
                 refetch: async () => {

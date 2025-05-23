@@ -29,6 +29,16 @@ export const useCastVote = (token: string) => {
             });
         },
         onSuccess(data) {
+            if (data.extra_info) {
+                data.extra_info.forEach((msg) => {
+                    notifications.show({
+                        message: `${msg}`,
+                        autoClose: false,
+                        color: "green",
+                    });
+                });
+            }
+
             if (data.votes.length < 1) {
                 notifications.show({
                     message: `${data.message}`,

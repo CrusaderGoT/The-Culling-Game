@@ -16,28 +16,27 @@ import { IconArrowUp, IconChartArcs, IconVs } from "@tabler/icons-react";
 import { Fragment } from "react";
 
 type MatchPlayersProp = {
-    players: (PlayerInfo | undefined)[];
+    players: PlayerInfo[];
 };
 export function MatchPlayers({ players }: MatchPlayersProp) {
-    const validPlayers = players.filter((player) => player !== undefined);
     return (
         <Flex
             justify="space-between"
             gap={"xs"}
             direction={{ base: "column", md: "row" }}
         >
-            {validPlayers.map((player, index) => {
+            {players.map((player, index) => {
                 return (
                     <Fragment key={index}>
                         <Box flex={1}>
                             <PlayerPaper player={player} />
                         </Box>
 
-                        {index + 1 < validPlayers.length && (
+                        {index + 1 < players.length && (
                             <Center
                                 // on small screens, give vertical margin; on md+, remove vertical margin
                                 my={{ base: "sm", md: 0 }}
-                                // on md+, give horizontal margin to push icon away from validPlayers
+                                // on md+, give horizontal margin to push icon away from players
                                 mx={{ base: 0, md: "sm" }}
                             >
                                 <ThemeIcon
@@ -61,7 +60,7 @@ export function MatchPlayers({ players }: MatchPlayersProp) {
 
 function PlayerPaper({ player }: { player: PlayerInfo }) {
     return (
-        <Paper>
+        <Paper withBorder p={"xs"}>
             <Group justify="space-between" p={5}>
                 <Badge
                     size="xs"

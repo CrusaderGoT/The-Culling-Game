@@ -1,6 +1,6 @@
 "use client";
 
-import { Card, CardSection } from "@mantine/core";
+import { Card, CardSection, Center, Paper, Stack } from "@mantine/core";
 
 import { MatchPlayers } from "@/components/match/match-players";
 import { MatchStatusHeader } from "@/components/match/match-status-header";
@@ -10,8 +10,8 @@ import { VoteDrawer } from "@/components/vote/vote-drawer";
 import { useAuth } from "@/lib/auth/auth-provider";
 import { useLatestMatch } from "@/lib/hooks/match";
 import { useGetPlayers } from "@/lib/hooks/players";
-import { DisplayAPIError } from "../ui/display-api-error";
 import { useMemo } from "react";
+import { DisplayAPIError } from "../ui/display-api-error";
 
 export function LiveMatch() {
     const token = useAuth();
@@ -30,15 +30,17 @@ export function LiveMatch() {
         isPending: playersIsPending,
         error: playersError,
         refetchFailed,
+        isFetched: playersIsFetched,
     } = useGetPlayers(token, playerIds);
 
     const validPlayers = useMemo(() => {
-        const validPlayers = players.filter((player) => player !== undefined);
-        console.error(validPlayers, "players");
-        return validPlayers;
-    }, [players]);
+        if (players && playersIsFetched) {
+            const vp = players.filter((player) => player !== undefined);
+            return vp;
+        }
+    }, [players, playersIsFetched]);
 
-    if (matchIsPending) {
+    if (matchIsPending || !validPlayers) {
         return <div>Loading</div>;
     }
 
@@ -47,27 +49,27 @@ export function LiveMatch() {
     }
 
     return (
-        <Card padding={"xs"}>
-            <CardSection p={"xs"}>
-                <MatchStatusHeader match={match} />
-            </CardSection>
+        <Stack my={"md"}>
+            <Paper withBorder p={"md"}>
+                <Stack>
+                    <MatchStatusHeader match={match} />
 
-            <MatchPlayers players={players} />
+                    <MatchPlayers players={validPlayers} />
+                </Stack>
+            </Paper>
 
-            <CardSection p={"xs"} pr={"xl"}>
-                <MatchVoteChart />
-            </CardSection>
+            <MatchVoteChart />
 
-            <CardSection mx={"auto"} p={"xs"}>
-                {!playersIsPending && (
+            {!playersIsPending && (
+                <Center>
                     <VoteDrawer
-                        players={players}
+                        players={validPlayers}
                         errors={playersError}
                         refetchFailed={refetchFailed}
                         matchId={match.id}
                     />
-                )}
-            </CardSection>
-        </Card>
+                </Center>
+            )}
+        </Stack>
     );
 }

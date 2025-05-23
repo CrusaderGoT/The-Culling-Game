@@ -35,6 +35,7 @@ import { useCurrentUser } from "@/lib/hooks/users";
 import classes from "@/styles/user-menu.module.css";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { getColorFromId } from "@/lib/utils";
 
 interface UserButtonProps extends React.ComponentPropsWithoutRef<"button"> {
     user: UserInfo;
@@ -50,7 +51,9 @@ const UserButton = forwardRef<HTMLButtonElement, UserButtonProps>(
                         <Text size="sm" fw={500}>
                             {user.username}
                         </Text>
-                        {user?.player && <Indicator color="green" />}
+                        {user?.player && (
+                            <Indicator color={getColorFromId(user.player.id)} />
+                        )}
                     </Group>
 
                     <Text c="dimmed" size="xs">
