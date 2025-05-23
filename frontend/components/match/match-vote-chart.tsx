@@ -1,73 +1,84 @@
-import { BaseVoteInfo, PlayerInfo } from "@/api/client";
+import { BaseCtAppInfo, BaseVoteInfo, PlayerInfo } from "@/api/client";
 import { getColorFromId } from "@/lib/utils";
 import { BarChart } from "@mantine/charts";
 
-// Props type
+// Props
 type MatchVoteChartProps = {
     players: PlayerInfo[];
     votes: BaseVoteInfo[];
 };
 
 export function MatchVoteChart({ players, votes }: MatchVoteChartProps) {
-    // 1. Build a lookup for CT App names and IDs
-    const ctAppMap = new Map<number, { name: string; id: number }>();
+    // Derive CT apps from players
+    const ctAppMap = new Map<number, BaseCtAppInfo>();
     players.forEach((player) => {
-        player.cursed_technique?.applications?.forEach((app) => {
-            ctAppMap.set(app.id, { name: app.name, id: app.id });
+        player.cursed_technique.applications.forEach((app) => {
+            ctAppMap.set(app.id, app);
         });
     });
 
-    // 2. Fold votes into per-player buckets
-    const data = players.map((player) => {
-        const row: Record<string, number | string> = {
-            player: player.name,
-        };
+    // Group votes by player and ct_app
+    const votesByPlayer = votes.reduce((acc, vote) => {
+        if (!vote.player_id) return acc;
+        const playerId = vote.player_id;
+        if (!acc[playerId]) acc[playerId] = {};
 
-        votes
-            .filter((v) => v.player_id === player.id)
-            .forEach((v) => {
-                const app = v.ct_app_id ? ctAppMap.get(v.ct_app_id) : null;
-                const key = app ? app.name : "Other";
-                row[key] = Number(row[key] || 0) + v.point;
-            });
-
-        return row;
-    });
-
-    // 3. Gather all dynamic keys (everything except 'player')
-    const keys = Array.from(
-        data.reduce<Set<string>>((set, row) => {
-            Object.keys(row).forEach((k) => {
-                if (k !== "player") set.add(k);
-            });
-            return set;
-        }, new Set())
-    );
-
-    if (keys.length === 0) {
-        return <div>No votes available for the selected players.</div>;
-    }
-
-    // 4. Generate Mantine-compliant series with colors from app.id
-    const nameToAppId = new Map<string, number>();
-    ctAppMap.forEach((value) => {
-        nameToAppId.set(value.name, value.id);
-    });
-
-    const series = keys.map((key) => {
-        const appId = nameToAppId.get(key);
-        let color: string;
-
-        if (appId !== undefined) {
-            color = getColorFromId(appId);
+        if (vote.ct_app_id) {
+            const ctApp = ctAppMap.get(vote.ct_app_id);
+            const ctAppName = ctApp ? ctApp.name : `CT App ${vote.ct_app_id}`;
+            if (!acc[playerId][ctAppName]) acc[playerId][ctAppName] = 0;
+            acc[playerId][ctAppName] += vote.point;
         } else {
-            // For "Other" category or unknown keys, use a fallback
-            const fallbackColor = getColorFromId(key.length);
-            color = fallbackColor || "#cccccc";
+            if (!acc[playerId]["Direct Votes"])
+                acc[playerId]["Direct Votes"] = 0;
+            acc[playerId]["Direct Votes"] += vote.point;
         }
 
-        return { name: key, color };
+        return acc;
+    }, {} as Record<number, Record<string, number>>);
+
+    // Convert to chart data format
+    const data = players
+        .map((player) => {
+            const playerVotes = votesByPlayer[player.id] || {};
+            return {
+                player: player.name,
+                ...playerVotes,
+            };
+        })
+        .filter((playerData) => {
+            const { player, ...voteData } = playerData;
+            return Object.keys(voteData).length > 0;
+        });
+
+    // Get all unique CT app names for series
+    const allCtAppNames = new Set<string>();
+    Object.values(votesByPlayer).forEach((playerVotes) => {
+        Object.keys(playerVotes).forEach((ctAppName) => {
+            allCtAppNames.add(ctAppName);
+        });
     });
+
+    // Map ctAppName to appId for color generation
+    const nameToAppId = new Map<string, number>();
+    ctAppMap.forEach((app) => {
+        nameToAppId.set(app.name, app.id);
+    });
+    nameToAppId.set("Direct Votes", -1); // Assign special ID for direct votes
+
+    const series = Array.from(allCtAppNames).map((ctAppName) => {
+        const appId = nameToAppId.get(ctAppName);
+        return {
+            name: ctAppName,
+            color: getColorFromId(
+                appId !== undefined ? appId : ctAppName.length
+            ),
+        };
+    });
+
+    if (data.length === 0) {
+        return <div>No votes to display.</div>;
+    }
 
     return (
         <BarChart
@@ -81,7 +92,9 @@ export function MatchVoteChart({ players, votes }: MatchVoteChartProps) {
             legendProps={{ verticalAlign: "bottom" }}
             tickLine="x"
             gridAxis="y"
-            xAxisLabel="Points"
+            xAxisLabel="Vote Points"
+            tooltipAnimationDuration={200}
+            barChartProps={{ maxBarSize: 50 }}
         />
     );
 }
