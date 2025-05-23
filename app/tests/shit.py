@@ -1,7 +1,10 @@
 c = [1, 2, 3, 5, 6]
-pv = 3
+pv = 4
 vl = 5
+e = vl - pv
 
-a = c[: (vl - pv)]
+b = e if e > 0 else 0
 
-print(a, vl - pv)
+a = c[:b]
+
+print(a, vl - pv, b)
