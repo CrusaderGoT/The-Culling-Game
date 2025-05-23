@@ -1,6 +1,6 @@
 c = [1, 2, 3, 5, 6]
 pv = 4
-vl = 5
+vl = 1
 e = vl - pv
 
 b = e if e > 0 else 0
