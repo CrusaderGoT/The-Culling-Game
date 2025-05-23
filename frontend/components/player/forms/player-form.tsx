@@ -18,12 +18,9 @@ export function PlayerForm() {
 
     // Handle query errors
     if (player.isError) {
-        console.error("Error fetching player:", JSON.stringify(player.error));
-
-        // You might want to show an error component or fallback to create form
         return (
             <Stack>
-                <DisplayAPIError error={player.error} />
+                <DisplayAPIError error={player.error} color="gold" title="" />
                 <CreatePlayerForm />
             </Stack>
         );

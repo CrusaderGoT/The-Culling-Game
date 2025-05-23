@@ -11,6 +11,7 @@ import { useAuth } from "@/lib/auth/auth-provider";
 import { useLatestMatch } from "@/lib/hooks/match";
 import { useGetPlayers } from "@/lib/hooks/players";
 import { DisplayAPIError } from "../ui/display-api-error";
+import { useMemo } from "react";
 
 export function LiveMatch() {
     const token = useAuth();
@@ -30,6 +31,12 @@ export function LiveMatch() {
         error: playersError,
         refetchFailed,
     } = useGetPlayers(token, playerIds);
+
+    const validPlayers = useMemo(() => {
+        const validPlayers = players.filter((player) => player !== undefined);
+        console.error(validPlayers, "players");
+        return validPlayers;
+    }, [players]);
 
     if (matchIsPending) {
         return <div>Loading</div>;
@@ -57,6 +64,7 @@ export function LiveMatch() {
                         players={players}
                         errors={playersError}
                         refetchFailed={refetchFailed}
+                        matchId={match.id}
                     />
                 )}
             </CardSection>

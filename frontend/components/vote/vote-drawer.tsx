@@ -16,11 +16,17 @@ import {
 import { useMemo, useState } from "react";
 
 import exceedVoteClasses from "@/styles/exceed-vote.module.css";
+import { notifications } from "@mantine/notifications";
 import { IconAlertCircle, IconAlertTriangle } from "@tabler/icons-react";
 import { QueryObserverResult } from "@tanstack/react-query";
 import cx from "clsx";
 
-export function VoteDrawer({ players, errors, refetchFailed }: VoteDrawerProp) {
+export function VoteDrawer({
+    players,
+    errors,
+    refetchFailed,
+    matchId,
+}: VoteDrawerProp) {
     const validPlayers = players.filter((player) => player !== undefined);
 
     const stack = useDrawersStack(["voting-info", "vote-tab", "confirm-vote"]);
@@ -101,17 +107,24 @@ export function VoteDrawer({ players, errors, refetchFailed }: VoteDrawerProp) {
                     <Button
                         onClick={() => {
                             // check vote counts
-                            if (selectedVotes.length > 5)
-                                return alert("Total votes must not exceed 5");
-                            if (selectedVotes.length < 1)
-                                return alert("Total votes must be at least 1");
+                            if (selectedVotes.length > 5) {
+                                notifications.show({
+                                    message: "Total votes must not exceed 5",
+                                });
+                                return;
+                            } else if (selectedVotes.length < 1) {
+                                notifications.show({
+                                    message: "Total votes must be at least 1",
+                                });
+                                return;
+                            }
 
                             stack.closeAll();
                             stack.open("confirm-vote");
                         }}
                         color={
                             !selectedVotes.length
-                                ? "charcoal"
+                                ? "muted"
                                 : selectedVotes.length < 5
                                 ? "teal"
                                 : "orange"
@@ -148,7 +161,7 @@ export function VoteDrawer({ players, errors, refetchFailed }: VoteDrawerProp) {
                     offset={10}
                     overlayProps={{ backgroundOpacity: 0.5, blur: 4 }}
                 >
-                    <VoteForm votes={votes} />
+                    <VoteForm votes={votes} matchId={matchId} />
 
                     <Button
                         onClick={() => {
@@ -176,4 +189,5 @@ export type VoteDrawerProp = {
     players: (PlayerInfo | undefined)[];
     errors: boolean;
     refetchFailed: () => Promise<QueryObserverResult<PlayerInfo, Error>[]>;
+    matchId: number;
 };

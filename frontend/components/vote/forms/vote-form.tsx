@@ -14,11 +14,16 @@ import { zodResolver } from "@mantine/form";
 
 import { z } from "zod";
 
-export function VoteForm({ votes }: VoteFormType) {
+import { DisplayAPIError } from "@/components/ui/display-api-error";
+import { useAuth } from "@/lib/auth/auth-provider";
+import { useCastVote } from "@/lib/hooks/match";
+
+export function VoteForm({ votes, matchId }: VoteFormType) {
     const voteSchema = z.object({ votes: z.array(zCastVote) });
 
     const initialValues: VoteFormType = {
         votes: votes,
+        matchId: matchId,
     };
 
     const form = useVoteForm({
@@ -27,15 +32,25 @@ export function VoteForm({ votes }: VoteFormType) {
         validate: zodResolver(voteSchema),
     });
 
+    const token = useAuth();
+
+    const { mutate, isPending, isError, error } = useCastVote(token);
+
     const handleSubmit = (data: VoteFormType) => {
-        // Replace this with the actual submit logic
-        console.log("Submitting form data:", data);
+        mutate({
+            path: { match_id: data.matchId },
+            body: data.votes,
+        });
     };
 
     return (
         <VoteFormProvider form={form}>
             <form onSubmit={form.onSubmit(handleSubmit)}>
                 <Stack>
+                    {isError && error && !isPending && (
+                        <DisplayAPIError error={error} />
+                    )}
+
                     {form.getValues().votes.map((_, index) => (
                         <Box key={index}>
                             <TextInput
@@ -57,7 +72,7 @@ export function VoteForm({ votes }: VoteFormType) {
                     ))}
                 </Stack>
 
-                <Button type="submit" color="red">
+                <Button type="submit" color="red" disabled={isPending}>
                     Confirm
                 </Button>
             </form>

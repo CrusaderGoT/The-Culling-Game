@@ -1,6 +1,10 @@
-import { getLastestMatchOptions } from "@/api/client/@tanstack/react-query.gen";
+import {
+    getLastestMatchOptions,
+    voteMutation,
+} from "@/api/client/@tanstack/react-query.gen";
 import { authHeader } from "@/lib/constants/AUTHCONSTANTS";
-import { useQuery } from "@tanstack/react-query";
+import { notifications } from "@mantine/notifications";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 export const useLatestMatch = (token: string, ongoing: boolean = false) => {
     const query = useQuery({
@@ -11,4 +15,34 @@ export const useLatestMatch = (token: string, ongoing: boolean = false) => {
         enabled: !!token, // run only if token is available
     });
     return query;
+};
+
+export const useCastVote = (token: string) => {
+    const mutation = useMutation({
+        ...voteMutation({
+            headers: authHeader(token),
+        }),
+        onError() {
+            notifications.show({
+                message: "Error Casting Vote(s)",
+                color: "red",
+            });
+        },
+        onSuccess(data) {
+            if (data.votes.length < 1) {
+                notifications.show({
+                    message: `${data.message}`,
+                    autoClose: false,
+                    color: "yellow",
+                });
+            } else {
+                notifications.show({
+                    message: `${data.message}`,
+                    autoClose: false,
+                    color: "green",
+                });
+            }
+        },
+    });
+    return mutation;
 };
