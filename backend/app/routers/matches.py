@@ -234,6 +234,8 @@ async def vote(
                                     )
 
                 else:  # runs after the loop
+                    # make sure new votes will not exceed the 5 vote limit
+                    new_votes = new_votes[: (atp.vote_limit - len(prev_votes))]
                     session.add_all(new_votes)
                     session.commit()  # this commit the increased player points also
                     [session.refresh(v) for v in new_votes]
