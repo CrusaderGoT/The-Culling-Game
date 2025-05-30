@@ -21,7 +21,8 @@ from app.auth.credentials import (
 )
 from app.auth.models import Token, TokenData
 from app.models.user import CreateUser, User, UserInfo
-from app.routers import admin, barriers, colonies, matches, players, users
+from app.routers import barriers, colonies, matches, players, users
+from app.routers.admin import admins
 from app.utils.config import Tag
 from app.utils.dependencies import session
 from app.utils.user import get_user, update_user_refresh_key, usernamedb
@@ -32,9 +33,9 @@ app.include_router(players.router)
 app.include_router(matches.router)
 app.include_router(barriers.router)
 app.include_router(colonies.router)
-app.include_router(admin.superuser_router)
+app.include_router(admins.superuser_router)
 
-app.include_router(admin.router)
+app.include_router(admins.router)
 
 # LOGIN
 @app.post(
