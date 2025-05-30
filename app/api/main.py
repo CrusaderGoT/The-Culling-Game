@@ -35,6 +35,7 @@ app.include_router(colonies.router)
 app.include_router(admin.admin_router)
 app.include_router(admin.superuser_router)
 
+app.include_router(admin.router)
 
 # LOGIN
 @app.post(
