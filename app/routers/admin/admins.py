@@ -22,6 +22,9 @@ from app.utils.user import get_user, id_name_email
 from dotenv import load_dotenv
 from fastapi import APIRouter, Body, Depends, HTTPException, Query, status
 
+from app.routers import admin
+
+
 load_dotenv()  # load for env used in this modules
 
 # Create your API routes here
@@ -30,6 +33,9 @@ router = APIRouter(
     tags=[Tag.admin],
     dependencies=[Depends(get_admin_user), Depends(oauth2_scheme)],
 )
+router.include_router(admin.users.router)
+router.include_router(admin.players.router)
+
 superuser_router = APIRouter(
     prefix="/admin",
     tags=[Tag.admin],
