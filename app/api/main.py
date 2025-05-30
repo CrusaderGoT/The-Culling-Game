@@ -32,7 +32,6 @@ app.include_router(players.router)
 app.include_router(matches.router)
 app.include_router(barriers.router)
 app.include_router(colonies.router)
-app.include_router(admin.admin_router)
 app.include_router(admin.superuser_router)
 
 app.include_router(admin.router)
