@@ -17,7 +17,11 @@ from ...utils.admin import (
 )
 from ...utils.dependencies import session
 from ...utils.player import get_player
-from .admins import router
+from fastapi import APIRouter
+
+
+# Create your API routes here
+router = APIRouter()
 
 
 @router.patch(
