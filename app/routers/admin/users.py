@@ -13,8 +13,11 @@ from app.utils.admin import (
 )
 from app.utils.dependencies import session
 from app.utils.user import edit_user_helper, get_user, id_name_email
-from fastapi import Body, HTTPException, status
+from fastapi import Body, HTTPException, status, APIRouter
 
+
+# Create your API routes here
+router = APIRouter()
 
 @router.patch(
     "/edit-user/{user}",
