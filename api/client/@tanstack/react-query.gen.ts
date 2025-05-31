@@ -38,6 +38,9 @@ const createQueryKey = <TOptions extends Options>(id: string, options?: TOptions
 
 export const currentUserQueryKey = (options?: Options<CurrentUserData>) => createQueryKey('currentUser', options);
 
+/**
+ * Get the logged in user
+ */
 export const currentUserOptions = (options?: Options<CurrentUserData>) => {
     return queryOptions({
         queryFn: async ({ queryKey, signal }) => {
@@ -55,6 +58,9 @@ export const currentUserOptions = (options?: Options<CurrentUserData>) => {
 
 export const aUserQueryKey = (options: Options<AuserData>) => createQueryKey('aUser', options);
 
+/**
+ * Get a user.
+ */
 export const aUserOptions = (options: Options<AuserData>) => {
     return queryOptions({
         queryFn: async ({ queryKey, signal }) => {
@@ -70,6 +76,9 @@ export const aUserOptions = (options: Options<AuserData>) => {
     });
 };
 
+/**
+ * Edit a user.
+ */
 export const editUserMutation = (options?: Partial<Options<EditUserData>>): UseMutationOptions<EditUserResponse, EditUserError, Options<EditUserData>> => {
     const mutationOptions: UseMutationOptions<EditUserResponse, EditUserError, Options<EditUserData>> = {
         mutationFn: async (localOptions) => {
@@ -84,6 +93,10 @@ export const editUserMutation = (options?: Partial<Options<EditUserData>>): UseM
     return mutationOptions;
 };
 
+/**
+ * Delete a user.
+ * Deleting a user will _set null_ on the *player* if any.
+ */
 export const deleteUserMutation = (options?: Partial<Options<DeleteUserData>>): UseMutationOptions<DeleteUserResponse, DeleteUserError, Options<DeleteUserData>> => {
     const mutationOptions: UseMutationOptions<DeleteUserResponse, DeleteUserError, Options<DeleteUserData>> = {
         mutationFn: async (localOptions) => {
@@ -100,6 +113,9 @@ export const deleteUserMutation = (options?: Partial<Options<DeleteUserData>>): 
 
 export const createPlayerQueryKey = (options: Options<CreatePlayerData>) => createQueryKey('createPlayer', options);
 
+/**
+ * Create a new player
+ */
 export const createPlayerOptions = (options: Options<CreatePlayerData>) => {
     return queryOptions({
         queryFn: async ({ queryKey, signal }) => {
@@ -115,6 +131,9 @@ export const createPlayerOptions = (options: Options<CreatePlayerData>) => {
     });
 };
 
+/**
+ * Create a new player
+ */
 export const createPlayerMutation = (options?: Partial<Options<CreatePlayerData>>): UseMutationOptions<CreatePlayerResponse, CreatePlayerError, Options<CreatePlayerData>> => {
     const mutationOptions: UseMutationOptions<CreatePlayerResponse, CreatePlayerError, Options<CreatePlayerData>> = {
         mutationFn: async (localOptions) => {
@@ -131,6 +150,9 @@ export const createPlayerMutation = (options?: Partial<Options<CreatePlayerData>
 
 export const myPlayerQueryKey = (options?: Options<MyPlayerData>) => createQueryKey('myPlayer', options);
 
+/**
+ * Get a player of the logged in user
+ */
 export const myPlayerOptions = (options?: Options<MyPlayerData>) => {
     return queryOptions({
         queryFn: async ({ queryKey, signal }) => {
@@ -148,6 +170,9 @@ export const myPlayerOptions = (options?: Options<MyPlayerData>) => {
 
 export const getPlayersQueryKey = (options?: Options<GetPlayersData>) => createQueryKey('getPlayers', options);
 
+/**
+ * Get a list of players.
+ */
 export const getPlayersOptions = (options?: Options<GetPlayersData>) => {
     return queryOptions({
         queryFn: async ({ queryKey, signal }) => {
@@ -194,6 +219,9 @@ const createInfiniteParams = <K extends Pick<QueryKey<Options>[0], 'body' | 'hea
 
 export const getPlayersInfiniteQueryKey = (options?: Options<GetPlayersData>): QueryKey<Options<GetPlayersData>> => createQueryKey('getPlayers', options, true);
 
+/**
+ * Get a list of players.
+ */
 export const getPlayersInfiniteOptions = (options?: Options<GetPlayersData>) => {
     return infiniteQueryOptions<GetPlayersResponse, GetPlayersError, InfiniteData<GetPlayersResponse>, QueryKey<Options<GetPlayersData>>, number | Pick<QueryKey<Options<GetPlayersData>>[0], 'body' | 'headers' | 'path' | 'query'>>(
     // @ts-ignore
@@ -220,6 +248,9 @@ export const getPlayersInfiniteOptions = (options?: Options<GetPlayersData>) => 
 
 export const aPlayerQueryKey = (options: Options<APlayerData>) => createQueryKey('aPlayer', options);
 
+/**
+ * Get a player with their ID
+ */
 export const aPlayerOptions = (options: Options<APlayerData>) => {
     return queryOptions({
         queryFn: async ({ queryKey, signal }) => {
@@ -235,6 +266,14 @@ export const aPlayerOptions = (options: Options<APlayerData>) => {
     });
 };
 
+/**
+ * Edit a player details.
+ * If an application is sent, it should have a valid number for the application you want to edit.
+ *
+ * To check an application number, first get a player info using the **'/players/{player_id}'** request.
+ *
+ * Else the application will be disregarded, valid numbers are 1-5.
+ */
 export const editPlayerMutation = (options?: Partial<Options<EditPlayerData>>): UseMutationOptions<EditPlayerResponse, EditPlayerError, Options<EditPlayerData>> => {
     const mutationOptions: UseMutationOptions<EditPlayerResponse, EditPlayerError, Options<EditPlayerData>> = {
         mutationFn: async (localOptions) => {
@@ -249,6 +288,9 @@ export const editPlayerMutation = (options?: Partial<Options<EditPlayerData>>): 
     return mutationOptions;
 };
 
+/**
+ * Delete a player
+ */
 export const deletePlayerMutation = (options?: Partial<Options<DeletePlayerData>>): UseMutationOptions<DeletePlayerResponse, DeletePlayerError, Options<DeletePlayerData>> => {
     const mutationOptions: UseMutationOptions<DeletePlayerResponse, DeletePlayerError, Options<DeletePlayerData>> = {
         mutationFn: async (localOptions) => {
@@ -265,6 +307,12 @@ export const deletePlayerMutation = (options?: Partial<Options<DeletePlayerData>
 
 export const upgradePlayerQueryKey = (options: Options<UpgradePlayerData>) => createQueryKey('upgradePlayer', options);
 
+/**
+ * Upgrade Player
+ * function for uprading the grade of a player.
+ *
+ * **points required.**
+ */
 export const upgradePlayerOptions = (options: Options<UpgradePlayerData>) => {
     return queryOptions({
         queryFn: async ({ queryKey, signal }) => {
@@ -280,6 +328,12 @@ export const upgradePlayerOptions = (options: Options<UpgradePlayerData>) => {
     });
 };
 
+/**
+ * Upgrade Player
+ * function for uprading the grade of a player.
+ *
+ * **points required.**
+ */
 export const upgradePlayerMutation = (options?: Partial<Options<UpgradePlayerData>>): UseMutationOptions<UpgradePlayerResponse, UpgradePlayerError, Options<UpgradePlayerData>> => {
     const mutationOptions: UseMutationOptions<UpgradePlayerResponse, UpgradePlayerError, Options<UpgradePlayerData>> = {
         mutationFn: async (localOptions) => {
@@ -296,6 +350,10 @@ export const upgradePlayerMutation = (options?: Partial<Options<UpgradePlayerDat
 
 export const createMatchQueryKey = (options: Options<CreateMatchData>) => createQueryKey('createMatch', options);
 
+/**
+ * Create Match
+ * path operation for automatically creating a match, requires a part query.
+ */
 export const createMatchOptions = (options: Options<CreateMatchData>) => {
     return queryOptions({
         queryFn: async ({ queryKey, signal }) => {
@@ -311,6 +369,10 @@ export const createMatchOptions = (options: Options<CreateMatchData>) => {
     });
 };
 
+/**
+ * Create Match
+ * path operation for automatically creating a match, requires a part query.
+ */
 export const createMatchMutation = (options?: Partial<Options<CreateMatchData>>): UseMutationOptions<CreateMatchResponse, CreateMatchError, Options<CreateMatchData>> => {
     const mutationOptions: UseMutationOptions<CreateMatchResponse, CreateMatchError, Options<CreateMatchData>> = {
         mutationFn: async (localOptions) => {
@@ -327,6 +389,10 @@ export const createMatchMutation = (options?: Partial<Options<CreateMatchData>>)
 
 export const getMatchesQueryKey = (options?: Options<GetMatchesData>) => createQueryKey('getMatches', options);
 
+/**
+ * Get Matches
+ * get all matches
+ */
 export const getMatchesOptions = (options?: Options<GetMatchesData>) => {
     return queryOptions({
         queryFn: async ({ queryKey, signal }) => {
@@ -344,6 +410,10 @@ export const getMatchesOptions = (options?: Options<GetMatchesData>) => {
 
 export const getMatchesInfiniteQueryKey = (options?: Options<GetMatchesData>): QueryKey<Options<GetMatchesData>> => createQueryKey('getMatches', options, true);
 
+/**
+ * Get Matches
+ * get all matches
+ */
 export const getMatchesInfiniteOptions = (options?: Options<GetMatchesData>) => {
     return infiniteQueryOptions<GetMatchesResponse, GetMatchesError, InfiniteData<GetMatchesResponse>, QueryKey<Options<GetMatchesData>>, number | Pick<QueryKey<Options<GetMatchesData>>[0], 'body' | 'headers' | 'path' | 'query'>>(
     // @ts-ignore
@@ -370,6 +440,10 @@ export const getMatchesInfiniteOptions = (options?: Options<GetMatchesData>) => 
 
 export const getLastestMatchQueryKey = (options?: Options<GetLastestMatchData>) => createQueryKey('getLastestMatch', options);
 
+/**
+ * Get Lastest Match
+ * get last created match
+ */
 export const getLastestMatchOptions = (options?: Options<GetLastestMatchData>) => {
     return queryOptions({
         queryFn: async ({ queryKey, signal }) => {
@@ -387,6 +461,13 @@ export const getLastestMatchOptions = (options?: Options<GetLastestMatchData>) =
 
 export const voteQueryKey = (options: Options<VoteData>) => createQueryKey('vote', options);
 
+/**
+ * Vote
+ * function for casting votes
+ *
+ * - a match id is required
+ * - if an invalid vote cursed application id or player id is submitted, they are ignored.
+ */
 export const voteOptions = (options: Options<VoteData>) => {
     return queryOptions({
         queryFn: async ({ queryKey, signal }) => {
@@ -402,6 +483,13 @@ export const voteOptions = (options: Options<VoteData>) => {
     });
 };
 
+/**
+ * Vote
+ * function for casting votes
+ *
+ * - a match id is required
+ * - if an invalid vote cursed application id or player id is submitted, they are ignored.
+ */
 export const voteMutation = (options?: Partial<Options<VoteData>>): UseMutationOptions<VoteResponse, VoteError, Options<VoteData>> => {
     const mutationOptions: UseMutationOptions<VoteResponse, VoteError, Options<VoteData>> = {
         mutationFn: async (localOptions) => {
@@ -416,6 +504,10 @@ export const voteMutation = (options?: Partial<Options<VoteData>>): UseMutationO
     return mutationOptions;
 };
 
+/**
+ * Delete Match
+ * Deletes a match from the database given its ID after verifying delete permissions.
+ */
 export const deleteMatchMutation = (options?: Partial<Options<DeleteMatchData>>): UseMutationOptions<unknown, DeleteMatchError, Options<DeleteMatchData>> => {
     const mutationOptions: UseMutationOptions<unknown, DeleteMatchError, Options<DeleteMatchData>> = {
         mutationFn: async (localOptions) => {
@@ -432,6 +524,14 @@ export const deleteMatchMutation = (options?: Partial<Options<DeleteMatchData>>)
 
 export const domainExpansionQueryKey = (options: Options<DomainExpansionData>) => createQueryKey('domainExpansion', options);
 
+/**
+ * Domain Expansion
+ * Activates the domain of a player in an ongoing match.
+ *
+ * Buffs the vote to x4 per vote.
+ *
+ * Weakend by simple domain
+ */
 export const domainExpansionOptions = (options: Options<DomainExpansionData>) => {
     return queryOptions({
         queryFn: async ({ queryKey, signal }) => {
@@ -447,6 +547,14 @@ export const domainExpansionOptions = (options: Options<DomainExpansionData>) =>
     });
 };
 
+/**
+ * Domain Expansion
+ * Activates the domain of a player in an ongoing match.
+ *
+ * Buffs the vote to x4 per vote.
+ *
+ * Weakend by simple domain
+ */
 export const domainExpansionMutation = (options?: Partial<Options<DomainExpansionData>>): UseMutationOptions<DomainExpansionResponse, DomainExpansionError, Options<DomainExpansionData>> => {
     const mutationOptions: UseMutationOptions<DomainExpansionResponse, DomainExpansionError, Options<DomainExpansionData>> = {
         mutationFn: async (localOptions) => {
@@ -463,6 +571,13 @@ export const domainExpansionMutation = (options?: Partial<Options<DomainExpansio
 
 export const simpleDomainQueryKey = (options: Options<SimpleDomainData>) => createQueryKey('simpleDomain', options);
 
+/**
+ * Simple Domain
+ * Activates the simple domain effect for a player during an ongoing match. The simple domain interaction
+ * modifies the opponent's capabilities based on their current domain status:
+ * - If the opponent's domain expansion is inactive, it halves the effect of their opponent's votes per action.
+ * - If the domain expansion is active, it weakens its effect.
+ */
 export const simpleDomainOptions = (options: Options<SimpleDomainData>) => {
     return queryOptions({
         queryFn: async ({ queryKey, signal }) => {
@@ -478,6 +593,13 @@ export const simpleDomainOptions = (options: Options<SimpleDomainData>) => {
     });
 };
 
+/**
+ * Simple Domain
+ * Activates the simple domain effect for a player during an ongoing match. The simple domain interaction
+ * modifies the opponent's capabilities based on their current domain status:
+ * - If the opponent's domain expansion is inactive, it halves the effect of their opponent's votes per action.
+ * - If the domain expansion is active, it weakens its effect.
+ */
 export const simpleDomainMutation = (options?: Partial<Options<SimpleDomainData>>): UseMutationOptions<SimpleDomainResponse, SimpleDomainError, Options<SimpleDomainData>> => {
     const mutationOptions: UseMutationOptions<SimpleDomainResponse, SimpleDomainError, Options<SimpleDomainData>> = {
         mutationFn: async (localOptions) => {
@@ -494,6 +616,10 @@ export const simpleDomainMutation = (options?: Partial<Options<SimpleDomainData>
 
 export const bindindVowQueryKey = (options: Options<BindindVowData>) => createQueryKey('bindindVow', options);
 
+/**
+ * Bindind Vow
+ * activates a binding vow
+ */
 export const bindindVowOptions = (options: Options<BindindVowData>) => {
     return queryOptions({
         queryFn: async ({ queryKey, signal }) => {
@@ -509,6 +635,10 @@ export const bindindVowOptions = (options: Options<BindindVowData>) => {
     });
 };
 
+/**
+ * Bindind Vow
+ * activates a binding vow
+ */
 export const bindindVowMutation = (options?: Partial<Options<BindindVowData>>): UseMutationOptions<BindindVowResponse, BindindVowError, Options<BindindVowData>> => {
     const mutationOptions: UseMutationOptions<BindindVowResponse, BindindVowError, Options<BindindVowData>> = {
         mutationFn: async (localOptions) => {
@@ -525,6 +655,10 @@ export const bindindVowMutation = (options?: Partial<Options<BindindVowData>>): 
 
 export const getColoniesQueryKey = (options?: Options<GetColoniesData>) => createQueryKey('getColonies', options);
 
+/**
+ * Get Colonies
+ * get all matches
+ */
 export const getColoniesOptions = (options?: Options<GetColoniesData>) => {
     return queryOptions({
         queryFn: async ({ queryKey, signal }) => {
@@ -542,6 +676,10 @@ export const getColoniesOptions = (options?: Options<GetColoniesData>) => {
 
 export const getColoniesInfiniteQueryKey = (options?: Options<GetColoniesData>): QueryKey<Options<GetColoniesData>> => createQueryKey('getColonies', options, true);
 
+/**
+ * Get Colonies
+ * get all matches
+ */
 export const getColoniesInfiniteOptions = (options?: Options<GetColoniesData>) => {
     return infiniteQueryOptions<GetColoniesResponse, GetColoniesError, InfiniteData<GetColoniesResponse>, QueryKey<Options<GetColoniesData>>, number | Pick<QueryKey<Options<GetColoniesData>>[0], 'body' | 'headers' | 'path' | 'query'>>(
     // @ts-ignore
@@ -568,6 +706,10 @@ export const getColoniesInfiniteOptions = (options?: Options<GetColoniesData>) =
 
 export const createAdminQueryKey = (options: Options<CreateAdminData>) => createQueryKey('createAdmin', options);
 
+/**
+ * Create Admin
+ * Creates an admin user with specified permissions.
+ */
 export const createAdminOptions = (options: Options<CreateAdminData>) => {
     return queryOptions({
         queryFn: async ({ queryKey, signal }) => {
@@ -583,6 +725,10 @@ export const createAdminOptions = (options: Options<CreateAdminData>) => {
     });
 };
 
+/**
+ * Create Admin
+ * Creates an admin user with specified permissions.
+ */
 export const createAdminMutation = (options?: Partial<Options<CreateAdminData>>): UseMutationOptions<CreateAdminResponse, CreateAdminError, Options<CreateAdminData>> => {
     const mutationOptions: UseMutationOptions<CreateAdminResponse, CreateAdminError, Options<CreateAdminData>> = {
         mutationFn: async (localOptions) => {
@@ -599,6 +745,10 @@ export const createAdminMutation = (options?: Partial<Options<CreateAdminData>>)
 
 export const newPermissionQueryKey = (options: Options<NewPermissionData>) => createQueryKey('newPermission', options);
 
+/**
+ * New Permission
+ * for creating new permissions; only doable by a superuser
+ */
 export const newPermissionOptions = (options: Options<NewPermissionData>) => {
     return queryOptions({
         queryFn: async ({ queryKey, signal }) => {
@@ -614,6 +764,10 @@ export const newPermissionOptions = (options: Options<NewPermissionData>) => {
     });
 };
 
+/**
+ * New Permission
+ * for creating new permissions; only doable by a superuser
+ */
 export const newPermissionMutation = (options?: Partial<Options<NewPermissionData>>): UseMutationOptions<NewPermissionResponse, NewPermissionError, Options<NewPermissionData>> => {
     const mutationOptions: UseMutationOptions<NewPermissionResponse, NewPermissionError, Options<NewPermissionData>> = {
         mutationFn: async (localOptions) => {
@@ -628,6 +782,9 @@ export const newPermissionMutation = (options?: Partial<Options<NewPermissionDat
     return mutationOptions;
 };
 
+/**
+ * Grant Permission
+ */
 export const grantPermissionMutation = (options?: Partial<Options<GrantPermissionData>>): UseMutationOptions<GrantPermissionResponse, GrantPermissionError, Options<GrantPermissionData>> => {
     const mutationOptions: UseMutationOptions<GrantPermissionResponse, GrantPermissionError, Options<GrantPermissionData>> = {
         mutationFn: async (localOptions) => {
@@ -642,6 +799,10 @@ export const grantPermissionMutation = (options?: Partial<Options<GrantPermissio
     return mutationOptions;
 };
 
+/**
+ * Remove Permission
+ * remove permission(s) of an admin. A superuser is required
+ */
 export const removePermissionMutation = (options?: Partial<Options<RemovePermissionData>>): UseMutationOptions<RemovePermissionResponse, RemovePermissionError, Options<RemovePermissionData>> => {
     const mutationOptions: UseMutationOptions<RemovePermissionResponse, RemovePermissionError, Options<RemovePermissionData>> = {
         mutationFn: async (localOptions) => {
@@ -658,6 +819,9 @@ export const removePermissionMutation = (options?: Partial<Options<RemovePermiss
 
 export const demoSuperuserQueryKey = (options: Options<DemoSuperuserData>) => createQueryKey('demoSuperuser', options);
 
+/**
+ * Demo Superuser
+ */
 export const demoSuperuserOptions = (options: Options<DemoSuperuserData>) => {
     return queryOptions({
         queryFn: async ({ queryKey, signal }) => {
@@ -673,6 +837,9 @@ export const demoSuperuserOptions = (options: Options<DemoSuperuserData>) => {
     });
 };
 
+/**
+ * Demo Superuser
+ */
 export const demoSuperuserMutation = (options?: Partial<Options<DemoSuperuserData>>): UseMutationOptions<unknown, DemoSuperuserError, Options<DemoSuperuserData>> => {
     const mutationOptions: UseMutationOptions<unknown, DemoSuperuserError, Options<DemoSuperuserData>> = {
         mutationFn: async (localOptions) => {
@@ -689,6 +856,9 @@ export const demoSuperuserMutation = (options?: Partial<Options<DemoSuperuserDat
 
 export const createTokenQueryKey = (options: Options<CreateTokenData>) => createQueryKey('createToken', options);
 
+/**
+ * creates a login token
+ */
 export const createTokenOptions = (options: Options<CreateTokenData>) => {
     return queryOptions({
         queryFn: async ({ queryKey, signal }) => {
@@ -704,6 +874,9 @@ export const createTokenOptions = (options: Options<CreateTokenData>) => {
     });
 };
 
+/**
+ * creates a login token
+ */
 export const createTokenMutation = (options?: Partial<Options<CreateTokenData>>): UseMutationOptions<CreateTokenResponse, CreateTokenError, Options<CreateTokenData>> => {
     const mutationOptions: UseMutationOptions<CreateTokenResponse, CreateTokenError, Options<CreateTokenData>> = {
         mutationFn: async (localOptions) => {
@@ -720,6 +893,9 @@ export const createTokenMutation = (options?: Partial<Options<CreateTokenData>>)
 
 export const refreshTokenQueryKey = (options: Options<RefreshTokenData>) => createQueryKey('refreshToken', options);
 
+/**
+ * refreshes/updates a token
+ */
 export const refreshTokenOptions = (options: Options<RefreshTokenData>) => {
     return queryOptions({
         queryFn: async ({ queryKey, signal }) => {
@@ -735,6 +911,9 @@ export const refreshTokenOptions = (options: Options<RefreshTokenData>) => {
     });
 };
 
+/**
+ * refreshes/updates a token
+ */
 export const refreshTokenMutation = (options?: Partial<Options<RefreshTokenData>>): UseMutationOptions<RefreshTokenResponse, RefreshTokenError, Options<RefreshTokenData>> => {
     const mutationOptions: UseMutationOptions<RefreshTokenResponse, RefreshTokenError, Options<RefreshTokenData>> = {
         mutationFn: async (localOptions) => {
@@ -751,6 +930,14 @@ export const refreshTokenMutation = (options?: Partial<Options<RefreshTokenData>
 
 export const verifyTokenQueryKey = (options: Options<VerifyTokenData>) => createQueryKey('verifyToken', options);
 
+/**
+ * verifies a token
+ * Verifies the JWT in `token` and returns its decoded payload:
+ * - `sub`: the subject (usually user ID)
+ * - `exp`: expiration timestamp
+ * - `iat`: issued-at timestamp
+ * - `scopes`: optional list of permission scopes
+ */
 export const verifyTokenOptions = (options: Options<VerifyTokenData>) => {
     return queryOptions({
         queryFn: async ({ queryKey, signal }) => {
@@ -766,6 +953,14 @@ export const verifyTokenOptions = (options: Options<VerifyTokenData>) => {
     });
 };
 
+/**
+ * verifies a token
+ * Verifies the JWT in `token` and returns its decoded payload:
+ * - `sub`: the subject (usually user ID)
+ * - `exp`: expiration timestamp
+ * - `iat`: issued-at timestamp
+ * - `scopes`: optional list of permission scopes
+ */
 export const verifyTokenMutation = (options?: Partial<Options<VerifyTokenData>>): UseMutationOptions<VerifyTokenResponse, VerifyTokenError, Options<VerifyTokenData>> => {
     const mutationOptions: UseMutationOptions<VerifyTokenResponse, VerifyTokenError, Options<VerifyTokenData>> = {
         mutationFn: async (localOptions) => {
@@ -782,6 +977,9 @@ export const verifyTokenMutation = (options?: Partial<Options<VerifyTokenData>>)
 
 export const createUserQueryKey = (options: Options<CreateUserData>) => createQueryKey('createUser', options);
 
+/**
+ * Create a new User
+ */
 export const createUserOptions = (options: Options<CreateUserData>) => {
     return queryOptions({
         queryFn: async ({ queryKey, signal }) => {
@@ -797,6 +995,9 @@ export const createUserOptions = (options: Options<CreateUserData>) => {
     });
 };
 
+/**
+ * Create a new User
+ */
 export const createUserMutation = (options?: Partial<Options<CreateUserData>>): UseMutationOptions<CreateUserResponse, CreateUserError, Options<CreateUserData>> => {
     const mutationOptions: UseMutationOptions<CreateUserResponse, CreateUserError, Options<CreateUserData>> = {
         mutationFn: async (localOptions) => {
@@ -813,6 +1014,9 @@ export const createUserMutation = (options?: Partial<Options<CreateUserData>>): 
 
 export const chatHtmlQueryKey = (options?: Options<ChatHtmlData>) => createQueryKey('chatHtml', options);
 
+/**
+ * Chat Html
+ */
 export const chatHtmlOptions = (options?: Options<ChatHtmlData>) => {
     return queryOptions({
         queryFn: async ({ queryKey, signal }) => {

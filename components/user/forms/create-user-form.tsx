@@ -8,7 +8,6 @@ import { zCreateUser } from "@/api/client/zod.gen";
 
 import { COUNTRIES } from "@/lib/constants/COUNTRIES";
 import {
-    Alert,
     Box,
     Button,
     Card,
@@ -25,19 +24,18 @@ import {
     Stack,
     Text,
     TextInput,
-    Title,
+    Title
 } from "@mantine/core";
 
 import { z } from "zod";
 
 import Naluka from "@/fonts/NalukaFont";
 import {
-    IconAlertCircle,
     IconAt,
     IconFishOff,
     IconLocationPin,
     IconLockPassword,
-    IconUser,
+    IconUser
 } from "@tabler/icons-react";
 import { redirect, useRouter } from "next/navigation";
 
@@ -123,15 +121,7 @@ export function CreateUserForm() {
                     pt: 100,
                 }}
             />
-            {createUserError && (
-                <Alert
-                    title="An Error Occured"
-                    color="red"
-                    icon={<IconAlertCircle />}
-                >
-                    <DisplayAPIError error={createUserError} />
-                </Alert>
-            )}
+            {createUserError && <DisplayAPIError error={createUserError} />}
             <form onSubmit={form.onSubmit(handleSubmit)}>
                 <Stack>
                     <TextInput
@@ -239,7 +229,7 @@ function SignUpCard() {
                     Welcome to the Culling Games
                 </Title>
 
-                <ScrollAreaAutosize mah={450}>
+                <ScrollAreaAutosize mah={450} offsetScrollbars>
                     <Text fz={"sm"} ta={"justify"} c={"white"} lh={2} lts={2}>
                         {signupMessage}
                     </Text>

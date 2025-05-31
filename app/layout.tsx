@@ -3,6 +3,7 @@
 import "@mantine/charts/styles.css";
 import "@mantine/core/styles.css";
 import "@mantine/notifications/styles.css";
+import "@mantine/nprogress/styles.css";
 
 import {
     ColorSchemeScript,
@@ -14,15 +15,13 @@ import {
     rem,
 } from "@mantine/core";
 
+import { NavigationProgress } from "@mantine/nprogress";
+
 import { Notifications } from "@mantine/notifications";
 
-import TanstackProviders from "@/lib/query-client/providers";
+import { charcoalColor, deepRedColor, goldColor } from "@/lib/constants/themes";
 
-import {
-    charcoalColor,
-    deepRedColor,
-    goldColor,
-} from "@/lib/constants/themeColors";
+import TanstackProviders from "@/lib/query-client/providers";
 
 import Naluka from "@/fonts/NalukaFont";
 import Neuropol from "@/fonts/NeuropolFont";
@@ -71,6 +70,7 @@ export default function RootLayout({
             <body>
                 <TanstackProviders>
                     <MantineProvider theme={theme}>
+                        <NavigationProgress />
                         <Notifications />
                         <Container size={"lg"}>
                             <ModeToggle />

@@ -25,9 +25,9 @@ export function ModeToggle() {
             variant="subtle"
             radius={"xl"}
             size="md"
-            mb={"xs"}
             color="dark"
             aria-label="Toggle color scheme"
+            className={classes.iconPosition}
         >
             <IconSun className={cx(classes.icon, classes.light)} stroke={1.5} />
             <IconMoon className={cx(classes.icon, classes.dark)} stroke={1.5} />

@@ -1,5 +1,3 @@
-"use client";
-
 import {
     createTokenMutation,
     createUserMutation,
@@ -8,8 +6,10 @@ import {
 
 import { useMutation, useQuery } from "@tanstack/react-query";
 
+import { createSession } from "@/lib/auth/session";
+import { authHeader } from "@/lib/constants/AUTHCONSTANTS";
+import { queryClient } from "@/lib/query-client/get-query-client";
 import { notifications } from "@mantine/notifications";
-import { createSession } from "../auth/session";
 
 export const useCreateUser = () => {
     const mutation = useMutation({
@@ -20,6 +20,9 @@ export const useCreateUser = () => {
                 message: "An error occurred while creating your account.",
                 color: "red",
             });
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries();
         },
     });
 
@@ -42,6 +45,7 @@ export const useLoginUser = () => {
                 message: "login successful",
                 color: "green",
             });
+            queryClient.invalidateQueries();
         },
     });
 
@@ -51,10 +55,9 @@ export const useLoginUser = () => {
 export const useCurrentUser = (token: string) => {
     const query = useQuery({
         ...currentUserOptions({
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
+            headers: authHeader(token),
         }),
+        enabled: !!token, // run only if token is available
     });
 
     return query;

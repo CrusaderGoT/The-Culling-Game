@@ -508,7 +508,8 @@ export const zMatchInfo = z.object({
         z.null()
     ]),
     players: z.array(zBasePlayerInfo),
-    colony: zBaseColonyInfo
+    colony: zBaseColonyInfo,
+    votes: z.array(zBaseVoteInfo)
 });
 
 export const zPermissionInfo = z.object({

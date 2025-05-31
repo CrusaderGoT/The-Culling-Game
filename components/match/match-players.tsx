@@ -1,6 +1,9 @@
+import { PlayerInfo } from "@/api/client";
 import {
     Avatar,
     Badge,
+    Box,
+    Center,
     Flex,
     Group,
     Paper,
@@ -9,71 +12,69 @@ import {
     ThemeIcon,
 } from "@mantine/core";
 
-import {
-    IconArrowDown,
-    IconArrowUp,
-    IconAward,
-    IconChartArcs,
-    IconVs,
-} from "@tabler/icons-react";
+import { IconArrowUp, IconChartArcs, IconVs } from "@tabler/icons-react";
+import { Fragment } from "react";
 
-export function MatchPlayers() {
+type MatchPlayersProp = {
+    players: PlayerInfo[];
+};
+export function MatchPlayers({ players }: MatchPlayersProp) {
     return (
         <Flex
             justify="space-between"
             gap={"xs"}
             direction={{ base: "column", md: "row" }}
         >
-            <Paper flex={1} withBorder>
-                <Group justify="space-between" p={5}>
-                    <ThemeIcon color="grape" size={"xs"} radius={"lg"}>
-                        <IconAward size={14} />
-                    </ThemeIcon>
+            {players.map((player, index) => {
+                return (
+                    <Fragment key={index}>
+                        <Box flex={1}>
+                            <PlayerPaper player={player} />
+                        </Box>
 
-                    <Badge
-                        size="xs"
-                        leftSection={<IconChartArcs size={14} />}
-                        rightSection={<IconArrowDown size={14} />}
-                    >
-                        120
-                    </Badge>
-                </Group>
-
-                <Stack p={"xs"} align="center">
-                    <Avatar size={"lg"} name="Ethan" />
-                    <Text>Ethan</Text>
-                    <Badge>Grade 1</Badge>
-                </Stack>
-            </Paper>
-
-            <ThemeIcon
-                color="red"
-                size={"lg"}
-                variant="light"
-                radius="lg"
-                style={{
-                    alignSelf: "center",
-                }}
-            >
-                <IconVs size={18} />
-            </ThemeIcon>
-
-            <Paper flex={1}>
-                <Group justify="space-between" p={5}>
-                    <Badge
-                        size="xs"
-                        leftSection={<IconChartArcs size={14} />}
-                        rightSection={<IconArrowUp size={14} />}
-                    >
-                        120
-                    </Badge>
-                </Group>
-                <Stack p={"md"} align="center">
-                    <Avatar size={"lg"} name="Nahte" />
-                    <Text>Nahte</Text>
-                    <Badge>Grade 1</Badge>
-                </Stack>
-            </Paper>
+                        {index + 1 < players.length && (
+                            <Center
+                                // on small screens, give vertical margin; on md+, remove vertical margin
+                                my={{ base: "sm", md: 0 }}
+                                // on md+, give horizontal margin to push icon away from players
+                                mx={{ base: 0, md: "sm" }}
+                            >
+                                <ThemeIcon
+                                    color="red"
+                                    size="lg"
+                                    variant="light"
+                                    radius="lg"
+                                    // this ensures it centers itself along the main axis of the Flex
+                                    style={{ alignSelf: "center" }}
+                                >
+                                    <IconVs size={18} />
+                                </ThemeIcon>
+                            </Center>
+                        )}
+                    </Fragment>
+                );
+            })}
         </Flex>
+    );
+}
+
+function PlayerPaper({ player }: { player: PlayerInfo }) {
+    return (
+        <Paper withBorder p={"xs"}>
+            <Group justify="space-between" p={5}>
+                <Badge
+                    size="xs"
+                    leftSection={<IconChartArcs size={14} />}
+                    rightSection={<IconArrowUp size={14} />}
+                >
+                    {player.points}
+                </Badge>
+            </Group>
+            <Stack p={"md"} align="center">
+                <Avatar size={"lg"} name="Nahte" />
+                <Text>{player.name}</Text>
+                <Badge>Grade {player.grade}</Badge>
+            </Stack>
+        </Paper>
     );
 }
