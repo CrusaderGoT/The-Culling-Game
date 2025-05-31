@@ -14,7 +14,7 @@ export default async function ProtectedLayout({
 }) {
     return (
         <AuthProvider>
-            <Stack mt={"15px"}>
+            <Stack>
                 <Group justify="flex-end" align="center" gap={"xl"}>
                     <ActionIcon
                         variant="transparent"
