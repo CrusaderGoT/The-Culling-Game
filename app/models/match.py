@@ -12,6 +12,7 @@ from ..models.base import (
     BaseMatch,
     BaseMatchInfo,
     BasePlayerInfo,
+    BaseVoteInfo,
     MatchPlayerLink,
 )
 
@@ -54,6 +55,7 @@ class MatchInfo(BaseMatchInfo):
 
     players: list["BasePlayerInfo"]
     colony: "BaseColonyInfo"
+    votes: list["BaseVoteInfo"]
 
 
 """ 

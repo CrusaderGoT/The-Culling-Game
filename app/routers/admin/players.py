@@ -1,8 +1,7 @@
 from typing import Annotated
 
+from app.utils.player import edit_player_helper
 from fastapi import Body, HTTPException, status
-
-from backend.app.utils.player import edit_player_helper
 
 from ...auth.dependencies import admin_user
 from ...models.base import BasePermission, ModelName
@@ -18,7 +17,11 @@ from ...utils.admin import (
 )
 from ...utils.dependencies import session
 from ...utils.player import get_player
-from .admins import router
+from fastapi import APIRouter
+
+
+# Create your API routes here
+router = APIRouter()
 
 
 @router.patch(
@@ -43,7 +46,7 @@ def admin_edit_player(
     permission = check_if_admin_has_crud_permission(
         session=session,
         admin=admin,
-        model_name=ModelName.player, 
+        model_name=ModelName.player,
         permission_level=BasePermission.PermissionLevel.UPDATE,
     )
 
@@ -86,11 +89,9 @@ def admin_delete_player(player_id: int, session: session, admin: admin_user):
     permission = check_if_admin_has_crud_permission(
         session=session,
         admin=admin,
-        model_name=ModelName.player, 
+        model_name=ModelName.player,
         permission_level=BasePermission.PermissionLevel.UPDATE,
     )
 
     if not permission:
         raise ADMIN_UNAUTHORIZED_EXCEPTION(admin)
-
-
