@@ -61,7 +61,6 @@ export const useGetPlayer = (token: string, playerId: number) => {
             headers: authHeader(token),
             path: { player_id: playerId },
         }),
-        refetchOnWindowFocus: false, // to avoid unwanted refretch
         enabled: !!token, // run only if token is available
     });
 

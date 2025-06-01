@@ -13,6 +13,7 @@ function makeQueryClient() {
                 staleTime: 12 * 60 * 1000,
                 // Retry count set to 3 in development mode
                 retry: process.env.NODE_ENV === "development" ? 3 : false,
+                refetchOnWindowFocus: false, // to avoid unwanted refetch
             },
             dehydrate: {
                 // include pending queries in dehydration

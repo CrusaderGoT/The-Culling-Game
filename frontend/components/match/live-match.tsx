@@ -1,20 +1,32 @@
 "use client";
 
-import { Box, Center, Paper, Skeleton, Stack } from "@mantine/core";
+import {
+    Box,
+    Button,
+    Center,
+    Image as MantineImage,
+    Paper,
+    Skeleton,
+    Stack,
+} from "@mantine/core";
 
 import { MatchPlayers } from "@/components/match/match-players";
-import { MatchStatusHeader } from "@/components/match/match-status-header";
+import { MatchHeader } from "@/components/match/match-status-header";
 import { MatchVoteChart } from "@/components/match/match-vote-chart";
 import { VoteDrawer } from "@/components/vote/vote-drawer";
 
+import { DisplayAPIError } from "@/components/ui/display-api-error";
 import { useAuth } from "@/lib/auth/auth-provider";
 import { useLatestMatch } from "@/lib/hooks/match";
 import { useGetPlayers } from "@/lib/hooks/players";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useMemo } from "react";
-import { DisplayAPIError } from "../ui/display-api-error";
 
 export function LiveMatch() {
     const token = useAuth();
+
+    const router = useRouter();
 
     const {
         data: match,
@@ -48,7 +60,22 @@ export function LiveMatch() {
         return (
             <Stack>
                 <DisplayAPIError error={matchError} />
-                <Skeleton h={500} />
+
+                <MantineImage
+                    src="/images/errors/4xx_arcade.jpeg"
+                    fallbackSrc="/images/errors/4xx_arcade.svg"
+                    alt="No Match"
+                    component={Image}
+                    height={1024}
+                    width={1024}
+                    h={{ base: 512, md: 768, xl: 1024 }}
+                    w={{ base: 512, md: 768, xl: 1024 }}
+                    mx={"auto"}
+                />
+
+                <Button w={200} mx={"auto"} onClick={() => router.refresh()}>
+                    Refresh
+                </Button>
             </Stack>
         );
     }
@@ -57,14 +84,14 @@ export function LiveMatch() {
         <Stack my={"md"}>
             <Paper withBorder p={"md"}>
                 <Stack>
-                    <MatchStatusHeader match={match} />
+                    <MatchHeader match={match} />
 
                     {validPlayers ? (
                         <MatchPlayers players={validPlayers} />
                     ) : (
                         <Stack>
                             {Array.from({ length: 2 }).map((_, index) => (
-                                <Skeleton key={index} />
+                                <Skeleton key={index} h={200} />
                             ))}
                         </Stack>
                     )}

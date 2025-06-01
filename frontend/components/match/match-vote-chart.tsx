@@ -1,6 +1,7 @@
 import { BaseCtAppInfo, BaseVoteInfo, PlayerInfo } from "@/api/client";
 import { getColorFromId } from "@/lib/utils";
 import { BarChart } from "@mantine/charts";
+import { Box } from "@mantine/core";
 
 // Props
 type MatchVoteChartProps = {
@@ -68,7 +69,7 @@ export function MatchVoteChart({ players, votes }: MatchVoteChartProps) {
     });
 
     if (data.length === 0) {
-        return <div>No votes to display.</div>;
+        return <Box>No votes to display.</Box>;
     }
 
     return (

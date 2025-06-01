@@ -9,7 +9,7 @@ import { useEffect, useState } from "react";
 dayjs.extend(duration);
 dayjs.extend(relativeTime);
 
-export function MatchStatusHeader({ match }: MatchStatusHeaderProp) {
+export function MatchHeader({ match }: MatchStatusHeaderProp) {
     const [timeLeft, setTimeLeft] = useState<string>("");
     const [isEnded, setIsEnded] = useState<boolean>(false);
 
@@ -20,7 +20,7 @@ export function MatchStatusHeader({ match }: MatchStatusHeaderProp) {
 
             if (now.isAfter(endTime) || now.isSame(endTime)) {
                 setIsEnded(true);
-                setTimeLeft("Match Ended");
+                setTimeLeft(`ended ${endTime.fromNow()}`);
                 return;
             }
 
