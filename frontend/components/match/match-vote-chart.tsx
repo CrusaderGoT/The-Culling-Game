@@ -38,7 +38,7 @@ export function MatchVoteChart({ players, votes }: MatchVoteChartProps) {
         );
 
         playerVotes.forEach((vote) => {
-            const ctApp = ctAppMap.get(vote.ct_app_id);
+            const ctApp = ctAppMap.get(vote.ct_app_id as number);
             if (!ctApp) return;
 
             let ctAppName = ctApp.name;
@@ -56,7 +56,9 @@ export function MatchVoteChart({ players, votes }: MatchVoteChartProps) {
             if (!series.some((s) => s.name === ctAppName)) {
                 series.push({
                     name: ctAppName,
-                    color: getColorFromId(vote.ct_app_id + vote.point),
+                    color: getColorFromId(
+                        (vote.ct_app_id as number) + vote.point
+                    ),
                 });
             }
         });

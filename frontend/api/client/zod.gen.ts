@@ -319,8 +319,14 @@ export const zBaseMatchInfo = z.object({
 });
 
 export const zBaseVoteInfo = z.object({
-    player_id: z.number().int(),
-    ct_app_id: z.number().int(),
+    player_id: z.union([
+        z.number().int(),
+        z.null()
+    ]).optional(),
+    ct_app_id: z.union([
+        z.number().int(),
+        z.null()
+    ]).optional(),
     id: z.number().int(),
     user_id: z.number().int(),
     point: z.number(),
