@@ -356,12 +356,8 @@ class BaseBarrierTech(SQLModel):
 class BaseVote(SQLModel):
     """
     ### The base class for a vote
-    `player_id: = Field(
-        foreign_key="player.id", ondelete="RESTRICT", index=True
-    )`
-    `ct_app_id: = Field(
-        foreign_key="ctapp.id", ondelete="RESTRICT", index=True
-    )`
+    `player_id: = Field(foreign_key="player.id", ondelete="RESTRICT", index=True)`
+    `ct_app_id: = Field(foreign_key="ctapp.id", ondelete="RESTRICT", index=True)`
     """
 
     player_id: int = Field(foreign_key="player.id", ondelete="RESTRICT", index=True)
@@ -404,7 +400,10 @@ class BaseVoteInfo(BaseVote):
     """
 
     id: int
-    user_id: int = Field(description="the id of the user that casted their votes")
+    user_id: int | None = Field(
+        description="the id of the user that casted their votes"
+    )
+    "userid; optional for when a user is deleted"
     point: float = Field(description="the point a vote carries")
     has_been_added: bool = Field(
         default=False,

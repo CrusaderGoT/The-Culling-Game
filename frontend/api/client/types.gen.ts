@@ -208,13 +208,13 @@ export type BaseUserInfo = {
  * `point: float = Field(description="the point a vote carries")`
  */
 export type BaseVoteInfo = {
-    player_id?: number | null;
-    ct_app_id?: number | null;
+    player_id: number;
+    ct_app_id: number;
     id: number;
     /**
      * the id of the user that casted their votes
      */
-    user_id: number;
+    user_id: number | null;
     /**
      * the point a vote carries
      */
