@@ -319,57 +319,12 @@ export const zBaseMatchInfo = z.object({
 });
 
 export const zBaseVoteInfo = z.object({
-    player_id: z.union([
-        z.number().int(),
-        z.null()
-    ]).optional(),
-    ct_app_id: z.union([
-        z.number().int(),
-        z.null()
-    ]).optional(),
+    player_id: z.number().int(),
+    ct_app_id: z.number().int(),
     id: z.number().int(),
     user_id: z.number().int(),
     point: z.number(),
     has_been_added: z.boolean().optional().default(false)
-});
-
-export const zCreatePlayer = z.object({
-    name: z.string().min(2).max(50),
-    gender: zGender,
-    age: z.number().int().gte(10).lte(102),
-    role: z.union([
-        z.string().min(3).max(50),
-        z.null()
-    ]).optional()
-});
-
-export const zCreateCt = z.object({
-    name: z.string().min(3).max(100),
-    definition: z.string().min(50).max(500)
-});
-
-export const zBodyCreatePlayer = z.object({
-    player: zCreatePlayer,
-    cursed_technique: zCreateCt,
-    applications: z.unknown()
-});
-
-export const zBodyCreateToken = z.object({
-    grant_type: z.union([
-        z.string().regex(/password/),
-        z.null()
-    ]).optional(),
-    username: z.string(),
-    password: z.string(),
-    scope: z.string().optional().default(''),
-    client_id: z.union([
-        z.string(),
-        z.null()
-    ]).optional(),
-    client_secret: z.union([
-        z.string(),
-        z.null()
-    ]).optional()
 });
 
 export const zEditPlayer = z.object({
@@ -410,6 +365,60 @@ export const zEditCtApp = z.object({
     ]).optional(),
     application: z.union([
         z.string().min(100).max(500),
+        z.null()
+    ]).optional()
+});
+
+export const zBodyAdminEditPlayer = z.object({
+    player: z.union([
+        zEditPlayer,
+        z.null()
+    ]).optional(),
+    cursed_technique: z.union([
+        zEditCt,
+        z.null()
+    ]).optional(),
+    applications: z.union([
+        z.array(zEditCtApp).max(5),
+        z.null()
+    ]).optional()
+});
+
+export const zCreatePlayer = z.object({
+    name: z.string().min(2).max(50),
+    gender: zGender,
+    age: z.number().int().gte(10).lte(102),
+    role: z.union([
+        z.string().min(3).max(50),
+        z.null()
+    ]).optional()
+});
+
+export const zCreateCt = z.object({
+    name: z.string().min(3).max(100),
+    definition: z.string().min(50).max(500)
+});
+
+export const zBodyCreatePlayer = z.object({
+    player: zCreatePlayer,
+    cursed_technique: zCreateCt,
+    applications: z.unknown()
+});
+
+export const zBodyCreateToken = z.object({
+    grant_type: z.union([
+        z.string().regex(/password/),
+        z.null()
+    ]).optional(),
+    username: z.string(),
+    password: z.string(),
+    scope: z.string().optional().default(''),
+    client_id: z.union([
+        z.string(),
+        z.null()
+    ]).optional(),
+    client_secret: z.union([
+        z.string(),
         z.null()
     ]).optional()
 });
@@ -630,6 +639,14 @@ export const zSimpleDomainResponse = zBarrierTechInfo;
 export const zBindindVowResponse = zBarrierTechInfo;
 
 export const zGetColoniesResponse = z.array(zColonyInfo);
+
+export const zAdminEditUserResponse = zUserInfo;
+
+export const zAdminDeleteUserResponse = zUserInfo;
+
+export const zAdminEditPlayerResponse = zPlayerInfo;
+
+export const zAdminDeletePlayerResponse = zPlayerInfo;
 
 export const zCreateAdminResponse = zAdminInfo;
 

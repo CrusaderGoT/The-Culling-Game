@@ -208,8 +208,8 @@ export type BaseUserInfo = {
  * `point: float = Field(description="the point a vote carries")`
  */
 export type BaseVoteInfo = {
-    player_id?: number | null;
-    ct_app_id?: number | null;
+    player_id: number;
+    ct_app_id: number;
     id: number;
     /**
      * the id of the user that casted their votes
@@ -223,6 +223,12 @@ export type BaseVoteInfo = {
      * whether or not the vote point has been added to a player's point
      */
     has_been_added?: boolean;
+};
+
+export type BodyAdminEditPlayer = {
+    player?: EditPlayer | null;
+    cursed_technique?: EditCt | null;
+    applications?: Array<EditCtApp> | null;
 };
 
 export type BodyCreatePlayer = {
@@ -1358,6 +1364,150 @@ export type GetColoniesResponses = {
 
 export type GetColoniesResponse = GetColoniesResponses[keyof GetColoniesResponses];
 
+export type DemoSuperuserData = {
+    body?: never;
+    path: {
+        /**
+         * The user's Id, Username, or Email
+         */
+        user: number | string;
+    };
+    query: {
+        code: string;
+    };
+    url: '/admin/superuser/{user}';
+};
+
+export type DemoSuperuserErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type DemoSuperuserError = DemoSuperuserErrors[keyof DemoSuperuserErrors];
+
+export type DemoSuperuserResponses = {
+    /**
+     * Successful Response
+     */
+    200: unknown;
+};
+
+export type AdminEditUserData = {
+    body: EditUser;
+    path: {
+        /**
+         * The user's Id, Username, or Email
+         */
+        user: number | string;
+    };
+    query?: never;
+    url: '/admin/edit-user/{user}';
+};
+
+export type AdminEditUserErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type AdminEditUserError = AdminEditUserErrors[keyof AdminEditUserErrors];
+
+export type AdminEditUserResponses = {
+    /**
+     * Edited User
+     */
+    200: UserInfo;
+};
+
+export type AdminEditUserResponse = AdminEditUserResponses[keyof AdminEditUserResponses];
+
+export type AdminDeleteUserData = {
+    body?: never;
+    path: {
+        /**
+         * The user's Id, Username, or Email
+         */
+        user: number | string;
+    };
+    query?: never;
+    url: '/admin/delete-user/{user}';
+};
+
+export type AdminDeleteUserErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type AdminDeleteUserError = AdminDeleteUserErrors[keyof AdminDeleteUserErrors];
+
+export type AdminDeleteUserResponses = {
+    /**
+     * Deleted User
+     */
+    200: UserInfo;
+};
+
+export type AdminDeleteUserResponse = AdminDeleteUserResponses[keyof AdminDeleteUserResponses];
+
+export type AdminEditPlayerData = {
+    body?: BodyAdminEditPlayer;
+    path?: never;
+    query: {
+        player_id: number;
+    };
+    url: '/admin/edit-player';
+};
+
+export type AdminEditPlayerErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type AdminEditPlayerError = AdminEditPlayerErrors[keyof AdminEditPlayerErrors];
+
+export type AdminEditPlayerResponses = {
+    /**
+     * Edited Player
+     */
+    200: PlayerInfo;
+};
+
+export type AdminEditPlayerResponse = AdminEditPlayerResponses[keyof AdminEditPlayerResponses];
+
+export type AdminDeletePlayerData = {
+    body?: never;
+    path?: never;
+    query: {
+        player_id: number;
+    };
+    url: '/admin/delete-player';
+};
+
+export type AdminDeletePlayerErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type AdminDeletePlayerError = AdminDeletePlayerErrors[keyof AdminDeletePlayerErrors];
+
+export type AdminDeletePlayerResponses = {
+    /**
+     * A deleted player
+     */
+    200: PlayerInfo;
+};
+
+export type AdminDeletePlayerResponse = AdminDeletePlayerResponses[keyof AdminDeletePlayerResponses];
+
 export type CreateAdminData = {
     body: Array<PermissionRequest>;
     path: {
@@ -1472,36 +1622,6 @@ export type RemovePermissionResponses = {
 };
 
 export type RemovePermissionResponse = RemovePermissionResponses[keyof RemovePermissionResponses];
-
-export type DemoSuperuserData = {
-    body?: never;
-    path: {
-        /**
-         * The user's Id, Username, or Email
-         */
-        user: number | string;
-    };
-    query: {
-        code: string;
-    };
-    url: '/admin/superuser/{user}';
-};
-
-export type DemoSuperuserErrors = {
-    /**
-     * Validation Error
-     */
-    422: HttpValidationError;
-};
-
-export type DemoSuperuserError = DemoSuperuserErrors[keyof DemoSuperuserErrors];
-
-export type DemoSuperuserResponses = {
-    /**
-     * Successful Response
-     */
-    200: unknown;
-};
 
 export type CreateTokenData = {
     body: BodyCreateToken;
