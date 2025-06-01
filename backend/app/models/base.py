@@ -356,20 +356,12 @@ class BaseBarrierTech(SQLModel):
 class BaseVote(SQLModel):
     """
     ### The base class for a vote
-    `player_id: int | None = Field(
-        default=None, foreign_key="player.id", ondelete="RESTRICT", index=True
-    )`
-    `ct_app_id: int | None = Field(
-        default=None, foreign_key="ctapp.id", ondelete="RESTRICT", index=True
-    )`
+    `player_id: int = Field(foreign_key="player.id", ondelete="RESTRICT")`
+    `ct_app_id: int = Field(foreign_key="ctapp.id", ondelete="RESTRICT")`
     """
 
-    player_id: int | None = Field(
-        default=None, foreign_key="player.id", ondelete="RESTRICT", index=True
-    )
-    ct_app_id: int | None = Field(
-        default=None, foreign_key="ctapp.id", ondelete="RESTRICT", index=True
-    )
+    player_id: int = Field(foreign_key="player.id", ondelete="RESTRICT", index=True)
+    ct_app_id: int = Field(foreign_key="ctapp.id", ondelete="RESTRICT", index=True)
 
 
 class ActionTimePoint(SQLModel):
