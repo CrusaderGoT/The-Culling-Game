@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
 
 # the vote model
-class CastVote(BaseVote):
+class CastVote(SQLModel):
     "model for collecting data to cast a vote"
 
     player_id: int
