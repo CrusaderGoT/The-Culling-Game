@@ -1,5 +1,6 @@
 "use client";
 
+import globalClasses from "@/styles/global.module.css";
 import classes from "@/styles/mode-toggle.module.css";
 import {
     ActionIcon,
@@ -27,7 +28,11 @@ export function ModeToggle() {
             size="md"
             color="dark"
             aria-label="Toggle color scheme"
-            className={classes.iconPosition}
+            className={cx(
+                globalClasses.stickyTop,
+                globalClasses.highZ
+            )}
+            style={{ top: "10px" }}
         >
             <IconSun className={cx(classes.icon, classes.light)} stroke={1.5} />
             <IconMoon className={cx(classes.icon, classes.dark)} stroke={1.5} />

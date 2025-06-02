@@ -10,7 +10,6 @@ import {
     Container,
     DEFAULT_THEME,
     MantineProvider,
-    Stack,
     createTheme,
     mantineHtmlProps,
     rem,
@@ -73,7 +72,7 @@ export default function RootLayout({
                     <MantineProvider theme={theme}>
                         <NavigationProgress />
                         <Notifications />
-                        <Container size={"lg"} mt={15}>
+                        <Container size={"lg"} style={{ position: "relative" }}>
                             <ModeToggle />
                             {children}
                         </Container>

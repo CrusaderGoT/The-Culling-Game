@@ -10,9 +10,13 @@ import {
     getClientCookie,
 } from "@/lib/auth/session";
 import { tokenNames } from "@/lib/constants/AUTHCONSTANTS";
+import globalClasses from "@/styles/global.module.css";
+import { Alert, Center, Stack } from "@mantine/core";
 import { useMounted } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
+import { IconNetworkOff } from "@tabler/icons-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import cx from "clsx";
 import { redirect, usePathname } from "next/navigation";
 import {
     createContext,
@@ -34,6 +38,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const [tokenExpired, setTokenExpired] = useState(false);
     const mountedRef = useMounted();
     const refreshTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const [isOnline, setIsOnline] = useState(true);
+
+    useEffect(() => {
+        const checkOnlineStatus = async () => {
+            const online =
+                process.env.NODE_ENV !== "development"
+                    ? navigator.onLine
+                    : true;
+            setIsOnline(online);
+        };
+
+        const interval = setInterval(checkOnlineStatus, 5000); // Check every 5 seconds
+
+        return () => clearInterval(interval);
+    }, []);
 
     // Load both tokens in a single useEffect
     useEffect(() => {
@@ -75,8 +94,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         ...verifyTokenOptions({ body: { token: token } }),
         enabled: tokensLoaded,
         retry: (failureCount) => {
-            if (failureCount < 2 && !!token && mountedRef) return true;
-            return false;
+            return failureCount < 2 && !!token && mountedRef;
         },
     });
 
@@ -90,7 +108,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             if (!mountedRef) return;
 
             await deleteSession();
-            console.error("Refresh token error:", e);
+            console.error("Refresh token error:", JSON.stringify(e));
             notifications.show({
                 message: "Session Expired Log In To Continue",
                 color: "yellow",
@@ -109,6 +127,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             const expDate = new Date(expiresAt);
             setTokenExpiresIn(expDate);
             setTokenExpired(false); // Reset expired state
+        },
+        retry: (failureCount) => {
+            return failureCount < 2;
         },
     });
 
@@ -129,9 +150,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             clearTimeout(refreshTimeoutRef.current);
         }
 
-        if (!tokenExpiresIn || !mountedRef || refreshError) return;
+        if (!tokenExpiresIn || !mountedRef || refreshError || !isOnline) return;
 
-        const REFRESH_BUFFER_MS = 30000; // 30 seconds before expiration
+        const REFRESH_BUFFER_MS = 5000; // 30 seconds before expiration
         const now = Date.now();
         const timeUntilRefresh =
             tokenExpiresIn.getTime() - now - REFRESH_BUFFER_MS;
@@ -153,7 +174,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 clearTimeout(refreshTimeoutRef.current);
             }
         };
-    }, [tokenExpiresIn, mountedRef, refreshError]);
+    }, [tokenExpiresIn, mountedRef, refreshError, isOnline]);
 
     // Simplified refresh logic
     useEffect(() => {
@@ -204,7 +225,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     ]);
 
     return (
-        <AuthContext.Provider value={token}>{children}</AuthContext.Provider>
+        <AuthContext.Provider value={token}>
+            <Stack>
+                {!isOnline && (
+                    <Center
+                        className={cx(
+                            globalClasses.stickyTop,
+                            globalClasses.highZ
+                        )}
+                        style={{ top: 45 }}
+                    >
+                        <Alert
+                            title="You are Offline"
+                            icon={<IconNetworkOff />}
+                            color="red.9"
+                        />
+                    </Center>
+                )}
+
+                {children}
+            </Stack>
+        </AuthContext.Provider>
     );
 }
 
