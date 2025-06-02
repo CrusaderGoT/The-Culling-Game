@@ -1,5 +1,6 @@
 import { MatchInfo } from "@/api/client";
-import { Badge, Code, Group, Indicator } from "@mantine/core";
+import { Badge, Code, Group, Indicator, Text } from "@mantine/core";
+import { IconCrown } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -71,11 +72,25 @@ export function MatchHeader({ match }: MatchStatusHeaderProp) {
                     variant="light"
                     size="xs"
                     color={isEnded ? "red" : "teal"}
-                    rightSection={colony}
                 >
                     {isEnded ? "Ended" : "Live"}
                 </Badge>
             </Indicator>
+
+            <Text size="xs">Colony: {colony}</Text>
+
+            {match.winner ? (
+                <Badge
+                    variant="light"
+                    size="xs"
+                    color="indigo"
+                    leftSection={<IconCrown size={15} />}
+                >
+                    <Text size="xs" truncate="end" maw={50}>
+                        {match.winner.name}
+                    </Text>
+                </Badge>
+            ) : null}
 
             <Code color={isEnded ? "red" : undefined}>
                 {isEnded ? timeLeft : `ends in: ${timeLeft}`}

@@ -71,7 +71,7 @@ function PlayerPaper({ player }: { player: PlayerInfo }) {
                 </Badge>
             </Group>
             <Stack p={"md"} align="center">
-                <Avatar size={"lg"} name="Nahte" />
+                <Avatar size={"lg"} name={player.name} />
                 <Text>{player.name}</Text>
                 <Badge>Grade {player.grade}</Badge>
             </Stack>

@@ -1,7 +1,6 @@
 import { BaseCtAppInfo, BaseVoteInfo, PlayerInfo } from "@/api/client";
 import { getColorFromId } from "@/lib/utils";
 import { BarChart } from "@mantine/charts";
-import { Box } from "@mantine/core";
 
 // Props
 type MatchVoteChartProps = {
@@ -68,9 +67,37 @@ export function MatchVoteChart({ players, votes }: MatchVoteChartProps) {
         }
     });
 
-    if (data.length === 0) {
-        return <Box>No votes to display.</Box>;
-    }
+    // A helper function to truncate long strings
+    const truncateLabel = (label: string, maxLength: number = 10): string => {
+        return label.length > maxLength
+            ? `${label.slice(0, maxLength)}...`
+            : label;
+    };
+
+    // Custom Y-axis tick renderer using SVG <text>
+    const renderCustomYAxisTick = ({
+        x,
+        y,
+        payload,
+        index,
+    }: {
+        x?: number;
+        y?: number;
+        payload: { value: string };
+        index: number;
+    }) => {
+        return (
+            <text
+                x={x}
+                y={y}
+                fontSize="12"
+                textAnchor="end"
+                fill={getColorFromId(index)}
+            >
+                {truncateLabel(payload.value)}
+            </text>
+        );
+    };
 
     return (
         <BarChart
@@ -81,12 +108,20 @@ export function MatchVoteChart({ players, votes }: MatchVoteChartProps) {
             dataKey="player"
             series={series}
             withLegend
-            legendProps={{ verticalAlign: "bottom" }}
+            legendProps={{
+                verticalAlign: "bottom",
+                layout: "vertical",
+            }}
             tickLine="x"
             gridAxis="y"
             xAxisLabel="Vote Points"
             tooltipAnimationDuration={200}
             barChartProps={{ maxBarSize: 50 }}
+            yAxisProps={{
+                type: "category",
+                width: 120,
+                tick: renderCustomYAxisTick,
+            }}
         />
     );
 }

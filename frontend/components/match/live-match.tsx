@@ -1,13 +1,13 @@
 "use client";
 
 import {
-    Box,
     Button,
     Center,
+    Flex,
     Image as MantineImage,
     Paper,
     Skeleton,
-    Stack,
+    Stack
 } from "@mantine/core";
 
 import { MatchPlayers } from "@/components/match/match-players";
@@ -89,22 +89,21 @@ export function LiveMatch() {
                     {validPlayers ? (
                         <MatchPlayers players={validPlayers} />
                     ) : (
-                        <Stack>
+                        <Flex
+                            justify="space-between"
+                            gap={"xs"}
+                            direction={{ base: "column", md: "row" }}
+                        >
                             {Array.from({ length: 2 }).map((_, index) => (
                                 <Skeleton key={index} h={200} />
                             ))}
-                        </Stack>
+                        </Flex>
                     )}
                 </Stack>
             </Paper>
 
             {validPlayers && match.votes.length > 0 && (
-                <Box p={"md"}>
-                    <MatchVoteChart
-                        players={validPlayers}
-                        votes={match.votes}
-                    />
-                </Box>
+                <MatchVoteChart players={validPlayers} votes={match.votes} />
             )}
 
             {!playersIsPending && validPlayers && (
