@@ -1,28 +1,18 @@
 """settings for the api"""
 
-from contextlib import asynccontextmanager
+#from contextlib import asynccontextmanager
 from uuid import UUID
 
 import socketio
-import taskiq_fastapi
+#import taskiq_fastapi
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.routing import APIRoute
 from fastapi.staticfiles import StaticFiles
 from pydantic_settings import BaseSettings
-from taskiq_nats import NatsBroker
-
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    if not broker.is_worker_process:
-        await broker.startup()
-
-    yield
-
-    if not broker.is_worker_process:
-        await broker.shutdown()
+#from taskiq_nats import NatsBroker
+#from taskiq_nats.result_backend import NATSObjectStoreResultBackend
 
 
 class Settings(BaseSettings):
@@ -47,18 +37,56 @@ def custom_generate_unique_id(route: APIRoute):
 
 
 # Create Taskiq broker
-broker = NatsBroker("demo.nats.io")
+"""nats_url = "nats://localhost:4222"
+
+result_backend = NATSObjectStoreResultBackend(
+    servers=[nats_url],
+)
+
+broker = NatsBroker(
+    servers=[nats_url],
+).with_result_backend(
+    result_backend=result_backend,
+)
 
 taskiq_fastapi.init(broker, "app.api:main")
 
 
+@broker.task
+async def add_one(value: int) -> int:
+    return value + 1
+
+
+# lifespan event
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    if not broker.is_worker_process:
+        await broker.startup()
+
+        # Send the task to the broker.
+        task = await add_one.kiq(1)
+        # Wait for the result.
+        result = await task.wait_result(timeout=2)
+        print(f"Task execution took: {result.execution_time} seconds.")
+        if not result.is_err:
+            print(f"Returned value: {result.return_value}")
+        else:
+            print("Error found while executing task.")
+
+    yield
+
+    if not broker.is_worker_process:
+        await broker.shutdown()
+
+"""
+# initialize fastapi
 app = FastAPI(
     title="The Culling Games API",
     description="The API Docs for The Culling Games",
     generate_unique_id_function=custom_generate_unique_id,
     # docs_url=None,
     debug=settings.debug,
-    lifespan=lifespan,
+    #lifespan=lifespan,
 )
 """
 The Global FastAPI app. To allow for use in multiple files.\n
@@ -100,7 +128,7 @@ app.mount("/static", StaticFiles(directory="app/static"), name="static")
 # MIDDLEWARE
 
 allowed_hosts = [
-    "localhost",  # for developement
+    "localhost",  # for development
     "testserver",  # for testing
     "the-culling-games.up.railway.app",
     "the-culling-games.vercel.app",

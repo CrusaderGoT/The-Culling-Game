@@ -1,8 +1,7 @@
-from contextlib import asynccontextmanager
 from typing import Annotated
 from uuid import uuid4, uuid5
 
-from fastapi import Body, Depends, FastAPI, HTTPException, status
+from fastapi import Body, Depends, HTTPException, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.openapi.docs import (
     get_swagger_ui_html,

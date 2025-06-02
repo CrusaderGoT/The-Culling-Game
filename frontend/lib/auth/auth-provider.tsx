@@ -80,7 +80,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         },
     });
 
-    const { isPending: isRefreshing, mutate } = useMutation({
+    const {
+        isPending: isRefreshing,
+        mutate,
+        error: refreshError,
+    } = useMutation({
         ...refreshTokenMutation(),
         onError: async (e) => {
             if (!mountedRef) return;
@@ -96,19 +100,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         onSuccess: async (t) => {
             if (!mountedRef) return;
 
-            try {
-                await createSession(t);
-                setToken(t.access_token);
-                setRefreshToken(t.refresh_token);
+            await createSession(t);
+            setToken(t.access_token);
+            setRefreshToken(t.refresh_token);
 
-                // Handle expiration - t.expires_in is in milliseconds
-                const expiresAt = Date.now() + t.expires_in;
-                const expDate = new Date(expiresAt);
-                setTokenExpiresIn(expDate);
-                setTokenExpired(false); // Reset expired state
-            } catch (error) {
-                console.error("Error in token refresh success handler:", error);
-            }
+            // Handle expiration - t.expires_in is in milliseconds
+            const expiresAt = Date.now() + t.expires_in;
+            const expDate = new Date(expiresAt);
+            setTokenExpiresIn(expDate);
+            setTokenExpired(false); // Reset expired state
         },
     });
 
@@ -129,7 +129,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             clearTimeout(refreshTimeoutRef.current);
         }
 
-        if (!tokenExpiresIn || !mountedRef) return;
+        if (!tokenExpiresIn || !mountedRef || refreshError) return;
 
         const REFRESH_BUFFER_MS = 30000; // 30 seconds before expiration
         const now = Date.now();
@@ -153,7 +153,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 clearTimeout(refreshTimeoutRef.current);
             }
         };
-    }, [tokenExpiresIn, mountedRef]);
+    }, [tokenExpiresIn, mountedRef, refreshError]);
 
     // Simplified refresh logic
     useEffect(() => {
