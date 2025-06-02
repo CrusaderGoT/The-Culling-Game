@@ -1,14 +1,28 @@
 """settings for the api"""
 
+from contextlib import asynccontextmanager
 from uuid import UUID
 
 import socketio
+import taskiq_fastapi
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.routing import APIRoute
 from fastapi.staticfiles import StaticFiles
 from pydantic_settings import BaseSettings
+from taskiq_nats import NatsBroker
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    if not broker.is_worker_process:
+        await broker.startup()
+
+    yield
+
+    if not broker.is_worker_process:
+        await broker.shutdown()
 
 
 class Settings(BaseSettings):
@@ -32,6 +46,29 @@ def custom_generate_unique_id(route: APIRoute):
     return f"{route.name}"
 
 
+# Create Taskiq broker
+broker = NatsBroker("demo.nats.io")
+
+taskiq_fastapi.init(broker, "app.api:main")
+
+
+app = FastAPI(
+    title="The Culling Games API",
+    description="The API Docs for The Culling Games",
+    generate_unique_id_function=custom_generate_unique_id,
+    # docs_url=None,
+    debug=settings.debug,
+    lifespan=lifespan,
+)
+"""
+The Global FastAPI app. To allow for use in multiple files.\n
+* ### Everything needed for the initailization of the app instance, should be made in the same directory as where this app is instantiated. Eg. CORS, Middleware, etc.\n
+#### example:
+>>> from api.settings import app
+>>> @app.get('/')
+>>> # rest of your code
+"""
+
 # Create a Socket.IO server with asyncio
 sio = socketio.AsyncServer(
     async_mode="asgi",
@@ -47,23 +84,6 @@ and then use that helper in both `sio`,`router`or`app`.
 >>> @sio.on("my_event")
 >>> def my_event:
         _sub_helper()
-"""
-
-
-app = FastAPI(
-    title="The Culling Games API",
-    description="The API Docs for The Culling Games",
-    generate_unique_id_function=custom_generate_unique_id,
-    #docs_url=None,
-    debug=settings.debug,
-)
-"""
-The Global FastAPI app. To allow for use in multiple files.\n
-* ### Everything needed for the initailization of the app instance, should be made in the same directory as where this app is instantiated. Eg. CORS, Middleware, etc.\n
-#### example:
->>> from api.settings import app
->>> @app.get('/')
->>> # rest of your code
 """
 
 
