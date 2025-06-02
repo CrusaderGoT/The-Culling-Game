@@ -19,6 +19,7 @@ import {
     ReactNode,
     useContext,
     useEffect,
+    useRef,
     useState,
 } from "react";
 
@@ -30,7 +31,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const [refreshToken, setRefreshToken] = useState<string>("");
     const [tokensLoaded, setTokensLoaded] = useState(false);
     const [tokenExpiresIn, setTokenExpiresIn] = useState<Date>();
+    const [tokenExpired, setTokenExpired] = useState(false);
     const mountedRef = useMounted();
+    const refreshTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     // Load both tokens in a single useEffect
     useEffect(() => {
@@ -70,7 +73,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         data: tokenData,
     } = useQuery({
         ...verifyTokenOptions({ body: { token: token } }),
-        enabled: tokensLoaded, // Run as soon as tokens are loaded
+        enabled: tokensLoaded,
         retry: (failureCount) => {
             if (failureCount < 2 && !!token && mountedRef) return true;
             return false;
@@ -93,36 +96,72 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         onSuccess: async (t) => {
             if (!mountedRef) return;
 
-            await createSession(t);
-            setToken(t.access_token);
-            setRefreshToken(t.refresh_token);
-            // update token expires
-            const expiresAt = Date.now() + t.expires_in;
-            const expDate = new Date(expiresAt);
-            setTokenExpiresIn(expDate);
+            try {
+                await createSession(t);
+                setToken(t.access_token);
+                setRefreshToken(t.refresh_token);
+
+                // Handle expiration - t.expires_in is in milliseconds
+                const expiresAt = Date.now() + t.expires_in;
+                const expDate = new Date(expiresAt);
+                setTokenExpiresIn(expDate);
+                setTokenExpired(false); // Reset expired state
+            } catch (error) {
+                console.error("Error in token refresh success handler:", error);
+            }
         },
     });
 
-    // set token expires in after a successful verified token
+    // Set token expires after successful token verification
     useEffect(() => {
         if (tokenData) {
+            // tokenData.exp is a date time
             const expDate = new Date(tokenData.exp);
             setTokenExpiresIn(expDate);
+            setTokenExpired(false); // Reset expired state
         }
     }, [tokenData]);
 
-    // Refresh logic - handle both error states and missing token scenarios
+    // Timer-based expiration tracking
+    useEffect(() => {
+        // Clear existing timeout
+        if (refreshTimeoutRef.current) {
+            clearTimeout(refreshTimeoutRef.current);
+        }
+
+        if (!tokenExpiresIn || !mountedRef) return;
+
+        const REFRESH_BUFFER_MS = 30000; // 30 seconds before expiration
+        const now = Date.now();
+        const timeUntilRefresh =
+            tokenExpiresIn.getTime() - now - REFRESH_BUFFER_MS;
+
+        if (timeUntilRefresh <= 0) {
+            // Token is already expired or should be refreshed now
+            setTokenExpired(true);
+        } else {
+            // Set timer to mark token as expired at the right time
+            refreshTimeoutRef.current = setTimeout(() => {
+                if (mountedRef) {
+                    setTokenExpired(true);
+                }
+            }, timeUntilRefresh);
+        }
+
+        return () => {
+            if (refreshTimeoutRef.current) {
+                clearTimeout(refreshTimeoutRef.current);
+            }
+        };
+    }, [tokenExpiresIn, mountedRef]);
+
+    // Simplified refresh logic
     useEffect(() => {
         if (!tokensLoaded || isRefreshing || !mountedRef) return;
 
         // Scenario 1: Verify failed and we have refresh token
         // Scenario 2: No access token but we have refresh token (token removed from session)
         // Scenario 3: Token has expired
-        const REFRESH_BUFFER_MS = 30000; // 30 seconds
-        const tokenExpired =
-            (tokenExpiresIn &&
-                Date.now() >= tokenExpiresIn.getTime() - REFRESH_BUFFER_MS) ??
-            false;
         const shouldRefresh =
             refreshToken &&
             ((isError && !isLoading) || (!token && !isLoading) || tokenExpired);
@@ -141,12 +180,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         tokensLoaded,
         token,
         mountedRef,
-        tokenExpiresIn,
+        tokenExpired,
     ]);
 
-    // Redirect logic - improved to handle all no-auth scenarios
+    // Redirect logic
     useEffect(() => {
-        if (!tokensLoaded) return; // Wait for tokens to load
+        if (!tokensLoaded) return;
 
         const hasNoTokens = !token && !refreshToken;
         const hasFailedAuth = isError && !refreshToken && !isRefreshing;
