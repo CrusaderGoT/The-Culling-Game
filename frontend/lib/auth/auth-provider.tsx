@@ -41,17 +41,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const [isOnline, setIsOnline] = useState(true);
 
     useEffect(() => {
-        const checkOnlineStatus = async () => {
-            const online =
-                process.env.NODE_ENV !== "development"
-                    ? navigator.onLine
-                    : true;
-            setIsOnline(online);
+        if (typeof window === "undefined") return;
+
+        const handleOnline = () => setIsOnline(true);
+        const handleOffline = () => setIsOnline(false);
+
+        window.addEventListener("online", handleOnline);
+        window.addEventListener("offline", handleOffline);
+
+        // Initial check
+        setIsOnline(navigator.onLine ?? true);
+
+        return () => {
+            window.removeEventListener("online", handleOnline);
+            window.removeEventListener("offline", handleOffline);
         };
-
-        const interval = setInterval(checkOnlineStatus, 5000); // Check every 5 seconds
-
-        return () => clearInterval(interval);
     }, []);
 
     // Load both tokens in a single useEffect
@@ -152,7 +156,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         if (!tokenExpiresIn || !mountedRef || refreshError || !isOnline) return;
 
-        const REFRESH_BUFFER_MS = 5000; // 30 seconds before expiration
+        const REFRESH_BUFFER_MS = 5000; // 5 seconds before expiration
         const now = Date.now();
         const timeUntilRefresh =
             tokenExpiresIn.getTime() - now - REFRESH_BUFFER_MS;
