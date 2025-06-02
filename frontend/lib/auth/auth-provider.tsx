@@ -29,6 +29,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const [token, setToken] = useState<string>("");
     const [refreshToken, setRefreshToken] = useState<string>("");
     const [tokensLoaded, setTokensLoaded] = useState(false);
+    const [tokenExpiresIn, setTokenExpiresIn] = useState<Date>();
     const mountedRef = useMounted();
 
     // Load both tokens in a single useEffect
@@ -63,10 +64,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }, [mountedRef]);
 
     // Always run verify query when tokens are loaded (even with empty token)
-    const { isError, isLoading } = useQuery({
+    const {
+        isError,
+        isLoading,
+        data: tokenData,
+    } = useQuery({
         ...verifyTokenOptions({ body: { token: token } }),
         enabled: tokensLoaded, // Run as soon as tokens are loaded
-        refetchInterval: token ? 13 * 60 * 1000 : false, // Only auto-refresh if we have a token
         retry: (failureCount) => {
             if (failureCount < 2 && !!token && mountedRef) return true;
             return false;
@@ -92,8 +96,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             await createSession(t);
             setToken(t.access_token);
             setRefreshToken(t.refresh_token);
+            // update token expires
+            const expiresAt = Date.now() + t.expires_in;
+            const expDate = new Date(expiresAt);
+            setTokenExpiresIn(expDate);
         },
     });
+
+    // set token expires in after a successful verified token
+    useEffect(() => {
+        if (tokenData) {
+            const expDate = new Date(tokenData.exp);
+            setTokenExpiresIn(expDate);
+        }
+    }, [tokenData]);
 
     // Refresh logic - handle both error states and missing token scenarios
     useEffect(() => {
@@ -101,8 +117,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         // Scenario 1: Verify failed and we have refresh token
         // Scenario 2: No access token but we have refresh token (token removed from session)
+        // Scenario 3: Token has expired
+        const REFRESH_BUFFER_MS = 30000; // 30 seconds
+        const tokenExpired =
+            (tokenExpiresIn &&
+                Date.now() >= tokenExpiresIn.getTime() - REFRESH_BUFFER_MS) ??
+            false;
         const shouldRefresh =
-            refreshToken && ((isError && !isLoading) || (!token && !isLoading));
+            refreshToken &&
+            ((isError && !isLoading) || (!token && !isLoading) || tokenExpired);
 
         if (shouldRefresh) {
             mutate({
@@ -118,6 +141,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         tokensLoaded,
         token,
         mountedRef,
+        tokenExpiresIn,
     ]);
 
     // Redirect logic - improved to handle all no-auth scenarios
