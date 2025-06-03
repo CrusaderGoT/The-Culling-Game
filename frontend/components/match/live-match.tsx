@@ -7,7 +7,7 @@ import {
     Image as MantineImage,
     Paper,
     Skeleton,
-    Stack
+    Stack,
 } from "@mantine/core";
 
 import { MatchPlayers } from "@/components/match/match-players";
@@ -24,7 +24,7 @@ import { useRouter } from "next/navigation";
 import { useMemo } from "react";
 
 export function LiveMatch() {
-    const token = useAuth();
+    const { token } = useAuth();
 
     const router = useRouter();
 

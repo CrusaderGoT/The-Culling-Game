@@ -32,10 +32,10 @@ import { forwardRef } from "react";
 import { useAuth } from "@/lib/auth/auth-provider";
 import { deleteSession } from "@/lib/auth/session";
 import { useCurrentUser } from "@/lib/hooks/users";
+import { getColorFromId } from "@/lib/utils";
 import classes from "@/styles/user-menu.module.css";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { getColorFromId } from "@/lib/utils";
 
 interface UserButtonProps extends React.ComponentPropsWithoutRef<"button"> {
     user: UserInfo;
@@ -81,7 +81,7 @@ export function UserMenu() {
 
     const router = useRouter();
 
-    const token = useAuth();
+    const { token } = useAuth();
 
     const { data: user, isPending } = useCurrentUser(token);
 

@@ -29,7 +29,6 @@ export function ModeToggle() {
             color="dark"
             aria-label="Toggle color scheme"
             className={cx(globalClasses.stickyTop, globalClasses.highZ)}
-            style={{ top: 10 }}
         >
             <IconSun className={cx(classes.icon, classes.light)} stroke={1.5} />
             <IconMoon className={cx(classes.icon, classes.dark)} stroke={1.5} />

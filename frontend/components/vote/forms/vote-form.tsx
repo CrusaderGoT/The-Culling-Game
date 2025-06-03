@@ -32,7 +32,7 @@ export function VoteForm({ votes, matchId }: VoteFormType) {
         validate: zodResolver(voteSchema),
     });
 
-    const token = useAuth();
+    const { token } = useAuth();
 
     const { mutate, isPending, isError, error } = useCastVote(token);
 

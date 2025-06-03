@@ -1,14 +1,17 @@
 .stickyTop {
   position: sticky;
-  top: 0px;
-  z-index: 999;
-}
-
-.blur {
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px) brightness(50%);
+  top: 10px;
 }
 
 .highZ {
-  z-index: 9999;
+  z-index: 999999;
+}
+
+.offline {
+  position: fixed;
+  top: 70px;
+  left: 50%;
+  transform: translateX(-50%);
+  -webkit-backdrop-filter: blur(5px);
+  backdrop-filter: blur(5px);
 }

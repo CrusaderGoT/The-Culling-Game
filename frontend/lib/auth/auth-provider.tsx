@@ -10,24 +10,29 @@ import {
     getClientCookie,
 } from "@/lib/auth/session";
 import { tokenNames } from "@/lib/constants/AUTHCONSTANTS";
-import globalClasses from "@/styles/global.module.css";
-import { Alert, Center, Stack } from "@mantine/core";
 import { useMounted } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
-import { IconNetworkOff } from "@tabler/icons-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import cx from "clsx";
 import { redirect, usePathname } from "next/navigation";
 import {
     createContext,
     ReactNode,
     useContext,
     useEffect,
+    useMemo,
     useRef,
     useState,
 } from "react";
 
-export const AuthContext = createContext<string>("");
+type ContextProp = {
+    token: string;
+    isOnline: boolean;
+};
+
+export const AuthContext = createContext<ContextProp>({
+    token: "",
+    isOnline: false,
+});
 
 export function AuthProvider({ children }: { children: ReactNode }) {
     const path = usePathname() || "/match";
@@ -50,7 +55,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         window.addEventListener("offline", handleOffline);
 
         // Initial check
-        setIsOnline(navigator.onLine ?? true);
+        setIsOnline(navigator.onLine || true);
 
         return () => {
             window.removeEventListener("online", handleOnline);
@@ -96,7 +101,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         data: tokenData,
     } = useQuery({
         ...verifyTokenOptions({ body: { token: token } }),
-        enabled: tokensLoaded,
+        enabled: tokensLoaded && isOnline,
         retry: (failureCount) => {
             return failureCount < 2 && !!token && mountedRef;
         },
@@ -189,6 +194,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // Scenario 3: Token has expired
         const shouldRefresh =
             refreshToken &&
+            isOnline &&
             ((isError && !isLoading) || (!token && !isLoading) || tokenExpired);
 
         if (shouldRefresh) {
@@ -206,6 +212,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         token,
         mountedRef,
         tokenExpired,
+        isOnline,
     ]);
 
     // Redirect logic
@@ -228,28 +235,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         mountedRef,
     ]);
 
-    return (
-        <AuthContext.Provider value={token}>
-            <Stack>
-                {!isOnline && (
-                    <Center
-                        className={cx(
-                            globalClasses.stickyTop,
-                            globalClasses.highZ
-                        )}
-                        style={{ top: 45 }}
-                    >
-                        <Alert
-                            title="You are Offline"
-                            icon={<IconNetworkOff />}
-                            color="red.9"
-                        />
-                    </Center>
-                )}
+    const value = useMemo<ContextProp>(() => {
+        return {
+            token: token,
+            isOnline: isOnline,
+        };
+    }, [token, isOnline]);
 
-                {children}
-            </Stack>
-        </AuthContext.Provider>
+    return (
+        <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
     );
 }
 

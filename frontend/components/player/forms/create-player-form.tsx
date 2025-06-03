@@ -57,7 +57,7 @@ export function CreatePlayerForm() {
         application: "",
     }));
 
-    const token = useAuth();
+    const { token } = useAuth();
 
     const [active, setActive] = useState(0);
     const [highestStepVisited, setHighestStepVisited] = useState(active);

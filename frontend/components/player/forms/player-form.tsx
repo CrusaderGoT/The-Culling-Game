@@ -8,7 +8,7 @@ import { useCurrentPlayer } from "@/lib/hooks/players";
 import { Skeleton, Stack } from "@mantine/core";
 
 export function PlayerForm() {
-    const token = useAuth();
+    const { token } = useAuth();
     const player = useCurrentPlayer(token);
 
     // Show loading while token is being loaded or query is pending
