@@ -2,6 +2,7 @@ import {
     getLastestMatchOptions,
     voteMutation,
 } from "@/api/client/@tanstack/react-query.gen";
+import { getAPIErrorMessage } from "@/components/ui/display-api-error";
 import { authHeader } from "@/lib/constants/AUTHCONSTANTS";
 import { notifications } from "@mantine/notifications";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -22,9 +23,9 @@ export const useCastVote = (token: string) => {
         ...voteMutation({
             headers: authHeader(token),
         }),
-        onError() {
+        onError(e) {
             notifications.show({
-                message: "Error Casting Vote(s)",
+                message: `Error Casting Vote(s) -> ${getAPIErrorMessage(e)}`,
                 color: "red",
             });
         },

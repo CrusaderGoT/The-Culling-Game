@@ -68,7 +68,7 @@ export function MatchVoteChart({ players, votes }: MatchVoteChartProps) {
     });
 
     // A helper function to truncate long strings
-    const truncateLabel = (label: string, maxLength: number = 10): string => {
+    const truncateLabel = (label: string, maxLength: number = 6): string => {
         return label.length > maxLength
             ? `${label.slice(0, maxLength)}...`
             : label;
@@ -119,7 +119,6 @@ export function MatchVoteChart({ players, votes }: MatchVoteChartProps) {
             barChartProps={{ maxBarSize: 50 }}
             yAxisProps={{
                 type: "category",
-                width: 120,
                 tick: renderCustomYAxisTick,
             }}
         />

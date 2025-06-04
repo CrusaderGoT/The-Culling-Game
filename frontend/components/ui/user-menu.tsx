@@ -114,6 +114,20 @@ export function UserMenu() {
             </Menu.Target>
 
             <Menu.Dropdown>
+                <Box className={classes.menuAlt}>
+                    <Group justify="center" m={"xs"}>
+                        <Text size="xs">{user.username}</Text>
+                        {user?.player && (
+                            <Indicator
+                                size={7}
+                                color={getColorFromId(user.player.id)}
+                            />
+                        )}
+                    </Group>
+
+                    <Menu.Divider />
+                </Box>
+
                 <Menu.Item
                     leftSection={
                         <IconUserEdit
@@ -148,7 +162,7 @@ export function UserMenu() {
                 <Menu.Item
                     leftSection={<IconSettings size={16} stroke={1.5} />}
                 >
-                    Account settings
+                    Settings
                 </Menu.Item>
 
                 <Menu.Item

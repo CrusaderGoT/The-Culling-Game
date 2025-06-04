@@ -1,17 +1,24 @@
-.stickyTop {
-  position: sticky;
+.fixedTop {
+  position: fixed;
   top: 10px;
 }
 
 .highZ {
-  z-index: 999999;
+  z-index: 666;
 }
 
 .offline {
   position: fixed;
-  top: 70px;
+  top: 100px;
   left: 50%;
   transform: translateX(-50%);
-  -webkit-backdrop-filter: blur(5px);
-  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  z-index: 555;
+}
+
+.matchHeader {
+  position: sticky;
+  top: 75px;
+  z-index: 111;
 }

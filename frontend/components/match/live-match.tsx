@@ -3,7 +3,6 @@
 import {
     Button,
     Center,
-    Flex,
     Image as MantineImage,
     Paper,
     Skeleton,
@@ -19,6 +18,9 @@ import { DisplayAPIError } from "@/components/ui/display-api-error";
 import { useAuth } from "@/lib/auth/auth-provider";
 import { useLatestMatch } from "@/lib/hooks/match";
 import { useGetPlayers } from "@/lib/hooks/players";
+import globalClasses from "@/styles/global.module.css";
+import clsx from "clsx";
+import dayjs from "dayjs";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
@@ -52,8 +54,8 @@ export function LiveMatch() {
         }
     }, [players, playersIsFetched]);
 
-    if (matchIsPending || (!validPlayers && playerIds.length > 0)) {
-        return <Skeleton h={500} />;
+    if (matchIsPending || !validPlayers) {
+        return <Skeleton h={"90vh"} my={"sm"} />;
     }
 
     if (matchError) {
@@ -80,33 +82,37 @@ export function LiveMatch() {
         );
     }
 
+    const now = dayjs();
+    const endTime = dayjs(match.end);
+    const ended = now.isAfter(endTime) || now.isSame(endTime);
+
     return (
         <Stack my={"md"}>
-            <Paper withBorder p={"md"}>
-                <Stack>
+            <Stack>
+                <Paper
+                    withBorder
+                    p={"xs"}
+                    style={{
+                        backgroundColor: "Background",
+                    }}
+                    radius={"md"}
+                    className={clsx(globalClasses.matchHeader)}
+                >
                     <MatchHeader match={match} />
+                </Paper>
 
-                    {validPlayers ? (
-                        <MatchPlayers players={validPlayers} />
-                    ) : (
-                        <Flex
-                            justify="space-between"
-                            gap={"xs"}
-                            direction={{ base: "column", md: "row" }}
-                        >
-                            {Array.from({ length: 2 }).map((_, index) => (
-                                <Skeleton key={index} h={200} />
-                            ))}
-                        </Flex>
-                    )}
-                </Stack>
-            </Paper>
+                <MatchPlayers
+                    players={validPlayers}
+                    match={match}
+                    ended={ended}
+                />
+            </Stack>
 
-            {validPlayers && match.votes.length > 0 && (
+            {match.votes.length > 0 && (
                 <MatchVoteChart players={validPlayers} votes={match.votes} />
             )}
 
-            {!playersIsPending && validPlayers && (
+            {!playersIsPending && !ended && (
                 <Center>
                     <VoteDrawer
                         players={validPlayers}

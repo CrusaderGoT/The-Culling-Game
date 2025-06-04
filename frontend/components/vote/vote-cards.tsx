@@ -12,7 +12,7 @@ import {
 import { Dispatch, SetStateAction } from "react";
 
 import voteClasses from "@/styles/vote-card.module.css";
-import cx from "clsx";
+import clsx from "clsx";
 
 type VoteCardProp = {
     player: PlayerInfo;
@@ -38,7 +38,7 @@ export function VoteCards({ player, value, setValue, color }: VoteCardProp) {
                 radius="md"
                 checked={isChecked}
                 value={cardValue}
-                className={cx(voteClasses.voteCard)}
+                className={clsx(voteClasses.voteCard)}
                 styles={() => ({
                     card: {
                         backgroundColor: isChecked
