@@ -409,3 +409,30 @@ class BaseVoteInfo(BaseVote):
         default=False,
         description="whether or not the vote point has been added to a player's point",
     )
+
+
+class BaseBarrierRecord(SQLModel):
+    """
+    base class for barrier records\n
+    ```
+    domain_counter: int = Field(
+        default=0, description="the number of times a domain is activated"
+    )
+    simple_domain_counter: int = Field(
+        default=0, description="the number of times a simple domain is activated"
+    )
+    binding_vow_counter: int = Field(
+        default=0, description="the number of times a binding vow is activated"
+    )
+    ```
+    """
+
+    domain_counter: int = Field(
+        default=0, description="the number of times a domain is activated"
+    )
+    simple_domain_counter: int = Field(
+        default=0, description="the number of times a simple domain is activated"
+    )
+    binding_vow_counter: int = Field(
+        default=0, description="the number of times a binding vow is activated"
+    )

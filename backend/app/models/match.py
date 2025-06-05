@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 
 from sqlmodel import Field, Relationship
 
-from ..models.barrier import BarrierRecord
+from ..models.barrier import BarrierRecord, BarrierRecordInfo
 from ..models.base import (
     BaseColonyInfo,
     BaseMatch,
@@ -56,6 +56,7 @@ class MatchInfo(BaseMatchInfo):
     players: list["BasePlayerInfo"]
     colony: "BaseColonyInfo"
     votes: list["BaseVoteInfo"]
+    barrier_records: list["BarrierRecordInfo"]
 
 
 """ 

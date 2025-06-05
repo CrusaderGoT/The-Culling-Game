@@ -44,24 +44,32 @@ export function LiveMatch() {
         isPending: playersIsPending,
         error: playersError,
         refetchFailed,
-        isFetched: playersIsFetched,
     } = useGetPlayers(token, playerIds);
 
     const validPlayers = useMemo(() => {
-        if (players && playersIsFetched) {
-            const vp = players.filter((player) => player !== undefined);
-            return vp;
-        }
-    }, [players, playersIsFetched]);
+        return players?.filter((player) => player !== undefined) || [];
+    }, [players]);
 
-    if (matchIsPending || !validPlayers) {
+    if (matchIsPending || playersIsPending) {
         return <Skeleton h={"90vh"} my={"sm"} />;
     }
 
-    if (matchError) {
+    if (matchError || playersError) {
         return (
             <Stack>
-                <DisplayAPIError error={matchError} />
+                <DisplayAPIError
+                    error={
+                        matchError
+                            ? matchError
+                            : new Error(
+                                  "An error occured while loading match players"
+                              )
+                    }
+                />
+
+                <Button w={200} mx={"auto"} onClick={() => router.refresh()}>
+                    Refresh
+                </Button>
 
                 <MantineImage
                     src="/images/errors/4xx_arcade.jpeg"
@@ -74,10 +82,6 @@ export function LiveMatch() {
                     w={{ base: 512, md: 768, xl: 1024 }}
                     mx={"auto"}
                 />
-
-                <Button w={200} mx={"auto"} onClick={() => router.refresh()}>
-                    Refresh
-                </Button>
             </Stack>
         );
     }

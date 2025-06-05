@@ -1,6 +1,7 @@
 import { BaseCtAppInfo, BaseVoteInfo, PlayerInfo } from "@/api/client";
 import { getColorFromId } from "@/lib/utils";
 import { BarChart } from "@mantine/charts";
+import { Tooltip } from "@mantine/core";
 
 // Props
 type MatchVoteChartProps = {
@@ -87,15 +88,17 @@ export function MatchVoteChart({ players, votes }: MatchVoteChartProps) {
         index: number;
     }) => {
         return (
-            <text
-                x={x}
-                y={y}
-                fontSize="12"
-                textAnchor="end"
-                fill={getColorFromId(index)}
-            >
-                {truncateLabel(payload.value)}
-            </text>
+            <Tooltip label={payload.value}>
+                <text
+                    x={x}
+                    y={y}
+                    fontSize="12"
+                    textAnchor="end"
+                    fill={getColorFromId(index)}
+                >
+                    {truncateLabel(payload.value)}
+                </text>
+            </Tooltip>
         );
     };
 

@@ -10,11 +10,30 @@ export type AdminInfo = {
     user: BaseUserInfo;
 };
 
+export type BarrierRecordInfo = {
+    /**
+     * the number of times a domain is activated
+     */
+    domain_counter?: number;
+    /**
+     * the number of times a simple domain is activated
+     */
+    simple_domain_counter?: number;
+    /**
+     * the number of times a binding vow is activated
+     */
+    binding_vow_counter?: number;
+    id: number;
+    barrier_tech_id: number;
+    match_id: number;
+};
+
 /**
  * Represents barrier technique information for client-side.
  *
  * Attributes:
  * id (int): Unique identifier for the barrier technique.
+ * player_id: int
  * domain_expansion: bool = Field(default=False, description="the player's domain expansion")
  * binding_vow: bool = Field(default=False, description="the player's binding vow")
  * simple_domain: bool = Field(default=False, description="the player's simple domain")
@@ -49,6 +68,7 @@ export type BarrierTechInfo = {
      */
     sd_end_time?: string | null;
     id: number;
+    player_id: number;
 };
 
 /**
@@ -673,6 +693,7 @@ export type MatchInfo = {
     players: Array<BasePlayerInfo>;
     colony: BaseColonyInfo;
     votes: Array<BaseVoteInfo>;
+    barrier_records: Array<BarrierRecordInfo>;
 };
 
 /**

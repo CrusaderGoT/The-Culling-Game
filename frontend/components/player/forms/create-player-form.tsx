@@ -126,44 +126,40 @@ export function CreatePlayerForm() {
         isPending: createPlayerIsPending,
         mutateAsync: createPlayerMutate,
         error: createPlayerError,
+        reset: createPlayerReset,
     } = useCreatePlayer(token);
 
     async function handleSubmit(data: CreatePlayerSchemaType) {
-        try {
-            if (!user) {
-                notifications.show({
-                    message:
-                        "User information not available. Please refresh and try again.",
-                    color: "red",
-                });
-                return;
-            }
-
-            const newPlayer = await createPlayerMutate({
-                // @ts-ignore: applications are always 5
-                body: data,
-                path: { user: user.id },
+        if (!user) {
+            notifications.show({
+                message:
+                    "User information not available. Please refresh and try again.",
+                color: "red",
             });
+            return;
+        }
 
-            if (newPlayer) {
-                notifications.show({
-                    message: "Player created successfully!",
-                    color: "green",
-                });
-                redirect("/player");
-            }
-        } catch (error) {
-            console.error("Error creating player:", error);
+        const newPlayer = await createPlayerMutate({
+            // @ts-ignore: applications are always 5
+            body: data,
+            path: { user: user.id },
+        });
+
+        if (!newPlayer) {
             notifications.show({
                 message: "Failed to create player. Please try again.",
                 color: "red",
             });
+            createPlayerReset();
+            return;
+        } else {
+            redirect("/player");
         }
     }
 
     // Loading state
     if (userIsLoading) {
-        return <Skeleton width="100%" height={400} mx="auto" />;
+        return <Skeleton width="100%" height={400} mx="auto" my={"sm"} />;
     }
 
     // Error state

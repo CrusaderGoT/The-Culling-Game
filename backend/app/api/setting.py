@@ -1,18 +1,20 @@
 """settings for the api"""
 
-#from contextlib import asynccontextmanager
+# from contextlib import asynccontextmanager
 from uuid import UUID
 
 import socketio
-#import taskiq_fastapi
+
+# import taskiq_fastapi
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.routing import APIRoute
 from fastapi.staticfiles import StaticFiles
 from pydantic_settings import BaseSettings
-#from taskiq_nats import NatsBroker
-#from taskiq_nats.result_backend import NATSObjectStoreResultBackend
+
+# from taskiq_nats import NatsBroker
+# from taskiq_nats.result_backend import NATSObjectStoreResultBackend
 
 
 class Settings(BaseSettings):
@@ -79,6 +81,8 @@ async def lifespan(app: FastAPI):
         await broker.shutdown()
 
 """
+
+
 # initialize fastapi
 app = FastAPI(
     title="The Culling Games API",
@@ -86,7 +90,7 @@ app = FastAPI(
     generate_unique_id_function=custom_generate_unique_id,
     # docs_url=None,
     debug=settings.debug,
-    #lifespan=lifespan,
+    # lifespan=lifespan,
 )
 """
 The Global FastAPI app. To allow for use in multiple files.\n

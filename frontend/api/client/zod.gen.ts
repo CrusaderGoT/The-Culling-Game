@@ -242,6 +242,15 @@ export const zAdminInfo = z.object({
     user: zBaseUserInfo
 });
 
+export const zBarrierRecordInfo = z.object({
+    domain_counter: z.number().int().optional().default(0),
+    simple_domain_counter: z.number().int().optional().default(0),
+    binding_vow_counter: z.number().int().optional().default(0),
+    id: z.number().int(),
+    barrier_tech_id: z.number().int(),
+    match_id: z.number().int()
+});
+
 export const zBarrierTechInfo = z.object({
     domain_expansion: z.boolean().optional().default(false),
     binding_vow: z.boolean().optional().default(false),
@@ -258,7 +267,8 @@ export const zBarrierTechInfo = z.object({
         z.string().datetime(),
         z.null()
     ]).optional(),
-    id: z.number().int()
+    id: z.number().int(),
+    player_id: z.number().int()
 });
 
 export const zBaseAdminInfo = z.object({
@@ -521,7 +531,8 @@ export const zMatchInfo = z.object({
     ]),
     players: z.array(zBasePlayerInfo),
     colony: zBaseColonyInfo,
-    votes: z.array(zBaseVoteInfo)
+    votes: z.array(zBaseVoteInfo),
+    barrier_records: z.array(zBarrierRecordInfo)
 });
 
 export const zPermissionInfo = z.object({

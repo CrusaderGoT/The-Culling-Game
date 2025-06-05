@@ -13,14 +13,14 @@ export function PlayerForm() {
 
     // Show loading while token is being loaded or query is pending
     if (!token || player.isPending) {
-        return <Skeleton width={"100%"} height={400} mx={"auto"} />;
+        return <Skeleton width="100%" height={400} mx="auto" my={"sm"} />;
     }
 
     // Handle query errors
     if (player.isError) {
         return (
             <Stack>
-                <DisplayAPIError error={player.error} color="gold" title="" />
+                <DisplayAPIError error={player.error} color="gold" />
                 <CreatePlayerForm />
             </Stack>
         );
