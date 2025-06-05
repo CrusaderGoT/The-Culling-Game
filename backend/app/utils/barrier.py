@@ -36,7 +36,7 @@ def conditions_for_barrier_tech(
     if player is not None:
         if match is not None:
             if player.user_id != current_user.id:
-                msg = "cannot activate simple domain of another player"
+                msg = "cannot activate barrier technique of another player"
                 raise UserException(current_user, status.HTTP_406_NOT_ACCEPTABLE, msg)
             else:
                 if ongoing_match(match) is True:
@@ -159,7 +159,7 @@ def schedule_deactivate_domain(barrier_tech: BarrierTech, session: session):
 def activate_simple_domain(
     barrier_tech: BarrierTech,
     barrier_record: BarrierRecord | None,
-    match,
+    match: Match,
     session: session,
     atp: atp,
 ):
@@ -198,7 +198,7 @@ def deactivate_simple_domain(barrier_tech: BarrierTech, session: session):
 
 def schedule_deactivate_simple_domain(barrier_tech: BarrierTech, session: session):
     "function for the background task of deactivating a simple domain"
-    
+
     # Ensure end_time is timezone-aware (UTC); if not, make it so
     if (barrier_tech.sd_end_time) and (
         barrier_tech.sd_end_time.tzinfo is None
@@ -229,7 +229,7 @@ def schedule_deactivate_simple_domain(barrier_tech: BarrierTech, session: sessio
 def activate_binding_vow(
     barrier_tech: BarrierTech,
     barrier_record: BarrierRecord | None,
-    match,
+    match: Match,
     session: session,
     atp: atp,
 ):

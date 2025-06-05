@@ -1,3 +1,5 @@
+"use client";
+
 import { HttpValidationError } from "@/api/client";
 import { Alert, Stack, Text } from "@mantine/core";
 import { Icon, IconAlertCircle } from "@tabler/icons-react";

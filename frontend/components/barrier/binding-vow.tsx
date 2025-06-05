@@ -2,25 +2,25 @@
 
 import { BarrierTechActionProp } from "@/components/barrier/activate-barriers";
 import { useAuth } from "@/lib/auth/auth-provider";
-import { useDomainExpansion } from "@/lib/hooks/barrier";
+import { useBindingVow } from "@/lib/hooks/barrier";
 import { getColorFromId } from "@/lib/utils";
 import { ActionIcon, Text, Tooltip } from "@mantine/core";
-import { IconBalloonFilled } from "@tabler/icons-react";
+import { IconLink } from "@tabler/icons-react";
 import { useMemo } from "react";
 
-export function DomainExpansionAction({
+export function BindingVowAction({
     barrierTech,
     match,
     ended,
 }: BarrierTechActionProp) {
     const { token } = useAuth();
-    const { mutateAsync, isPending } = useDomainExpansion(token);
+    const { mutateAsync, isPending } = useBindingVow(token);
 
-    const domainUse = useMemo(() => {
+    const bindingVowUse = useMemo(() => {
         const usage = match.barrier_records
             .filter((record) => record.barrier_tech_id === barrierTech.id)
             .map((playerRecord) => {
-                return playerRecord.domain_counter || 0;
+                return playerRecord.binding_vow_counter || 0;
             })
             .reduce((acc, curr) => acc + curr, 0);
 
@@ -34,37 +34,37 @@ export function DomainExpansionAction({
                 size="xs"
                 flex={1}
                 loading={isPending}
-                color={getColorFromId(domainUse)}
-                disabled={ended}
+                color={getColorFromId(bindingVowUse)}
                 onClick={async () => {
                     await mutateAsync({
                         path: { player_id: barrierTech.player_id },
                         query: { match_id: match.id },
                     });
                 }}
+                disabled={ended}
             >
                 <Tooltip
-                    label={ended ? "match ended" : "activate domain"}
+                    label={ended ? "match ended" : "activate binding vow"}
                     multiline
                     maw={200}
                     events={{ focus: false, hover: true, touch: true }}
                 >
-                    <IconBalloonFilled />
+                    <IconLink />
                 </Tooltip>
             </ActionIcon>
             <ActionIcon.GroupSection
                 variant="light"
                 size="xs"
                 flex={1}
-                color={getColorFromId(domainUse)}
+                color={getColorFromId(bindingVowUse)}
             >
                 <Tooltip
-                    label={`activated ${domainUse} times`}
+                    label={`activated ${bindingVowUse} times`}
                     multiline
                     maw={200}
                     events={{ focus: false, hover: true, touch: true }}
                 >
-                    <Text size="xs">{domainUse}</Text>
+                    <Text size="xs">{bindingVowUse}</Text>
                 </Tooltip>
             </ActionIcon.GroupSection>
         </>

@@ -1,3 +1,5 @@
+"use client";
+
 import { MatchInfo, PlayerInfo } from "@/api/client";
 import { Box, Center, Flex, ThemeIcon } from "@mantine/core";
 

@@ -1,3 +1,5 @@
+"use client";
+
 import { MatchInfo, PlayerInfo } from "@/api/client";
 import { SingleVoteGroup } from "@/components/vote/single-votes";
 import { getColorFromId } from "@/lib/utils";
@@ -123,7 +125,7 @@ export function PlayerCard({
                     <>
                         <Divider label="Barrier techniques" />
 
-                        <Group>
+                        <Group grow>
                             <MatchActivateBarriers
                                 barrierTech={player.barrier_technique}
                                 match={match}

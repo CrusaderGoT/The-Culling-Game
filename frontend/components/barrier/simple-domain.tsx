@@ -2,25 +2,25 @@
 
 import { BarrierTechActionProp } from "@/components/barrier/activate-barriers";
 import { useAuth } from "@/lib/auth/auth-provider";
-import { useDomainExpansion } from "@/lib/hooks/barrier";
+import { useSimpleDomain } from "@/lib/hooks/barrier";
 import { getColorFromId } from "@/lib/utils";
 import { ActionIcon, Text, Tooltip } from "@mantine/core";
-import { IconBalloonFilled } from "@tabler/icons-react";
+import { IconChartBubble } from "@tabler/icons-react";
 import { useMemo } from "react";
 
-export function DomainExpansionAction({
+export function SimpleDomainAction({
     barrierTech,
     match,
     ended,
 }: BarrierTechActionProp) {
     const { token } = useAuth();
-    const { mutateAsync, isPending } = useDomainExpansion(token);
+    const { mutateAsync, isPending } = useSimpleDomain(token);
 
-    const domainUse = useMemo(() => {
+    const simpleDomainUse = useMemo(() => {
         const usage = match.barrier_records
             .filter((record) => record.barrier_tech_id === barrierTech.id)
             .map((playerRecord) => {
-                return playerRecord.domain_counter || 0;
+                return playerRecord.simple_domain_counter || 0;
             })
             .reduce((acc, curr) => acc + curr, 0);
 
@@ -34,7 +34,7 @@ export function DomainExpansionAction({
                 size="xs"
                 flex={1}
                 loading={isPending}
-                color={getColorFromId(domainUse)}
+                color={getColorFromId(simpleDomainUse)}
                 disabled={ended}
                 onClick={async () => {
                     await mutateAsync({
@@ -44,27 +44,27 @@ export function DomainExpansionAction({
                 }}
             >
                 <Tooltip
-                    label={ended ? "match ended" : "activate domain"}
+                    label={ended ? "match ended" : "activate simple domain"}
                     multiline
                     maw={200}
                     events={{ focus: false, hover: true, touch: true }}
                 >
-                    <IconBalloonFilled />
+                    <IconChartBubble />
                 </Tooltip>
             </ActionIcon>
             <ActionIcon.GroupSection
                 variant="light"
                 size="xs"
                 flex={1}
-                color={getColorFromId(domainUse)}
+                color={getColorFromId(simpleDomainUse)}
             >
                 <Tooltip
-                    label={`activated ${domainUse} times`}
+                    label={`activated ${simpleDomainUse} times`}
                     multiline
                     maw={200}
                     events={{ focus: false, hover: true, touch: true }}
                 >
-                    <Text size="xs">{domainUse}</Text>
+                    <Text size="xs">{simpleDomainUse}</Text>
                 </Tooltip>
             </ActionIcon.GroupSection>
         </>

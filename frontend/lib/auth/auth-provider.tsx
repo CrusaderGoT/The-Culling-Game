@@ -4,6 +4,7 @@ import {
     refreshTokenMutation,
     verifyTokenOptions,
 } from "@/api/client/@tanstack/react-query.gen";
+import { getAPIErrorMessage } from "@/components/ui/display-api-error";
 import {
     createSession,
     deleteSession,
@@ -117,7 +118,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             if (!mountedRef) return;
 
             await deleteSession();
-            console.error("Refresh token error:", JSON.stringify(e));
+
+            console.log("Refresh token error:", getAPIErrorMessage(e));
+
             notifications.show({
                 message: "Session Expired Log In To Continue",
                 color: "yellow",
@@ -137,9 +140,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             setTokenExpiresIn(expDate);
             setTokenExpired(false); // Reset expired state
         },
-        retry: (failureCount) => {
-            return failureCount < 2;
-        },
+        retry: false, // one fail -> session is deleted
     });
 
     // Set token expires after successful token verification
@@ -161,7 +162,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         if (!tokenExpiresIn || !mountedRef || refreshError || !isOnline) return;
 
-        const REFRESH_BUFFER_MS = 5000; // 5 seconds before expiration
+        const REFRESH_BUFFER_MS = 30000; // 30 seconds before expiration
         const now = Date.now();
         const timeUntilRefresh =
             tokenExpiresIn.getTime() - now - REFRESH_BUFFER_MS;

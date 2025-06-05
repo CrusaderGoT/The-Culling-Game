@@ -1,3 +1,5 @@
+"use client";
+
 import { MatchInfo } from "@/api/client";
 import { Badge, Code, Group, Indicator, Text } from "@mantine/core";
 import { IconCrown } from "@tabler/icons-react";

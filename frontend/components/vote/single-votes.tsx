@@ -1,3 +1,5 @@
+"use client";
+
 import { MatchInfo, PlayerInfo } from "@/api/client";
 import { useAuth } from "@/lib/auth/auth-provider";
 import { useCastVote } from "@/lib/hooks/match";
@@ -109,6 +111,9 @@ function SingleVote({
                     label={
                         ended ? "match ended" : `vote for ${application.name}`
                     }
+                    multiline
+                    maw={200}
+                    events={{ focus: false, hover: true, touch: true }}
                 >
                     <AppIcon />
                 </Tooltip>
@@ -124,6 +129,9 @@ function SingleVote({
                     label={`${application.name} ${
                         ended ? "had" : "has"
                     } ${prevVotes} vote(s)`}
+                    multiline
+                    maw={200}
+                    events={{ focus: false, hover: true, touch: true }}
                 >
                     <Text size="xs">{prevVotes}</Text>
                 </Tooltip>
