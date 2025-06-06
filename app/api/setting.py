@@ -88,7 +88,7 @@ app = FastAPI(
     title="The Culling Games API",
     description="The API Docs for The Culling Games",
     generate_unique_id_function=custom_generate_unique_id,
-    # docs_url=None,
+    docs_url=None if settings.debug else "",
     debug=settings.debug,
     # lifespan=lifespan,
 )
