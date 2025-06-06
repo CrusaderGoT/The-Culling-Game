@@ -29,6 +29,7 @@ import Nexarust from "@/fonts/NexarustFont";
 
 import { ModeToggle } from "@/components/ui/mode-toggle";
 
+import { SocketProvider } from "@/lib/contexts/socket-context";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -68,16 +69,25 @@ export default function RootLayout({
                 <ColorSchemeScript />
             </head>
             <body>
-                <TanstackProviders>
-                    <MantineProvider theme={theme}>
-                        <NavigationProgress />
-                        <Notifications />
-                        <Container size={"lg"}>
-                            <ModeToggle />
-                            {children}
-                        </Container>
-                    </MantineProvider>
-                </TanstackProviders>
+                <MantineProvider theme={theme}>
+                    <NavigationProgress />
+                    <Notifications />
+                    <TanstackProviders>
+                        <SocketProvider
+                            serverUrl={
+                                process.env.NODE_ENV === "production"
+                                    ? "https://the-culling-games.up.railway.app"
+                                    : "http://localhost:8000"
+                            }
+                            socketPath="/ws"
+                        >
+                            <Container size={"lg"}>
+                                <ModeToggle />
+                                {children}
+                            </Container>
+                        </SocketProvider>
+                    </TanstackProviders>
+                </MantineProvider>
             </body>
         </html>
     );

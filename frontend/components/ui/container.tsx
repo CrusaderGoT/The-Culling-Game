@@ -1,7 +1,7 @@
 "use client";
 
 import { UserMenu } from "@/components/ui/user-menu";
-import { useAuth } from "@/lib/auth/auth-provider";
+import { useAuth } from "@/lib/contexts/auth-provider";
 import globalClasses from "@/styles/global.module.css";
 import { ActionIcon, Alert, AppShell, Center, Group } from "@mantine/core";
 import { IconHome, IconNetworkOff } from "@tabler/icons-react";

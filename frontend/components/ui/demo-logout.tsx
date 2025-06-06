@@ -1,6 +1,6 @@
 "use client";
 
-import { deleteSession } from "@/lib/auth/session";
+import { deleteSession } from "@/lib/session";
 import { Button } from "@mantine/core";
 import { redirect } from "next/navigation";
 

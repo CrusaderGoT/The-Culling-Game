@@ -1,7 +1,7 @@
 "use client";
 
 import { MatchInfo, PlayerInfo } from "@/api/client";
-import { useAuth } from "@/lib/auth/auth-provider";
+import { useAuth } from "@/lib/contexts/auth-provider";
 import { useCastVote } from "@/lib/hooks/match";
 import { getColorFromId } from "@/lib/utils";
 import { ActionIcon, Text, Tooltip } from "@mantine/core";

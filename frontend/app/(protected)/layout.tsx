@@ -1,6 +1,6 @@
 // app/(protected)/layout.tsx
 
-import { AuthProvider } from "@/lib/auth/auth-provider";
+import { AuthProvider } from "@/lib/contexts/auth-provider";
 
 import { MainContainer } from "@/components/ui/container";
 

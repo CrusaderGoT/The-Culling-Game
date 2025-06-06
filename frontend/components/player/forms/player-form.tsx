@@ -3,7 +3,7 @@
 import { CreatePlayerForm } from "@/components/player/forms/create-player-form";
 import { EditPlayerForm } from "@/components/player/forms/edit-player-form";
 import { DisplayAPIError } from "@/components/ui/display-api-error";
-import { useAuth } from "@/lib/auth/auth-provider";
+import { useAuth } from "@/lib/contexts/auth-provider";
 import { useCurrentPlayer } from "@/lib/hooks/players";
 import { Skeleton, Stack } from "@mantine/core";
 

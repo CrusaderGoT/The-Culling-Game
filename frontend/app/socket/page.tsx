@@ -1,62 +1,36 @@
 "use client";
 
-import type { DefaultEventsMap } from "@socket.io/component-emitter";
-import { useEffect, useRef, useState } from "react";
-import { io, Socket } from "socket.io-client";
+import {
+    useSocket,
+    useSocketEmit,
+    useSocketEvent,
+} from "@/lib/contexts/socket-context";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 export default function ChatPage() {
     const [messages, setMessages] = useState<string[]>([]);
     const [inputValue, setInputValue] = useState("");
-    const [socket, setSocket] = useState<Socket<
-        DefaultEventsMap,
-        DefaultEventsMap
-    > | null>(null);
     const messagesRef = useRef<HTMLUListElement | null>(null);
     const inputRef = useRef<HTMLInputElement | null>(null);
 
+    // Get socket connection status
+    const { isConnected, error } = useSocket();
+
+    // Get emit function
+    const { emit } = useSocketEmit();
+
+    // Listen for messages using the custom hook with stable handler
+    const handleMessage = useCallback((data: { msg: string }) => {
+        setMessages((prev) => [...prev, data.msg]);
+    }, []);
+
+    useSocketEvent("message", handleMessage);
+
     useEffect(() => {
-        // Initialize Socket.IO client - Fixed configuration
-        const socketInstance = io(
-            process.env.NODE_ENV === "production"
-                ? "https://the-culling-games.up.railway.app"
-                : "http://localhost:8000",
-            {
-                path: "/ws", // This should match your FastAPI Socket.IO mount path
-                transports: ["websocket", "polling"], // Specify transport methods
-                upgrade: true,
-                rememberUpgrade: true,
-            }
-        );
-
-        setSocket(socketInstance);
-
-        // Connection event handlers
-        socketInstance.on("connect", () => {
-            console.log("Connected to server");
-        });
-
-        socketInstance.on("disconnect", () => {
-            console.log("Disconnected from server");
-        });
-
-        socketInstance.on("connect_error", (error) => {
-            console.error("Connection error:", error);
-        });
-
-        // Listen for incoming messages from the server
-        socketInstance.on("message", (data: { msg: string }) => {
-            setMessages((prev) => [...prev, data.msg]);
-        });
-
         // Auto-focus input on mount
         if (inputRef.current) {
             inputRef.current.focus();
         }
-
-        // Cleanup on unmount
-        return () => {
-            socketInstance.disconnect();
-        };
     }, []);
 
     useEffect(() => {
@@ -68,12 +42,14 @@ export default function ChatPage() {
 
     const handleSend = () => {
         const message = inputValue.trim();
-        if (!message || !socket) return;
+        if (!message) return;
 
-        socket.emit("message", { msg: message });
-        setInputValue("");
-        if (inputRef.current) {
-            inputRef.current.focus();
+        const success = emit("message", { msg: message });
+        if (success) {
+            setInputValue("");
+            if (inputRef.current) {
+                inputRef.current.focus();
+            }
         }
     };
 
@@ -97,6 +73,20 @@ export default function ChatPage() {
                     Socket.IO. Type your message below and hit{" "}
                     <strong>Send</strong> or press <strong>Enter</strong>.
                 </p>
+
+                {/* Connection status indicator */}
+                <div className="connection-status">
+                    <span
+                        className={`status-indicator ${
+                            isConnected ? "connected" : "disconnected"
+                        }`}
+                    >
+                        {isConnected ? "🟢 Connected" : "🔴 Disconnected"}
+                    </span>
+                    {error && (
+                        <span className="error-message">Error: {error}</span>
+                    )}
+                </div>
             </header>
 
             <section className="chat-container" aria-label="Chat message area">
@@ -125,11 +115,12 @@ export default function ChatPage() {
                         onChange={(e) => setInputValue(e.target.value)}
                         onKeyDown={handleKeyDown}
                         className="input"
+                        disabled={!isConnected}
                     />
                     <button
                         type="button"
                         onClick={handleSend}
-                        disabled={!hasText}
+                        disabled={!hasText || !isConnected}
                         className="send-button"
                     >
                         Send
@@ -152,6 +143,31 @@ export default function ChatPage() {
                 .title {
                     font-size: 2rem;
                     margin-bottom: 0.5rem;
+                }
+
+                .connection-status {
+                    margin-top: 1rem;
+                    padding: 0.5rem;
+                    border-radius: 4px;
+                    background-color: #f8f9fa;
+                }
+
+                .status-indicator {
+                    font-weight: bold;
+                    margin-right: 1rem;
+                }
+
+                .status-indicator.connected {
+                    color: #28a745;
+                }
+
+                .status-indicator.disconnected {
+                    color: #dc3545;
+                }
+
+                .error-message {
+                    color: #dc3545;
+                    font-size: 0.9rem;
                 }
 
                 .chat-container {
@@ -187,6 +203,11 @@ export default function ChatPage() {
                     font-size: 1rem;
                     border: 1px solid #ccc;
                     border-radius: 4px;
+                }
+
+                .input:disabled {
+                    background-color: #f5f5f5;
+                    cursor: not-allowed;
                 }
 
                 .send-button {

@@ -1,7 +1,7 @@
 "use client";
 
 import { BarrierTechActionProp } from "@/components/barrier/activate-barriers";
-import { useAuth } from "@/lib/auth/auth-provider";
+import { useAuth } from "@/lib/contexts/auth-provider";
 import { useSimpleDomain } from "@/lib/hooks/barrier";
 import { getColorFromId } from "@/lib/utils";
 import { ActionIcon, Text, Tooltip } from "@mantine/core";

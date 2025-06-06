@@ -13,7 +13,7 @@ import {
     useCreatePlayerForm,
 } from "@/components/player/forms/create-player-form-context";
 import { DisplayAPIError } from "@/components/ui/display-api-error";
-import { useAuth } from "@/lib/auth/auth-provider";
+import { useAuth } from "@/lib/contexts/auth-provider";
 import { useCreatePlayer } from "@/lib/hooks/players";
 import { useCurrentUser } from "@/lib/hooks/users";
 

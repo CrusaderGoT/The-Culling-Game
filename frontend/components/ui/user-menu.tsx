@@ -29,8 +29,8 @@ import {
 
 import { forwardRef } from "react";
 
-import { useAuth } from "@/lib/auth/auth-provider";
-import { deleteSession } from "@/lib/auth/session";
+import { useAuth } from "@/lib/contexts/auth-provider";
+import { deleteSession } from "@/lib/session";
 import { useCurrentUser } from "@/lib/hooks/users";
 import { getColorFromId } from "@/lib/utils";
 import classes from "@/styles/user-menu.module.css";

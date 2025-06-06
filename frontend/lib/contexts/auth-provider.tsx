@@ -5,12 +5,8 @@ import {
     verifyTokenOptions,
 } from "@/api/client/@tanstack/react-query.gen";
 import { getAPIErrorMessage } from "@/components/ui/display-api-error";
-import {
-    createSession,
-    deleteSession,
-    getClientCookie,
-} from "@/lib/auth/session";
 import { tokenNames } from "@/lib/constants/AUTHCONSTANTS";
+import { createSession, deleteSession, getClientCookie } from "@/lib/session";
 import { useMounted } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { useMutation, useQuery } from "@tanstack/react-query";

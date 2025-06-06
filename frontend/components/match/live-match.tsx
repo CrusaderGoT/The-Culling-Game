@@ -15,7 +15,7 @@ import { MatchVoteChart } from "@/components/match/match-vote-chart";
 import { VoteDrawer } from "@/components/vote/vote-drawer";
 
 import { DisplayAPIError } from "@/components/ui/display-api-error";
-import { useAuth } from "@/lib/auth/auth-provider";
+import { useAuth } from "@/lib/contexts/auth-provider";
 import { useLatestMatch } from "@/lib/hooks/match";
 import { useGetPlayers } from "@/lib/hooks/players";
 import globalClasses from "@/styles/global.module.css";

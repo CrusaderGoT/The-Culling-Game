@@ -6,7 +6,7 @@ import {
 
 import { useMutation, useQuery } from "@tanstack/react-query";
 
-import { createSession } from "@/lib/auth/session";
+import { createSession } from "@/lib/session";
 import { authHeader } from "@/lib/constants/AUTHCONSTANTS";
 import { queryClient } from "@/lib/query-client/get-query-client";
 import { notifications } from "@mantine/notifications";
