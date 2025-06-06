@@ -935,6 +935,15 @@ wheels = [
 ]
 
 [[package]]
+name = "scalar-fastapi"
+version = "1.0.3"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/2c/04/08ae9e86f24cd9b43bc5b2068fc5d1dcd3e7efa6db860290734d7d742512/scalar_fastapi-1.0.3.tar.gz", hash = "sha256:9e9cb8398e298cd435a0171eebe1675b8899eb21e47c238db0d48783143f0ffb", size = 4107 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/6d/9e/ca0ffc3fc4788c6e1367b96a70f2d6ee33f91d580664a8142ba7ee292ef2/scalar_fastapi-1.0.3-py3-none-any.whl", hash = "sha256:4a47a140795097ad034518ce0e32940f2c54f0f4bc60e4c3289ca30a7e6f954d", size = 4579 },
+]
+
+[[package]]
 name = "setuptools"
 version = "74.1.2"
 source = { registry = "https://pypi.org/simple" }
@@ -1123,6 +1132,7 @@ dependencies = [
     { name = "python-socketio", extra = ["asyncio-client"] },
     { name = "pyyaml" },
     { name = "rich" },
+    { name = "scalar-fastapi" },
     { name = "setuptools" },
     { name = "shellingham" },
     { name = "simple-websocket" },
@@ -1189,6 +1199,7 @@ requires-dist = [
     { name = "python-socketio", extras = ["asyncio-client"], specifier = ">=5.11.4" },
     { name = "pyyaml", specifier = "==6.0.1" },
     { name = "rich", specifier = "==13.7.1" },
+    { name = "scalar-fastapi", specifier = ">=1.0.3" },
     { name = "setuptools", specifier = "==74.1.2" },
     { name = "shellingham", specifier = "==1.5.4" },
     { name = "simple-websocket", specifier = "==1.1.0" },

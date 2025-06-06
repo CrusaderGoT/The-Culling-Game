@@ -49,6 +49,7 @@ dependencies = [
     "python-socketio[asyncio-client]>=5.11.4",
     "pyyaml==6.0.1",
     "rich==13.7.1",
+    "scalar-fastapi>=1.0.3",
     "setuptools==74.1.2",
     "shellingham==1.5.4",
     "simple-websocket==1.1.0",
