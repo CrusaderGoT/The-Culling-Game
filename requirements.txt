@@ -212,6 +212,8 @@ rich==13.7.1
     # via
     #   the-culling-game-backend (pyproject.toml)
     #   typer
+scalar-fastapi==1.0.3
+    # via the-culling-game-backend (pyproject.toml)
 setuptools==74.1.2
     # via
     #   the-culling-game-backend (pyproject.toml)
