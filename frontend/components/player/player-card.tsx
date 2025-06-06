@@ -3,6 +3,7 @@
 import { MatchInfo, PlayerInfo } from "@/api/client";
 import { SingleVoteGroup } from "@/components/vote/single-votes";
 import { getColorFromId } from "@/lib/utils";
+import classes from "@/styles/player-card.module.css";
 import {
     Badge,
     Divider,
@@ -12,8 +13,14 @@ import {
     Stack,
     Text,
 } from "@mantine/core";
-import { IconGradienter, IconMatchstick, IconPoint } from "@tabler/icons-react";
+import {
+    IconMatchstick,
+    IconPointFilled,
+    IconSpiral
+} from "@tabler/icons-react";
+import clsx from "clsx";
 import Image from "next/image";
+import { useMemo } from "react";
 import { MatchActivateBarriers } from "../barrier/activate-barriers";
 
 export function PlayerCard({
@@ -25,16 +32,26 @@ export function PlayerCard({
     match?: MatchInfo;
     ended?: boolean;
 }) {
+    const playerMatchPoints = useMemo(() => {
+        let points = 0;
+        match?.votes.forEach((vote) => {
+            if (vote.player_id === player.id) {
+                points += vote.point;
+            }
+        });
+        return points;
+    }, [match?.votes, player.id]);
+
     return (
-        <Paper withBorder p={"xs"}>
-            <Stack>
-                <Group justify="space-between" p={5}>
+        <Paper withBorder p={"xs"} className={clsx(classes.fullHeight)}>
+            <Stack className={clsx(classes.fullHeight, classes.spaceBetween)}>
+                <Group p={5} className={clsx(classes.spaceBetween)}>
                     <Badge
                         size="xs"
-                        leftSection={<IconPoint size={14} />}
+                        leftSection={<IconPointFilled size={14} />}
                         rightSection={
                             <Text size={"8"} visibleFrom="sm">
-                                {player.points > 1 ? "Points" : "Point"}
+                                {player.points > 0 ? "Points" : "Point"}
                             </Text>
                         }
                         color={getColorFromId(player.points)}
@@ -47,8 +64,8 @@ export function PlayerCard({
                         rightSection={
                             <Text size={"8"} visibleFrom="sm">
                                 {player.matches.length > 1
-                                    ? "Matches"
-                                    : "Match"}
+                                    ? "Battles"
+                                    : "Battle"}
                             </Text>
                         }
                         leftSection={<IconMatchstick size={14} />}
@@ -57,30 +74,33 @@ export function PlayerCard({
                         {player.matches.length}
                     </Badge>
 
-                    <Badge
-                        size="xs"
-                        leftSection={
-                            <Text size={"8"} visibleFrom="sm">
-                                Grade
-                            </Text>
-                        }
-                        rightSection={<IconGradienter size={14} />}
-                        color={getColorFromId(player.grade)}
-                    >
-                        {player.grade}
-                    </Badge>
+                    {match && (
+                        <Badge
+                            size="xs"
+                            rightSection={
+                                <Text size={"8"} visibleFrom="sm">
+                                    {playerMatchPoints > 0
+                                        ? "Battle Points"
+                                        : "Battle Point"}
+                                </Text>
+                            }
+                            leftSection={<IconSpiral size={14} />}
+                            color="charcoal"
+                        >
+                            {playerMatchPoints}
+                        </Badge>
+                    )}
                 </Group>
 
                 <Group align="flex-start">
                     <MantineImage
                         component={Image}
-                        src={"/images/Kogane.png"}
+                        src={"/player.image_url"}
+                        fallbackSrc="/images/Kogane.png"
                         alt="Player Image"
                         height={100}
                         width={100}
-                        w={"auto"}
-                        h={"auto"}
-                        mx={"auto"}
+                        className={clsx(classes.playerCard)}
                     />
 
                     <Group lts={4} flex={1} wrap="nowrap">
@@ -89,23 +109,35 @@ export function PlayerCard({
                             <Text size="xs">Age</Text>
                             <Text size="xs">Gender</Text>
                             {player.role && <Text size="xs">Role</Text>}
+                            <Text size="xs">Grade</Text>
                         </Stack>
 
                         <Divider orientation="vertical" />
 
                         <Stack flex={1} align="flex-end">
-                            <Text size="xs">{player.name}</Text>
-                            <Text size="xs">{player.age}</Text>
-                            <Text size="xs">{player.gender}</Text>
+                            <Text size="xs" truncate maw={200}>
+                                {player.name}
+                            </Text>
+                            <Text size="xs" truncate maw={200}>
+                                {player.age}
+                            </Text>
+                            <Text size="xs" truncate maw={200}>
+                                {player.gender}
+                            </Text>
                             {player.role && (
-                                <Text size="xs">{player.role}</Text>
+                                <Text size="xs" truncate maw={200}>
+                                    {player.role}
+                                </Text>
                             )}
+                            <Text size="xs" truncate maw={200}>
+                                {player.grade < 1 ? "SPECIAL" : player.grade}
+                            </Text>
                         </Stack>
                     </Group>
                 </Group>
 
                 {match && (
-                    <>
+                    <Stack>
                         <Divider label="cursed techniques" />
 
                         <Group grow>
@@ -118,11 +150,11 @@ export function PlayerCard({
                                 ended={ended}
                             />
                         </Group>
-                    </>
+                    </Stack>
                 )}
 
                 {player.barrier_technique && match && (
-                    <>
+                    <Stack>
                         <Divider label="Barrier techniques" />
 
                         <Group grow>
@@ -132,7 +164,7 @@ export function PlayerCard({
                                 ended={ended}
                             />
                         </Group>
-                    </>
+                    </Stack>
                 )}
             </Stack>
         </Paper>

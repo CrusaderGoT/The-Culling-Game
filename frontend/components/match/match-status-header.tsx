@@ -1,8 +1,9 @@
 "use client";
 
 import { MatchInfo } from "@/api/client";
+import { getColorFromId } from "@/lib/utils";
 import { Badge, Code, Group, Indicator, Text } from "@mantine/core";
-import { IconCrown } from "@tabler/icons-react";
+import { IconCrown, IconSparkles } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -78,6 +79,19 @@ export function MatchHeader({ match }: MatchStatusHeaderProp) {
                     {isEnded ? "Ended" : "Live"}
                 </Badge>
             </Indicator>
+
+            <Badge
+                size="xs"
+                leftSection={
+                    <Text size={"8"} visibleFrom="sm">
+                        Part
+                    </Text>
+                }
+                rightSection={<IconSparkles size={14} />}
+                color={getColorFromId(match.part)}
+            >
+                {match.part}
+            </Badge>
 
             <Text size="xs">Colony: {colony}</Text>
 

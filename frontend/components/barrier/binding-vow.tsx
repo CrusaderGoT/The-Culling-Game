@@ -44,7 +44,7 @@ export function BindingVowAction({
                 disabled={ended}
             >
                 <Tooltip
-                    label={ended ? "match ended" : "activate binding vow"}
+                    label={ended ? "match ended" : "use binding vow"}
                     multiline
                     maw={200}
                     events={{ focus: false, hover: true, touch: true }}
@@ -59,7 +59,7 @@ export function BindingVowAction({
                 color={getColorFromId(bindingVowUse)}
             >
                 <Tooltip
-                    label={`activated ${bindingVowUse} times`}
+                    label={`used binding vow ${bindingVowUse} times`}
                     multiline
                     maw={200}
                     events={{ focus: false, hover: true, touch: true }}

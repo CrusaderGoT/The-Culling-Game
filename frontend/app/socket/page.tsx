@@ -5,6 +5,16 @@ import {
     useSocketEmit,
     useSocketEvent,
 } from "@/lib/contexts/socket-context";
+import {
+    Button,
+    Group,
+    Mark,
+    Paper,
+    Stack,
+    Text,
+    TextInput,
+    Title,
+} from "@mantine/core";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 export default function ChatPage() {
@@ -65,46 +75,35 @@ export default function ChatPage() {
     const hasText = inputValue.trim().length > 0;
 
     return (
-        <div className="chat-page">
-            <header className="header">
-                <h1 className="title">FastAPI Chat Application</h1>
-                <p className="description">
+        <Paper mx={"auto"} p={"md"} my={50} withBorder>
+            <Stack>
+                <Title> FastAPI Chat Application</Title>
+                <Text truncate>
                     Welcome to the real-time chat powered by FastAPI and
-                    Socket.IO. Type your message below and hit{" "}
-                    <strong>Send</strong> or press <strong>Enter</strong>.
-                </p>
-
+                    Socket.IO. Type your message below and hit <Mark>Send</Mark>{" "}
+                    or press <Mark>Enter</Mark>.
+                </Text>
                 {/* Connection status indicator */}
-                <div className="connection-status">
-                    <span
-                        className={`status-indicator ${
-                            isConnected ? "connected" : "disconnected"
-                        }`}
-                    >
+                <Group>
+                    <span>
                         {isConnected ? "🟢 Connected" : "🔴 Disconnected"}
                     </span>
-                    {error && (
-                        <span className="error-message">Error: {error}</span>
-                    )}
-                </div>
-            </header>
+                    {error && <span>Error: {error}</span>}
+                </Group>
+            </Stack>
 
-            <section className="chat-container" aria-label="Chat message area">
+            <section aria-label="Chat message area">
                 {/* Message list */}
-                <ul ref={messagesRef} className="messages" aria-live="polite">
+                <ul ref={messagesRef} aria-live="polite">
                     {messages.map((message, index) => (
-                        <li key={index} className="message-item">
-                            {message}
-                        </li>
+                        <li key={index}>{message}</li>
                     ))}
                 </ul>
 
                 {/* Input and send button */}
-                <div className="input-area">
-                    <label htmlFor="message-input" className="visually-hidden">
-                        Your message:
-                    </label>
-                    <input
+                <Group align="flex-end">
+                    <TextInput
+                        label="Your message:"
                         id="message-input"
                         ref={inputRef}
                         type="text"
@@ -114,129 +113,17 @@ export default function ChatPage() {
                         value={inputValue}
                         onChange={(e) => setInputValue(e.target.value)}
                         onKeyDown={handleKeyDown}
-                        className="input"
                         disabled={!isConnected}
                     />
-                    <button
-                        type="button"
+                    <Button
                         onClick={handleSend}
                         disabled={!hasText || !isConnected}
-                        className="send-button"
+                        size="sm"
                     >
                         Send
-                    </button>
-                </div>
+                    </Button>
+                </Group>
             </section>
-
-            <style jsx>{`
-                .chat-page {
-                    font-family: Arial, sans-serif;
-                    margin: 2rem;
-                    background-color: #f9f9f9;
-                    color: #333;
-                }
-
-                .header {
-                    margin-bottom: 1.5rem;
-                }
-
-                .title {
-                    font-size: 2rem;
-                    margin-bottom: 0.5rem;
-                }
-
-                .connection-status {
-                    margin-top: 1rem;
-                    padding: 0.5rem;
-                    border-radius: 4px;
-                    background-color: #f8f9fa;
-                }
-
-                .status-indicator {
-                    font-weight: bold;
-                    margin-right: 1rem;
-                }
-
-                .status-indicator.connected {
-                    color: #28a745;
-                }
-
-                .status-indicator.disconnected {
-                    color: #dc3545;
-                }
-
-                .error-message {
-                    color: #dc3545;
-                    font-size: 0.9rem;
-                }
-
-                .chat-container {
-                    border: 1px solid #ddd;
-                    border-radius: 8px;
-                    padding: 1rem;
-                    background-color: #fff;
-                    max-width: 600px;
-                    margin: 0 auto;
-                }
-
-                .messages {
-                    list-style-type: none;
-                    padding: 0;
-                    max-height: 300px;
-                    overflow-y: auto;
-                    margin-bottom: 1rem;
-                }
-
-                .message-item {
-                    padding: 0.5rem;
-                    border-bottom: 1px solid #eee;
-                }
-
-                .input-area {
-                    display: flex;
-                    gap: 0.5rem;
-                }
-
-                .input {
-                    flex: 1;
-                    padding: 0.5rem;
-                    font-size: 1rem;
-                    border: 1px solid #ccc;
-                    border-radius: 4px;
-                }
-
-                .input:disabled {
-                    background-color: #f5f5f5;
-                    cursor: not-allowed;
-                }
-
-                .send-button {
-                    padding: 0.5rem 1rem;
-                    font-size: 1rem;
-                    border: none;
-                    border-radius: 4px;
-                    background-color: #007bff;
-                    color: #fff;
-                    cursor: pointer;
-                }
-
-                .send-button:disabled {
-                    background-color: #aaa;
-                    cursor: not-allowed;
-                }
-
-                .visually-hidden {
-                    position: absolute;
-                    width: 1px;
-                    height: 1px;
-                    padding: 0;
-                    margin: -1px;
-                    overflow: hidden;
-                    clip: rect(0, 0, 0, 0);
-                    white-space: nowrap;
-                    border: 0;
-                }
-            `}</style>
-        </div>
+        </Paper>
     );
 }

@@ -59,7 +59,7 @@ export function SimpleDomainAction({
                 color={getColorFromId(simpleDomainUse)}
             >
                 <Tooltip
-                    label={`activated ${simpleDomainUse} times`}
+                    label={`activated simple domain ${simpleDomainUse} times`}
                     multiline
                     maw={200}
                     events={{ focus: false, hover: true, touch: true }}

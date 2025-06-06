@@ -1,0 +1,14 @@
+.playerCard {
+  height: auto;
+  width: auto;
+  margin: auto;
+  border-radius: 5px;
+}
+
+.fullHeight {
+  height: 100%;
+}
+
+.spaceBetween {
+    justify-content: space-between;
+}

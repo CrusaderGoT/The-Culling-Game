@@ -44,7 +44,7 @@ export function DomainExpansionAction({
                 }}
             >
                 <Tooltip
-                    label={ended ? "match ended" : "activate domain"}
+                    label={ended ? "match ended" : "domain expansion!"}
                     multiline
                     maw={200}
                     events={{ focus: false, hover: true, touch: true }}
@@ -59,7 +59,7 @@ export function DomainExpansionAction({
                 color={getColorFromId(domainUse)}
             >
                 <Tooltip
-                    label={`activated ${domainUse} times`}
+                    label={`activated domain ${domainUse} times`}
                     multiline
                     maw={200}
                     events={{ focus: false, hover: true, touch: true }}
