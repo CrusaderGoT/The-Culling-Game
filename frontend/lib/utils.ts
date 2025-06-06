@@ -6,8 +6,6 @@ export function cleanString(input: string) {
 }
 export function getColorFromId(id: PlayerInfo["id"]): MantineColor {
     const colors: MantineColor[] = [
-        "dark",
-        "gray",
         "red",
         "pink",
         "grape",
@@ -22,7 +20,6 @@ export function getColorFromId(id: PlayerInfo["id"]): MantineColor {
         "orange",
         "gold",
         "deepred",
-        "charcoal",
     ];
 
     const hash = Array.from(id.toString()).reduce(
