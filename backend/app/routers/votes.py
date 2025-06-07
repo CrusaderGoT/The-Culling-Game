@@ -5,13 +5,15 @@ from app.models.match import Match
 from app.models.player import CTApp, CursedTechnique, Player
 from app.models.user import User
 from app.models.vote import CastVote, ClientVoteInfo, Vote
-from app.routers.matches import router
 from app.utils.barrier import fix_barrier_deactivation_task_fail
 from app.utils.dependencies import atp, session
 from app.utils.match import get_match, ongoing_match
 from app.utils.vote import get_vote_point
-from fastapi import Body, HTTPException, Path, status
+from fastapi import APIRouter, Body, HTTPException, Path, status
 from sqlmodel import select
+
+# Create your API routes here
+router = APIRouter()
 
 
 @router.post("/vote/{match_id}", response_model=ClientVoteInfo)

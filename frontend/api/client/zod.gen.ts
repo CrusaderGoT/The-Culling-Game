@@ -460,6 +460,20 @@ export const zBodyVerifyToken = z.object({
     token: z.string()
 });
 
+export const zCastVote = z.object({
+    player_id: z.number().int(),
+    ct_app_id: z.number().int()
+});
+
+export const zClientVoteInfo = z.object({
+    message: z.string(),
+    extra_info: z.union([
+        z.array(z.string()),
+        z.null()
+    ]),
+    votes: z.array(zBaseVoteInfo)
+});
+
 export const zColonyInfo = z.object({
     country: zCountry,
     id: z.number().int(),
@@ -624,6 +638,8 @@ export const zEditPlayerResponse = zPlayerInfo;
 export const zDeletePlayerResponse = zPlayerInfo;
 
 export const zUpgradePlayerResponse = zPlayerInfo;
+
+export const zVoteResponse = zClientVoteInfo;
 
 export const zCreateMatchResponse = zMatchInfo;
 

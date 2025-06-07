@@ -291,6 +291,27 @@ export type BodyVerifyToken = {
 };
 
 /**
+ * model for collecting data to cast a vote
+ */
+export type CastVote = {
+    player_id: number;
+    ct_app_id: number;
+};
+
+/**
+ * Represents information about a client's vote in a match.
+ *
+ * Attributes:
+ * message (str): A message associated with the client's vote.
+ * votes (list[BaseVoteInfo]): A list of vote information objects related to the client.
+ */
+export type ClientVoteInfo = {
+    message: string;
+    extra_info: Array<string> | null;
+    votes: Array<BaseVoteInfo>;
+};
+
+/**
  * colony info -> client-side
  */
 export type ColonyInfo = {
@@ -1115,6 +1136,33 @@ export type UpgradePlayerResponses = {
 };
 
 export type UpgradePlayerResponse = UpgradePlayerResponses[keyof UpgradePlayerResponses];
+
+export type VoteData = {
+    body: Array<CastVote>;
+    path: {
+        match_id: number;
+    };
+    query?: never;
+    url: '/match/vote/{match_id}';
+};
+
+export type VoteErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type VoteError = VoteErrors[keyof VoteErrors];
+
+export type VoteResponses = {
+    /**
+     * Successful Response
+     */
+    200: ClientVoteInfo;
+};
+
+export type VoteResponse = VoteResponses[keyof VoteResponses];
 
 export type CreateMatchData = {
     body?: never;
