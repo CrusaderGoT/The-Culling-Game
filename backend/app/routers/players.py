@@ -16,7 +16,7 @@ from app.models.player import (
 )
 from app.utils.barrier import fix_barrier_deactivation_task_fail
 from app.utils.config import Tag, UserException
-from app.utils.dependencies import colony, session
+from app.utils.dependencies import atp, colony, session
 from app.utils.player import (
     calculate_points,
     edit_player_helper,
@@ -254,6 +254,7 @@ def upgrade_player(
     session: session,
     grade_up: Annotated[Player.Grade, Query(description="specified upgrade")],
     current_user: active_user,
+    atp: atp,
 ):
     """function for uprading the grade of a player.\n
     **points required.**"""
@@ -279,7 +280,9 @@ def upgrade_player(
                 # check if player points is enough
                 if player_points >= needed_points:  # there is enough
                     # check if they have reached the level to access Barrier Tech
-                    if gu <= 2 and cg > 2:  # grant barrier technique
+                    if (
+                        gu <= atp.bt_min_grade and cg > atp.bt_min_grade
+                    ):  # grant barrier technique
                         new_barrier_tech = BarrierTech(player=player)
                         session.add(new_barrier_tech)
                     # upgrade and deduct points
