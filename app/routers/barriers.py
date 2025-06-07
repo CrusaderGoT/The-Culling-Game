@@ -10,6 +10,7 @@ from app.models.player import Player
 from app.utils.barrier import (
     activate_binding_vow,
     activate_domain,
+    activate_reverse_cursed_technique,
     activate_simple_domain,
     conditions_for_barrier_tech,
     fix_barrier_deactivation_task_fail,
@@ -63,8 +64,8 @@ def domain_expansion(
     # check for pontential deactivate task fails
     fix_barrier_deactivation_task_fail(barrier_tech, session)
 
+    # only grade 1 and higher can use DE
     if player.grade > Player.Grade.ONE:
-        # only special grades can use DE
         raise PlayerException(
             player,
             status.HTTP_426_UPGRADE_REQUIRED,
@@ -299,4 +300,54 @@ def bindind_vow(
             barrier_tech, barrier_record, match, session, atp
         )
         background.add_task(schedule_deactivate_binding_vow, barrier_tech, session)
+        return barrier_tech
+
+
+@router.post("/activate/rct/{player_id}", response_model=BarrierTechInfo)
+def reverse_cursed_technique(
+    player_id: Annotated[int, Path()],
+    match_id: Annotated[int, Query()],
+    current_user: active_user,
+    session: session,
+    atp: atp,
+):
+    "activates a reverse cursed technique"
+    match_none = session.get(Match, match_id)
+    player_none = session.get(Player, player_id)
+
+    barrier_tech, barrier_record, match, player = conditions_for_barrier_tech(
+        player=player_none,
+        match=match_none,
+        player_id=player_id,
+        match_id=match_id,
+        current_user=current_user,
+        session=session,
+    )
+
+    # only special grade can use RCT
+    if player.grade != Player.Grade.SPECIAL:
+        raise PlayerException(
+            player,
+            status.HTTP_426_UPGRADE_REQUIRED,
+            "Only Special Grade Players can use Reverse Cursed Technique. Upgrade your player",
+        )
+
+    # 1. check if they have a barrier record for this match
+    # and if they have reach their limit
+    if (
+        barrier_record
+        and (count := barrier_record.reverse_cursed_technique_counter)
+        >= atp.limit_reverse_cursed_technique
+    ):
+        raise PlayerException(
+            player,
+            status.HTTP_423_LOCKED,
+            f"reverse cursed technique can only be used {count} times per match",
+        )
+
+    # 2. activate rct
+    else:
+        barrier_tech = activate_reverse_cursed_technique(
+            barrier_tech, barrier_record, match, session, atp
+        )
         return barrier_tech

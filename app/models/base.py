@@ -379,6 +379,7 @@ class ActionTimePoint(SQLModel):
     limit_binding_vow: int = 5
     limit_domain_expansion: int = 5
     limit_simple_domain: int = 5
+    limit_reverse_cursed_technique = 5
 
     cost_binding_vow: float = 2.0
     cost_domain_expansion: float = 2.0
@@ -387,6 +388,7 @@ class ActionTimePoint(SQLModel):
     vote_point: float = 0.2
     domain_expansion_point: float = 4.0
     simple_domain_point: float = 2.0
+    reverse_cursed_technique_point: float = 0.5
 
     winner_point: float = 5.0
 
@@ -436,4 +438,8 @@ class BaseBarrierRecord(SQLModel):
     )
     binding_vow_counter: int = Field(
         default=0, description="the number of times a binding vow is activated"
+    )
+    reverse_cursed_technique_counter: int = Field(
+        default=0,
+        description="the number of times a reverse cursed technique is activated",
     )

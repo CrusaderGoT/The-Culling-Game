@@ -1,6 +1,5 @@
 import time
 from datetime import UTC, datetime, timezone
-from typing import Literal
 
 from fastapi import HTTPException, status
 from sqlmodel import select
@@ -110,10 +109,10 @@ def activate_domain(
         barrier_record.domain_counter += 1
         session.add(barrier_record)
     else:  # no barrier detail
-        new_barrier_detail = BarrierRecord(
+        new_barrier_record = BarrierRecord(
             domain_counter=1, match=match, barrier_tech=barrier_tech
         )
-        session.add(new_barrier_detail)
+        session.add(new_barrier_record)
     # commits
     session.add(barrier_tech)
     session.commit()
@@ -177,10 +176,10 @@ def activate_simple_domain(
         barrier_record.simple_domain_counter += 1
         session.add(barrier_record)
     else:  # no barrier detail
-        new_barrier_detail = BarrierRecord(
+        new_barrier_record = BarrierRecord(
             simple_domain_counter=1, match=match, barrier_tech=barrier_tech
         )
-        session.add(new_barrier_detail)
+        session.add(new_barrier_record)
     # commits
     session.add(barrier_tech)
     session.commit()
@@ -246,10 +245,10 @@ def activate_binding_vow(
         barrier_record.binding_vow_counter += 1
         session.add(barrier_record)
     else:  # no barrier detail
-        new_barrier_detail = BarrierRecord(
+        new_barrier_record = BarrierRecord(
             binding_vow_counter=1, match=match, barrier_tech=barrier_tech
         )
-        session.add(new_barrier_detail)
+        session.add(new_barrier_record)
     # commits
     session.add(barrier_tech)
     session.commit()
@@ -292,21 +291,31 @@ def schedule_deactivate_binding_vow(barrier_tech: BarrierTech, session: session)
             continue  # loop again
 
 
-def activate_barrier_tech(
-    technique: Literal["domain_expansion", "simple_domain", "binding_vow"],
+def activate_reverse_cursed_technique(
     barrier_tech: BarrierTech,
     barrier_record: BarrierRecord | None,
     match: Match,
     session: session,
     atp: atp,
 ):
-    "function for a match/case implementation of barrier techniques"
-    # make the variables depending on which technique to activate
-    match technique:
-        case "simple_domain":
-            activate_simple_domain(barrier_tech, barrier_record, match, session, atp)
-        case "domain_expansion":
-            activate_domain(barrier_tech, barrier_record, match, session, atp)
+    barrier_tech.player.points += atp.reverse_cursed_technique_point
+    # add/record the detail
+    # the barrier detail should commited here
+    if barrier_record is not None:
+        barrier_record.reverse_cursed_technique_counter += 1
+        session.add(barrier_record)
+    else:  # no barrier detail
+        new_barrier_record = BarrierRecord(
+            reverse_cursed_technique_counter=1,
+            match=match,
+            barrier_tech=barrier_tech,
+        )
+        session.add(new_barrier_record)
+
+    # commits
+    session.add(barrier_tech)
+    session.commit()
+    session.refresh(barrier_tech)
 
 
 def fix_barrier_deactivation_task_fail(
