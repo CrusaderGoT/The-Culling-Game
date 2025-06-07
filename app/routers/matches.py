@@ -26,12 +26,14 @@ from ..models.base import ModelName
 from ..models.match import Match, MatchInfo
 from ..utils.config import AdminException, Tag
 from ..utils.dependencies import atp, session
+from .votes import router as vote_router
 
 # write you match api routes here
 
 router = APIRouter(
     prefix="/match", tags=[Tag.match], dependencies=[Depends(oauth2_scheme)]
 )
+router.include_router(vote_router)
 
 
 @router.post("/create", status_code=status.HTTP_201_CREATED, response_model=MatchInfo)

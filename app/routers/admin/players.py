@@ -1,7 +1,7 @@
 from typing import Annotated
 
 from app.utils.player import edit_player_helper
-from fastapi import Body, HTTPException, status
+from fastapi import APIRouter, Body, HTTPException, status
 
 from ...auth.dependencies import admin_user
 from ...models.base import BasePermission, ModelName
@@ -17,8 +17,6 @@ from ...utils.admin import (
 )
 from ...utils.dependencies import session
 from ...utils.player import get_player
-from fastapi import APIRouter
-
 
 # Create your API routes here
 router = APIRouter()
