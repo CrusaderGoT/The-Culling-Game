@@ -379,7 +379,7 @@ class ActionTimePoint(SQLModel):
     limit_binding_vow: int = 5
     limit_domain_expansion: int = 5
     limit_simple_domain: int = 5
-    limit_reverse_cursed_technique = 5
+    limit_reverse_cursed_technique: int = 5
 
     cost_binding_vow: float = 2.0
     cost_domain_expansion: float = 2.0

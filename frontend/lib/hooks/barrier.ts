@@ -1,6 +1,7 @@
 import {
     bindindVowMutation,
     domainExpansionMutation,
+    reverseCursedTechniqueMutation,
     simpleDomainMutation,
 } from "@/api/client/@tanstack/react-query.gen";
 
@@ -66,6 +67,29 @@ export const useBindingVow = (token: string) => {
             notifications.show({
                 message: `Binding Vow Failed -> ${getAPIErrorMessage(err)}`,
                 color: "lime",
+            });
+        },
+    });
+    return mutation;
+};
+
+export const useReverseCursedTechnique = (token: string) => {
+    const mutation = useMutation({
+        ...reverseCursedTechniqueMutation({
+            headers: authHeader(token),
+        }),
+        onSuccess: () => {
+            notifications.show({
+                message: "Reversed Cursed Technique Used!",
+                color: "white",
+            });
+        },
+        onError: (err) => {
+            notifications.show({
+                message: `Reversed Cursed Technique Failed -> ${getAPIErrorMessage(
+                    err
+                )}`,
+                color: "black",
             });
         },
     });

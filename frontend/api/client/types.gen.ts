@@ -23,6 +23,10 @@ export type BarrierRecordInfo = {
      * the number of times a binding vow is activated
      */
     binding_vow_counter?: number;
+    /**
+     * the number of times a reverse cursed technique is activated
+     */
+    reverse_cursed_technique_counter?: number;
     id: number;
     barrier_tech_id: number;
     match_id: number;
@@ -284,27 +288,6 @@ export type BodyRefreshToken = {
 
 export type BodyVerifyToken = {
     token: string;
-};
-
-/**
- * model for collecting data to cast a vote
- */
-export type CastVote = {
-    player_id: number;
-    ct_app_id: number;
-};
-
-/**
- * Represents information about a client's vote in a match.
- *
- * Attributes:
- * message (str): A message associated with the client's vote.
- * votes (list[BaseVoteInfo]): A list of vote information objects related to the client.
- */
-export type ClientVoteInfo = {
-    message: string;
-    extra_info: Array<string> | null;
-    votes: Array<BaseVoteInfo>;
 };
 
 /**
@@ -1218,33 +1201,6 @@ export type GetLastestMatchResponses = {
 
 export type GetLastestMatchResponse = GetLastestMatchResponses[keyof GetLastestMatchResponses];
 
-export type VoteData = {
-    body: Array<CastVote>;
-    path: {
-        match_id: number;
-    };
-    query?: never;
-    url: '/match/vote/{match_id}';
-};
-
-export type VoteErrors = {
-    /**
-     * Validation Error
-     */
-    422: HttpValidationError;
-};
-
-export type VoteError = VoteErrors[keyof VoteErrors];
-
-export type VoteResponses = {
-    /**
-     * Successful Response
-     */
-    200: ClientVoteInfo;
-};
-
-export type VoteResponse = VoteResponses[keyof VoteResponses];
-
 export type DeleteMatchData = {
     body?: never;
     path: {
@@ -1356,6 +1312,35 @@ export type BindindVowResponses = {
 };
 
 export type BindindVowResponse = BindindVowResponses[keyof BindindVowResponses];
+
+export type ReverseCursedTechniqueData = {
+    body?: never;
+    path: {
+        player_id: number;
+    };
+    query: {
+        match_id: number;
+    };
+    url: '/barrier/activate/rct/{player_id}';
+};
+
+export type ReverseCursedTechniqueErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ReverseCursedTechniqueError = ReverseCursedTechniqueErrors[keyof ReverseCursedTechniqueErrors];
+
+export type ReverseCursedTechniqueResponses = {
+    /**
+     * Successful Response
+     */
+    200: BarrierTechInfo;
+};
+
+export type ReverseCursedTechniqueResponse = ReverseCursedTechniqueResponses[keyof ReverseCursedTechniqueResponses];
 
 export type GetColoniesData = {
     body?: never;

@@ -246,6 +246,7 @@ export const zBarrierRecordInfo = z.object({
     domain_counter: z.number().int().optional().default(0),
     simple_domain_counter: z.number().int().optional().default(0),
     binding_vow_counter: z.number().int().optional().default(0),
+    reverse_cursed_technique_counter: z.number().int().optional().default(0),
     id: z.number().int(),
     barrier_tech_id: z.number().int(),
     match_id: z.number().int()
@@ -459,20 +460,6 @@ export const zBodyVerifyToken = z.object({
     token: z.string()
 });
 
-export const zCastVote = z.object({
-    player_id: z.number().int(),
-    ct_app_id: z.number().int()
-});
-
-export const zClientVoteInfo = z.object({
-    message: z.string(),
-    extra_info: z.union([
-        z.array(z.string()),
-        z.null()
-    ]),
-    votes: z.array(zBaseVoteInfo)
-});
-
 export const zColonyInfo = z.object({
     country: zCountry,
     id: z.number().int(),
@@ -644,13 +631,13 @@ export const zGetMatchesResponse = z.array(zMatchInfo);
 
 export const zGetLastestMatchResponse = zMatchInfo;
 
-export const zVoteResponse = zClientVoteInfo;
-
 export const zDomainExpansionResponse = zBarrierTechInfo;
 
 export const zSimpleDomainResponse = zBarrierTechInfo;
 
 export const zBindindVowResponse = zBarrierTechInfo;
+
+export const zReverseCursedTechniqueResponse = zBarrierTechInfo;
 
 export const zGetColoniesResponse = z.array(zColonyInfo);
 

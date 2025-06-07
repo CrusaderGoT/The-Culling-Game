@@ -5,6 +5,7 @@ import { BindingVowAction } from "@/components/barrier/binding-vow";
 import { DomainExpansionAction } from "@/components/barrier/domain-expansion";
 import { SimpleDomainAction } from "@/components/barrier/simple-domain";
 import { ActionIcon } from "@mantine/core";
+import { ReverseCursedTechniqueAction } from "./reverse-cursed-technique";
 
 export type BarrierTechActionProp = {
     barrierTech: BarrierTechInfo;
@@ -30,6 +31,11 @@ export function MatchActivateBarriers({
                 ended={ended}
             />
             <BindingVowAction
+                match={match}
+                barrierTech={barrierTech}
+                ended={ended}
+            />
+            <ReverseCursedTechniqueAction
                 match={match}
                 barrierTech={barrierTech}
                 ended={ended}
