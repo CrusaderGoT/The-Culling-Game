@@ -141,6 +141,7 @@ class BasePlayerInfo(BasePlayer):
     created: date
     grade: BasePlayer.Grade
     points: float
+    alive: bool
 
 
 # CURSED TECHNIQUE
