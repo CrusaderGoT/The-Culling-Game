@@ -5,6 +5,8 @@ on the database and will be used as schemas/response/request data in the API sch
 from datetime import date
 from typing import TYPE_CHECKING, Union, Annotated
 
+from pydantic import HttpUrl
+
 from sqlmodel import Field, Relationship, SQLModel
 
 from ..models.barrier import BarrierTech, BarrierTechInfo
