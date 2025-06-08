@@ -152,6 +152,9 @@ class EditPlayer(SQLModel):
         max_length=50,
         description="The role of the player, e.g., doctor, lawyer, student, curse user, sorcerer etc.",
     )
+    picture: Annotated[str | None, HttpUrl | None] = Field(
+        default=None, description="the picture of the player"
+    )
 
 
 class EditCT(SQLModel):
