@@ -224,13 +224,22 @@ def delete_player(player_id: int, session: session, current_user: active_user):
             colony = playerdb.colony
             # add ct apps to  a variable and add/append to delete session
             ct_apps = playerdb.cursed_technique.applications
-            for app in ct_apps:
-                session.delete(app)
-            else:  # after for loop
-                session.delete(playerdb.cursed_technique)
-                session.delete(playerdb)
-                session.commit()
-            # create a new player info. This is done because after player is deleted
+
+            # if player has a match, set their status to dead instead (to avoid not null violation)
+            if (len(playerdb.matches) > 0) or (len(playerdb.votes) > 0):
+                playerdb.alive = False
+                session.add(playerdb)
+            else:
+                for app in ct_apps:
+                    session.delete(app)
+                else:  # after for loop
+                    playerdb.alive = False  # check if viable
+                    session.delete(playerdb.cursed_technique)
+                    session.delete(playerdb.barrier_technique)
+                    session.delete(playerdb)
+            # commit relevant changes
+            session.commit()
+            # (when real deleted) create a new player info. This is done because after player is deleted
             # it is removed from the session(detached state), and returning the playerdb
             # will attempt to fetch its respective user and colony, and will fail.
             # having the user(current user) and colony(colony) in variables
