@@ -219,36 +219,42 @@ def delete_player(player_id: int, session: session, current_user: active_user):
     playerdb = session.get(Player, player_id)
     if playerdb:
         if playerdb.user_id == current_user.id:  # logged in user matches players user
-            # colony is not deleted, but assigned to a variable
-            # to avoid detached error when/if fetched later, after playerdb is deleted
-            colony = playerdb.colony
-            # add ct apps to  a variable and add/append to delete session
-            ct_apps = playerdb.cursed_technique.applications
-
             # if player has a match, set their status to dead instead (to avoid not null violation)
             if (len(playerdb.matches) > 0) or (len(playerdb.votes) > 0):
                 playerdb.alive = False
                 session.add(playerdb)
-            else:
+                # commit relevant changes
+                session.commit()
+                session.refresh(playerdb)
+                return playerdb
+            else:  # thoroughly delete player
+                # colony is not deleted, but assigned to a variable
+                # to avoid detached error when/if fetched later, after playerdb is deleted
+                colony = playerdb.colony
+                # add ct apps to  a variable and add/append to delete session
+                ct_apps = playerdb.cursed_technique.applications
                 for app in ct_apps:
                     session.delete(app)
                 else:  # after for loop
-                    playerdb.alive = False  # check if viable
+                    playerdb.alive = False
                     session.delete(playerdb.cursed_technique)
-                    session.delete(playerdb.barrier_technique)
+                    if playerdb.barrier_technique:
+                        session.delete(playerdb.barrier_technique)
                     session.delete(playerdb)
-            # commit relevant changes
-            session.commit()
-            # (when real deleted) create a new player info. This is done because after player is deleted
-            # it is removed from the session(detached state), and returning the playerdb
-            # will attempt to fetch its respective user and colony, and will fail.
-            # having the user(current user) and colony(colony) in variables
-            # prevents this failure, but i think it is better to be explicit, as to avoid potential bugs.
-            update_user_colony = {"colony": colony, "user": current_user}
-            deleted_player = PlayerInfo.model_validate(
-                playerdb, update=update_user_colony
-            )
-            return deleted_player
+
+                # commit relevant changes
+                session.commit()
+
+                # create a new player info. This is done because after player is deleted
+                # it is removed from the session(detached state), and returning the playerdb
+                # will attempt to fetch its respective user and colony, and will fail.
+                # having the user(current user) and colony(colony) in variables
+                # prevents this failure, but i think it is better to be explicit, as to avoid potential bugs.
+                update_user_colony = {"colony": colony, "user": current_user}
+                deleted_player = PlayerInfo.model_validate(
+                    playerdb, update=update_user_colony
+                )
+                return deleted_player
         else:  # player user don't match
             err_msg = "Attempting to delete another player."
             raise HTTPException(status.HTTP_401_UNAUTHORIZED, err_msg)
