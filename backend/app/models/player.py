@@ -3,7 +3,7 @@
 on the database and will be used as schemas/response/request data in the API schema. All SQLModels"""
 
 from datetime import date
-from typing import TYPE_CHECKING, Union
+from typing import TYPE_CHECKING, Union, Annotated
 
 from sqlmodel import Field, Relationship, SQLModel
 
