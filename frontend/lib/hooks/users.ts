@@ -6,9 +6,9 @@ import {
 
 import { useMutation, useQuery } from "@tanstack/react-query";
 
-import { createSession } from "@/lib/session";
 import { authHeader } from "@/lib/constants/AUTHCONSTANTS";
 import { queryClient } from "@/lib/query-client/get-query-client";
+import { createSession } from "@/lib/session";
 import { notifications } from "@mantine/notifications";
 
 export const useCreateUser = () => {
@@ -52,12 +52,12 @@ export const useLoginUser = () => {
     return mutation;
 };
 
-export const useCurrentUser = (token: string) => {
+export const useCurrentUser = (token: string, tokenError?: boolean) => {
     const query = useQuery({
         ...currentUserOptions({
             headers: authHeader(token),
         }),
-        enabled: !!token, // run only if token is available
+        enabled: !!token && !tokenError, // run only if token is available
     });
 
     return query;

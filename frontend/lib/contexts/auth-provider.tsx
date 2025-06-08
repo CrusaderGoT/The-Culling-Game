@@ -1,11 +1,13 @@
 // auth/auth-provider.tsx
 "use client";
+import { UserInfo } from "@/api/client";
 import {
     refreshTokenMutation,
     verifyTokenOptions,
 } from "@/api/client/@tanstack/react-query.gen";
 import { getAPIErrorMessage } from "@/components/ui/display-api-error";
 import { tokenNames } from "@/lib/constants/AUTHCONSTANTS";
+import { useCurrentUser } from "@/lib/hooks/users";
 import { createSession, deleteSession, getClientCookie } from "@/lib/session";
 import { useMounted } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
@@ -24,11 +26,18 @@ import {
 type ContextProp = {
     token: string;
     isOnline: boolean;
+    user: {
+        userInfo?: UserInfo;
+        isPendingUser: boolean;
+    };
 };
 
 export const AuthContext = createContext<ContextProp>({
     token: "",
     isOnline: false,
+    user: {
+        isPendingUser: true,
+    },
 });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -139,6 +148,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         retry: false, // one fail -> session is deleted
     });
 
+    const { data: user, isPending: userIsPending } = useCurrentUser(
+        token,
+        isError
+    );
+
     // Set token expires after successful token verification
     useEffect(() => {
         if (tokenData) {
@@ -236,8 +250,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return {
             token: token,
             isOnline: isOnline,
+            user: {
+                userInfo: user,
+                isPendingUser: userIsPending,
+            },
         };
-    }, [token, isOnline]);
+    }, [token, isOnline, user, userIsPending]);
 
     return (
         <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
