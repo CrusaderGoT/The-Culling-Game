@@ -13,7 +13,7 @@ from enum import Enum, IntEnum
 from pathlib import Path
 from typing import Annotated, Union
 
-from pydantic import EmailStr, StringConstraints
+from pydantic import EmailStr, HttpUrl, StringConstraints
 from sqlmodel import TIMESTAMP, Column, Field, SQLModel
 
 from ..models.table import (
@@ -122,6 +122,9 @@ class BasePlayer(SQLModel):
         min_length=3,
         max_length=50,
         description="The role of the player, e.g., doctor, lawyer, student, curse user, sorcerer etc.",
+    )
+    picture: Annotated[str | None, HttpUrl | None] = Field(
+        default=None, description="the picture of the player"
     )
 
 
