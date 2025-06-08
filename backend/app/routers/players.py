@@ -231,14 +231,16 @@ def delete_player(player_id: int, session: session, current_user: active_user):
                 # colony is not deleted, but assigned to a variable
                 # to avoid detached error when/if fetched later, after playerdb is deleted
                 colony = playerdb.colony
+                # get player barrier tech here (to avoid confirm_deleted_rows warning)
+                barrier_tech = playerdb.barrier_technique
                 # add ct apps to  a variable and add/append to delete session
                 ct_apps = playerdb.cursed_technique.applications
                 for app in ct_apps:
                     session.delete(app)
                 else:  # after for loop
+                    if barrier_tech:
+                        session.delete(barrier_tech)
                     session.delete(playerdb.cursed_technique)
-                    if playerdb.barrier_technique:
-                        session.delete(playerdb.barrier_technique)
                     session.delete(playerdb)
 
                     # commit relevant changes
@@ -253,7 +255,6 @@ def delete_player(player_id: int, session: session, current_user: active_user):
                     deleted_player = PlayerInfo.model_validate(
                         playerdb, update=update_user_colony
                     )
-                    print(deleted_player)
                     return deleted_player
         else:  # player user don't match
             err_msg = "Attempting to delete another player."
