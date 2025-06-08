@@ -112,6 +112,7 @@ def colonies_with_players_available_for_part(session: session, part: int):
         exists(
             select(Player.id)
             .join(User)  # colony players must have a user
+            .where(Player.alive is True)  # only living players
             .where(
                 and_(
                     Player.colony_id == Colony.id,

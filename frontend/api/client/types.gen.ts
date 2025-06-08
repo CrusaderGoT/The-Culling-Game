@@ -193,6 +193,10 @@ export type BasePlayerInfo = {
      * The role of the player, e.g., doctor, lawyer, student, curse user, sorcerer etc.
      */
     role?: string | null;
+    /**
+     * the picture of the player
+     */
+    picture?: string | null;
     id: number;
     created: string;
     grade: Grade;
@@ -563,6 +567,10 @@ export type CreatePlayer = {
      * The role of the player, e.g., doctor, lawyer, student, curse user, sorcerer etc.
      */
     role?: string | null;
+    /**
+     * the picture of the player
+     */
+    picture?: string | null;
 };
 
 /**
@@ -769,6 +777,10 @@ export type PlayerInfo = {
      * The role of the player, e.g., doctor, lawyer, student, curse user, sorcerer etc.
      */
     role?: string | null;
+    /**
+     * the picture of the player
+     */
+    picture?: string | null;
     id: number;
     created: string;
     grade: Grade;

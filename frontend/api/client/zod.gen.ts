@@ -312,6 +312,10 @@ export const zBasePlayerInfo = z.object({
         z.string().min(3).max(50),
         z.null()
     ]).optional(),
+    picture: z.union([
+        z.string(),
+        z.null()
+    ]).optional(),
     id: z.number().int(),
     created: z.string().date(),
     grade: zGrade,
@@ -404,6 +408,10 @@ export const zCreatePlayer = z.object({
     age: z.number().int().gte(10).lte(102),
     role: z.union([
         z.string().min(3).max(50),
+        z.null()
+    ]).optional(),
+    picture: z.union([
+        z.string(),
         z.null()
     ]).optional()
 });
@@ -554,6 +562,10 @@ export const zPlayerInfo = z.object({
     age: z.number().int().gte(10).lte(102),
     role: z.union([
         z.string().min(3).max(50),
+        z.null()
+    ]).optional(),
+    picture: z.union([
+        z.string(),
         z.null()
     ]).optional(),
     id: z.number().int(),
