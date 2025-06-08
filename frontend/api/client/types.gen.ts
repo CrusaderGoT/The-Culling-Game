@@ -201,6 +201,7 @@ export type BasePlayerInfo = {
     created: string;
     grade: Grade;
     points: number;
+    alive: boolean;
 };
 
 /**
@@ -642,6 +643,10 @@ export type EditPlayer = {
      * The role of the player, e.g., doctor, lawyer, student, curse user, sorcerer etc.
      */
     role?: string | null;
+    /**
+     * the picture of the player
+     */
+    picture?: string | null;
 };
 
 /**
@@ -785,6 +790,7 @@ export type PlayerInfo = {
     created: string;
     grade: Grade;
     points: number;
+    alive: boolean;
     cursed_technique: BaseCtInfo;
     barrier_technique: BarrierTechInfo | null;
     colony: BaseColonyInfo | null;

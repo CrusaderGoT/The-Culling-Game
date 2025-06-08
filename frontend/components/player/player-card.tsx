@@ -95,7 +95,7 @@ export function PlayerCard({
                 <Group align="flex-start">
                     <MantineImage
                         component={Image}
-                        src={player.picture || null}
+                        src={player.picture}
                         fallbackSrc="/images/Kogane.png"
                         alt="Player Image"
                         height={100}

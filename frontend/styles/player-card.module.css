@@ -3,6 +3,7 @@
   width: auto;
   margin: auto;
   border-radius: 5px;
+  background-size: cover;
 }
 
 .fullHeight {

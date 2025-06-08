@@ -319,7 +319,8 @@ export const zBasePlayerInfo = z.object({
     id: z.number().int(),
     created: z.string().date(),
     grade: zGrade,
-    points: z.number()
+    points: z.number(),
+    alive: z.boolean()
 });
 
 export const zBaseMatchInfo = z.object({
@@ -360,6 +361,10 @@ export const zEditPlayer = z.object({
     ]).optional(),
     role: z.union([
         z.string().min(3).max(50),
+        z.null()
+    ]).optional(),
+    picture: z.union([
+        z.string(),
         z.null()
     ]).optional()
 });
@@ -572,6 +577,7 @@ export const zPlayerInfo = z.object({
     created: z.string().date(),
     grade: zGrade,
     points: z.number(),
+    alive: z.boolean(),
     cursed_technique: zBaseCtInfo,
     barrier_technique: z.union([
         zBarrierTechInfo,
