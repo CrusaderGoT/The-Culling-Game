@@ -5,7 +5,7 @@ import { useAuth } from "@/lib/contexts/auth-provider";
 import { useReverseCursedTechnique } from "@/lib/hooks/barrier";
 import { getColorFromId } from "@/lib/utils";
 import { ActionIcon, Text, Tooltip } from "@mantine/core";
-import { IconBalloonFilled } from "@tabler/icons-react";
+import { IconHeartPlus } from "@tabler/icons-react";
 import { useMemo } from "react";
 
 export function ReverseCursedTechniqueAction({
@@ -44,15 +44,15 @@ export function ReverseCursedTechniqueAction({
                 }}
             >
                 <Tooltip
-                    label={ended ? "match ended" : "heal"}
+                    label={ended ? "match ended" : "reverse cursed technique"}
                     multiline
                     maw={200}
                     events={{ focus: false, hover: true, touch: true }}
                 >
-                    <IconBalloonFilled />
+                    <IconHeartPlus />
                 </Tooltip>
             </ActionIcon>
-            
+
             <ActionIcon.GroupSection
                 variant="light"
                 size="xs"
@@ -60,7 +60,7 @@ export function ReverseCursedTechniqueAction({
                 color={getColorFromId(rctUse)}
             >
                 <Tooltip
-                    label={`use reverse cursed technique ${rctUse} times`}
+                    label={`used reverse cursed technique ${rctUse} times`}
                     multiline
                     maw={200}
                     events={{ focus: false, hover: true, touch: true }}

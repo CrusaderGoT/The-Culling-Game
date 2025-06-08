@@ -7,60 +7,16 @@ import { IconCrown, IconSparkles } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { useEffect, useState } from "react";
 
 // Extend dayjs with plugins
 dayjs.extend(duration);
 dayjs.extend(relativeTime);
 
-export function MatchHeader({ match }: MatchStatusHeaderProp) {
-    const [timeLeft, setTimeLeft] = useState<string>("");
-    const [isEnded, setIsEnded] = useState<boolean>(false);
-
-    useEffect(() => {
-        const updateTimer = () => {
-            const now = dayjs();
-            const endTime = dayjs(match.end);
-
-            if (now.isAfter(endTime) || now.isSame(endTime)) {
-                setIsEnded(true);
-                setTimeLeft(`ended ${endTime.fromNow()}`);
-                return;
-            }
-
-            const diff = endTime.diff(now);
-            const duration = dayjs.duration(diff);
-
-            const days = Math.floor(duration.asDays());
-            const hours = duration.hours();
-            const minutes = duration.minutes();
-            const seconds = duration.seconds();
-
-            let timeString = "";
-
-            if (days > 0) {
-                timeString = `${days}d ${hours}h ${minutes}m ${seconds}s`;
-            } else if (hours > 0) {
-                timeString = `${hours}h ${minutes}m ${seconds}s`;
-            } else if (minutes > 0) {
-                timeString = `${minutes}m ${seconds}s`;
-            } else {
-                timeString = `${seconds}s`;
-            }
-
-            setTimeLeft(timeString);
-        };
-
-        // Initial update
-        updateTimer();
-
-        // Set up interval to update every second
-        const interval = setInterval(updateTimer, 1000);
-
-        // Cleanup interval on unmount
-        return () => clearInterval(interval);
-    }, [match.end]);
-
+export function MatchHeader({
+    match,
+    isEnded,
+    timeLeft,
+}: MatchStatusHeaderProp) {
     const colony = `${match.colony.id} - ${match.colony.country}`;
 
     return (
@@ -117,4 +73,6 @@ export function MatchHeader({ match }: MatchStatusHeaderProp) {
 
 type MatchStatusHeaderProp = {
     match: MatchInfo;
+    isEnded: boolean;
+    timeLeft: string;
 };

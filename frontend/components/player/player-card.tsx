@@ -16,7 +16,7 @@ import {
 import {
     IconMatchstick,
     IconPointFilled,
-    IconSpiral
+    IconSpiral,
 } from "@tabler/icons-react";
 import clsx from "clsx";
 import Image from "next/image";
@@ -85,7 +85,7 @@ export function PlayerCard({
                                 </Text>
                             }
                             leftSection={<IconSpiral size={14} />}
-                            color="charcoal"
+                            color={getColorFromId(match.id)}
                         >
                             {playerMatchPoints}
                         </Badge>
