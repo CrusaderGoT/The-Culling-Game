@@ -57,6 +57,7 @@ class Player(BasePlayer, table=True):
         default=None, foreign_key="colony.id", ondelete="SET NULL", index=True
     )
     colony: "Colony" = Relationship(back_populates="players")
+    alive: bool = Field(default=True, description="living status of the player")
 
 
 class CreatePlayer(BasePlayer):

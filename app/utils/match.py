@@ -12,6 +12,7 @@ from sqlmodel import and_, exists, not_, select
 from app.models.colony import Colony
 from app.models.match import Match
 from app.models.player import Player
+from app.models.user import User
 from app.utils.dependencies import atp, session
 from app.utils.player import (
     get_player,
@@ -109,7 +110,9 @@ def colonies_with_players_available_for_part(session: session, part: int):
     subquery_select = select_players_fought_in_part(part=part)
     statement = select(Colony.id).where(
         exists(
-            select(Player.id).where(
+            select(Player.id)
+            .join(User)  # colony players must have a user
+            .where(
                 and_(
                     Player.colony_id == Colony.id,
                     not_(Player.id.in_(subquery_select)),  # type: ignore
