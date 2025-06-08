@@ -236,25 +236,25 @@ def delete_player(player_id: int, session: session, current_user: active_user):
                 for app in ct_apps:
                     session.delete(app)
                 else:  # after for loop
-                    playerdb.alive = False
                     session.delete(playerdb.cursed_technique)
                     if playerdb.barrier_technique:
                         session.delete(playerdb.barrier_technique)
                     session.delete(playerdb)
 
-                # commit relevant changes
-                session.commit()
+                    # commit relevant changes
+                    session.commit()
 
-                # create a new player info. This is done because after player is deleted
-                # it is removed from the session(detached state), and returning the playerdb
-                # will attempt to fetch its respective user and colony, and will fail.
-                # having the user(current user) and colony(colony) in variables
-                # prevents this failure, but i think it is better to be explicit, as to avoid potential bugs.
-                update_user_colony = {"colony": colony, "user": current_user}
-                deleted_player = PlayerInfo.model_validate(
-                    playerdb, update=update_user_colony
-                )
-                return deleted_player
+                    # create a new player info. This is done because after player is deleted
+                    # it is removed from the session(detached state), and returning the playerdb
+                    # will attempt to fetch its respective user and colony, and will fail.
+                    # having the user(current user) and colony(colony) in variables
+                    # prevents this failure, but i think it is better to be explicit, as to avoid potential bugs.
+                    update_user_colony = {"colony": colony, "user": current_user}
+                    deleted_player = PlayerInfo.model_validate(
+                        playerdb, update=update_user_colony
+                    )
+                    print(deleted_player)
+                    return deleted_player
         else:  # player user don't match
             err_msg = "Attempting to delete another player."
             raise HTTPException(status.HTTP_401_UNAUTHORIZED, err_msg)
