@@ -9,6 +9,7 @@ from sqlalchemy import create_engine
 from sqlmodel import Session, SQLModel
 
 from app.api.main import app
+from app.api.setting import settings
 from app.tests.utils_test import (
     create_test_player,
     create_test_user,
@@ -94,7 +95,7 @@ def authenticated_admin_client(test_client) -> tuple[TestClient, dict]:
     test_user = create_test_user(test_client).json()
     token = login_test_user(test_client, test_user["id"])
     client = setup_authenticated_client(test_client, token)
-    code = os.getenv("CODE")
+    code = settings.code
     super_user_res = test_client.post(
         f"/admin/superuser/{test_user['id']}", params={"code": code}
     )
