@@ -49,7 +49,7 @@ def get_players_not_in_part(colony_id: int, part: int, session: Session):
 
     # Query to get players (that have a user) in the specified colony who haven't fought in the part
     players_not_in_part_query = select(Player).where(
-        and_(Player.colony_id == colony_id, not_(Player.id.in_(part_matches_select)), Player.id.in_(viable_player_select))
+        and_(Player.colony_id == colony_id, not_(Player.id.in_(part_matches_select)), Player.id.in_(viable_players_select))
     )
 
     players_not_in_part = session.exec(players_not_in_part_query).all()
