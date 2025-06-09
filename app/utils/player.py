@@ -13,6 +13,7 @@ from app.models.player import (
     EditPlayer,
     Player,
 )
+from app.models.user import User
 from app.utils.dependencies import session
 
 
