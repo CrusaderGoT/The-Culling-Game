@@ -1,7 +1,7 @@
 from typing import Literal
 
 from fastapi import HTTPException, status
-from sqlmodel import Session, and_, not_, select
+from sqlmodel import Session, and_, select
 
 from app.models.base import MatchPlayerLink
 from app.models.match import Match
@@ -20,10 +20,7 @@ from app.utils.dependencies import session
 def get_player(session: session, player_id: int):
     "for getting a player from the database"
     player = session.get(Player, player_id)
-    if player:
-        return player
-    else:
-        return None
+    return player
 
 
 def get_players_not_in_part(colony_id: int, part: int, session: Session):
@@ -57,8 +54,10 @@ def get_players_not_in_part(colony_id: int, part: int, session: Session):
 
 
 def select_players_fought_in_part(part: int):
-    """Subquery to get player IDs who have fought in the specified part\n
-    returns a select statement"""
+    """
+    Subquery to get player IDs who have fought in the specified part\n
+    returns a select statement
+    """
     subquery = (
         select(MatchPlayerLink.player_id)
         .join(Match, MatchPlayerLink.match_id == Match.id)  # type: ignore

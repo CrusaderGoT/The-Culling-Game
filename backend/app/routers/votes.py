@@ -5,7 +5,7 @@ from app.models.match import Match
 from app.models.player import CTApp, CursedTechnique, Player
 from app.models.user import User
 from app.models.vote import CastVote, ClientVoteInfo, Vote
-from app.utils.barrier import fix_barrier_deactivation_task_fail
+from app.utils.barrier import black_flash, fix_barrier_deactivation_task_fail
 from app.utils.dependencies import atp, session
 from app.utils.match import get_match, ongoing_match
 from app.utils.vote import get_vote_point
@@ -87,10 +87,11 @@ async def vote(
                                     p for p in match.players if p.id != player.id
                                 ][0]
 
-                                # deactive any potential barrier end task fails
+                                # deactivate any potential barrier end task fails
                                 fix_barrier_deactivation_task_fail(
                                     player.barrier_technique, session
                                 )
+
                                 # get the vote point
                                 vote_point = get_vote_point(
                                     match,
@@ -101,6 +102,10 @@ async def vote(
                                 )
                                 # account for 0 vote_point, because of binding vows
                                 if vote_point > 0:
+                                    # try for black flash
+                                    if black_flash(vote_point):
+                                        vote_point *= atp.black_flash_point
+
                                     # Create and add the vote
                                     update_vote = {
                                         "user": voter,

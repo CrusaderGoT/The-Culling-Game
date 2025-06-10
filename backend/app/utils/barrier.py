@@ -1,3 +1,4 @@
+import random
 import time
 from datetime import UTC, datetime, timezone
 
@@ -339,3 +340,26 @@ def fix_barrier_deactivation_task_fail(
             deactivate_simple_domain(barrier_tech, session)
     else:
         pass
+
+
+def black_flash(current_vote_point: float, rng: random.Random = random.Random()):
+    """
+    Determine whether a “Black Flash” activates, using Beta distribution.
+    """
+
+    if current_vote_point <= 0:  # must be > 0
+        return False
+
+    impact = 0.000001  # Representing the precise timing
+    scaled_impact = 1.0 - impact * 1000  # Scaled threshold
+
+    # Using betavariate for less rare but still special Black Flash
+    # betavariate(first_number, second_number):
+    # - First number (current_vote): How often you get big values (HIGHER = more Black Flash)
+    # - Second number (1): How consistent it is
+    # (LOWER = more chaos, HIGHER = more predictable) -> with value relative to (current_vote_point)
+    # Think: (how_often_special_happens, how_crazy_or_calm)
+    # used 1 because current_vote_point will be 0.2 lower and around 1 when high
+    flash_chance = rng.betavariate(current_vote_point, 1)
+
+    return flash_chance >= scaled_impact

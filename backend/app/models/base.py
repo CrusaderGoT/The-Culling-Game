@@ -393,6 +393,7 @@ class ActionTimePoint(SQLModel):
     domain_expansion_point: float = 4.0
     simple_domain_point: float = 2.0
     reverse_cursed_technique_point: float = 0.5
+    black_flash_point: float = 2.5
 
     winner_point: float = 5.0
 

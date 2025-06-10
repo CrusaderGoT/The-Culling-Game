@@ -90,18 +90,19 @@ def random_players_for_match(
         all_players = session.exec(all_players_query).all()
 
         if not all_players:  # means only one player in colony
-            err_msg = f"Only one player in Colony {players_not_in_part[0].colony_id}, cannot make match. Try again or add a player to the colony"
+            err_msg = f"Only one player in Colony {colony_id}, cannot make match. Add a player to the colony and Try again."
             raise HTTPException(status.HTTP_412_PRECONDITION_FAILED, err_msg)
         else:
             player1 = players_not_in_part[0]  # the only player available
             player2 = choice(
                 all_players
             )  # Randomly select another player from the same colony
+            players = [player1, player2]
 
     else:  # players available are more than 2
         # Randomly select two unique players from those who haven't fought in the specified part
-        player1, player2 = sample(players_not_in_part, 2)
-    return [player1, player2]
+        players = sample(players_not_in_part, 2)
+    return players
 
 
 def colonies_with_players_available_for_part(session: session, part: int):
