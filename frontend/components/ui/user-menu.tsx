@@ -69,7 +69,11 @@ UserButton.displayName = "UserButton";
 
 function UserButtonAlt() {
     return (
-        <ActionIcon variant="transparent" className={classes.menuAlt}>
+        <ActionIcon
+            variant="transparent"
+            className={classes.menuAlt}
+            hiddenFrom="sm"
+        >
             <IconDotsVertical />
         </ActionIcon>
     );
@@ -87,7 +91,12 @@ export function UserMenu() {
     if (isPendingUser)
         return (
             <Box>
-                <Skeleton height={38} width={220} className={classes.menu} />
+                <Skeleton
+                    height={38}
+                    width={220}
+                    className={classes.menu}
+                    visibleFrom="sm"
+                />
 
                 <Skeleton
                     height={28}
