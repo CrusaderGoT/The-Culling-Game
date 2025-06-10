@@ -13,6 +13,7 @@ from app.models.player import (
     EditPlayer,
     Player,
 )
+from app.models.user import User
 from app.utils.dependencies import session
 
 
@@ -38,9 +39,21 @@ def get_players_not_in_part(colony_id: int, part: int, session: Session):
 
     part_matches_select = select(part_matches_subquery.c.player_id)
 
+    alive_players_with_users_subquery = (
+        select(Player.id)
+        .join(User)  # colony players must have a user
+        .where(Player.alive)  # only living players
+    ).subquery()
+
+    viable_players_select = select(alive_players_with_users_subquery.c.id)
+
     # Query to get players (that have a user) in the specified colony who haven't fought in the part
     players_not_in_part_query = select(Player).where(
-        and_(Player.colony_id == colony_id, not_(Player.id.in_(part_matches_select)))
+        and_(
+            Player.colony_id == colony_id,
+            not_(Player.id.in_(part_matches_select)),
+            Player.id.in_(viable_players_select),
+        )
     )
 
     players_not_in_part = session.exec(players_not_in_part_query).all()
