@@ -371,7 +371,7 @@ class BaseVote(SQLModel):
 class ActionTimePoint(SQLModel):
     "class for duration, limit, points cost, etc. of techniques, match, etc."
 
-    match_duration: timedelta = timedelta(minutes=10)
+    match_duration: timedelta = timedelta(seconds=10)
     domain_duration: timedelta = timedelta(minutes=5)
     simple_domain_duration: timedelta = timedelta(minutes=5)
     binding_vow_duration: timedelta = timedelta(minutes=5)

@@ -28,37 +28,32 @@ def get_player(session: session, player_id: int):
 
 def get_players_not_in_part(colony_id: int, part: int, session: Session):
     """
-    Fetch players from a specified colony who haven't fought in a match for the given part.
+    Fetch players (that have users and are alive)
+    from a specified colony who haven't fought in a match for the given part.
     """
-    # Subquery to get player IDs who have fought in the specified part
-    part_matches_subquery = (
-        select(MatchPlayerLink.player_id)
-        .join(Match, MatchPlayerLink.match_id == Match.id)
-        .where(Match.part == part)
-    ).subquery()
-
-    part_matches_select = select(part_matches_subquery.c.player_id)
-
-    alive_players_with_users_subquery = (
-        select(Player.id)
-        .join(User)  # colony players must have a user
-        .where(Player.alive)  # only living players
-    ).subquery()
-
-    viable_players_select = select(alive_players_with_users_subquery.c.id)
-
-    # Query to get players (that have a user) in the specified colony who haven't fought in the part
-    players_not_in_part_query = select(Player).where(
-        and_(
-            Player.colony_id == colony_id,
-            not_(Player.id.in_(part_matches_select)),
-            Player.id.in_(viable_players_select),
+    # Single query using LEFT JOIN and filtering
+    query = (
+        select(Player)
+        .join(User)  # Inner join - players must have users
+        .outerjoin(
+            MatchPlayerLink,
+            and_(
+                MatchPlayerLink.player_id == Player.id,
+                MatchPlayerLink.match_id.in_(
+                    select(Match.id).where(Match.part == part)
+                ),
+            ),
+        )
+        .where(
+            and_(
+                Player.colony_id == colony_id,
+                Player.alive.is_(True),
+                MatchPlayerLink.player_id.is_(None),  # Haven't fought in this part
+            )
         )
     )
 
-    players_not_in_part = session.exec(players_not_in_part_query).all()
-
-    return players_not_in_part
+    return session.exec(query).all()
 
 
 def select_players_fought_in_part(part: int):
