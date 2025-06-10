@@ -1,3 +1,11 @@
+<picture>
+ <source media="(prefers-color-scheme: dark)" srcset="YOUR-DARKMODE-IMAGE">
+ <source media="(prefers-color-scheme: light)" srcset="YOUR-LIGHTMODE-IMAGE">
+ <img alt="YOUR-ALT-TEXT" src="YOUR-DEFAULT-IMAGE">
+</picture>
+
+
+
 # The Culling Games
 *This is a repository for the Implementation of the culling games from reddit, r/thecullinggames as a website/api.*
 *Engineered using FastAPI and NextJS.*
