@@ -1,5 +1,6 @@
 "use client";
 
+import globalClasses from "@/styles/global.module.css";
 import classes from "@/styles/mode-toggle.module.css";
 import {
     ActionIcon,
@@ -7,7 +8,7 @@ import {
     useMantineColorScheme,
 } from "@mantine/core";
 import { IconMoon, IconSun } from "@tabler/icons-react";
-import cx from "clsx";
+import clsx from "clsx";
 
 export function ModeToggle() {
     const { setColorScheme } = useMantineColorScheme();
@@ -25,12 +26,18 @@ export function ModeToggle() {
             variant="subtle"
             radius={"xl"}
             size="md"
-            color="dark"
+            color="charcoal"
             aria-label="Toggle color scheme"
-            className={classes.iconPosition}
+            className={clsx(globalClasses.fixedTop, globalClasses.highZ)}
         >
-            <IconSun className={cx(classes.icon, classes.light)} stroke={1.5} />
-            <IconMoon className={cx(classes.icon, classes.dark)} stroke={1.5} />
+            <IconSun
+                className={clsx(classes.icon, classes.light)}
+                stroke={1.5}
+            />
+            <IconMoon
+                className={clsx(classes.icon, classes.dark)}
+                stroke={1.5}
+            />
         </ActionIcon>
     );
 }

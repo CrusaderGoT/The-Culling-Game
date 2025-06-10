@@ -1,3 +1,5 @@
+"use client";
+
 export function EditPlayerForm() {
-    return <div>edit player</div>
+    return <div>edit player</div>;
 }

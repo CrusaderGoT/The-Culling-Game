@@ -1,28 +1,25 @@
-import { PlayerInfo } from "@/api/client";
 import { MantineColor } from "@mantine/core";
 
 export function cleanString(input: string) {
     return input.replace(/\//g, " ").replace(/-/g, " ");
 }
-export function getColorFromId(id: PlayerInfo["id"]): MantineColor {
+
+export function getColorFromId(id: number): MantineColor {
     const colors: MantineColor[] = [
-        "dark",
-        "gray",
         "red",
-        "pink",
-        "grape",
-        "violet",
-        "indigo",
-        "blue",
         "cyan",
-        "teal",
-        "green",
-        "lime",
-        "yellow",
         "orange",
+        "teal",
+        "yellow",
+        "blue",
+        "lime",
+        "violet",
+        "green",
+        "pink",
+        "indigo",
         "gold",
+        "grape",
         "deepred",
-        "charcoal",
     ];
 
     const hash = Array.from(id.toString()).reduce(

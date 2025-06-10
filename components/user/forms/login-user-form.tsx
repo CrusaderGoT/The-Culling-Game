@@ -12,7 +12,6 @@ import { useLoginUser } from "@/lib/hooks/users";
 import { cleanString } from "@/lib/utils";
 
 import {
-    Alert,
     Button,
     Divider,
     Flex,
@@ -22,11 +21,7 @@ import {
     Stack,
     TextInput,
 } from "@mantine/core";
-import {
-    IconAlertCircle,
-    IconLockPassword,
-    IconUser,
-} from "@tabler/icons-react";
+import { IconLockPassword, IconUser } from "@tabler/icons-react";
 
 import { zodResolver } from "mantine-form-zod-resolver";
 import { redirect, useRouter } from "next/navigation";

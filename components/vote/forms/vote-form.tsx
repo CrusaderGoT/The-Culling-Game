@@ -15,7 +15,7 @@ import { zodResolver } from "@mantine/form";
 import { z } from "zod";
 
 import { DisplayAPIError } from "@/components/ui/display-api-error";
-import { useAuth } from "@/lib/auth/auth-provider";
+import { useAuth } from "@/lib/contexts/auth-provider";
 import { useCastVote } from "@/lib/hooks/match";
 
 export function VoteForm({ votes, matchId }: VoteFormType) {
@@ -32,7 +32,7 @@ export function VoteForm({ votes, matchId }: VoteFormType) {
         validate: zodResolver(voteSchema),
     });
 
-    const token = useAuth();
+    const { token } = useAuth();
 
     const { mutate, isPending, isError, error } = useCastVote(token);
 

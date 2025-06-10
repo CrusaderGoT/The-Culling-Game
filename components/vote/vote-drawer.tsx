@@ -19,7 +19,7 @@ import exceedVoteClasses from "@/styles/exceed-vote.module.css";
 import { notifications } from "@mantine/notifications";
 import { IconAlertCircle, IconAlertTriangle } from "@tabler/icons-react";
 import { QueryObserverResult } from "@tanstack/react-query";
-import cx from "clsx";
+import clsx from "clsx";
 
 export function VoteDrawer({
     players,
@@ -136,12 +136,12 @@ export function VoteDrawer({
                         withBorder
                         withinPortal={false}
                         position={{ bottom: 20, left: 10 }}
-                        className={cx(exceedVoteClasses.warningContainer)}
+                        className={clsx(exceedVoteClasses.warningContainer)}
                     >
                         <Group wrap="nowrap">
                             <IconAlertCircle color="red" />
                             <Text
-                                className={cx(exceedVoteClasses.warningText)}
+                                className={clsx(exceedVoteClasses.warningText)}
                                 truncate="start"
                                 flex={1}
                             >

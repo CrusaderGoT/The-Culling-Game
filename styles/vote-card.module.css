@@ -1,6 +1,6 @@
 .voteCard {
   border: 1px solid var(--mantine-color-gray-3);
-  padding: var(--mantine-spacing-xs) var(--mantine-spacing-sm);
+  padding: var(--mantine-spacing-sm);
   border-radius: var(--mantine-radius-md);
   font-weight: 500;
   transition: color 500ms ease, background-color 500ms ease,

@@ -24,7 +24,7 @@ import {
     Stack,
     Text,
     TextInput,
-    Title
+    Title,
 } from "@mantine/core";
 
 import { z } from "zod";
@@ -35,7 +35,7 @@ import {
     IconFishOff,
     IconLocationPin,
     IconLockPassword,
-    IconUser
+    IconUser,
 } from "@tabler/icons-react";
 import { redirect, useRouter } from "next/navigation";
 

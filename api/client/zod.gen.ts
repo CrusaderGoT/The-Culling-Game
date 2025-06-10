@@ -242,6 +242,16 @@ export const zAdminInfo = z.object({
     user: zBaseUserInfo
 });
 
+export const zBarrierRecordInfo = z.object({
+    domain_counter: z.number().int().optional().default(0),
+    simple_domain_counter: z.number().int().optional().default(0),
+    binding_vow_counter: z.number().int().optional().default(0),
+    reverse_cursed_technique_counter: z.number().int().optional().default(0),
+    id: z.number().int(),
+    barrier_tech_id: z.number().int(),
+    match_id: z.number().int()
+});
+
 export const zBarrierTechInfo = z.object({
     domain_expansion: z.boolean().optional().default(false),
     binding_vow: z.boolean().optional().default(false),
@@ -258,7 +268,8 @@ export const zBarrierTechInfo = z.object({
         z.string().datetime(),
         z.null()
     ]).optional(),
-    id: z.number().int()
+    id: z.number().int(),
+    player_id: z.number().int()
 });
 
 export const zBaseAdminInfo = z.object({
@@ -301,10 +312,15 @@ export const zBasePlayerInfo = z.object({
         z.string().min(3).max(50),
         z.null()
     ]).optional(),
+    picture: z.union([
+        z.string(),
+        z.null()
+    ]).optional(),
     id: z.number().int(),
     created: z.string().date(),
     grade: zGrade,
-    points: z.number()
+    points: z.number(),
+    alive: z.boolean()
 });
 
 export const zBaseMatchInfo = z.object({
@@ -319,18 +335,76 @@ export const zBaseMatchInfo = z.object({
 });
 
 export const zBaseVoteInfo = z.object({
-    player_id: z.union([
-        z.number().int(),
-        z.null()
-    ]).optional(),
-    ct_app_id: z.union([
-        z.number().int(),
-        z.null()
-    ]).optional(),
+    player_id: z.number().int(),
+    ct_app_id: z.number().int(),
     id: z.number().int(),
-    user_id: z.number().int(),
+    user_id: z.union([
+        z.number().int(),
+        z.null()
+    ]),
     point: z.number(),
     has_been_added: z.boolean().optional().default(false)
+});
+
+export const zEditPlayer = z.object({
+    name: z.union([
+        z.string().min(2).max(50),
+        z.null()
+    ]).optional(),
+    gender: z.union([
+        zGender,
+        z.null()
+    ]).optional(),
+    age: z.union([
+        z.number().int().gte(10).lte(102),
+        z.null()
+    ]).optional(),
+    role: z.union([
+        z.string().min(3).max(50),
+        z.null()
+    ]).optional(),
+    picture: z.union([
+        z.string(),
+        z.null()
+    ]).optional()
+});
+
+export const zEditCt = z.object({
+    name: z.union([
+        z.string().min(3).max(100),
+        z.null()
+    ]).optional(),
+    definition: z.union([
+        z.string().min(50).max(500),
+        z.null()
+    ]).optional()
+});
+
+export const zEditCtApp = z.object({
+    number: z.number().int().gte(1).lte(5),
+    name: z.union([
+        z.string().min(3).max(100),
+        z.null()
+    ]).optional(),
+    application: z.union([
+        z.string().min(100).max(500),
+        z.null()
+    ]).optional()
+});
+
+export const zBodyAdminEditPlayer = z.object({
+    player: z.union([
+        zEditPlayer,
+        z.null()
+    ]).optional(),
+    cursed_technique: z.union([
+        zEditCt,
+        z.null()
+    ]).optional(),
+    applications: z.union([
+        z.array(zEditCtApp).max(5),
+        z.null()
+    ]).optional()
 });
 
 export const zCreatePlayer = z.object({
@@ -339,6 +413,10 @@ export const zCreatePlayer = z.object({
     age: z.number().int().gte(10).lte(102),
     role: z.union([
         z.string().min(3).max(50),
+        z.null()
+    ]).optional(),
+    picture: z.union([
+        z.string(),
         z.null()
     ]).optional()
 });
@@ -368,48 +446,6 @@ export const zBodyCreateToken = z.object({
     ]).optional(),
     client_secret: z.union([
         z.string(),
-        z.null()
-    ]).optional()
-});
-
-export const zEditPlayer = z.object({
-    name: z.union([
-        z.string().min(2).max(50),
-        z.null()
-    ]).optional(),
-    gender: z.union([
-        zGender,
-        z.null()
-    ]).optional(),
-    age: z.union([
-        z.number().int().gte(10).lte(102),
-        z.null()
-    ]).optional(),
-    role: z.union([
-        z.string().min(3).max(50),
-        z.null()
-    ]).optional()
-});
-
-export const zEditCt = z.object({
-    name: z.union([
-        z.string().min(3).max(100),
-        z.null()
-    ]).optional(),
-    definition: z.union([
-        z.string().min(50).max(500),
-        z.null()
-    ]).optional()
-});
-
-export const zEditCtApp = z.object({
-    number: z.number().int().gte(1).lte(5),
-    name: z.union([
-        z.string().min(3).max(100),
-        z.null()
-    ]).optional(),
-    application: z.union([
-        z.string().min(100).max(500),
         z.null()
     ]).optional()
 });
@@ -509,7 +545,8 @@ export const zMatchInfo = z.object({
     ]),
     players: z.array(zBasePlayerInfo),
     colony: zBaseColonyInfo,
-    votes: z.array(zBaseVoteInfo)
+    votes: z.array(zBaseVoteInfo),
+    barrier_records: z.array(zBarrierRecordInfo)
 });
 
 export const zPermissionInfo = z.object({
@@ -532,10 +569,15 @@ export const zPlayerInfo = z.object({
         z.string().min(3).max(50),
         z.null()
     ]).optional(),
+    picture: z.union([
+        z.string(),
+        z.null()
+    ]).optional(),
     id: z.number().int(),
     created: z.string().date(),
     grade: zGrade,
     points: z.number(),
+    alive: z.boolean(),
     cursed_technique: zBaseCtInfo,
     barrier_technique: z.union([
         zBarrierTechInfo,
@@ -615,13 +657,13 @@ export const zDeletePlayerResponse = zPlayerInfo;
 
 export const zUpgradePlayerResponse = zPlayerInfo;
 
+export const zVoteResponse = zClientVoteInfo;
+
 export const zCreateMatchResponse = zMatchInfo;
 
 export const zGetMatchesResponse = z.array(zMatchInfo);
 
 export const zGetLastestMatchResponse = zMatchInfo;
-
-export const zVoteResponse = zClientVoteInfo;
 
 export const zDomainExpansionResponse = zBarrierTechInfo;
 
@@ -629,7 +671,17 @@ export const zSimpleDomainResponse = zBarrierTechInfo;
 
 export const zBindindVowResponse = zBarrierTechInfo;
 
+export const zReverseCursedTechniqueResponse = zBarrierTechInfo;
+
 export const zGetColoniesResponse = z.array(zColonyInfo);
+
+export const zAdminEditUserResponse = zUserInfo;
+
+export const zAdminDeleteUserResponse = zUserInfo;
+
+export const zAdminEditPlayerResponse = zPlayerInfo;
+
+export const zAdminDeletePlayerResponse = zPlayerInfo;
 
 export const zCreateAdminResponse = zAdminInfo;
 

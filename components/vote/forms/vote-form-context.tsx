@@ -1,3 +1,5 @@
+"use client";
+
 import { CastVote } from "@/api/client";
 import { createFormContext } from "@mantine/form";
 

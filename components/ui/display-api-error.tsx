@@ -1,3 +1,5 @@
+"use client";
+
 import { HttpValidationError } from "@/api/client";
 import { Alert, Stack, Text } from "@mantine/core";
 import { Icon, IconAlertCircle } from "@tabler/icons-react";
@@ -9,21 +11,19 @@ type DisplayAPIErrorProp = {
     AlertIcon?: Icon;
 };
 
-function ErrorAlert({ error }: { error: HttpValidationError | Error }) {
-    if (error instanceof Error) {
-        return <Text>{error.message}</Text>;
-    } else if (typeof error.detail === "string") {
-        return <Text>{error.detail}</Text>;
-    } else if (typeof error.detail === "object") {
+function APIErrorAlertText({ error }: { error: HttpValidationError | Error }) {
+    const errMsg = getAPIErrorMessage(error);
+
+    if (typeof errMsg === "string") {
+        return <Text>{errMsg}</Text>;
+    } else {
         return (
             <Stack>
-                {error.detail?.map((e, i) => (
-                    <Text key={i}>{e.msg}</Text>
+                {errMsg.map((e, i) => (
+                    <Text key={i}>{e}</Text>
                 ))}
             </Stack>
         );
-    } else {
-        return <Text>API Error Occured</Text>;
     }
 }
 
@@ -35,7 +35,19 @@ export function DisplayAPIError({
 }: DisplayAPIErrorProp) {
     return (
         <Alert title={title} color={color} icon={<AlertIcon />} my={"xs"}>
-            <ErrorAlert error={error} />
+            <APIErrorAlertText error={error} />
         </Alert>
     );
+}
+
+export function getAPIErrorMessage(error: HttpValidationError | Error) {
+    if (error instanceof Error) {
+        return error.message;
+    } else if (typeof error.detail === "string") {
+        return error.detail;
+    } else if (typeof error.detail === "object") {
+        return error.detail?.map((e) => e.msg);
+    } else {
+        return "API Error Occured";
+    }
 }

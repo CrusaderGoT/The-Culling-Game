@@ -2,9 +2,9 @@ import { defineConfig } from "@hey-api/openapi-ts";
 
 export default defineConfig({
     input:
-        process.env.NODE_ENV === "development"
-            ? "http://localhost:8000/openapi.json"
-            : "https://the-culling-games.up.railway.app/openapi.json",
+        process.env.NODE_ENV === "production"
+            ? "https://the-culling-games.up.railway.app/openapi.json"
+            : "http://localhost:8000/openapi.json",
     output: {
         format: "prettier",
         lint: "eslint",

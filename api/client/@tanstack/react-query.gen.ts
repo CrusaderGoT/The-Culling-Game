@@ -2,7 +2,7 @@
 
 import { type Options, UsersService, PlayersService, MatchesService, BarriersService, ColoniesService, AdminsService, AuthService, DefaultService } from '../sdk.gen';
 import { queryOptions, type UseMutationOptions, infiniteQueryOptions, type InfiniteData } from '@tanstack/react-query';
-import type { CurrentUserData, AuserData, EditUserData, EditUserError, EditUserResponse, DeleteUserData, DeleteUserError, DeleteUserResponse, CreatePlayerData, CreatePlayerError, CreatePlayerResponse, MyPlayerData, GetPlayersData, GetPlayersError, GetPlayersResponse, APlayerData, EditPlayerData, EditPlayerError, EditPlayerResponse, DeletePlayerData, DeletePlayerError, DeletePlayerResponse, UpgradePlayerData, UpgradePlayerError, UpgradePlayerResponse, CreateMatchData, CreateMatchError, CreateMatchResponse, GetMatchesData, GetMatchesError, GetMatchesResponse, GetLastestMatchData, VoteData, VoteError, VoteResponse, DeleteMatchData, DeleteMatchError, DomainExpansionData, DomainExpansionError, DomainExpansionResponse, SimpleDomainData, SimpleDomainError, SimpleDomainResponse, BindindVowData, BindindVowError, BindindVowResponse, GetColoniesData, GetColoniesError, GetColoniesResponse, CreateAdminData, CreateAdminError, CreateAdminResponse, NewPermissionData, NewPermissionError, NewPermissionResponse, GrantPermissionData, GrantPermissionError, GrantPermissionResponse, RemovePermissionData, RemovePermissionError, RemovePermissionResponse, DemoSuperuserData, DemoSuperuserError, CreateTokenData, CreateTokenError, CreateTokenResponse, RefreshTokenData, RefreshTokenError, RefreshTokenResponse, VerifyTokenData, VerifyTokenError, VerifyTokenResponse, CreateUserData, CreateUserError, CreateUserResponse, ChatHtmlData } from '../types.gen';
+import type { CurrentUserData, AuserData, EditUserData, EditUserError, EditUserResponse, DeleteUserData, DeleteUserError, DeleteUserResponse, CreatePlayerData, CreatePlayerError, CreatePlayerResponse, MyPlayerData, GetPlayersData, GetPlayersError, GetPlayersResponse, APlayerData, EditPlayerData, EditPlayerError, EditPlayerResponse, DeletePlayerData, DeletePlayerError, DeletePlayerResponse, UpgradePlayerData, UpgradePlayerError, UpgradePlayerResponse, VoteData, VoteError, VoteResponse, CreateMatchData, CreateMatchError, CreateMatchResponse, GetMatchesData, GetMatchesError, GetMatchesResponse, GetLastestMatchData, DeleteMatchData, DeleteMatchError, DomainExpansionData, DomainExpansionError, DomainExpansionResponse, SimpleDomainData, SimpleDomainError, SimpleDomainResponse, BindindVowData, BindindVowError, BindindVowResponse, ReverseCursedTechniqueData, ReverseCursedTechniqueError, ReverseCursedTechniqueResponse, GetColoniesData, GetColoniesError, GetColoniesResponse, DemoSuperuserData, DemoSuperuserError, AdminEditUserData, AdminEditUserError, AdminEditUserResponse, AdminDeleteUserData, AdminDeleteUserError, AdminDeleteUserResponse, AdminEditPlayerData, AdminEditPlayerError, AdminEditPlayerResponse, AdminDeletePlayerData, AdminDeletePlayerError, AdminDeletePlayerResponse, CreateAdminData, CreateAdminError, CreateAdminResponse, NewPermissionData, NewPermissionError, NewPermissionResponse, GrantPermissionData, GrantPermissionError, GrantPermissionResponse, RemovePermissionData, RemovePermissionError, RemovePermissionResponse, CreateTokenData, CreateTokenError, CreateTokenResponse, RefreshTokenData, RefreshTokenError, RefreshTokenResponse, VerifyTokenData, VerifyTokenError, VerifyTokenResponse, CreateUserData, CreateUserError, CreateUserResponse, ChatHtmlData } from '../types.gen';
 import { client as _heyApiClient } from '../client.gen';
 
 export type QueryKey<TOptions extends Options> = [
@@ -348,6 +348,51 @@ export const upgradePlayerMutation = (options?: Partial<Options<UpgradePlayerDat
     return mutationOptions;
 };
 
+export const voteQueryKey = (options: Options<VoteData>) => createQueryKey('vote', options);
+
+/**
+ * Vote
+ * function for casting votes
+ *
+ * - a match id is required
+ * - if an invalid vote cursed application id or player id is submitted, they are ignored.
+ */
+export const voteOptions = (options: Options<VoteData>) => {
+    return queryOptions({
+        queryFn: async ({ queryKey, signal }) => {
+            const { data } = await MatchesService.vote({
+                ...options,
+                ...queryKey[0],
+                signal,
+                throwOnError: true
+            });
+            return data;
+        },
+        queryKey: voteQueryKey(options)
+    });
+};
+
+/**
+ * Vote
+ * function for casting votes
+ *
+ * - a match id is required
+ * - if an invalid vote cursed application id or player id is submitted, they are ignored.
+ */
+export const voteMutation = (options?: Partial<Options<VoteData>>): UseMutationOptions<VoteResponse, VoteError, Options<VoteData>> => {
+    const mutationOptions: UseMutationOptions<VoteResponse, VoteError, Options<VoteData>> = {
+        mutationFn: async (localOptions) => {
+            const { data } = await MatchesService.vote({
+                ...options,
+                ...localOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
 export const createMatchQueryKey = (options: Options<CreateMatchData>) => createQueryKey('createMatch', options);
 
 /**
@@ -457,51 +502,6 @@ export const getLastestMatchOptions = (options?: Options<GetLastestMatchData>) =
         },
         queryKey: getLastestMatchQueryKey(options)
     });
-};
-
-export const voteQueryKey = (options: Options<VoteData>) => createQueryKey('vote', options);
-
-/**
- * Vote
- * function for casting votes
- *
- * - a match id is required
- * - if an invalid vote cursed application id or player id is submitted, they are ignored.
- */
-export const voteOptions = (options: Options<VoteData>) => {
-    return queryOptions({
-        queryFn: async ({ queryKey, signal }) => {
-            const { data } = await MatchesService.vote({
-                ...options,
-                ...queryKey[0],
-                signal,
-                throwOnError: true
-            });
-            return data;
-        },
-        queryKey: voteQueryKey(options)
-    });
-};
-
-/**
- * Vote
- * function for casting votes
- *
- * - a match id is required
- * - if an invalid vote cursed application id or player id is submitted, they are ignored.
- */
-export const voteMutation = (options?: Partial<Options<VoteData>>): UseMutationOptions<VoteResponse, VoteError, Options<VoteData>> => {
-    const mutationOptions: UseMutationOptions<VoteResponse, VoteError, Options<VoteData>> = {
-        mutationFn: async (localOptions) => {
-            const { data } = await MatchesService.vote({
-                ...options,
-                ...localOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
 };
 
 /**
@@ -653,6 +653,45 @@ export const bindindVowMutation = (options?: Partial<Options<BindindVowData>>): 
     return mutationOptions;
 };
 
+export const reverseCursedTechniqueQueryKey = (options: Options<ReverseCursedTechniqueData>) => createQueryKey('reverseCursedTechnique', options);
+
+/**
+ * Reverse Cursed Technique
+ * activates a reverse cursed technique
+ */
+export const reverseCursedTechniqueOptions = (options: Options<ReverseCursedTechniqueData>) => {
+    return queryOptions({
+        queryFn: async ({ queryKey, signal }) => {
+            const { data } = await BarriersService.reverseCursedTechnique({
+                ...options,
+                ...queryKey[0],
+                signal,
+                throwOnError: true
+            });
+            return data;
+        },
+        queryKey: reverseCursedTechniqueQueryKey(options)
+    });
+};
+
+/**
+ * Reverse Cursed Technique
+ * activates a reverse cursed technique
+ */
+export const reverseCursedTechniqueMutation = (options?: Partial<Options<ReverseCursedTechniqueData>>): UseMutationOptions<ReverseCursedTechniqueResponse, ReverseCursedTechniqueError, Options<ReverseCursedTechniqueData>> => {
+    const mutationOptions: UseMutationOptions<ReverseCursedTechniqueResponse, ReverseCursedTechniqueError, Options<ReverseCursedTechniqueData>> = {
+        mutationFn: async (localOptions) => {
+            const { data } = await BarriersService.reverseCursedTechnique({
+                ...options,
+                ...localOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
 export const getColoniesQueryKey = (options?: Options<GetColoniesData>) => createQueryKey('getColonies', options);
 
 /**
@@ -702,6 +741,113 @@ export const getColoniesInfiniteOptions = (options?: Options<GetColoniesData>) =
         },
         queryKey: getColoniesInfiniteQueryKey(options)
     });
+};
+
+export const demoSuperuserQueryKey = (options: Options<DemoSuperuserData>) => createQueryKey('demoSuperuser', options);
+
+/**
+ * Demo Superuser
+ */
+export const demoSuperuserOptions = (options: Options<DemoSuperuserData>) => {
+    return queryOptions({
+        queryFn: async ({ queryKey, signal }) => {
+            const { data } = await AdminsService.demoSuperuser({
+                ...options,
+                ...queryKey[0],
+                signal,
+                throwOnError: true
+            });
+            return data;
+        },
+        queryKey: demoSuperuserQueryKey(options)
+    });
+};
+
+/**
+ * Demo Superuser
+ */
+export const demoSuperuserMutation = (options?: Partial<Options<DemoSuperuserData>>): UseMutationOptions<unknown, DemoSuperuserError, Options<DemoSuperuserData>> => {
+    const mutationOptions: UseMutationOptions<unknown, DemoSuperuserError, Options<DemoSuperuserData>> = {
+        mutationFn: async (localOptions) => {
+            const { data } = await AdminsService.demoSuperuser({
+                ...options,
+                ...localOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Admin Operation to Edit a USer
+ */
+export const adminEditUserMutation = (options?: Partial<Options<AdminEditUserData>>): UseMutationOptions<AdminEditUserResponse, AdminEditUserError, Options<AdminEditUserData>> => {
+    const mutationOptions: UseMutationOptions<AdminEditUserResponse, AdminEditUserError, Options<AdminEditUserData>> = {
+        mutationFn: async (localOptions) => {
+            const { data } = await AdminsService.adminEditUser({
+                ...options,
+                ...localOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Admin Operation to Delete a USer
+ */
+export const adminDeleteUserMutation = (options?: Partial<Options<AdminDeleteUserData>>): UseMutationOptions<AdminDeleteUserResponse, AdminDeleteUserError, Options<AdminDeleteUserData>> => {
+    const mutationOptions: UseMutationOptions<AdminDeleteUserResponse, AdminDeleteUserError, Options<AdminDeleteUserData>> = {
+        mutationFn: async (localOptions) => {
+            const { data } = await AdminsService.adminDeleteUser({
+                ...options,
+                ...localOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Admin editing a player details.
+ * admin api for editing a plauyer
+ */
+export const adminEditPlayerMutation = (options?: Partial<Options<AdminEditPlayerData>>): UseMutationOptions<AdminEditPlayerResponse, AdminEditPlayerError, Options<AdminEditPlayerData>> => {
+    const mutationOptions: UseMutationOptions<AdminEditPlayerResponse, AdminEditPlayerError, Options<AdminEditPlayerData>> = {
+        mutationFn: async (localOptions) => {
+            const { data } = await AdminsService.adminEditPlayer({
+                ...options,
+                ...localOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Admin deletion of a player
+ * API for admin deletion of a player
+ */
+export const adminDeletePlayerMutation = (options?: Partial<Options<AdminDeletePlayerData>>): UseMutationOptions<AdminDeletePlayerResponse, AdminDeletePlayerError, Options<AdminDeletePlayerData>> => {
+    const mutationOptions: UseMutationOptions<AdminDeletePlayerResponse, AdminDeletePlayerError, Options<AdminDeletePlayerData>> = {
+        mutationFn: async (localOptions) => {
+            const { data } = await AdminsService.adminDeletePlayer({
+                ...options,
+                ...localOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
 };
 
 export const createAdminQueryKey = (options: Options<CreateAdminData>) => createQueryKey('createAdmin', options);
@@ -807,43 +953,6 @@ export const removePermissionMutation = (options?: Partial<Options<RemovePermiss
     const mutationOptions: UseMutationOptions<RemovePermissionResponse, RemovePermissionError, Options<RemovePermissionData>> = {
         mutationFn: async (localOptions) => {
             const { data } = await AdminsService.removePermission({
-                ...options,
-                ...localOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
-};
-
-export const demoSuperuserQueryKey = (options: Options<DemoSuperuserData>) => createQueryKey('demoSuperuser', options);
-
-/**
- * Demo Superuser
- */
-export const demoSuperuserOptions = (options: Options<DemoSuperuserData>) => {
-    return queryOptions({
-        queryFn: async ({ queryKey, signal }) => {
-            const { data } = await AdminsService.demoSuperuser({
-                ...options,
-                ...queryKey[0],
-                signal,
-                throwOnError: true
-            });
-            return data;
-        },
-        queryKey: demoSuperuserQueryKey(options)
-    });
-};
-
-/**
- * Demo Superuser
- */
-export const demoSuperuserMutation = (options?: Partial<Options<DemoSuperuserData>>): UseMutationOptions<unknown, DemoSuperuserError, Options<DemoSuperuserData>> => {
-    const mutationOptions: UseMutationOptions<unknown, DemoSuperuserError, Options<DemoSuperuserData>> = {
-        mutationFn: async (localOptions) => {
-            const { data } = await AdminsService.demoSuperuser({
                 ...options,
                 ...localOptions,
                 throwOnError: true

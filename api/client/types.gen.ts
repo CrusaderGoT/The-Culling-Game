@@ -10,11 +10,34 @@ export type AdminInfo = {
     user: BaseUserInfo;
 };
 
+export type BarrierRecordInfo = {
+    /**
+     * the number of times a domain is activated
+     */
+    domain_counter?: number;
+    /**
+     * the number of times a simple domain is activated
+     */
+    simple_domain_counter?: number;
+    /**
+     * the number of times a binding vow is activated
+     */
+    binding_vow_counter?: number;
+    /**
+     * the number of times a reverse cursed technique is activated
+     */
+    reverse_cursed_technique_counter?: number;
+    id: number;
+    barrier_tech_id: number;
+    match_id: number;
+};
+
 /**
  * Represents barrier technique information for client-side.
  *
  * Attributes:
  * id (int): Unique identifier for the barrier technique.
+ * player_id: int
  * domain_expansion: bool = Field(default=False, description="the player's domain expansion")
  * binding_vow: bool = Field(default=False, description="the player's binding vow")
  * simple_domain: bool = Field(default=False, description="the player's simple domain")
@@ -49,6 +72,7 @@ export type BarrierTechInfo = {
      */
     sd_end_time?: string | null;
     id: number;
+    player_id: number;
 };
 
 /**
@@ -169,10 +193,15 @@ export type BasePlayerInfo = {
      * The role of the player, e.g., doctor, lawyer, student, curse user, sorcerer etc.
      */
     role?: string | null;
+    /**
+     * the picture of the player
+     */
+    picture?: string | null;
     id: number;
     created: string;
     grade: Grade;
     points: number;
+    alive: boolean;
 };
 
 /**
@@ -208,13 +237,13 @@ export type BaseUserInfo = {
  * `point: float = Field(description="the point a vote carries")`
  */
 export type BaseVoteInfo = {
-    player_id?: number | null;
-    ct_app_id?: number | null;
+    player_id: number;
+    ct_app_id: number;
     id: number;
     /**
      * the id of the user that casted their votes
      */
-    user_id: number;
+    user_id: number | null;
     /**
      * the point a vote carries
      */
@@ -223,6 +252,12 @@ export type BaseVoteInfo = {
      * whether or not the vote point has been added to a player's point
      */
     has_been_added?: boolean;
+};
+
+export type BodyAdminEditPlayer = {
+    player?: EditPlayer | null;
+    cursed_technique?: EditCt | null;
+    applications?: Array<EditCtApp> | null;
 };
 
 export type BodyCreatePlayer = {
@@ -533,6 +568,10 @@ export type CreatePlayer = {
      * The role of the player, e.g., doctor, lawyer, student, curse user, sorcerer etc.
      */
     role?: string | null;
+    /**
+     * the picture of the player
+     */
+    picture?: string | null;
 };
 
 /**
@@ -604,6 +643,10 @@ export type EditPlayer = {
      * The role of the player, e.g., doctor, lawyer, student, curse user, sorcerer etc.
      */
     role?: string | null;
+    /**
+     * the picture of the player
+     */
+    picture?: string | null;
 };
 
 /**
@@ -667,6 +710,7 @@ export type MatchInfo = {
     players: Array<BasePlayerInfo>;
     colony: BaseColonyInfo;
     votes: Array<BaseVoteInfo>;
+    barrier_records: Array<BarrierRecordInfo>;
 };
 
 /**
@@ -738,10 +782,15 @@ export type PlayerInfo = {
      * The role of the player, e.g., doctor, lawyer, student, curse user, sorcerer etc.
      */
     role?: string | null;
+    /**
+     * the picture of the player
+     */
+    picture?: string | null;
     id: number;
     created: string;
     grade: Grade;
     points: number;
+    alive: boolean;
     cursed_technique: BaseCtInfo;
     barrier_technique: BarrierTechInfo | null;
     colony: BaseColonyInfo | null;
@@ -1106,6 +1155,33 @@ export type UpgradePlayerResponses = {
 
 export type UpgradePlayerResponse = UpgradePlayerResponses[keyof UpgradePlayerResponses];
 
+export type VoteData = {
+    body: Array<CastVote>;
+    path: {
+        match_id: number;
+    };
+    query?: never;
+    url: '/match/vote/{match_id}';
+};
+
+export type VoteErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type VoteError = VoteErrors[keyof VoteErrors];
+
+export type VoteResponses = {
+    /**
+     * Successful Response
+     */
+    200: ClientVoteInfo;
+};
+
+export type VoteResponse = VoteResponses[keyof VoteResponses];
+
 export type CreateMatchData = {
     body?: never;
     path?: never;
@@ -1190,33 +1266,6 @@ export type GetLastestMatchResponses = {
 };
 
 export type GetLastestMatchResponse = GetLastestMatchResponses[keyof GetLastestMatchResponses];
-
-export type VoteData = {
-    body: Array<CastVote>;
-    path: {
-        match_id: number;
-    };
-    query?: never;
-    url: '/match/vote/{match_id}';
-};
-
-export type VoteErrors = {
-    /**
-     * Validation Error
-     */
-    422: HttpValidationError;
-};
-
-export type VoteError = VoteErrors[keyof VoteErrors];
-
-export type VoteResponses = {
-    /**
-     * Successful Response
-     */
-    200: ClientVoteInfo;
-};
-
-export type VoteResponse = VoteResponses[keyof VoteResponses];
 
 export type DeleteMatchData = {
     body?: never;
@@ -1330,6 +1379,35 @@ export type BindindVowResponses = {
 
 export type BindindVowResponse = BindindVowResponses[keyof BindindVowResponses];
 
+export type ReverseCursedTechniqueData = {
+    body?: never;
+    path: {
+        player_id: number;
+    };
+    query: {
+        match_id: number;
+    };
+    url: '/barrier/activate/rct/{player_id}';
+};
+
+export type ReverseCursedTechniqueErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ReverseCursedTechniqueError = ReverseCursedTechniqueErrors[keyof ReverseCursedTechniqueErrors];
+
+export type ReverseCursedTechniqueResponses = {
+    /**
+     * Successful Response
+     */
+    200: BarrierTechInfo;
+};
+
+export type ReverseCursedTechniqueResponse = ReverseCursedTechniqueResponses[keyof ReverseCursedTechniqueResponses];
+
 export type GetColoniesData = {
     body?: never;
     path?: never;
@@ -1357,6 +1435,150 @@ export type GetColoniesResponses = {
 };
 
 export type GetColoniesResponse = GetColoniesResponses[keyof GetColoniesResponses];
+
+export type DemoSuperuserData = {
+    body?: never;
+    path: {
+        /**
+         * The user's Id, Username, or Email
+         */
+        user: number | string;
+    };
+    query: {
+        code: string;
+    };
+    url: '/admin/superuser/{user}';
+};
+
+export type DemoSuperuserErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type DemoSuperuserError = DemoSuperuserErrors[keyof DemoSuperuserErrors];
+
+export type DemoSuperuserResponses = {
+    /**
+     * Successful Response
+     */
+    200: unknown;
+};
+
+export type AdminEditUserData = {
+    body: EditUser;
+    path: {
+        /**
+         * The user's Id, Username, or Email
+         */
+        user: number | string;
+    };
+    query?: never;
+    url: '/admin/edit-user/{user}';
+};
+
+export type AdminEditUserErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type AdminEditUserError = AdminEditUserErrors[keyof AdminEditUserErrors];
+
+export type AdminEditUserResponses = {
+    /**
+     * Edited User
+     */
+    200: UserInfo;
+};
+
+export type AdminEditUserResponse = AdminEditUserResponses[keyof AdminEditUserResponses];
+
+export type AdminDeleteUserData = {
+    body?: never;
+    path: {
+        /**
+         * The user's Id, Username, or Email
+         */
+        user: number | string;
+    };
+    query?: never;
+    url: '/admin/delete-user/{user}';
+};
+
+export type AdminDeleteUserErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type AdminDeleteUserError = AdminDeleteUserErrors[keyof AdminDeleteUserErrors];
+
+export type AdminDeleteUserResponses = {
+    /**
+     * Deleted User
+     */
+    200: UserInfo;
+};
+
+export type AdminDeleteUserResponse = AdminDeleteUserResponses[keyof AdminDeleteUserResponses];
+
+export type AdminEditPlayerData = {
+    body?: BodyAdminEditPlayer;
+    path?: never;
+    query: {
+        player_id: number;
+    };
+    url: '/admin/edit-player';
+};
+
+export type AdminEditPlayerErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type AdminEditPlayerError = AdminEditPlayerErrors[keyof AdminEditPlayerErrors];
+
+export type AdminEditPlayerResponses = {
+    /**
+     * Edited Player
+     */
+    200: PlayerInfo;
+};
+
+export type AdminEditPlayerResponse = AdminEditPlayerResponses[keyof AdminEditPlayerResponses];
+
+export type AdminDeletePlayerData = {
+    body?: never;
+    path?: never;
+    query: {
+        player_id: number;
+    };
+    url: '/admin/delete-player';
+};
+
+export type AdminDeletePlayerErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type AdminDeletePlayerError = AdminDeletePlayerErrors[keyof AdminDeletePlayerErrors];
+
+export type AdminDeletePlayerResponses = {
+    /**
+     * A deleted player
+     */
+    200: PlayerInfo;
+};
+
+export type AdminDeletePlayerResponse = AdminDeletePlayerResponses[keyof AdminDeletePlayerResponses];
 
 export type CreateAdminData = {
     body: Array<PermissionRequest>;
@@ -1472,36 +1694,6 @@ export type RemovePermissionResponses = {
 };
 
 export type RemovePermissionResponse = RemovePermissionResponses[keyof RemovePermissionResponses];
-
-export type DemoSuperuserData = {
-    body?: never;
-    path: {
-        /**
-         * The user's Id, Username, or Email
-         */
-        user: number | string;
-    };
-    query: {
-        code: string;
-    };
-    url: '/admin/superuser/{user}';
-};
-
-export type DemoSuperuserErrors = {
-    /**
-     * Validation Error
-     */
-    422: HttpValidationError;
-};
-
-export type DemoSuperuserError = DemoSuperuserErrors[keyof DemoSuperuserErrors];
-
-export type DemoSuperuserResponses = {
-    /**
-     * Successful Response
-     */
-    200: unknown;
-};
 
 export type CreateTokenData = {
     body: BodyCreateToken;

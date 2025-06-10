@@ -1,3 +1,5 @@
+"use client";
+
 import { createFormContext } from "@mantine/form";
 
 import { z } from "zod";

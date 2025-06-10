@@ -29,13 +29,12 @@ import {
 
 import { forwardRef } from "react";
 
-import { useAuth } from "@/lib/auth/auth-provider";
-import { deleteSession } from "@/lib/auth/session";
-import { useCurrentUser } from "@/lib/hooks/users";
+import { useAuth } from "@/lib/contexts/auth-provider";
+import { deleteSession } from "@/lib/session";
+import { getColorFromId } from "@/lib/utils";
 import classes from "@/styles/user-menu.module.css";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { getColorFromId } from "@/lib/utils";
 
 interface UserButtonProps extends React.ComponentPropsWithoutRef<"button"> {
     user: UserInfo;
@@ -81,11 +80,11 @@ export function UserMenu() {
 
     const router = useRouter();
 
-    const token = useAuth();
+    const {
+        user: { userInfo, isPendingUser },
+    } = useAuth();
 
-    const { data: user, isPending } = useCurrentUser(token);
-
-    if (isPending)
+    if (isPendingUser)
         return (
             <Box>
                 <Skeleton height={38} width={220} className={classes.menu} />
@@ -99,7 +98,7 @@ export function UserMenu() {
             </Box>
         );
 
-    if (!user) return <AnonMenu />;
+    if (!userInfo) return <AnonMenu />;
 
     return (
         <Menu
@@ -108,12 +107,26 @@ export function UserMenu() {
         >
             <Menu.Target>
                 <Group>
-                    <UserButton user={user} className={classes.menu} />
+                    <UserButton user={userInfo} className={classes.menu} />
                     <UserButtonAlt />
                 </Group>
             </Menu.Target>
 
             <Menu.Dropdown>
+                <Box className={classes.menuAlt}>
+                    <Group justify="center" m={"xs"}>
+                        <Text size="xs">{userInfo.username}</Text>
+                        {userInfo?.player && (
+                            <Indicator
+                                size={7}
+                                color={getColorFromId(userInfo.player.id)}
+                            />
+                        )}
+                    </Group>
+
+                    <Menu.Divider />
+                </Box>
+
                 <Menu.Item
                     leftSection={
                         <IconUserEdit
@@ -132,7 +145,7 @@ export function UserMenu() {
                             size={16}
                             stroke={1.5}
                             color={
-                                user.player
+                                userInfo.player
                                     ? theme.colors.blue[5]
                                     : theme.colors.green[7]
                             }
@@ -141,14 +154,14 @@ export function UserMenu() {
                     component={Link}
                     href="/player/form"
                 >
-                    {user.player ? "Edit Player" : "Create Player"}
+                    {userInfo.player ? "Edit Player" : "Create Player"}
                 </Menu.Item>
 
                 <Menu.Label>Settings</Menu.Label>
                 <Menu.Item
                     leftSection={<IconSettings size={16} stroke={1.5} />}
                 >
-                    Account settings
+                    Settings
                 </Menu.Item>
 
                 <Menu.Item

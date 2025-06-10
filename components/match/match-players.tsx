@@ -1,24 +1,18 @@
-import { PlayerInfo } from "@/api/client";
-import {
-    Avatar,
-    Badge,
-    Box,
-    Center,
-    Flex,
-    Group,
-    Paper,
-    Stack,
-    Text,
-    ThemeIcon,
-} from "@mantine/core";
+"use client";
 
-import { IconArrowUp, IconChartArcs, IconVs } from "@tabler/icons-react";
+import { MatchInfo, PlayerInfo } from "@/api/client";
+import { Box, Center, Flex, ThemeIcon } from "@mantine/core";
+
+import { PlayerCard } from "@/components/player/player-card";
+import { IconVs } from "@tabler/icons-react";
 import { Fragment } from "react";
 
 type MatchPlayersProp = {
     players: PlayerInfo[];
+    match: MatchInfo;
+    ended: boolean;
 };
-export function MatchPlayers({ players }: MatchPlayersProp) {
+export function MatchPlayers({ players, match, ended }: MatchPlayersProp) {
     return (
         <Flex
             justify="space-between"
@@ -29,7 +23,11 @@ export function MatchPlayers({ players }: MatchPlayersProp) {
                 return (
                     <Fragment key={index}>
                         <Box flex={1}>
-                            <PlayerPaper player={player} />
+                            <PlayerCard
+                                player={player}
+                                match={match}
+                                ended={ended}
+                            />
                         </Box>
 
                         {index + 1 < players.length && (
@@ -55,26 +53,5 @@ export function MatchPlayers({ players }: MatchPlayersProp) {
                 );
             })}
         </Flex>
-    );
-}
-
-function PlayerPaper({ player }: { player: PlayerInfo }) {
-    return (
-        <Paper withBorder p={"xs"}>
-            <Group justify="space-between" p={5}>
-                <Badge
-                    size="xs"
-                    leftSection={<IconChartArcs size={14} />}
-                    rightSection={<IconArrowUp size={14} />}
-                >
-                    {player.points}
-                </Badge>
-            </Group>
-            <Stack p={"md"} align="center">
-                <Avatar size={"lg"} name="Nahte" />
-                <Text>{player.name}</Text>
-                <Badge>Grade {player.grade}</Badge>
-            </Stack>
-        </Paper>
     );
 }

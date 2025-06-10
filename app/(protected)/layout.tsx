@@ -1,11 +1,8 @@
 // app/(protected)/layout.tsx
 
+import { AuthProvider } from "@/lib/contexts/auth-provider";
 
-import { UserMenu } from "@/components/ui/user-menu";
-import { AuthProvider } from "@/lib/auth/auth-provider";
-import { ActionIcon, Group, Stack } from "@mantine/core";
-import { IconHome } from "@tabler/icons-react";
-import Link from "next/link";
+import { MainContainer } from "@/components/ui/container";
 
 export default async function ProtectedLayout({
     children,
@@ -14,20 +11,7 @@ export default async function ProtectedLayout({
 }) {
     return (
         <AuthProvider>
-            <Stack>
-                <Group justify="flex-end" align="center" gap={"xl"}>
-                    <ActionIcon
-                        variant="transparent"
-                        component={Link}
-                        href="/match"
-                    >
-                        <IconHome />
-                    </ActionIcon>
-
-                    <UserMenu />
-                </Group>
-                {children}
-            </Stack>
+            <MainContainer>{children}</MainContainer>
         </AuthProvider>
     );
 }

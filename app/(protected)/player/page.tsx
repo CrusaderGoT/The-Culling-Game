@@ -25,7 +25,7 @@ import {
 
 const player = {
     name: "Alex Mercer",
-    avatar: "https://randomuser.me/api/portraits/men/32.jpg",
+    avatar: "https://avatars.githubusercontent.com/u/133652764?v=4",
     level: 27,
     rank: "Diamond",
     stats: {

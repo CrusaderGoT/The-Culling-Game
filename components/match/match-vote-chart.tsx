@@ -1,6 +1,9 @@
+"use client";
+
 import { BaseCtAppInfo, BaseVoteInfo, PlayerInfo } from "@/api/client";
 import { getColorFromId } from "@/lib/utils";
 import { BarChart } from "@mantine/charts";
+import { Tooltip } from "@mantine/core";
 
 // Props
 type MatchVoteChartProps = {
@@ -17,68 +20,89 @@ export function MatchVoteChart({ players, votes }: MatchVoteChartProps) {
         });
     });
 
-    // Group votes by player and ct_app
-    const votesByPlayer = votes.reduce((acc, vote) => {
-        if (!vote.player_id) return acc;
-        const playerId = vote.player_id;
-        if (!acc[playerId]) acc[playerId] = {};
-
-        if (vote.ct_app_id) {
-            const ctApp = ctAppMap.get(vote.ct_app_id);
-            const ctAppName = ctApp ? ctApp.name : `CT App ${vote.ct_app_id}`;
-            if (!acc[playerId][ctAppName]) acc[playerId][ctAppName] = 0;
-            acc[playerId][ctAppName] += vote.point;
-        } else {
-            if (!acc[playerId]["Direct Votes"])
-                acc[playerId]["Direct Votes"] = 0;
-            acc[playerId]["Direct Votes"] += vote.point;
-        }
-
-        return acc;
-    }, {} as Record<number, Record<string, number>>);
-
     // Convert to chart data format
-    const data = players
-        .map((player) => {
-            const playerVotes = votesByPlayer[player.id] || {};
-            return {
-                player: player.name,
-                ...playerVotes,
-            };
-        })
-        .filter((playerData) => {
-            const { player, ...voteData } = playerData;
-            return Object.keys(voteData).length > 0;
+    const data: Record<string, string | number>[] = [];
+    const series: { name: string; color: string }[] = [];
+
+    players.forEach((player, index) => {
+        const voteData = new Map<string, string | number>();
+        const playerName = player.name.trim();
+
+        // Handle duplicate player names
+        voteData.set(
+            "player",
+            data.some((d) => d.player === playerName)
+                ? `${playerName}-${index + 1}`
+                : playerName
+        );
+
+        const playerVotes = votes.filter(
+            (vote) => vote.player_id === player.id
+        );
+
+        playerVotes.forEach((vote) => {
+            const ctApp = ctAppMap.get(vote.ct_app_id);
+            if (!ctApp) return;
+
+            let ctAppName = ctApp.name;
+
+            // Handle duplicate CT app names
+            if (data.some((d) => d.hasOwnProperty(ctAppName))) {
+                ctAppName = `${ctAppName} (${voteData.get("player")})`;
+            }
+
+            // Update vote points
+            const currentPoints = (voteData.get(ctAppName) as number) || 0;
+            voteData.set(ctAppName, currentPoints + vote.point);
+
+            // Add series entry if not exists
+            if (!series.some((s) => s.name === ctAppName)) {
+                series.push({
+                    name: ctAppName,
+                    color: getColorFromId(vote.ct_app_id + vote.point),
+                });
+            }
         });
 
-    // Get all unique CT app names for series
-    const allCtAppNames = new Set<string>();
-    Object.values(votesByPlayer).forEach((playerVotes) => {
-        Object.keys(playerVotes).forEach((ctAppName) => {
-            allCtAppNames.add(ctAppName);
-        });
+        // Add player data if they have votes
+        if (voteData.size > 1) {
+            data.push(Object.fromEntries(voteData));
+        }
     });
 
-    // Map ctAppName to appId for color generation
-    const nameToAppId = new Map<string, number>();
-    ctAppMap.forEach((app) => {
-        nameToAppId.set(app.name, app.id);
-    });
-    nameToAppId.set("Direct Votes", -1); // Assign special ID for direct votes
+    // A helper function to truncate long strings
+    const truncateLabel = (label: string, maxLength: number = 6): string => {
+        return label.length > maxLength
+            ? `${label.slice(0, maxLength)}...`
+            : label;
+    };
 
-    const series = Array.from(allCtAppNames).map((ctAppName) => {
-        const appId = nameToAppId.get(ctAppName);
-        return {
-            name: ctAppName,
-            color: getColorFromId(
-                appId !== undefined ? appId : ctAppName.length
-            ),
-        };
-    });
-
-    if (data.length === 0) {
-        return <div>No votes to display.</div>;
-    }
+    // Custom Y-axis tick renderer using SVG <text>
+    const renderCustomYAxisTick = ({
+        x,
+        y,
+        payload,
+        index,
+    }: {
+        x?: number;
+        y?: number;
+        payload: { value: string };
+        index: number;
+    }) => {
+        return (
+            <Tooltip label={payload.value}>
+                <text
+                    x={x}
+                    y={y}
+                    fontSize="12"
+                    textAnchor="end"
+                    fill={getColorFromId(index)}
+                >
+                    {truncateLabel(payload.value)}
+                </text>
+            </Tooltip>
+        );
+    };
 
     return (
         <BarChart
@@ -89,12 +113,19 @@ export function MatchVoteChart({ players, votes }: MatchVoteChartProps) {
             dataKey="player"
             series={series}
             withLegend
-            legendProps={{ verticalAlign: "bottom" }}
+            legendProps={{
+                verticalAlign: "bottom",
+                layout: "vertical",
+            }}
             tickLine="x"
             gridAxis="y"
             xAxisLabel="Vote Points"
             tooltipAnimationDuration={200}
             barChartProps={{ maxBarSize: 50 }}
+            yAxisProps={{
+                type: "category",
+                tick: renderCustomYAxisTick,
+            }}
         />
     );
 }
