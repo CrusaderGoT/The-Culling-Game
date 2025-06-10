@@ -7,12 +7,12 @@ import { getColorFromId } from "@/lib/utils";
 import { ActionIcon, Text, Tooltip } from "@mantine/core";
 import {
     Icon,
-    IconCactus,
-    IconHierarchy,
+    IconBomb,
+    IconBow,
+    IconHandRock,
+    IconShield,
     IconStretching,
-    IconSunElectricity,
-    IconVectorBezier,
-    IconVolcano,
+    IconSword,
 } from "@tabler/icons-react";
 
 type SingleVoteGroupProp = {
@@ -28,13 +28,7 @@ export function SingleVoteGroup({
     playerId,
     ended,
 }: SingleVoteGroupProp) {
-    const appIcons = [
-        IconCactus,
-        IconVectorBezier,
-        IconVolcano,
-        IconSunElectricity,
-        IconHierarchy,
-    ];
+    const appIcons = [IconSword, IconShield, IconBow, IconBomb, IconHandRock];
 
     const appGroup = applications.map((app, index) => {
         const prevVotes = match.votes.filter(
