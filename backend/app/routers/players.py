@@ -20,7 +20,7 @@ from app.utils.dependencies import atp, colony, session
 from app.utils.player import (
     calculate_points,
     edit_player_helper,
-    get_player,
+    get_alive_player,
     points_required_for_upgrade,
 )
 from app.utils.user import (
@@ -100,7 +100,7 @@ def create_player(
 )
 def my_player(session: session, current_user: active_user):
     if current_user.player and type(current_user.player.id) is int:
-        player = get_player(session, current_user.player.id)
+        player = get_alive_player(session, current_user.player.id)
         if player:
             # deactive any potential barrier end task fails
             fix_barrier_deactivation_task_fail(player.barrier_technique, session)
@@ -155,7 +155,7 @@ def get_players(
     summary="Get a player with their ID",
 )
 def a_player(player_id: Annotated[int, Path()], session: session):
-    player = get_player(session, player_id)
+    player = get_alive_player(session=session, player_id=player_id)
     if player:
         # deactive any potential barrier end task fails
         fix_barrier_deactivation_task_fail(player.barrier_technique, session)
@@ -185,7 +185,7 @@ def edit_player(
     \nTo check an application number, first get a player info using the **'/players/{player_id}'** request.
     \nElse the application will be disregarded, valid numbers are 1-5.
     """
-    playerdb = get_player(session, player_id)
+    playerdb = get_alive_player(session=session, player_id=player_id)
     if playerdb:
         if playerdb.user_id != current_user.id:
             raise UserException(current_user, detail="Can only edit your own player.")
@@ -216,7 +216,7 @@ def edit_player(
     summary="Delete a player",
 )
 def delete_player(player_id: int, session: session, current_user: active_user):
-    playerdb = session.get(Player, player_id)
+    playerdb = get_alive_player(session=session, player_id=player_id)
     if playerdb:
         if playerdb.user_id == current_user.id:  # logged in user matches players user
             # if player has a match, set their status to dead instead (to avoid not null violation)
@@ -274,7 +274,7 @@ def upgrade_player(
 ):
     """function for uprading the grade of a player.\n
     **points required.**"""
-    player = session.get(Player, player_id)
+    player = get_alive_player(session=session, player_id=player_id)
     if player is not None:
         if player != current_user.player:
             msg = "cannot upgrade another player; wrong player id."

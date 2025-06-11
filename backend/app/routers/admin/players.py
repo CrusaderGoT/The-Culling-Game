@@ -16,7 +16,7 @@ from ...utils.admin import (
     check_if_admin_has_crud_permission,
 )
 from ...utils.dependencies import session
-from ...utils.player import get_player
+from ...utils.player import get_alive_player
 
 # Create your API routes here
 router = APIRouter()
@@ -52,7 +52,7 @@ def admin_edit_player(
         raise ADMIN_UNAUTHORIZED_EXCEPTION(admin)
 
     # check if player exists
-    playerdb = get_player(session, player_id=player_id)
+    playerdb = get_alive_player(session=session, player_id=player_id)
 
     if not playerdb:
         raise HTTPException(status.HTTP_404_NOT_FOUND)

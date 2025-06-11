@@ -18,6 +18,7 @@ from app.utils.barrier import (
     schedule_deactivate_domain,
     schedule_deactivate_simple_domain,
 )
+from app.utils.player import get_alive_player
 from app.utils.config import PlayerException, Tag
 from app.utils.dependencies import atp, session
 from fastapi import (
@@ -49,7 +50,7 @@ def domain_expansion(
     Weakend by simple domain"""
     # first get the match, check if it is ongoing
     match = session.get(Match, match_id)
-    player = session.get(Player, player_id)
+    player = get_alive_player(session=session, player_id=player_id)
 
     # get the condition necessary for a BT
     barrier_tech, barrier_record, match, player = conditions_for_barrier_tech(
@@ -153,7 +154,7 @@ def simple_domain(
             deactivate the effect after its duration has elapsed.
     """
     match_none = session.get(Match, match_id)
-    player_none = session.get(Player, player_id)
+    player_none = get_alive_player(session=session, player_id=player_id)
 
     barrier_tech, barrier_record, match, player = conditions_for_barrier_tech(
         player=player_none,
@@ -232,7 +233,7 @@ def bindind_vow(
 ):
     "activates a binding vow"
     match_none = session.get(Match, match_id)
-    player_none = session.get(Player, player_id)
+    player_none = get_alive_player(session=session, player_id=player_id)
 
     barrier_tech, barrier_record, match, player = conditions_for_barrier_tech(
         player=player_none,
@@ -313,7 +314,7 @@ def reverse_cursed_technique(
 ):
     "activates a reverse cursed technique"
     match_none = session.get(Match, match_id)
-    player_none = session.get(Player, player_id)
+    player_none = get_alive_player(session=session, player_id=player_id)
 
     barrier_tech, barrier_record, match, player = conditions_for_barrier_tech(
         player=player_none,
