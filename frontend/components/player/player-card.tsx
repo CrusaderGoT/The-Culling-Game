@@ -153,7 +153,7 @@ export function PlayerCard({
                     </Stack>
                 )}
 
-                {player.barrier_technique && match && (
+                {match && player.barrier_technique && (
                     <Stack>
                         <Divider label="Barrier techniques" />
 

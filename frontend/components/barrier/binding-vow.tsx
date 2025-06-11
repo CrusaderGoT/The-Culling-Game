@@ -13,7 +13,10 @@ export function BindingVowAction({
     match,
     ended,
 }: BarrierTechActionProp) {
-    const { token } = useAuth();
+    const {
+        token,
+        user: { userInfo },
+    } = useAuth();
     const { mutateAsync, isPending } = useBindingVow(token);
 
     const bindingVowUse = useMemo(() => {
@@ -41,7 +44,9 @@ export function BindingVowAction({
                         query: { match_id: match.id },
                     });
                 }}
-                disabled={ended}
+                disabled={
+                    ended || userInfo?.player?.id !== barrierTech.player_id
+                }
             >
                 <Tooltip
                     label={ended ? "match ended" : "use binding vow"}
@@ -49,7 +54,7 @@ export function BindingVowAction({
                     maw={200}
                     events={{ focus: false, hover: true, touch: true }}
                 >
-                    <IconLink />
+                    <IconLink size={18} />
                 </Tooltip>
             </ActionIcon>
             <ActionIcon.GroupSection

@@ -13,7 +13,10 @@ export function ReverseCursedTechniqueAction({
     match,
     ended,
 }: BarrierTechActionProp) {
-    const { token } = useAuth();
+    const {
+        token,
+        user: { userInfo },
+    } = useAuth();
     const { mutateAsync, isPending } = useReverseCursedTechnique(token);
 
     const rctUse = useMemo(() => {
@@ -35,7 +38,9 @@ export function ReverseCursedTechniqueAction({
                 flex={1}
                 loading={isPending}
                 color={getColorFromId(rctUse)}
-                disabled={ended}
+                disabled={
+                    ended || userInfo?.player?.id !== barrierTech.player_id
+                }
                 onClick={async () => {
                     await mutateAsync({
                         path: { player_id: barrierTech.player_id },
@@ -49,7 +54,7 @@ export function ReverseCursedTechniqueAction({
                     maw={200}
                     events={{ focus: false, hover: true, touch: true }}
                 >
-                    <IconHeartPlus />
+                    <IconHeartPlus size={18} />
                 </Tooltip>
             </ActionIcon>
 

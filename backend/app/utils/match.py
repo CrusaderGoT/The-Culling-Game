@@ -239,17 +239,6 @@ def schedule_assign_match_winner(*, match_id: int, session: session, atp: atp):
             session.commit()
 
 
-def assign_match_winner(match_id: int, session: session, atp: atp):
-    match = get_match(session, match_id)
-    if match:
-        winner = get_match_winner(match, session)
-        if not winner:
-            print("NO WINNER!!")
-        else:
-            player = Player.model_validate(winner)
-            print(player.model_dump())
-
-
 def get_match_winner(match: Match, session: session):
     """
     return the player that won the match, else return None
@@ -278,18 +267,3 @@ def get_match_winner(match: Match, session: session):
             return winner
     else:
         return None
-
-
-def select_players_fought_in_part(part: int):
-    """
-    Subquery to get player IDs who have fought in the specified part\n
-    returns a select statement
-    """
-    subquery = (
-        select(MatchPlayerLink.player_id)
-        .join(Match, MatchPlayerLink.match_id == Match.id)  # type: ignore
-        .where(Match.part == part)
-    ).subquery(name=f"matches_in_part_{part}")
-    # Convert the subquery into a select() construct for use in the IN clause
-    subquery_select = select(subquery.c.player_id)
-    return subquery_select

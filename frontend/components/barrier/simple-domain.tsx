@@ -5,7 +5,7 @@ import { useAuth } from "@/lib/contexts/auth-provider";
 import { useSimpleDomain } from "@/lib/hooks/barrier";
 import { getColorFromId } from "@/lib/utils";
 import { ActionIcon, Text, Tooltip } from "@mantine/core";
-import { IconChartBubble } from "@tabler/icons-react";
+import { IconDiscFilled } from "@tabler/icons-react";
 import { useMemo } from "react";
 
 export function SimpleDomainAction({
@@ -13,7 +13,10 @@ export function SimpleDomainAction({
     match,
     ended,
 }: BarrierTechActionProp) {
-    const { token } = useAuth();
+    const {
+        token,
+        user: { userInfo },
+    } = useAuth();
     const { mutateAsync, isPending } = useSimpleDomain(token);
 
     const simpleDomainUse = useMemo(() => {
@@ -35,7 +38,9 @@ export function SimpleDomainAction({
                 flex={1}
                 loading={isPending}
                 color={getColorFromId(simpleDomainUse)}
-                disabled={ended}
+                disabled={
+                    ended || userInfo?.player?.id !== barrierTech.player_id
+                }
                 onClick={async () => {
                     await mutateAsync({
                         path: { player_id: barrierTech.player_id },
@@ -49,7 +54,7 @@ export function SimpleDomainAction({
                     maw={200}
                     events={{ focus: false, hover: true, touch: true }}
                 >
-                    <IconChartBubble />
+                    <IconDiscFilled size={18} />
                 </Tooltip>
             </ActionIcon>
             <ActionIcon.GroupSection

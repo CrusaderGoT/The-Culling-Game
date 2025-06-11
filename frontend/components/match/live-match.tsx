@@ -104,7 +104,7 @@ export function LiveMatch({ ongoing = false }: { ongoing: boolean }) {
         return (
             <Stack my={"md"}>
                 <Skeleton
-                    h={20}
+                    h={40}
                     radius={"md"}
                     className={clsx(globalClasses.matchHeader)}
                 />
@@ -114,9 +114,8 @@ export function LiveMatch({ ongoing = false }: { ongoing: boolean }) {
                     gap={"xs"}
                     direction={{ base: "column", md: "row" }}
                 >
-                    {Array({ length: 2 }).map((_, index) => (
-                        <Skeleton key={index} h={400} />
-                    ))}
+                    <Skeleton h={330} />
+                    <Skeleton h={330} />
                 </Flex>
             </Stack>
         );
