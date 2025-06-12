@@ -20,7 +20,7 @@ import { useState } from "react";
 export function EditPlayerForm({ player }: { player: PlayerInfo }) {
     const { token } = useAuth();
 
-    const [allowEdit, setAllowEdit] = useState(false);
+    const [disabled, setDisabled] = useState(true);
 
     const initialValues: EditPlayerSchemaType = {
         player: {
@@ -39,7 +39,7 @@ export function EditPlayerForm({ player }: { player: PlayerInfo }) {
         initialValues: initialValues,
         mode: "uncontrolled",
         validate: zodResolver(editPlayerSchema),
-        enhanceGetInputProps: () => ({ allowEdit }),
+        enhanceGetInputProps: () => ({ disabled }),
     });
 
     const { error, mutateAsync } = useEditPlayer(token);
@@ -62,10 +62,10 @@ export function EditPlayerForm({ player }: { player: PlayerInfo }) {
                     <EditApplicationsFormInputs />
 
                     <Group>
-                        <Button onClick={() => setAllowEdit((d) => !d)}>
-                            Edit
+                        <Button onClick={() => setDisabled((d) => !d)}>
+                            {!disabled ? "Cancel" : "Edit"}
                         </Button>
-                        {allowEdit && (
+                        {!disabled && (
                             <Button type="submit">save changes</Button>
                         )}
                     </Group>
