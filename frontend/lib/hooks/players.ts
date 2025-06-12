@@ -2,6 +2,7 @@ import {
     aPlayerOptions,
     createPlayerMutation,
     currentUserQueryKey,
+    editPlayerMutation,
     myPlayerOptions,
     myPlayerQueryKey,
 } from "@/api/client/@tanstack/react-query.gen";
@@ -48,7 +49,7 @@ export const useCurrentPlayer = (token: string) => {
         ...myPlayerOptions({
             headers: authHeader(token),
         }),
-        refetchOnWindowFocus: false, // to avoid unwanted refretch
+        refetchOnWindowFocus: false, // to avoid unwanted refetch
         enabled: !!token, // run only if token is available
     });
 
@@ -128,4 +129,37 @@ export const useGetPlayers = (token: string, playerIds: number[]) => {
     });
 
     return playerQueries;
+};
+
+export const useEditPlayer = (token: string) => {
+    const mutation = useMutation({
+        ...editPlayerMutation({
+            headers: authHeader(token),
+        }),
+        onError: (error) => {
+            console.error(JSON.stringify(error));
+            notifications.show({
+                message: "An error occurred while editing player detail(s)",
+                color: "red",
+            });
+        },
+        onSuccess: () => {
+            notifications.show({
+                message: `player detail(s) edited successfully`,
+                color: "green",
+            });
+            queryClient.invalidateQueries({
+                queryKey: [
+                    myPlayerQueryKey({
+                        headers: authHeader(token),
+                    }),
+                    currentUserQueryKey({
+                        headers: authHeader(token),
+                    }),
+                ],
+            });
+        },
+    });
+
+    return mutation;
 };
