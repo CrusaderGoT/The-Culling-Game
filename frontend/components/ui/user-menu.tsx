@@ -20,11 +20,10 @@ import {
 import {
     IconDotsVertical,
     IconFish,
-    IconFishOff,
     IconLogout,
     IconSettings,
     IconTrash,
-    IconUserEdit,
+    IconUser,
 } from "@tabler/icons-react";
 
 import { forwardRef } from "react";
@@ -32,7 +31,6 @@ import { forwardRef } from "react";
 import { useAuth } from "@/lib/contexts/auth-provider";
 import { deleteSession } from "@/lib/session";
 import { getColorFromId } from "@/lib/utils";
-import classes from "@/styles/user-menu.module.css";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -42,7 +40,7 @@ interface UserButtonProps extends React.ComponentPropsWithoutRef<"button"> {
 
 const UserButton = forwardRef<HTMLButtonElement, UserButtonProps>(
     ({ user, ...others }: UserButtonProps, ref) => (
-        <UnstyledButton ref={ref} {...others}>
+        <UnstyledButton ref={ref} {...others} visibleFrom="sm">
             <Group>
                 <Avatar name={user.username} />
                 <Box flex={1}>
@@ -69,11 +67,7 @@ UserButton.displayName = "UserButton";
 
 function UserButtonAlt() {
     return (
-        <ActionIcon
-            variant="transparent"
-            className={classes.menuAlt}
-            hiddenFrom="sm"
-        >
+        <ActionIcon variant="transparent" hiddenFrom="sm">
             <IconDotsVertical />
         </ActionIcon>
     );
@@ -91,19 +85,9 @@ export function UserMenu() {
     if (isPendingUser)
         return (
             <Box>
-                <Skeleton
-                    height={38}
-                    width={220}
-                    className={classes.menu}
-                    visibleFrom="sm"
-                />
+                <Skeleton height={38} width={220} visibleFrom="sm" />
 
-                <Skeleton
-                    height={28}
-                    width={5}
-                    mr={"sm"}
-                    className={classes.menuAlt}
-                />
+                <Skeleton height={28} width={5} mr={"sm"} hiddenFrom="sm" />
             </Box>
         );
 
@@ -111,18 +95,19 @@ export function UserMenu() {
 
     return (
         <Menu
+            trigger="click-hover"
             withArrow
             transitionProps={{ transition: "rotate-left", duration: 150 }}
         >
             <Menu.Target>
                 <Group>
-                    <UserButton user={userInfo} className={classes.menu} />
+                    <UserButton user={userInfo} />
                     <UserButtonAlt />
                 </Group>
             </Menu.Target>
 
             <Menu.Dropdown>
-                <Box className={classes.menuAlt}>
+                <Box hiddenFrom="sm">
                     <Group justify="center" m={"xs"}>
                         <Text size="xs">{userInfo.username}</Text>
                         {userInfo?.player && (
@@ -136,17 +121,38 @@ export function UserMenu() {
                     <Menu.Divider />
                 </Box>
 
-                <Menu.Item
-                    leftSection={
-                        <IconUserEdit
-                            size={16}
-                            stroke={1.5}
-                            color={theme.colors.yellow[6]}
-                        />
-                    }
-                >
-                    Edit User
-                </Menu.Item>
+                <Menu.Sub>
+                    <Menu.Sub.Target>
+                        <Menu.Sub.Item
+                            leftSection={
+                                <IconUser
+                                    size={16}
+                                    stroke={1.5}
+                                    color={theme.colors.green[5]}
+                                />
+                            }
+                        >
+                            User
+                        </Menu.Sub.Item>
+                    </Menu.Sub.Target>
+
+                    <Menu.Sub.Dropdown>
+                        <Menu.Item>Edit User</Menu.Item>
+
+                        <Menu.Item
+                            leftSection={
+                                <IconTrash
+                                    size={16}
+                                    stroke={1.5}
+                                    color={theme.colors.red[6]}
+                                />
+                            }
+                            color="red"
+                        >
+                            Delete User
+                        </Menu.Item>
+                    </Menu.Sub.Dropdown>
+                </Menu.Sub>
 
                 <Menu.Item
                     leftSection={
@@ -155,15 +161,15 @@ export function UserMenu() {
                             stroke={1.5}
                             color={
                                 userInfo.player
-                                    ? theme.colors.blue[5]
+                                    ? getColorFromId(userInfo.player.id)
                                     : theme.colors.green[7]
                             }
                         />
                     }
                     component={Link}
-                    href="/player/form"
+                    href="/player"
                 >
-                    {userInfo.player ? "Edit Player" : "Create Player"}
+                    {userInfo.player ? "Player Profile" : "Create Player"}
                 </Menu.Item>
 
                 <Menu.Label>Settings</Menu.Label>
@@ -181,35 +187,6 @@ export function UserMenu() {
                     }}
                 >
                     Logout
-                </Menu.Item>
-
-                <Menu.Divider />
-                <Menu.Label>Danger</Menu.Label>
-
-                <Menu.Item
-                    leftSection={
-                        <IconTrash
-                            size={16}
-                            stroke={1.5}
-                            color={theme.colors.red[6]}
-                        />
-                    }
-                    color="red"
-                >
-                    Delete User
-                </Menu.Item>
-
-                <Menu.Item
-                    leftSection={
-                        <IconFishOff
-                            size={16}
-                            stroke={1.5}
-                            color={theme.colors.red[6]}
-                        />
-                    }
-                    color="red"
-                >
-                    Delete Player
                 </Menu.Item>
             </Menu.Dropdown>
         </Menu>

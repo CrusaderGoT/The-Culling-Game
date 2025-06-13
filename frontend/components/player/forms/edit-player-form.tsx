@@ -15,12 +15,9 @@ import { useAuth } from "@/lib/contexts/auth-provider";
 import { useEditPlayer } from "@/lib/hooks/players";
 import { Button, Group, Stack } from "@mantine/core";
 import { zodResolver } from "mantine-form-zod-resolver";
-import { useState } from "react";
 
 export function EditPlayerForm({ player }: { player: PlayerInfo }) {
     const { token } = useAuth();
-
-    const [disabled, setDisabled] = useState(true);
 
     const initialValues: EditPlayerSchemaType = {
         player: {
@@ -39,7 +36,6 @@ export function EditPlayerForm({ player }: { player: PlayerInfo }) {
         initialValues: initialValues,
         mode: "uncontrolled",
         validate: zodResolver(editPlayerSchema),
-        enhanceGetInputProps: () => ({ disabled }),
     });
 
     const { error, mutateAsync } = useEditPlayer(token);
@@ -62,12 +58,7 @@ export function EditPlayerForm({ player }: { player: PlayerInfo }) {
                     <EditApplicationsFormInputs />
 
                     <Group>
-                        <Button onClick={() => setDisabled((d) => !d)}>
-                            {!disabled ? "Cancel" : "Edit"}
-                        </Button>
-                        {!disabled && (
-                            <Button type="submit">save changes</Button>
-                        )}
+                        <Button type="submit">save changes</Button>
                     </Group>
                 </Stack>
             </form>

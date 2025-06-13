@@ -102,7 +102,7 @@ export function LiveMatch({ ongoing = false }: { ongoing: boolean }) {
 
     if (matchIsPending || playersIsPending) {
         return (
-            <Stack my={"md"}>
+            <Stack>
                 <Skeleton
                     h={40}
                     radius={"md"}
@@ -154,7 +154,7 @@ export function LiveMatch({ ongoing = false }: { ongoing: boolean }) {
     }
 
     return (
-        <Stack my={"md"}>
+        <Stack>
             <Stack>
                 <Paper
                     withBorder

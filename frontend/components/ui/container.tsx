@@ -16,6 +16,7 @@ export function MainContainer({ children }: { children: React.ReactNode }) {
             header={{
                 height: { base: 50, "640px": 70 },
             }}
+            padding={"md"}
         >
             <AppShell.Header>
                 <Group
