@@ -38,7 +38,7 @@ export function EditPlayerForm({ player }: { player: PlayerInfo }) {
         validate: zodResolver(editPlayerSchema),
     });
 
-    const { error, mutateAsync } = useEditPlayer(token);
+    const { error, mutateAsync, isPending } = useEditPlayer(token);
 
     async function handleSubmit(data: EditPlayerSchemaType) {
         await mutateAsync({
@@ -58,7 +58,9 @@ export function EditPlayerForm({ player }: { player: PlayerInfo }) {
                     <EditApplicationsFormInputs />
 
                     <Group>
-                        <Button type="submit">save changes</Button>
+                        <Button type="submit" disabled={isPending}>
+                            save changes
+                        </Button>
                     </Group>
                 </Stack>
             </form>

@@ -130,6 +130,7 @@ def get_players(
     gender: Annotated[Player.Gender | None, Query()] = None,
     age: Annotated[int | None, Query(ge=10, le=102)] = None,
     role: Annotated[str | None, Query()] = None,
+    alive: Annotated[bool, Query()] = True,
 ):
     statement = select(Player).offset(offset).limit(limit)
     # if clauses to add a where/or clause to the statement
@@ -139,6 +140,8 @@ def get_players(
         statement = statement.where(or_(Player.age == age))
     if role is not None:
         statement = statement.where(or_(Player.role == role))
+    if not alive:
+        statement = statement.where(or_(Player.alive == False))
     # execute
     players = session.exec(statement).all()
     # if slim return info without cursed technique info and user info
@@ -154,8 +157,13 @@ def get_players(
     response_description="A Player",
     summary="Get a player with their ID",
 )
-def a_player(player_id: Annotated[int, Path()], session: session):
-    player = get_alive_player(session=session, player_id=player_id)
+def a_player(
+    *,
+    player_id: Annotated[int, Path()],
+    alive: Annotated[bool, Query()] = True,
+    session: session,
+):
+    player = get_alive_player(session=session, player_id=player_id, alive=alive)
     if player:
         # deactive any potential barrier end task fails
         fix_barrier_deactivation_task_fail(player.barrier_technique, session)

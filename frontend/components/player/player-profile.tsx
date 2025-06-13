@@ -92,6 +92,7 @@ function EditPlayerModal({ player, opened, close }: EditPlayerModalProp) {
 
     return (
         <Modal
+            title={`Edit Player ${player.name}`}
             opened={opened}
             onClose={close}
             fullScreen={isMobile}
@@ -110,6 +111,7 @@ function DeletePlayerModal({ player, opened, close }: DeletePlayerModalProp) {
     const { mutateAsync, isPending } = useDeletePlayer(token);
     return (
         <Modal
+            title={`Delete Player ${player.name}`}
             opened={opened}
             onClose={close}
             transitionProps={{ transition: "fade", duration: 200 }}
@@ -124,8 +126,10 @@ function DeletePlayerModal({ player, opened, close }: DeletePlayerModalProp) {
                         Once Player is deleted, It can no longer participate in
                         matches. If the player had prior matches, it can be
                         recovered (cantact an admin). If player had no prior
-                        match, it will be deleted permanently. Consider editing
-                        your player instead
+                        match, it will be deleted permanently.
+                        {player.matches.length > 0
+                            ? "Consider editing your player instead"
+                            : ""}
                     </Text>
                 </Alert>
 

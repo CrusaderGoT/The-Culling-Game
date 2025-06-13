@@ -14,12 +14,15 @@ from app.models.player import (
 from app.utils.dependencies import session
 
 
-def get_alive_player(session: session, player_id: int):
+def get_alive_player(session: session, player_id: int, alive: bool = True):
     "for getting a player from the database"
     player = session.get(Player, player_id)
-    if not player or not player.alive:
+    if not alive:  # if alive arg is false return player without checking living status
+        return player
+    elif not player or not player.alive:
         return None
-    return player
+    else:
+        return player
 
 
 def points_required_for_upgrade(grade: Player.Grade):

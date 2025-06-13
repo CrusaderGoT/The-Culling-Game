@@ -1017,6 +1017,7 @@ export type GetPlayersData = {
         gender?: Gender | null;
         age?: number | null;
         role?: string | null;
+        alive?: boolean;
     };
     url: '/player/all';
 };
@@ -1044,7 +1045,9 @@ export type APlayerData = {
     path: {
         player_id: number;
     };
-    query?: never;
+    query?: {
+        alive?: boolean;
+    };
     url: '/player/{player_id}';
 };
 

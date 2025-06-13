@@ -81,7 +81,7 @@ export const useGetPlayers = (token: string, playerIds: number[]) => {
             ...aPlayerOptions({
                 headers: authHeader(token),
                 path: { player_id: playerId },
-                // alive false
+                query: { alive: false },
             }),
             enabled: !!token && !!playerId, // Only run query if we have both token and playerId
             staleTime: Infinity,
