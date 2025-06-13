@@ -106,7 +106,6 @@ export function LiveMatch({ ongoing = false }: { ongoing: boolean }) {
                 <Skeleton
                     h={40}
                     radius={"md"}
-                    className={clsx(globalClasses.matchHeader)}
                 />
 
                 <Flex
@@ -115,6 +114,7 @@ export function LiveMatch({ ongoing = false }: { ongoing: boolean }) {
                     direction={{ base: "column", md: "row" }}
                 >
                     <Skeleton h={330} />
+                    <Skeleton height={20} circle mb="xl" />
                     <Skeleton h={330} />
                 </Flex>
             </Stack>
