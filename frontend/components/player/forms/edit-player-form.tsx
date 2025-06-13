@@ -25,6 +25,7 @@ export function EditPlayerForm({ player }: { player: PlayerInfo }) {
             gender: player.gender,
             age: player.age,
             role: player.role,
+            picture: player.picture,
         },
         cursed_technique: {
             ...player.cursed_technique,

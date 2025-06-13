@@ -5,6 +5,7 @@ import { SingleVoteGroup } from "@/components/vote/single-votes";
 import { getColorFromId } from "@/lib/utils";
 import classes from "@/styles/player-card.module.css";
 import {
+    AspectRatio,
     Badge,
     Divider,
     Group,
@@ -93,15 +94,20 @@ export function PlayerCard({
                 </Group>
 
                 <Group align="flex-start">
-                    <MantineImage
-                        component={Image}
-                        src={player.picture}
-                        fallbackSrc="/images/Kogane.png"
-                        alt="Player Image"
-                        height={100}
-                        width={100}
-                        className={clsx(classes.playerCard)}
-                    />
+                    <AspectRatio
+                        ratio={100 / 100}
+                        className={clsx(classes.mAuto)}
+                    >
+                        <MantineImage
+                            component={Image}
+                            src={player.picture}
+                            fallbackSrc="/images/Kogane.png"
+                            alt="Player Image"
+                            height={100}
+                            width={100}
+                            className={clsx(classes.playerImage)}
+                        />
+                    </AspectRatio>
 
                     <Group lts={4} flex={1} wrap="nowrap">
                         <Stack>

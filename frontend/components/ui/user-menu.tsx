@@ -128,7 +128,7 @@ export function UserMenu() {
                                 <IconUser
                                     size={16}
                                     stroke={1.5}
-                                    color={theme.colors.green[5]}
+                                    color={getColorFromId(userInfo.id)}
                                 />
                             }
                         >

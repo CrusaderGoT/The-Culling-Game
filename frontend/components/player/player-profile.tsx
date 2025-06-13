@@ -1,24 +1,18 @@
 "use client";
 
-import { PlayerInfo } from "@/api/client";
 import { CreatePlayerForm } from "@/components/player/forms/create-player-form";
-import { EditPlayerForm } from "@/components/player/forms/edit-player-form";
 import { DisplayAPIError } from "@/components/ui/display-api-error";
 import { useAuth } from "@/lib/contexts/auth-provider";
-import { useCurrentPlayer, useDeletePlayer } from "@/lib/hooks/players";
-import {
-    Alert,
-    Button,
-    FocusTrap,
-    Group,
-    Modal,
-    Skeleton,
-    Stack,
-    Text,
-} from "@mantine/core";
-import { useDisclosure, useMediaQuery } from "@mantine/hooks";
-import { IconAlertTriangleFilled } from "@tabler/icons-react";
+import { useCurrentPlayer } from "@/lib/hooks/players";
+import { Button, Group, Skeleton, Stack, Text, Tooltip } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
+import { IconInfoCircle } from "@tabler/icons-react";
 import { PlayerCard } from "./player-card";
+import {
+    DeletePlayerModal,
+    EditPlayerModal,
+    UpgradePlayerSlider,
+} from "./player-crud";
 
 export function PlayerProfile() {
     const { token } = useAuth();
@@ -75,86 +69,20 @@ export function PlayerProfile() {
                     </Button>
                 </Group>
                 <PlayerCard player={player.data} />
-                cursedtechnique card stats
+                {player.data.grade > 0 && (
+                    <Group justify="center" gap={3}>
+                        <Text size="sm" c={"deepred"}>
+                            Upgrade Your Player
+                        </Text>
+                        <Tooltip
+                            label={"upgrade to access more advanced techniques"}
+                        >
+                            <IconInfoCircle size={12} />
+                        </Tooltip>
+                    </Group>
+                )}
+                <UpgradePlayerSlider player={player.data} />
             </Stack>
         );
     }
-}
-
-type EditPlayerModalProp = {
-    player: PlayerInfo;
-    opened: boolean;
-    close: () => void;
-};
-
-function EditPlayerModal({ player, opened, close }: EditPlayerModalProp) {
-    const isMobile = useMediaQuery("(max-width: 50em)");
-
-    return (
-        <Modal
-            title={`Edit Player ${player.name}`}
-            opened={opened}
-            onClose={close}
-            fullScreen={isMobile}
-            radius={0}
-            transitionProps={{ transition: "fade", duration: 200 }}
-        >
-            <FocusTrap.InitialFocus />
-            <EditPlayerForm player={player} />
-        </Modal>
-    );
-}
-
-type DeletePlayerModalProp = EditPlayerModalProp;
-function DeletePlayerModal({ player, opened, close }: DeletePlayerModalProp) {
-    const { token } = useAuth();
-    const { mutateAsync, isPending } = useDeletePlayer(token);
-    return (
-        <Modal
-            title={`Delete Player ${player.name}`}
-            opened={opened}
-            onClose={close}
-            transitionProps={{ transition: "fade", duration: 200 }}
-        >
-            <Stack>
-                <Alert
-                    title="Are You Super Sure You Want To Delete Your Player?"
-                    color="red.9"
-                    icon={<IconAlertTriangleFilled />}
-                >
-                    <Text>
-                        Once Player is deleted, It can no longer participate in
-                        matches. If the player had prior matches, it can be
-                        recovered (cantact an admin). If player had no prior
-                        match, it will be deleted permanently.
-                        {player.matches.length > 0
-                            ? "Consider editing your player instead"
-                            : ""}
-                    </Text>
-                </Alert>
-
-                <Group justify="space-between">
-                    <Button
-                        onClick={() => close()}
-                        size="compact-xs"
-                        variant="default"
-                        disabled={isPending}
-                    >
-                        cancel
-                    </Button>
-
-                    <Button
-                        onClick={async () => {
-                            mutateAsync({ path: { player_id: player.id } });
-                        }}
-                        size="compact-xs"
-                        color="red.9"
-                        disabled={isPending}
-                    >
-                        confirm
-                    </Button>
-                </Group>
-            </Stack>
-        </Modal>
-    );
 }

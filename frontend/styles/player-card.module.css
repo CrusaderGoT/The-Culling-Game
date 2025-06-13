@@ -1,9 +1,12 @@
-.playerCard {
+.playerImage {
   height: auto;
   width: auto;
-  margin: auto;
   border-radius: 5px;
-  background-size: cover;
+  object-fit: cover;
+}
+
+.mAuto {
+  margin: auto;
 }
 
 .fullHeight {
@@ -11,5 +14,5 @@
 }
 
 .spaceBetween {
-    justify-content: space-between;
+  justify-content: space-between;
 }

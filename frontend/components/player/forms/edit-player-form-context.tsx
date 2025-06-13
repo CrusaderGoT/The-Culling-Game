@@ -37,6 +37,12 @@ export function EditPlayerFormInputs() {
         <Stack>
             <Stack>
                 <TextInput
+                    label="Player Picture"
+                    key={form.key("player.picture")}
+                    {...form.getInputProps("player.picture")}
+                />
+
+                <TextInput
                     label="Player Name"
                     key={form.key("player.name")}
                     {...form.getInputProps("player.name")}
