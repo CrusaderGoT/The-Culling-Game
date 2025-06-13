@@ -2,6 +2,7 @@ import {
     aPlayerOptions,
     createPlayerMutation,
     currentUserQueryKey,
+    deletePlayerMutation,
     editPlayerMutation,
     myPlayerOptions,
     myPlayerQueryKey,
@@ -10,6 +11,7 @@ import { authHeader } from "@/lib/constants/AUTHCONSTANTS";
 import { queryClient } from "@/lib/query-client/get-query-client";
 import { notifications } from "@mantine/notifications";
 import { useMutation, useQueries, useQuery } from "@tanstack/react-query";
+import { redirect } from "next/navigation";
 
 export const useCreatePlayer = (token: string) => {
     const mutation = useMutation({
@@ -79,6 +81,7 @@ export const useGetPlayers = (token: string, playerIds: number[]) => {
             ...aPlayerOptions({
                 headers: authHeader(token),
                 path: { player_id: playerId },
+                // alive false
             }),
             enabled: !!token && !!playerId, // Only run query if we have both token and playerId
             staleTime: Infinity,
@@ -158,6 +161,40 @@ export const useEditPlayer = (token: string) => {
                     }),
                 ],
             });
+        },
+    });
+
+    return mutation;
+};
+
+export const useDeletePlayer = (token: string) => {
+    const mutation = useMutation({
+        ...deletePlayerMutation({
+            headers: authHeader(token),
+        }),
+        onError: (error) => {
+            console.error(JSON.stringify(error));
+            notifications.show({
+                message: "An error occurred while deleting player",
+                color: "yellow",
+            });
+        },
+        onSuccess: () => {
+            notifications.show({
+                message: `player deleted successfully`,
+                color: "red",
+            });
+            queryClient.invalidateQueries({
+                queryKey: [
+                    myPlayerQueryKey({
+                        headers: authHeader(token),
+                    }),
+                    currentUserQueryKey({
+                        headers: authHeader(token),
+                    }),
+                ],
+            });
+            redirect("/match");
         },
     });
 
