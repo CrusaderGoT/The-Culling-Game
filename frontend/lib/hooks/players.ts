@@ -6,12 +6,14 @@ import {
     editPlayerMutation,
     myPlayerOptions,
     myPlayerQueryKey,
+    upgradePlayerMutation,
 } from "@/api/client/@tanstack/react-query.gen";
+import { getAPIErrorMessage } from "@/components/ui/display-api-error";
 import { authHeader } from "@/lib/constants/AUTHCONSTANTS";
 import { queryClient } from "@/lib/query-client/get-query-client";
 import { notifications } from "@mantine/notifications";
 import { useMutation, useQueries, useQuery } from "@tanstack/react-query";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 export const useCreatePlayer = (token: string) => {
     const mutation = useMutation({
@@ -19,7 +21,7 @@ export const useCreatePlayer = (token: string) => {
             headers: authHeader(token),
         }),
         onError: (error) => {
-            console.error(JSON.stringify(error));
+            console.error(getAPIErrorMessage(error));
             notifications.show({
                 message: "An error occurred while creating player",
                 color: "red",
@@ -140,7 +142,7 @@ export const useEditPlayer = (token: string) => {
             headers: authHeader(token),
         }),
         onError: (error) => {
-            console.error(JSON.stringify(error));
+            console.error(getAPIErrorMessage(error));
             notifications.show({
                 message: "An error occurred while editing player detail(s)",
                 color: "red",
@@ -168,12 +170,14 @@ export const useEditPlayer = (token: string) => {
 };
 
 export const useDeletePlayer = (token: string) => {
+    const router = useRouter();
+
     const mutation = useMutation({
         ...deletePlayerMutation({
             headers: authHeader(token),
         }),
         onError: (error) => {
-            console.error(JSON.stringify(error));
+            console.error(getAPIErrorMessage(error));
             notifications.show({
                 message: "An error occurred while deleting player",
                 color: "yellow",
@@ -194,7 +198,42 @@ export const useDeletePlayer = (token: string) => {
                     }),
                 ],
             });
-            redirect("/match");
+            router.push("/match");
+        },
+    });
+
+    return mutation;
+};
+
+export const useUpgradePlayer = (token: string) => {
+    const mutation = useMutation({
+        ...upgradePlayerMutation({
+            headers: authHeader(token),
+        }),
+        onError: (error) => {
+            console.error(getAPIErrorMessage(error));
+            notifications.show({
+                message: `An error occurred while upgrading player -> ${getAPIErrorMessage(
+                    error
+                )}`,
+                color: "yellow",
+            });
+        },
+        onSuccess: () => {
+            notifications.show({
+                message: `player's grade upgraded successfully`,
+                color: "red",
+            });
+            queryClient.invalidateQueries({
+                queryKey: [
+                    myPlayerQueryKey({
+                        headers: authHeader(token),
+                    }),
+                    currentUserQueryKey({
+                        headers: authHeader(token),
+                    }),
+                ],
+            });
         },
     });
 
