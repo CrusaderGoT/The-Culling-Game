@@ -106,7 +106,6 @@ export function LiveMatch({ ongoing = false }: { ongoing: boolean }) {
                 <Skeleton
                     h={40}
                     radius={"md"}
-                    className={clsx(globalClasses.matchHeader)}
                 />
 
                 <Flex
@@ -115,6 +114,16 @@ export function LiveMatch({ ongoing = false }: { ongoing: boolean }) {
                     direction={{ base: "column", md: "row" }}
                 >
                     <Skeleton h={330} />
+
+                    <Center
+                                // on small screens, give vertical margin; on md+, remove vertical margin
+                                my={{ base: "sm", md: 0 }}
+                                // on md+, give horizontal margin to push icon away from players
+                                mx={{ base: 0, md: "sm" }}
+                            >
+                                <Skeleton height={18} circle />
+                            </Center>
+                    
                     <Skeleton h={330} />
                 </Flex>
             </Stack>
