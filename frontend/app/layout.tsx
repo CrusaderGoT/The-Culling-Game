@@ -1,7 +1,7 @@
 // Import styles of packages that you've installed.
 // All packages except `@mantine/hooks` require styles imports
-import '@mantine/core/styles.layer.css';
 import "@mantine/charts/styles.css";
+import "@mantine/core/styles.layer.css";
 import "@mantine/notifications/styles.css";
 import "@mantine/nprogress/styles.css";
 
@@ -15,7 +15,6 @@ import {
     rem,
 } from "@mantine/core";
 
-import { NavigationProgress } from "@mantine/nprogress";
 
 import { Notifications } from "@mantine/notifications";
 
@@ -29,6 +28,7 @@ import Nexarust from "@/fonts/NexarustFont";
 
 import { ModeToggle } from "@/components/ui/mode-toggle";
 
+import { RouterTransition } from "@/components/ui/router-transition";
 import { SocketProvider } from "@/lib/contexts/socket-context";
 import type { Metadata } from "next";
 
@@ -70,7 +70,7 @@ export default function RootLayout({
             </head>
             <body>
                 <MantineProvider theme={theme}>
-                    <NavigationProgress />
+                    <RouterTransition />
                     <Notifications />
                     <TanstackProviders>
                         <SocketProvider
