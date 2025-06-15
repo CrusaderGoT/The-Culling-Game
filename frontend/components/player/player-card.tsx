@@ -94,7 +94,10 @@ export function PlayerCard({
                 </Group>
 
                 <Group align="flex-start">
-                    
+                    <AspectRatio
+                        ratio={100 / 100}
+                        className={clsx(classes.mAuto, classes.playerImage)}
+                    >
                         <MantineImage
                             component={Image}
                             src={player.picture}
@@ -103,8 +106,8 @@ export function PlayerCard({
                             height={100}
                             width={100}
                             className={clsx(classes.playerImage)}
-                            m="auto"
                         />
+                    </AspectRatio>
 
                     <Group lts={4} flex={1} wrap="nowrap">
                         <Stack>
