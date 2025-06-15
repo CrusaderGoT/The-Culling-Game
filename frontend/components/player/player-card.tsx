@@ -19,7 +19,7 @@ import {
     IconPointFilled,
     IconSpiral,
 } from "@tabler/icons-react";
-import clsx from "clsx";
+import cx from "clsx";
 import Image from "next/image";
 import { useMemo } from "react";
 import { MatchActivateBarriers } from "../barrier/activate-barriers";
@@ -44,9 +44,9 @@ export function PlayerCard({
     }, [match?.votes, player.id]);
 
     return (
-        <Paper withBorder p={"xs"} className={clsx(classes.fullHeight)}>
-            <Stack className={clsx(classes.fullHeight, classes.spaceBetween)}>
-                <Group p={5} justify="space-between">
+        <Paper withBorder p={"xs"} className={cx(classes.fullHeight)}>
+            <Stack className={cx(classes.fullHeight, classes.spaceBetween)}>
+                <Group p={5} className={cx(classes.spaceBetween)}>
                     <Badge
                         size="xs"
                         leftSection={<IconPointFilled size={14} />}
@@ -96,7 +96,7 @@ export function PlayerCard({
                 <Group align="flex-start">
                     <AspectRatio
                         ratio={100 / 100}
-                        className={clsx(classes.mAuto)}
+                        className={cx(classes.mAuto)}
                     >
                         <MantineImage
                             component={Image}
@@ -105,7 +105,7 @@ export function PlayerCard({
                             alt="Player Image"
                             height={100}
                             width={100}
-                            className={clsx(classes.playerImage)}
+                            className={cx(classes.playerImage)}
                         />
                     </AspectRatio>
 
