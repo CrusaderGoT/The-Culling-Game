@@ -288,3 +288,14 @@ def demo_superuser(
     session.commit()
     session.refresh(admin_user)
     return admin_user
+
+
+@router.get(
+    "/me",
+    response_model=AdminInfo,
+    response_description="An Admin",
+    summary="Get the logged in admin",
+    status_code=status.HTTP_200_OK,
+)
+def current_admin(admin: admin_user) -> AdminUser:
+    return admin

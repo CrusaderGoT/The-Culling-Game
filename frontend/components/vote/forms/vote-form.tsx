@@ -16,7 +16,7 @@ import { z } from "zod";
 
 import { DisplayAPIError } from "@/components/ui/display-api-error";
 import { useAuth } from "@/lib/contexts/auth-provider";
-import { useCastVote } from "@/lib/hooks/match";
+import { useCastVote } from "@/lib/hooks/matches";
 
 export function VoteForm({ votes, matchId }: VoteFormType) {
     const voteSchema = z.object({ votes: z.array(zCastVote) });

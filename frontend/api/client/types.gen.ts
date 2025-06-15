@@ -1699,6 +1699,22 @@ export type RemovePermissionResponses = {
 
 export type RemovePermissionResponse = RemovePermissionResponses[keyof RemovePermissionResponses];
 
+export type CurrentAdminData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/admin/me';
+};
+
+export type CurrentAdminResponses = {
+    /**
+     * An Admin
+     */
+    200: AdminInfo;
+};
+
+export type CurrentAdminResponse = CurrentAdminResponses[keyof CurrentAdminResponses];
+
 export type CreateTokenData = {
     body: BodyCreateToken;
     path?: never;

@@ -2,7 +2,7 @@
 
 import { BarrierTechActionProp } from "@/components/barrier/activate-barriers";
 import { useAuth } from "@/lib/contexts/auth-provider";
-import { useSimpleDomain } from "@/lib/hooks/barrier";
+import { useSimpleDomain } from "@/lib/hooks/barriers";
 import { getColorFromId } from "@/lib/utils";
 import { ActionIcon, Text, Tooltip } from "@mantine/core";
 import { IconDiscFilled } from "@tabler/icons-react";

@@ -692,6 +692,8 @@ export const zGrantPermissionResponse = zAdminInfo;
 
 export const zRemovePermissionResponse = zAdminInfo;
 
+export const zCurrentAdminResponse = zAdminInfo;
+
 export const zCreateTokenResponse = zToken;
 
 export const zRefreshTokenResponse = zToken;

@@ -2,7 +2,7 @@
 
 import { MatchInfo, PlayerInfo } from "@/api/client";
 import { useAuth } from "@/lib/contexts/auth-provider";
-import { useCastVote } from "@/lib/hooks/match";
+import { useCastVote } from "@/lib/hooks/matches";
 import { getColorFromId } from "@/lib/utils";
 import { ActionIcon, Text, Tooltip } from "@mantine/core";
 import {

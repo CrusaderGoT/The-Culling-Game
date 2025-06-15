@@ -17,7 +17,7 @@ import { VoteDrawer } from "@/components/vote/vote-drawer";
 
 import { DisplayAPIError } from "@/components/ui/display-api-error";
 import { useAuth } from "@/lib/contexts/auth-provider";
-import { useLatestMatch } from "@/lib/hooks/match";
+import { useLatestMatch } from "@/lib/hooks/matches";
 import { useGetPlayers } from "@/lib/hooks/players";
 import gclasses from "@/styles/global.module.css";
 import clsx from "clsx";

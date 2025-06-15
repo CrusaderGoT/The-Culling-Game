@@ -2,7 +2,7 @@
 
 import { type Options, UsersService, PlayersService, MatchesService, BarriersService, ColoniesService, AdminsService, AuthService, DefaultService } from '../sdk.gen';
 import { queryOptions, type UseMutationOptions, infiniteQueryOptions, type InfiniteData } from '@tanstack/react-query';
-import type { CurrentUserData, AuserData, EditUserData, EditUserError, EditUserResponse, DeleteUserData, DeleteUserError, DeleteUserResponse, CreatePlayerData, CreatePlayerError, CreatePlayerResponse, MyPlayerData, GetPlayersData, GetPlayersError, GetPlayersResponse, APlayerData, EditPlayerData, EditPlayerError, EditPlayerResponse, DeletePlayerData, DeletePlayerError, DeletePlayerResponse, UpgradePlayerData, UpgradePlayerError, UpgradePlayerResponse, VoteData, VoteError, VoteResponse, CreateMatchData, CreateMatchError, CreateMatchResponse, GetMatchesData, GetMatchesError, GetMatchesResponse, GetLastestMatchData, DeleteMatchData, DeleteMatchError, DomainExpansionData, DomainExpansionError, DomainExpansionResponse, SimpleDomainData, SimpleDomainError, SimpleDomainResponse, BindindVowData, BindindVowError, BindindVowResponse, ReverseCursedTechniqueData, ReverseCursedTechniqueError, ReverseCursedTechniqueResponse, GetColoniesData, GetColoniesError, GetColoniesResponse, DemoSuperuserData, DemoSuperuserError, AdminEditUserData, AdminEditUserError, AdminEditUserResponse, AdminDeleteUserData, AdminDeleteUserError, AdminDeleteUserResponse, AdminEditPlayerData, AdminEditPlayerError, AdminEditPlayerResponse, AdminDeletePlayerData, AdminDeletePlayerError, AdminDeletePlayerResponse, CreateAdminData, CreateAdminError, CreateAdminResponse, NewPermissionData, NewPermissionError, NewPermissionResponse, GrantPermissionData, GrantPermissionError, GrantPermissionResponse, RemovePermissionData, RemovePermissionError, RemovePermissionResponse, CreateTokenData, CreateTokenError, CreateTokenResponse, RefreshTokenData, RefreshTokenError, RefreshTokenResponse, VerifyTokenData, VerifyTokenError, VerifyTokenResponse, CreateUserData, CreateUserError, CreateUserResponse, ChatHtmlData } from '../types.gen';
+import type { CurrentUserData, AuserData, EditUserData, EditUserError, EditUserResponse, DeleteUserData, DeleteUserError, DeleteUserResponse, CreatePlayerData, CreatePlayerError, CreatePlayerResponse, MyPlayerData, GetPlayersData, GetPlayersError, GetPlayersResponse, APlayerData, EditPlayerData, EditPlayerError, EditPlayerResponse, DeletePlayerData, DeletePlayerError, DeletePlayerResponse, UpgradePlayerData, UpgradePlayerError, UpgradePlayerResponse, VoteData, VoteError, VoteResponse, CreateMatchData, CreateMatchError, CreateMatchResponse, GetMatchesData, GetMatchesError, GetMatchesResponse, GetLastestMatchData, DeleteMatchData, DeleteMatchError, DomainExpansionData, DomainExpansionError, DomainExpansionResponse, SimpleDomainData, SimpleDomainError, SimpleDomainResponse, BindindVowData, BindindVowError, BindindVowResponse, ReverseCursedTechniqueData, ReverseCursedTechniqueError, ReverseCursedTechniqueResponse, GetColoniesData, GetColoniesError, GetColoniesResponse, DemoSuperuserData, DemoSuperuserError, AdminEditUserData, AdminEditUserError, AdminEditUserResponse, AdminDeleteUserData, AdminDeleteUserError, AdminDeleteUserResponse, AdminEditPlayerData, AdminEditPlayerError, AdminEditPlayerResponse, AdminDeletePlayerData, AdminDeletePlayerError, AdminDeletePlayerResponse, CreateAdminData, CreateAdminError, CreateAdminResponse, NewPermissionData, NewPermissionError, NewPermissionResponse, GrantPermissionData, GrantPermissionError, GrantPermissionResponse, RemovePermissionData, RemovePermissionError, RemovePermissionResponse, CurrentAdminData, CreateTokenData, CreateTokenError, CreateTokenResponse, RefreshTokenData, RefreshTokenError, RefreshTokenResponse, VerifyTokenData, VerifyTokenError, VerifyTokenResponse, CreateUserData, CreateUserError, CreateUserResponse, ChatHtmlData } from '../types.gen';
 import { client as _heyApiClient } from '../client.gen';
 
 export type QueryKey<TOptions extends Options> = [
@@ -961,6 +961,26 @@ export const removePermissionMutation = (options?: Partial<Options<RemovePermiss
         }
     };
     return mutationOptions;
+};
+
+export const currentAdminQueryKey = (options?: Options<CurrentAdminData>) => createQueryKey('currentAdmin', options);
+
+/**
+ * Get the logged in admin
+ */
+export const currentAdminOptions = (options?: Options<CurrentAdminData>) => {
+    return queryOptions({
+        queryFn: async ({ queryKey, signal }) => {
+            const { data } = await AdminsService.currentAdmin({
+                ...options,
+                ...queryKey[0],
+                signal,
+                throwOnError: true
+            });
+            return data;
+        },
+        queryKey: currentAdminQueryKey(options)
+    });
 };
 
 export const createTokenQueryKey = (options: Options<CreateTokenData>) => createQueryKey('createToken', options);
