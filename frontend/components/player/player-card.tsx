@@ -46,7 +46,7 @@ export function PlayerCard({
     return (
         <Paper withBorder p={"xs"} className={cx(classes.fullHeight)}>
             <Stack className={cx(classes.fullHeight, classes.spaceBetween)}>
-                <Group p={5} className={classes.spaceBetween}>
+                <Group p={5} className={`${classes.spaceBetween}`}>
                     <Badge
                         size="xs"
                         leftSection={<IconPointFilled size={14} />}
