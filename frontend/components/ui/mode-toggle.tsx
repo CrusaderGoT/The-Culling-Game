@@ -28,7 +28,7 @@ export function ModeToggle() {
             size="md"
             color="charcoal"
             aria-label="Toggle color scheme"
-            className={clsx(globalClasses.fixedTop, globalClasses.highZ)}
+            className={clsx(globalClasses.stickyTop, globalClasses.highZ)}
         >
             <IconSun
                 className={clsx(classes.icon, classes.light)}

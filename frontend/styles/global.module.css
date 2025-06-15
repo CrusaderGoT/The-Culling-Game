@@ -1,5 +1,5 @@
-.fixedTop {
-  position: fixed;
+.stickyTop {
+  position: sticky;
   top: 15;
 }
 
@@ -21,4 +21,8 @@
   position: sticky;
   top: 75px;
   z-index: 111;
+}
+
+.markLabel {
+  display: none;
 }

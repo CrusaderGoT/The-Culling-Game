@@ -1,6 +1,7 @@
 import { Grade, PlayerInfo } from "@/api/client";
 import { useAuth } from "@/lib/contexts/auth-provider";
 import { useDeletePlayer, useUpgradePlayer } from "@/lib/hooks/players";
+import gclasses from "@/styles/global.module.css";
 import {
     Alert,
     Button,
@@ -115,6 +116,8 @@ export function DeletePlayerModal({
 type UpgradePlayerSliderProp = { player: PlayerInfo };
 
 export function UpgradePlayerSlider({ player }: UpgradePlayerSliderProp) {
+    const isMobile = useMediaQuery("(max-width: 50em)");
+
     const [endValue, setEndValue] = useState<Grade>(player.grade);
 
     const grades = [
@@ -151,8 +154,9 @@ export function UpgradePlayerSlider({ player }: UpgradePlayerSliderProp) {
                 label={(val) =>
                     grades.find((grade) => grade.value === val)?.label
                 }
-                step={1}
+                labelAlwaysOn
                 marks={grades}
+                restrictToMarks
                 labelTransitionProps={{
                     transition: "skew-down",
                     duration: 150,
@@ -163,9 +167,11 @@ export function UpgradePlayerSlider({ player }: UpgradePlayerSliderProp) {
                 thumbSize={26}
                 thumbChildren={<ThumbIcon />}
                 flex={1}
+                classNames={{ markLabel: isMobile ? gclasses.markLabel : "" }}
+                disabled={player.grade === Grade[0]}
             />
 
-            {endValue !== player.grade && (
+            {endValue !== player.grade && player.grade > endValue && (
                 <Button
                     size="compact-xs"
                     onClick={async () => {
