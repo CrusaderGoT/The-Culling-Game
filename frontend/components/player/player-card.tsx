@@ -46,7 +46,7 @@ export function PlayerCard({
     return (
         <Paper withBorder p={"xs"} className={clsx(classes.fullHeight)}>
             <Stack className={clsx(classes.fullHeight, classes.spaceBetween)}>
-                <Group p={5} className={clsx(true, classes.spaceBetween)}>
+                <Group p={5} className={clsx(classes.spaceBetween)}>
                     <Badge
                         size="xs"
                         leftSection={<IconPointFilled size={14} />}
@@ -96,7 +96,7 @@ export function PlayerCard({
                 <Group align="flex-start">
                     <AspectRatio
                         ratio={100 / 100}
-                        className={clsx(classes.mAuto, classes.playerImage)}
+                        className={clsx(classes.mAuto)}
                     >
                         <MantineImage
                             component={Image}
