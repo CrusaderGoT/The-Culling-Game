@@ -796,6 +796,7 @@ export type PlayerInfo = {
     colony: BaseColonyInfo | null;
     user: BaseUserInfo | null;
     matches: Array<BaseMatchInfo>;
+    votes: Array<BaseVoteInfo>;
 };
 
 /**

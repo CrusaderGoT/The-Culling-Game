@@ -19,7 +19,7 @@ import { DisplayAPIError } from "@/components/ui/display-api-error";
 import { useAuth } from "@/lib/contexts/auth-provider";
 import { useLatestMatch } from "@/lib/hooks/match";
 import { useGetPlayers } from "@/lib/hooks/players";
-import globalClasses from "@/styles/global.module.css";
+import gclasses from "@/styles/global.module.css";
 import clsx from "clsx";
 import dayjs from "dayjs";
 import Image from "next/image";
@@ -169,7 +169,7 @@ export function LiveMatch({ ongoing = false }: { ongoing: boolean }) {
                         backgroundColor: "Background",
                     }}
                     radius={"md"}
-                    className={clsx(globalClasses.matchHeader)}
+                    className={clsx(gclasses.matchHeader)}
                 >
                     <MatchHeader
                         match={match}

@@ -1,7 +1,7 @@
 "use client";
 
-import { BaseCtAppInfo, BaseVoteInfo, PlayerInfo } from "@/api/client";
-import { getColorFromId } from "@/lib/utils";
+import { BaseVoteInfo, PlayerInfo } from "@/api/client";
+import { getColorFromId, getCtAppMap } from "@/lib/utils";
 import { BarChart } from "@mantine/charts";
 import { Tooltip } from "@mantine/core";
 
@@ -13,12 +13,7 @@ type MatchVoteChartProps = {
 
 export function MatchVoteChart({ players, votes }: MatchVoteChartProps) {
     // Derive CT apps from players
-    const ctAppMap = new Map<number, BaseCtAppInfo>();
-    players.forEach((player) => {
-        player.cursed_technique.applications.forEach((app) => {
-            ctAppMap.set(app.id, app);
-        });
-    });
+    const ctAppMap = getCtAppMap(players);
 
     // Convert to chart data format
     const data: Record<string, string | number>[] = [];

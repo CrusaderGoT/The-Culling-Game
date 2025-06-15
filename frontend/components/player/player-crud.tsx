@@ -1,3 +1,5 @@
+"use client";
+
 import { Grade, PlayerInfo } from "@/api/client";
 import { useAuth } from "@/lib/contexts/auth-provider";
 import { useDeletePlayer, useUpgradePlayer } from "@/lib/hooks/players";
@@ -79,10 +81,10 @@ export function DeletePlayerModal({
                     <Text>
                         Once Player is deleted, It can no longer participate in
                         matches. If the player had prior matches, it can be
-                        recovered (cantact an admin). If player had no prior
+                        recovered (contact an admin). If player had no prior
                         match, it will be deleted permanently.
                         {player.matches.length > 0
-                            ? "Consider editing your player instead"
+                            ? " Consider editing your player instead"
                             : ""}
                     </Text>
                 </Alert>

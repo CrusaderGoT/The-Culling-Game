@@ -18,6 +18,7 @@ from ..models.base import (
     BasePlayer,
     BasePlayerInfo,
     BaseUserInfo,
+    BaseVoteInfo,
     MatchPlayerLink,
 )
 from .vote import Vote
@@ -127,6 +128,7 @@ class PlayerInfo(BasePlayerInfo):
     colony: BaseColonyInfo | None
     user: BaseUserInfo | None
     matches: list[BaseMatchInfo]
+    votes: list["BaseVoteInfo"]
 
 
 class CTInfo(BaseCTInfo):

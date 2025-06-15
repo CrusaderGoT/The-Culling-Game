@@ -591,7 +591,8 @@ export const zPlayerInfo = z.object({
         zBaseUserInfo,
         z.null()
     ]),
-    matches: z.array(zBaseMatchInfo)
+    matches: z.array(zBaseMatchInfo),
+    votes: z.array(zBaseVoteInfo)
 });
 
 export const zToken = z.object({

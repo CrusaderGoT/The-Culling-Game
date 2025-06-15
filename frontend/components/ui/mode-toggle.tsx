@@ -1,6 +1,6 @@
 "use client";
 
-import globalClasses from "@/styles/global.module.css";
+import gclasses from "@/styles/global.module.css";
 import classes from "@/styles/mode-toggle.module.css";
 import {
     ActionIcon,
@@ -28,7 +28,7 @@ export function ModeToggle() {
             size="md"
             color="charcoal"
             aria-label="Toggle color scheme"
-            className={clsx(globalClasses.stickyTop, globalClasses.highZ)}
+            className={clsx(gclasses.stickyTop, gclasses.highZ)}
         >
             <IconSun
                 className={clsx(classes.icon, classes.light)}

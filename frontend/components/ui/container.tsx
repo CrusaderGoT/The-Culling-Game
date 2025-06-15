@@ -2,7 +2,7 @@
 
 import { UserMenu } from "@/components/ui/user-menu";
 import { useAuth } from "@/lib/contexts/auth-provider";
-import globalClasses from "@/styles/global.module.css";
+import gclasses from "@/styles/global.module.css";
 import { ActionIcon, Alert, AppShell, Center, Group } from "@mantine/core";
 import { IconHome, IconNetworkOff } from "@tabler/icons-react";
 import clsx from "clsx";
@@ -25,7 +25,7 @@ export function MainContainer({ children }: { children: React.ReactNode }) {
                     gap={"xl"}
                     p={{ base: "xs", "640px": "md" }}
                     pr={"md"}
-                    className={clsx(globalClasses.highZ)}
+                    className={clsx(gclasses.highZ)}
                 >
                     <ActionIcon
                         variant="transparent"
@@ -41,7 +41,7 @@ export function MainContainer({ children }: { children: React.ReactNode }) {
 
             <AppShell.Main>
                 {!isOnline && (
-                    <Center className={clsx(globalClasses.offline)}>
+                    <Center className={clsx(gclasses.offline)}>
                         <Alert
                             title="You are Offline"
                             icon={<IconNetworkOff />}
