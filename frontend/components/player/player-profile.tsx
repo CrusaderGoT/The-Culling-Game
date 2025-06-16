@@ -87,6 +87,7 @@ export function PlayerProfile() {
                         </Text>
                         <Tooltip
                             label={"upgrade to access more advanced techniques"}
+                            events={{ focus: false, hover: true, touch: true }}
                         >
                             <IconInfoCircle size={12} />
                         </Tooltip>
@@ -114,7 +115,7 @@ function PlayerCtAppVoteChart({ player }: { player: PlayerInfo }) {
         <DonutChart
             data={data}
             tooltipDataSource="segment"
-            chartLabel={"techniques votes"}
+            chartLabel={"applications votes"}
             labelsType="percent"
             withLabels
             strokeWidth={5}

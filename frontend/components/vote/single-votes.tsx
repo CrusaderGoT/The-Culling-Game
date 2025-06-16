@@ -1,6 +1,6 @@
 "use client";
 
-import { MatchInfo, PlayerInfo } from "@/api/client";
+import { BaseCtAppInfo, MatchInfo, PlayerInfo } from "@/api/client";
 import { useAuth } from "@/lib/contexts/auth-provider";
 import { useCastVote } from "@/lib/hooks/matches";
 import { getColorFromId } from "@/lib/utils";
@@ -62,7 +62,7 @@ export function SingleVoteGroup({
 
 type SingleVoteProp = {
     matchId: number;
-    application: PlayerInfo["cursed_technique"]["applications"][0];
+    application: BaseCtAppInfo;
     playerId: number;
     prevVotes: number;
     icon?: Icon;
