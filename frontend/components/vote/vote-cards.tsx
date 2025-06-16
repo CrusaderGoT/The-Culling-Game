@@ -11,7 +11,7 @@ import {
 } from "@mantine/core";
 import { Dispatch, SetStateAction } from "react";
 
-import voteClasses from "@/styles/vote-card.module.css";
+import styles from "@/styles/vote-card.module.css";
 import clsx from "clsx";
 
 type VoteCardProp = {
@@ -38,7 +38,7 @@ export function VoteCards({ player, value, setValue, color }: VoteCardProp) {
                 radius="md"
                 checked={isChecked}
                 value={cardValue}
-                className={clsx(votestyles.voteCard)}
+                className={clsx(styles.voteCard)}
                 styles={() => ({
                     card: {
                         backgroundColor: isChecked

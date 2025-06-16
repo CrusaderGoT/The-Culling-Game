@@ -10,7 +10,6 @@ import {
     IconBombFilled,
     IconBow,
     IconHandGrab,
-    IconHandRock,
     IconKarate,
     IconShieldFilled,
     IconSwords
