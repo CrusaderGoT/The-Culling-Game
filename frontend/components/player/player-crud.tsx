@@ -3,7 +3,7 @@
 import { Grade, PlayerInfo } from "@/api/client";
 import { useAuth } from "@/lib/contexts/auth-provider";
 import { useDeletePlayer, useUpgradePlayer } from "@/lib/hooks/players";
-import gclasses from "@/styles/global.module.css";
+import gstyles from "@/styles/global.module.css";
 import {
     Alert,
     Button,
@@ -169,7 +169,7 @@ export function UpgradePlayerSlider({ player }: UpgradePlayerSliderProp) {
                 thumbSize={26}
                 thumbChildren={<ThumbIcon />}
                 flex={1}
-                classNames={{ markLabel: isMobile ? gclasses.markLabel : "" }}
+                classNames={{ markLabel: isMobile ? gstyles.markLabel : "" }}
                 disabled={player.grade === Grade[0]}
             />
 

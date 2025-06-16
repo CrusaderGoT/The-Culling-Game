@@ -1,6 +1,7 @@
 "use client";
 
 import { AdminInfo } from "@/api/client";
+import { AdminAccessDenied } from "@/components/ui/admin-access-denied";
 import { useAuth } from "@/lib/contexts/auth-provider";
 import { useCurrentAdmin } from "@/lib/hooks/admins";
 import { createContext, ReactNode, useContext, useMemo } from "react";
@@ -57,7 +58,7 @@ export function AdminProvider({ children }: { children: ReactNode }) {
             {isPending ? (
                 <div>Loading...</div>
             ) : error ? (
-                <div>Failed to load admin info.</div>
+                <AdminAccessDenied />
             ) : (
                 children
             )}

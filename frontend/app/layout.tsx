@@ -15,7 +15,6 @@ import {
     rem,
 } from "@mantine/core";
 
-
 import { Notifications } from "@mantine/notifications";
 
 import { charcoalColor, deepRedColor, goldColor } from "@/lib/constants/themes";

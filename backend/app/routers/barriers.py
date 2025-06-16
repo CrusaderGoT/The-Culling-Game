@@ -180,7 +180,7 @@ def simple_domain(
     # and prevent activating simple domain
     if (
         barrier_tech.domain_expansion is True or barrier_tech.binding_vow is True
-    ) and player.grade >= Player.Grade.SPECIAL:
+    ) and player.grade > Player.Grade.SPECIAL:
         raise PlayerException(
             player=player,
             code=status.HTTP_409_CONFLICT,
@@ -252,7 +252,7 @@ def bindind_vow(
         raise PlayerException(
             player,
             status.HTTP_426_UPGRADE_REQUIRED,
-            "Only Players of Grade THREE or higher can use Simple Domain. Upgrade your player",
+            "Only Players of Grade THREE or higher can use Binding Vow. Upgrade your player",
         )
 
     # check if player has an active barrier tech

@@ -18,6 +18,9 @@ import {
 } from "@mantine/core";
 
 import {
+    IconAdjustmentsPin,
+    IconDashboard,
+    IconDashboardFilled,
     IconDotsVertical,
     IconFish,
     IconLogout,
@@ -120,6 +123,16 @@ export function UserMenu() {
 
                     <Menu.Divider />
                 </Box>
+
+                {userInfo.admin && (
+                    <Menu.Item
+                        leftSection={<IconDashboard size={16} stroke={1.5} />}
+                        component={Link}
+                        href="/admin"
+                    >
+                        Admin Dashboard
+                    </Menu.Item>
+                )}
 
                 <Menu.Sub>
                     <Menu.Sub.Target>

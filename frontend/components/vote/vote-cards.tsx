@@ -38,7 +38,7 @@ export function VoteCards({ player, value, setValue, color }: VoteCardProp) {
                 radius="md"
                 checked={isChecked}
                 value={cardValue}
-                className={clsx(voteClasses.voteCard)}
+                className={clsx(votestyles.voteCard)}
                 styles={() => ({
                     card: {
                         backgroundColor: isChecked

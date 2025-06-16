@@ -136,12 +136,12 @@ export function VoteDrawer({
                         withBorder
                         withinPortal={false}
                         position={{ bottom: 20, left: 10 }}
-                        className={clsx(exceedVoteClasses.warningContainer)}
+                        className={clsx(exceedVotestyles.warningContainer)}
                     >
                         <Group wrap="nowrap">
                             <IconAlertCircle color="red" />
                             <Text
-                                className={clsx(exceedVoteClasses.warningText)}
+                                className={clsx(exceedVotestyles.warningText)}
                                 truncate="start"
                                 flex={1}
                             >

@@ -3,7 +3,7 @@
 import { MatchInfo, PlayerInfo } from "@/api/client";
 import { SingleVoteGroup } from "@/components/vote/single-votes";
 import { getColorFromId } from "@/lib/utils";
-import classes from "@/styles/player-card.module.css";
+import styles from "@/styles/player-card.module.css";
 import {
     AspectRatio,
     Badge,
@@ -44,9 +44,9 @@ export function PlayerCard({
     }, [match?.votes, player.id]);
 
     return (
-        <Paper withBorder p={"xs"} className={clsx(classes.fullHeight)}>
-            <Stack className={clsx(classes.fullHeight, classes.spaceBetween)}>
-                <Group p={5} className={clsx(classes.spaceBetween)}>
+        <Paper withBorder p={"xs"} className={clsx(styles.fullHeight)}>
+            <Stack className={clsx(styles.fullHeight, styles.spaceBetween)}>
+                <Group p={5} className={clsx(styles.spaceBetween)}>
                     <Badge
                         size="xs"
                         leftSection={<IconPointFilled size={14} />}
@@ -96,7 +96,7 @@ export function PlayerCard({
                 <Group align="flex-start">
                     <AspectRatio
                         ratio={100 / 100}
-                        className={clsx(classes.mAuto)}
+                        className={clsx(styles.mAuto)}
                     >
                         <MantineImage
                             component={Image}
@@ -105,7 +105,7 @@ export function PlayerCard({
                             alt="Player Image"
                             height={100}
                             width={100}
-                            className={clsx(classes.playerImage)}
+                            className={clsx(styles.playerImage)}
                         />
                     </AspectRatio>
 
