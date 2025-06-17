@@ -61,23 +61,47 @@ def create_new_match(session: session, part: int, atp) -> Match:
 
 def _get_eligible_colony(session: session, part: int) -> int:
     """Get a random colony that has available players for the given part."""
+
+    # First validate the part number before doing queries
+    last_match = get_last_created_match(session)
+    _validate_part_number(part, last_match)
+
     eligible_colonies = _get_colonies_with_available_players(session, part)
 
     if not eligible_colonies:
-        last_match = get_last_created_match(session)
-        if not last_match:
+        # specific error message based on context
+        if last_match:
+            next_part = last_match.part + 1
             raise MatchCreationException(
-                "No matches have been created yet", status.HTTP_404_NOT_FOUND
+                f"No colony has players available for part {part}. "
+                f"Consider starting part {next_part} or add more players."
+            )
+        else:
+            # First match scenario
+            raise MatchCreationException(
+                "No colonies with available players found. "
+                "Please ensure there are colonies with at least 2 alive players who have users."
             )
 
-        next_part = last_match.part + 1
+    return choice(eligible_colonies)
+
+
+def _validate_part_number(part: int, last_match: Match | None) -> None:
+    """Validate that the part number is valid based on the last match."""
+    if not last_match:
+        return  # No validation needed for first match
+
+    if part < last_match.part:
         raise MatchCreationException(
-            f"No colony has players available for part {part}. "
-            f"Consider starting part {next_part} or add more players.",
-            status.HTTP_404_NOT_FOUND,
+            f"Invalid match part. Must be equal to or greater than last part ({last_match.part})",
+            status.HTTP_406_NOT_ACCEPTABLE,
         )
 
-    return choice(eligible_colonies)
+    if part > last_match.part + 1:
+        raise MatchCreationException(
+            f"Invalid match part. Next part must be {last_match.part + 1}",
+            status.HTTP_406_NOT_ACCEPTABLE,
+        )
 
 
 def _get_colonies_with_available_players(session: session, part: int) -> list[int]:
