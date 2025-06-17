@@ -4,8 +4,8 @@ import { useAuth } from "@/lib/contexts/auth-provider";
 import { useCreateMatch } from "@/lib/hooks/admins";
 import {
     ActionIcon,
-    Box,
     Button,
+    Flex,
     Group,
     Modal,
     NumberInput,
@@ -21,17 +21,17 @@ export function CreateMatchAction() {
     const [opened, { open, close }] = useDisclosure(false);
 
     return (
-        <Box>
+        <Flex>
             <CreateMatchButton open={open} />
             <CreateMatchModal opened={opened} close={close} />
-        </Box>
+        </Flex>
     );
 }
 
 function CreateMatchButton({ open }: { open: () => void }) {
     return (
         <TooltipFloating label="Create Match">
-            <ActionIcon h={100} w={100} onClick={open}>
+            <ActionIcon flex={1} h={200} onClick={open} color="deepred">
                 <IconMatchstick size={50} />
             </ActionIcon>
         </TooltipFloating>
@@ -88,7 +88,9 @@ function CreateMatchModal({
                     >
                         Create Match
                     </Button>
-                    <Button variant="default" onClick={() => close()}>Close</Button>
+                    <Button variant="default" onClick={() => close()}>
+                        Close
+                    </Button>
                 </Group>
             </Stack>
         </Modal>

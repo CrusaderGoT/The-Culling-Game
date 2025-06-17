@@ -2,7 +2,7 @@
 
 import { useAdminContext } from "@/lib/contexts/admin-provider";
 import { checkAdminPermission } from "@/lib/utils";
-import { Group, Paper, Skeleton } from "@mantine/core";
+import { Group, Paper, Skeleton, Stack } from "@mantine/core";
 import { CreateMatchAction } from "./create-match";
 
 export function MatchActionsInterface() {
@@ -13,12 +13,8 @@ export function MatchActionsInterface() {
     }
 
     return (
-        <Paper withBorder>
-            <Group>
-                {checkAdminPermission(admin, "match", 2) && (
-                    <CreateMatchAction />
-                )}
-            </Group>
-        </Paper>
+        <Stack>
+            {checkAdminPermission(admin, "match", 2) && <CreateMatchAction />}
+        </Stack>
     );
 }
