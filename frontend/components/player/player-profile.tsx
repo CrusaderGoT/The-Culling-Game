@@ -97,18 +97,33 @@ export function PlayerProfile() {
 
                 <Space />
 
-                <Text ta={"center"} size="sm">
-                    Player Charts
-                </Text>
-                <Group gap={"xs"}>
-                    <PlayerCtAppVoteChart player={player.data} />
-                </Group>
+                {/* Render charts only if the player has participated in matches */}
+                {player.data.matches.length > 0 && (
+                    <>
+                        <Text ta={"center"} size="sm">
+                            Player Match Charts
+                        </Text>
+                        <Group>
+                            <PlayerCtAppVoteChart player={player.data} />
+                        </Group>
+                    </>
+                )}
             </Stack>
         );
     }
 }
 
+/**
+ * PlayerCtAppVoteChart is a component that visualizes the player's application votes
+ * as a donut chart. It uses the `calculateCtAppPoints` utility to process the player's
+ * data and displays the results in a graphical format.
+ *
+ * Props:
+ * - player: The PlayerInfo object containing the player's data, including votes.
+ */
 function PlayerCtAppVoteChart({ player }: { player: PlayerInfo }) {
+    if (!player.votes) return null;
+
     const data = calculateCtAppPoints(player);
 
     return (

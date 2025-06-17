@@ -1,7 +1,9 @@
-"""module for configurations of
+"""
+module for configurations of
 1. path operation decorators args; e.g tags.
 2. custom exceptions.
-3. Common logic"""
+3. Common logic
+"""
 
 from enum import Enum
 from typing import Any
@@ -79,6 +81,27 @@ class PlayerException(Exception):
 
 @app.exception_handler(PlayerException)
 async def player_exception_handler(request: Request, exc: PlayerException):
+    return JSONResponse(status_code=exc.code, content=exc.detail)
+
+
+class MatchCreationException(Exception):
+    """Custom exception for match creation errors"""
+
+    def __init__(
+        self,
+        detail: str,
+        code: int = status.HTTP_400_BAD_REQUEST,
+        headers: dict[str, str] | None = None,
+    ):
+        self.detail = detail
+        self.code = code
+        self.headers = headers
+
+
+@app.exception_handler(MatchCreationException)
+async def match_creation_exception_handler(
+    request: Request, exc: MatchCreationException
+):
     return JSONResponse(status_code=exc.code, content=exc.detail)
 
 

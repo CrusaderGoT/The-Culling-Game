@@ -1,7 +1,7 @@
 import {
     createMatchMutation,
     currentAdminOptions,
-    getLastestMatchQueryKey
+    getLastestMatchQueryKey,
 } from "@/api/client/@tanstack/react-query.gen";
 import { getAPIErrorMessage } from "@/components/ui/display-api-error";
 import { authHeader } from "@/lib/constants/AUTHCONSTANTS";
@@ -35,7 +35,7 @@ export const useCreateMatch = (token: string) => {
         },
         onSuccess: (match) => {
             notifications.show({
-                message: `match part ${match.part}: colony ${match.colony} started successfully`,
+                message: `match part ${match.part}: colony ${match.colony.country} started successfully`,
                 color: "deepred",
             });
             queryClient.invalidateQueries({

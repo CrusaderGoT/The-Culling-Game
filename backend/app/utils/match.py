@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 from random import choice, sample
 from typing import Sequence
 
-from fastapi import HTTPException, status
+from fastapi import status
 from sqlmodel import and_, exists, select
 
 from app.models.base import MatchPlayerLink
@@ -14,6 +14,7 @@ from app.models.colony import Colony
 from app.models.match import Match
 from app.models.player import Player
 from app.models.user import User
+from app.utils.config import MatchCreationException
 from app.utils.dependencies import atp, session
 from app.utils.player import (
     get_alive_player,
@@ -45,29 +46,17 @@ def get_last_created_match(session: session):
     return last_match
 
 
-class MatchCreationError(Exception):
-    """Custom exception for match creation errors"""
-
-    def __init__(self, message: str, status_code: int = status.HTTP_404_NOT_FOUND):
-        self.message = message
-        self.status_code = status_code
-        super().__init__(message)
-
-
 def create_new_match(session: session, part: int, atp) -> Match:
     """Creates a new match with optimized player selection logic."""
-    try:
-        # Get eligible colony with available players
-        colony_id = _get_eligible_colony(session, part)
 
-        # Get players for the match
-        players = _get_match_players(session, colony_id, part)
+    # Get eligible colony with available players
+    colony_id = _get_eligible_colony(session, part)
 
-        # Create and return the match
-        return _create_match_instance(colony_id, part, players, atp)
+    # Get players for the match
+    players = _get_match_players(session, colony_id, part)
 
-    except MatchCreationError as e:
-        raise HTTPException(e.status_code, detail=e.message)
+    # Create and return the match
+    return _create_match_instance(colony_id, part, players, atp)
 
 
 def _get_eligible_colony(session: session, part: int) -> int:
@@ -77,14 +66,15 @@ def _get_eligible_colony(session: session, part: int) -> int:
     if not eligible_colonies:
         last_match = get_last_created_match(session)
         if not last_match:
-            raise MatchCreationError(
+            raise MatchCreationException(
                 "No matches have been created yet", status.HTTP_404_NOT_FOUND
             )
 
         next_part = last_match.part + 1
-        raise MatchCreationError(
+        raise MatchCreationException(
             f"No colony has players available for part {part}. "
-            f"Consider starting part {next_part} or add more players."
+            f"Consider starting part {next_part} or add more players.",
+            status.HTTP_404_NOT_FOUND,
         )
 
     return choice(eligible_colonies)
@@ -140,7 +130,7 @@ def _get_match_players(session: session, colony_id: int, part: int) -> list[Play
 
     else:
         # No available players - this shouldn't happen if colony selection worked correctly
-        raise MatchCreationError(
+        raise MatchCreationException(
             f"No available players in colony {colony_id} for part {part}",
             status.HTTP_404_NOT_FOUND,
         )
@@ -201,7 +191,7 @@ def _get_mixed_player_pair(
     other_players = session.exec(other_players_query).all()
 
     if not other_players:
-        raise MatchCreationError(
+        raise MatchCreationException(
             f"Colony {colony_id} has only one alive player. "
             "At least 2 players are required to create a match.",
             status.HTTP_412_PRECONDITION_FAILED,
@@ -233,44 +223,6 @@ def _ensure_utc_timezone(dt: datetime) -> datetime:
     if dt.tzinfo is None or dt.tzinfo.utcoffset(dt) is None:
         return dt.replace(tzinfo=timezone.utc)
     return dt
-
-
-# Legacy function maintained for backward compatibility
-def get_players_not_in_part(
-    colony_id: int, part: int, session: session
-) -> Sequence[Player]:
-    """
-    Legacy function - use _get_available_players_for_part instead.
-    Maintained for backward compatibility.
-    """
-    return _get_available_players_for_part(session, colony_id, part)
-
-
-def colonies_with_players_available_for_part(session: session, part: int) -> list[int]:
-    """
-    Legacy function - use _get_colonies_with_available_players instead.
-    Maintained for backward compatibility.
-    """
-    return _get_colonies_with_available_players(session, part)
-
-
-def random_players_for_match(
-    session: session, players_not_in_part: Sequence[Player], colony_id: int, part: int
-) -> list[Player]:
-    """
-    Legacy function - logic moved to _get_match_players.
-    Maintained for backward compatibility.
-    """
-    if not players_not_in_part:
-        raise HTTPException(
-            status.HTTP_404_NOT_FOUND,
-            detail=f"No players in Colony {colony_id} who haven't fought in part {part}",
-        )
-
-    if len(players_not_in_part) == 1:
-        return _get_mixed_player_pair(session, colony_id, players_not_in_part[0])
-
-    return sample(players_not_in_part, 2)
 
 
 def schedule_assign_match_winner(*, match_id: int, session: session, atp: atp):
