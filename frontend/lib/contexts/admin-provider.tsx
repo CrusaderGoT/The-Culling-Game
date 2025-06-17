@@ -4,6 +4,7 @@ import { AdminInfo } from "@/api/client";
 import { AdminAccessDenied } from "@/components/ui/admin-access-denied";
 import { useAuth } from "@/lib/contexts/auth-provider";
 import { useCurrentAdmin } from "@/lib/hooks/admins";
+import { LoadingOverlay } from "@mantine/core";
 import { createContext, ReactNode, useContext, useMemo } from "react";
 
 type AdminContextProp = {
@@ -56,7 +57,22 @@ export function AdminProvider({ children }: { children: ReactNode }) {
     return (
         <AdminContext.Provider value={contextValue}>
             {isPending ? (
-                <div>Loading...</div>
+                <>
+                    <LoadingOverlay
+                        visible={isPending}
+                        zIndex={600}
+                        overlayProps={{ radius: "sm", blur: 0 }}
+                        loaderProps={{ color: "pink", type: "bars" }}
+                    />
+                    <LoadingOverlay
+                        visible={isPending}
+                        overlayProps={{ radius: "sm", blur: 2 }}
+                        loaderProps={{
+                            children: "Authenticating",
+                            pt: 100,
+                        }}
+                    />
+                </>
             ) : error ? (
                 <AdminAccessDenied />
             ) : (

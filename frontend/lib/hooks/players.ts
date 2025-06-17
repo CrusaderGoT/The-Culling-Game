@@ -1,7 +1,6 @@
 import {
     aPlayerOptions,
     createPlayerMutation,
-    currentUserQueryKey,
     deletePlayerMutation,
     editPlayerMutation,
     myPlayerOptions,
@@ -21,9 +20,10 @@ export const useCreatePlayer = (token: string) => {
             headers: authHeader(token),
         }),
         onError: (error) => {
-            console.error(getAPIErrorMessage(error));
             notifications.show({
-                message: "An error occurred while creating player",
+                message: `An error occurred while creating player -> ${getAPIErrorMessage(
+                    error
+                )}`,
                 color: "red",
             });
         },
@@ -31,16 +31,6 @@ export const useCreatePlayer = (token: string) => {
             notifications.show({
                 message: `player ${player.name} created successfully`,
                 color: "green",
-            });
-            queryClient.invalidateQueries({
-                queryKey: [
-                    myPlayerQueryKey({
-                        headers: authHeader(token),
-                    }),
-                    currentUserQueryKey({
-                        headers: authHeader(token),
-                    }),
-                ],
             });
         },
     });
@@ -142,9 +132,10 @@ export const useEditPlayer = (token: string) => {
             headers: authHeader(token),
         }),
         onError: (error) => {
-            console.error(getAPIErrorMessage(error));
             notifications.show({
-                message: "An error occurred while editing player detail(s)",
+                message: `An error occurred while editing player detail(s) -> ${getAPIErrorMessage(
+                    error
+                )}`,
                 color: "red",
             });
         },
@@ -154,14 +145,7 @@ export const useEditPlayer = (token: string) => {
                 color: "green",
             });
             queryClient.invalidateQueries({
-                queryKey: [
-                    myPlayerQueryKey({
-                        headers: authHeader(token),
-                    }),
-                    currentUserQueryKey({
-                        headers: authHeader(token),
-                    }),
-                ],
+                queryKey: [myPlayerQueryKey()],
             });
         },
     });
@@ -177,9 +161,10 @@ export const useDeletePlayer = (token: string) => {
             headers: authHeader(token),
         }),
         onError: (error) => {
-            console.error(getAPIErrorMessage(error));
             notifications.show({
-                message: "An error occurred while deleting player",
+                message: `An error occurred while deleting player -> ${getAPIErrorMessage(
+                    error
+                )}`,
                 color: "yellow",
             });
         },
@@ -189,14 +174,7 @@ export const useDeletePlayer = (token: string) => {
                 color: "red",
             });
             queryClient.invalidateQueries({
-                queryKey: [
-                    myPlayerQueryKey({
-                        headers: authHeader(token),
-                    }),
-                    currentUserQueryKey({
-                        headers: authHeader(token),
-                    }),
-                ],
+                queryKey: [myPlayerQueryKey()],
             });
             router.push("/match");
         },
@@ -211,7 +189,6 @@ export const useUpgradePlayer = (token: string) => {
             headers: authHeader(token),
         }),
         onError: (error) => {
-            console.error(getAPIErrorMessage(error));
             notifications.show({
                 message: `An error occurred while upgrading player -> ${getAPIErrorMessage(
                     error
@@ -222,17 +199,10 @@ export const useUpgradePlayer = (token: string) => {
         onSuccess: () => {
             notifications.show({
                 message: `player's grade upgraded successfully`,
-                color: "red",
+                color: "green",
             });
             queryClient.invalidateQueries({
-                queryKey: [
-                    myPlayerQueryKey({
-                        headers: authHeader(token),
-                    }),
-                    currentUserQueryKey({
-                        headers: authHeader(token),
-                    }),
-                ],
+                queryKey: [myPlayerQueryKey()],
             });
         },
     });

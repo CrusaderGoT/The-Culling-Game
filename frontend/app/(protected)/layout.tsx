@@ -2,7 +2,7 @@
 
 import { AuthProvider } from "@/lib/contexts/auth-provider";
 
-import { MainContainer } from "@/components/ui/container";
+import { Shell } from "@/components/ui/shell";
 
 export default async function ProtectedLayout({
     children,
@@ -11,7 +11,7 @@ export default async function ProtectedLayout({
 }) {
     return (
         <AuthProvider>
-            <MainContainer>{children}</MainContainer>
+            <Shell>{children}</Shell>
         </AuthProvider>
     );
 }

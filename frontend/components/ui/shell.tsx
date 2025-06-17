@@ -17,7 +17,7 @@ import clsx from "clsx";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-export function MainContainer({ children }: { children: React.ReactNode }) {
+export function Shell({ children }: { children: React.ReactNode }) {
     const {
         isOnline,
         user: { userInfo },

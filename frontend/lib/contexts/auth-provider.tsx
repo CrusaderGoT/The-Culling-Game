@@ -116,7 +116,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const {
         isPending: isRefreshing,
-        mutate,
+        mutateAsync,
         error: refreshError,
     } = useMutation({
         ...refreshTokenMutation(),
@@ -131,7 +131,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 message: "Session Expired Log In To Continue",
                 color: "yellow",
             });
-            redirect(`/login?next=${encodeURIComponent(path)}`);
+            return; // redirect to login is handled in the use effect
         },
         onSuccess: async (t) => {
             if (!mountedRef) return;
@@ -210,21 +210,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             ((isError && !isLoading) || (!token && !isLoading) || tokenExpired);
 
         if (shouldRefresh) {
-            mutate({
-                body: { refresh_token: refreshToken },
-            });
+            async function refreshTokenAsyncMutate() {
+                const rt = await mutateAsync({
+                    body: { refresh_token: refreshToken },
+                });
+
+                if (!rt) {
+                    redirect(`/login?next=${encodeURIComponent(path)}`);
+                }
+            }
+            refreshTokenAsyncMutate();
         }
     }, [
         isError,
         refreshToken,
         isRefreshing,
         isLoading,
-        mutate,
+        mutateAsync,
         tokensLoaded,
         token,
         mountedRef,
         tokenExpired,
         isOnline,
+        path,
     ]);
 
     // Redirect logic

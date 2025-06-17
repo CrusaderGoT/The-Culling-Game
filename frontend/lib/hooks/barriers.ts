@@ -39,13 +39,13 @@ export const useSimpleDomain = (token: string) => {
         onSuccess: () => {
             notifications.show({
                 message: "Simple Domain Activated",
-                color: "white",
+                color: "gray.3",
             });
         },
         onError: (err) => {
             notifications.show({
                 message: `Simple Domain Failed -> ${getAPIErrorMessage(err)}`,
-                color: "black",
+                color: "gray.6",
             });
         },
     });

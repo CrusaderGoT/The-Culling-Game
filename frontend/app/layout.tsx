@@ -28,7 +28,7 @@ import Nexarust from "@/fonts/NexarustFont";
 import { ModeToggle } from "@/components/ui/mode-toggle";
 
 import { RouterTransition } from "@/components/ui/router-transition";
-import { SocketProvider } from "@/lib/contexts/socket-context";
+import { SocketProvider } from "@/lib/contexts/socket-provider";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -80,7 +80,8 @@ export default function RootLayout({
                             }
                             socketPath="/ws"
                         >
-                            <Container size={"lg"}>
+                            {/** pos relative for global loading overlay, eg (admin dashboard loading) */}
+                            <Container size={"lg"} pos={"relative"}>
                                 <ModeToggle />
                                 {children}
                             </Container>

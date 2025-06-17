@@ -1,4 +1,4 @@
-import { BaseCtAppInfo, PlayerInfo } from "@/api/client";
+import { AdminInfo, BaseCtAppInfo, ModelName, PermissionLevel, PlayerInfo } from "@/api/client";
 import { MantineColor } from "@mantine/core";
 
 export function cleanString(input: string) {
@@ -76,4 +76,30 @@ export function calculateCtAppPoints(player: PlayerInfo) {
 
     const data = Array.from(ctAppPointsMap.values());
     return data;
+}
+/**
+ * Checks if the given admin has a specific permission level for a particular model.
+ *
+ * Permission levels are structured as follows:
+ *   READ = 1
+ *   CREATE = 2
+ *   UPDATE = 3
+ *   DELETE = 4
+ *
+ * @param admin - The admin user whose permissions are being checked.
+ * @param model - The name of the model to check permissions against.
+ * @param level - The required permission level to verify.
+ * @returns `true` if the admin has the specified permission level for the model, otherwise `false`.
+ */
+
+export function checkAdminPermission(
+    admin: AdminInfo,
+    model: ModelName,
+    level: PermissionLevel
+) {
+    const hasPermission = admin.permissions.some(
+        (perm) => perm.model === model && perm.level === level
+    );
+
+    return hasPermission;
 }

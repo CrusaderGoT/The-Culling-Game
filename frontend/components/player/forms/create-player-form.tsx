@@ -15,7 +15,6 @@ import {
 import { DisplayAPIError } from "@/components/ui/display-api-error";
 import { useAuth } from "@/lib/contexts/auth-provider";
 import { useCreatePlayer } from "@/lib/hooks/players";
-import { useCurrentUser } from "@/lib/hooks/users";
 
 import {
     Button,
@@ -24,10 +23,9 @@ import {
     Group,
     Paper,
     ScrollAreaAutosize,
-    Skeleton,
     Stack,
     Stepper,
-    Text,
+    Text
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 
@@ -57,7 +55,10 @@ export function CreatePlayerForm() {
         application: "",
     }));
 
-    const { token } = useAuth();
+    const {
+        token,
+        user: { userInfo },
+    } = useAuth();
 
     const [active, setActive] = useState(0);
     const [highestStepVisited, setHighestStepVisited] = useState(active);
@@ -116,13 +117,6 @@ export function CreatePlayerForm() {
     });
 
     const {
-        data: user,
-        error: userError,
-        refetch: refetchUser,
-        isLoading: userIsLoading,
-    } = useCurrentUser(token);
-
-    const {
         isPending: createPlayerIsPending,
         mutateAsync: createPlayerMutate,
         error: createPlayerError,
@@ -130,7 +124,7 @@ export function CreatePlayerForm() {
     } = useCreatePlayer(token);
 
     async function handleSubmit(data: CreatePlayerSchemaType) {
-        if (!user) {
+        if (!userInfo) {
             notifications.show({
                 message:
                     "User information not available. Please refresh and try again.",
@@ -142,7 +136,7 @@ export function CreatePlayerForm() {
         const newPlayer = await createPlayerMutate({
             // @ts-ignore: applications are always 5
             body: data,
-            path: { user: user.id },
+            path: { user: userInfo.id },
         });
 
         if (!newPlayer) {
@@ -155,23 +149,6 @@ export function CreatePlayerForm() {
         } else {
             redirect("/player");
         }
-    }
-
-    // Loading state
-    if (userIsLoading) {
-        return <Skeleton width="100%" height={400} mx="auto" my={"sm"} />;
-    }
-
-    // Error state
-    if (userError || !user) {
-        return (
-            <Stack>
-                {userError && <DisplayAPIError error={userError} />}
-                <Button onClick={() => refetchUser()}>
-                    Retry Loading User
-                </Button>
-            </Stack>
-        );
     }
 
     return (
