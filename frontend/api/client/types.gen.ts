@@ -1276,11 +1276,11 @@ export type GetLastestMatchResponse = GetLastestMatchResponses[keyof GetLastestM
 
 export type DeleteMatchData = {
     body?: never;
-    path: {
+    path?: never;
+    query: {
         match_id: number;
     };
-    query?: never;
-    url: '/match/delete/{match_id}';
+    url: '/match/delete';
 };
 
 export type DeleteMatchErrors = {
@@ -1296,8 +1296,10 @@ export type DeleteMatchResponses = {
     /**
      * Successful Response
      */
-    200: unknown;
+    200: MatchInfo;
 };
+
+export type DeleteMatchResponse = DeleteMatchResponses[keyof DeleteMatchResponses];
 
 export type DomainExpansionData = {
     body?: never;

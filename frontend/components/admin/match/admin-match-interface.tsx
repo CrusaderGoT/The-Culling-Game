@@ -1,9 +1,10 @@
 "use client";
 
+import { CreateMatchAction } from "@/components/admin/match/create-match";
+import { DeleteMatchAction } from "@/components/admin/match/delete-match";
 import { useAdminContext } from "@/lib/contexts/admin-provider";
 import { checkAdminPermission } from "@/lib/utils";
-import { Group, Paper, Skeleton, Stack } from "@mantine/core";
-import { CreateMatchAction } from "./create-match";
+import { Skeleton, Stack } from "@mantine/core";
 
 export function MatchActionsInterface() {
     const { admin, isPending } = useAdminContext();
@@ -15,6 +16,7 @@ export function MatchActionsInterface() {
     return (
         <Stack>
             {checkAdminPermission(admin, "match", 2) && <CreateMatchAction />}
+            {checkAdminPermission(admin, "match", 4) && <DeleteMatchAction />}
         </Stack>
     );
 }

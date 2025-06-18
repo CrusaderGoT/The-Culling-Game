@@ -666,6 +666,8 @@ export const zGetMatchesResponse = z.array(zMatchInfo);
 
 export const zGetLastestMatchResponse = zMatchInfo;
 
+export const zDeleteMatchResponse = zMatchInfo;
+
 export const zDomainExpansionResponse = zBarrierTechInfo;
 
 export const zSimpleDomainResponse = zBarrierTechInfo;

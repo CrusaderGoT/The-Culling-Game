@@ -1,4 +1,11 @@
-import { AdminInfo, BaseCtAppInfo, ModelName, PermissionLevel, PlayerInfo } from "@/api/client";
+import {
+    AdminInfo,
+    BaseAdminInfo,
+    BaseCtAppInfo,
+    ModelName,
+    PermissionLevel,
+    PlayerInfo,
+} from "@/api/client";
 import { MantineColor } from "@mantine/core";
 
 export function cleanString(input: string) {
@@ -93,7 +100,7 @@ export function calculateCtAppPoints(player: PlayerInfo) {
  */
 
 export function checkAdminPermission(
-    admin: AdminInfo,
+    admin: AdminInfo | BaseAdminInfo,
     model: ModelName,
     level: PermissionLevel
 ) {

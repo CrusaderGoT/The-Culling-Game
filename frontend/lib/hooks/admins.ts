@@ -1,6 +1,7 @@
 import {
     createMatchMutation,
     currentAdminOptions,
+    deleteMatchMutation,
     getLastestMatchQueryKey,
 } from "@/api/client/@tanstack/react-query.gen";
 import { getAPIErrorMessage } from "@/components/ui/display-api-error";
@@ -27,7 +28,9 @@ export const useCreateMatch = (token: string) => {
         }),
         onError: (error) => {
             notifications.show({
-                message: `An error occurred while creating match -> ${getAPIErrorMessage(error)}`,
+                message: `An error occurred while creating match -> ${getAPIErrorMessage(
+                    error
+                )}`,
                 color: "yellow",
             });
         },
@@ -35,6 +38,32 @@ export const useCreateMatch = (token: string) => {
             notifications.show({
                 message: `match part ${match.part}: colony ${match.colony.country} started successfully`,
                 color: "deepred",
+            });
+            queryClient.invalidateQueries({
+                queryKey: [getLastestMatchQueryKey()],
+            });
+        },
+    });
+    return mutation;
+};
+
+export const useDeleteMatch = (token: string) => {
+    const mutation = useMutation({
+        ...deleteMatchMutation({
+            headers: authHeader(token),
+        }),
+        onError: (error) => {
+            notifications.show({
+                message: `An error occurred while deleting match -> ${getAPIErrorMessage(
+                    error
+                )}`,
+                color: "yellow",
+            });
+        },
+        onSuccess: (match) => {
+            notifications.show({
+                message: `match part ${match.part}: colony ${match.colony.country} deleted successfully`,
+                color: "blue",
             });
             queryClient.invalidateQueries({
                 queryKey: [getLastestMatchQueryKey()],

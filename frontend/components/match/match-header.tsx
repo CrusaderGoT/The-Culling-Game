@@ -1,12 +1,14 @@
 "use client";
 
 import { MatchInfo } from "@/api/client";
-import { getColorFromId } from "@/lib/utils";
+import { useAuth } from "@/lib/contexts/auth-provider";
+import { checkAdminPermission, getColorFromId } from "@/lib/utils";
 import { Badge, Code, Group, Indicator, Text } from "@mantine/core";
 import { IconCrown, IconSparkles } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import relativeTime from "dayjs/plugin/relativeTime";
+import { DeleteMatchAction2 } from "../admin/match/delete-match";
 
 // Extend dayjs with plugins
 dayjs.extend(duration);
@@ -17,6 +19,10 @@ export function MatchHeader({
     isEnded,
     timeLeft,
 }: MatchStatusHeaderProp) {
+    const {
+        user: { userInfo },
+    } = useAuth();
+
     const colony = `${match.colony.id} - ${match.colony.country}`;
 
     return (
@@ -67,6 +73,11 @@ export function MatchHeader({
             <Code color={isEnded ? "red" : undefined}>
                 {isEnded ? timeLeft : `ends in: ${timeLeft}`}
             </Code>
+
+            {userInfo?.admin &&
+                checkAdminPermission(userInfo.admin, "match", 4) && (
+                    <DeleteMatchAction2 matchId={match.id} />
+                )}
         </Group>
     );
 }

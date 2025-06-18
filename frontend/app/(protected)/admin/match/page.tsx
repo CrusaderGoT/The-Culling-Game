@@ -1,4 +1,4 @@
-import { MatchActionsInterface } from "@/components/admin/admin-match-interface";
+import { MatchActionsInterface } from "@/components/admin/match/admin-match-interface";
 
 export default async function AdminMatchPage() {
     return <MatchActionsInterface />;

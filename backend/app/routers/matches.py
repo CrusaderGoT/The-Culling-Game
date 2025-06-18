@@ -14,7 +14,6 @@ from fastapi import (
     BackgroundTasks,
     Depends,
     HTTPException,
-    Path,
     Query,
     status,
 )
@@ -126,9 +125,9 @@ async def get_lastest_match(
         raise HTTPException(status.HTTP_404_NOT_FOUND, "No latest match")
 
 
-@router.delete("/delete/{match_id}")
+@router.delete("/delete", response_model=MatchInfo)
 async def delete_match(
-    match_id: Annotated[int, Path()],
+    match_id: Annotated[int, Query()],
     session: session,
     admin: admin_user,
 ):

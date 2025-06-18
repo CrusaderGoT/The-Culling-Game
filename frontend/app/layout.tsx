@@ -7,7 +7,6 @@ import "@mantine/nprogress/styles.css";
 
 import {
     ColorSchemeScript,
-    Container,
     DEFAULT_THEME,
     MantineProvider,
     createTheme,
@@ -25,12 +24,10 @@ import Naluka from "@/fonts/NalukaFont";
 import Neuropol from "@/fonts/NeuropolFont";
 import Nexarust from "@/fonts/NexarustFont";
 
-import { ModeToggle } from "@/components/ui/mode-toggle";
-
 import { RouterTransition } from "@/components/ui/router-transition";
+import { Shell } from "@/components/ui/shell";
 import { SocketProvider } from "@/lib/contexts/socket-provider";
 import type { Metadata } from "next";
-import { Shell } from "@/components/ui/shell";
 
 export const metadata: Metadata = {
     title: "The Culling Games",

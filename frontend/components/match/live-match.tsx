@@ -27,7 +27,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 export function LiveMatch({ ongoing = false }: { ongoing: boolean }) {
-    const { token } = useAuth();
+    const { token, user: {userInfo} } = useAuth();
 
     const router = useRouter();
 

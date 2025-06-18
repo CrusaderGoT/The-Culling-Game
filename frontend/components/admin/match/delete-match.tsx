@@ -1,7 +1,8 @@
 "use client";
 
+import { getAPIErrorMessage } from "@/components/ui/display-api-error";
 import { useAuth } from "@/lib/contexts/auth-provider";
-import { useCreateMatch } from "@/lib/hooks/admins";
+import { useDeleteMatch } from "@/lib/hooks/admins";
 import {
     ActionIcon,
     Button,
@@ -10,35 +11,42 @@ import {
     Modal,
     NumberInput,
     Stack,
+    Tooltip,
     TooltipFloating,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { IconMatchstick } from "@tabler/icons-react";
+import {
+    IconMatchstick,
+    IconTrash,
+    IconTrashFilled,
+} from "@tabler/icons-react";
 import { useState } from "react";
-import { getAPIErrorMessage } from "../ui/display-api-error";
 
-export function CreateMatchAction() {
+export function DeleteMatchAction() {
     const [opened, { open, close }] = useDisclosure(false);
 
     return (
         <Flex>
-            <CreateMatchButton open={open} />
-            <CreateMatchModal opened={opened} close={close} />
+            <DeleteMatchButton open={open} />
+
+            <DeleteMatchModal opened={opened} close={close} />
         </Flex>
     );
 }
 
-function CreateMatchButton({ open }: { open: () => void }) {
+function DeleteMatchButton({ open }: { open: () => void }) {
     return (
-        <TooltipFloating label="Create Match">
+        <TooltipFloating label="Delete Match">
             <ActionIcon flex={1} h={200} onClick={open} color="deepred">
-                <IconMatchstick size={50} />
+                <Group gap={"xs"}>
+                    <IconTrash size={50} /> <IconMatchstick size={50} />
+                </Group>
             </ActionIcon>
         </TooltipFloating>
     );
 }
 
-function CreateMatchModal({
+function DeleteMatchModal({
     opened,
     close,
 }: {
@@ -49,13 +57,13 @@ function CreateMatchModal({
 
     const [value, setValue] = useState<string | number>("");
 
-    const { mutateAsync, error } = useCreateMatch(token);
+    const { mutateAsync, error } = useDeleteMatch(token);
 
     return (
         <Modal
             opened={opened}
             onClose={close}
-            title="Create a new Match"
+            title="Delete a new Match"
             centered
             size={"xs"}
         >
@@ -63,7 +71,7 @@ function CreateMatchModal({
                 <NumberInput
                     label="Part"
                     withAsterisk
-                    description="Match part to create"
+                    description="Match part to Delete"
                     placeholder="try the current match number or higher"
                     value={value}
                     onChange={setValue}
@@ -81,12 +89,12 @@ function CreateMatchModal({
                         onClick={async () => {
                             await mutateAsync({
                                 query: {
-                                    part: Number(value),
+                                    match_id: Number(value),
                                 },
                             });
                         }}
                     >
-                        Create Match
+                        Delete Match
                     </Button>
                     <Button variant="default" onClick={() => close()}>
                         Close
@@ -94,5 +102,32 @@ function CreateMatchModal({
                 </Group>
             </Stack>
         </Modal>
+    );
+}
+
+export function DeleteMatchAction2({ matchId }: { matchId: number }) {
+    const { token } = useAuth();
+
+    const { mutateAsync } = useDeleteMatch(token);
+
+    return (
+        <Tooltip
+            label="Delete Match"
+            events={{ focus: false, hover: true, touch: true }}
+        >
+            <ActionIcon
+                onClick={async () => {
+                    await mutateAsync({
+                        query: {
+                            match_id: matchId,
+                        },
+                    });
+                }}
+                color="deepred"
+                size={"xs"}
+            >
+                <IconTrashFilled size={16} />
+            </ActionIcon>
+        </Tooltip>
     );
 }
