@@ -27,9 +27,7 @@ export const useCreateMatch = (token: string) => {
         }),
         onError: (error) => {
             notifications.show({
-                message: `An error occurred while creating match -> ${getAPIErrorMessage(
-                    error
-                )}`,
+                message: `An error occurred while creating match -> ${getAPIErrorMessage(error)}`,
                 color: "yellow",
             });
         },

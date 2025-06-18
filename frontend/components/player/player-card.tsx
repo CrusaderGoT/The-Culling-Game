@@ -80,7 +80,7 @@ export function PlayerCard({
                             size="xs"
                             rightSection={
                                 <Text size={"8"} visibleFrom="sm">
-                                    {playerMatchPoints > 0
+                                    {Number(playerMatchPoints) > 0
                                         ? "Battle Points"
                                         : "Battle Point"}
                                 </Text>

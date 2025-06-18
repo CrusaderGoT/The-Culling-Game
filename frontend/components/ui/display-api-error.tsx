@@ -45,6 +45,8 @@ export function getAPIErrorMessage(error: HttpValidationError | Error) {
         return error.message;
     } else if (typeof error.detail === "string") {
         return error.detail;
+    } else if (typeof error === "string") {
+        return error;
     } else if (typeof error.detail === "object") {
         return error.detail?.map((e) => e.msg);
     } else {
