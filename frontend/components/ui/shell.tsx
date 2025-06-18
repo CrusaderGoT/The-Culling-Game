@@ -1,5 +1,6 @@
 "use client";
 
+import { ModeToggle } from "@/components/ui/mode-toggle";
 import { UserMenu } from "@/components/ui/user-menu";
 import { useAuth } from "@/lib/contexts/auth-provider";
 import gstyles from "@/styles/global.module.css";
@@ -9,6 +10,7 @@ import {
     AppShell,
     Burger,
     Center,
+    Container,
     Group,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
@@ -48,40 +50,44 @@ export function Shell({ children }: { children: React.ReactNode }) {
             padding={"md"}
         >
             <AppShell.Header>
-                <Group
-                    justify="right"
-                    align="center"
-                    gap={"xl"}
-                    p={{ base: "xs", "640px": "md" }}
-                    pr={"md"}
-                    className={clsx(gstyles.highZ)}
-                >
-                    <ActionIcon
-                        variant="transparent"
-                        component={Link}
-                        href="/match"
+                <Group justify="space-between" className={clsx(gstyles.highZ)}>
+                    <ModeToggle />
+
+                    <Group
+                        justify="flex-end"
+                        align="center"
+                        gap={"xl"}
+                        p={{ base: "xs", "640px": "md" }}
+                        pr={"md"}
+                        flex={1}
                     >
-                        <IconHome />
-                    </ActionIcon>
+                        <ActionIcon
+                            variant="transparent"
+                            component={Link}
+                            href="/match"
+                        >
+                            <IconHome />
+                        </ActionIcon>
 
-                    <UserMenu />
+                        <UserMenu />
 
-                    {userInfo?.admin && pathname.startsWith("/admin") && (
-                        <>
-                            <Burger
-                                opened={mobileOpened}
-                                onClick={toggleMobile}
-                                hiddenFrom="sm"
-                                size="sm"
-                            />
-                            <Burger
-                                opened={desktopOpened}
-                                onClick={toggleDesktop}
-                                visibleFrom="sm"
-                                size="sm"
-                            />
-                        </>
-                    )}
+                        {userInfo?.admin && pathname.startsWith("/admin") && (
+                            <>
+                                <Burger
+                                    opened={mobileOpened}
+                                    onClick={toggleMobile}
+                                    hiddenFrom="sm"
+                                    size="sm"
+                                />
+                                <Burger
+                                    opened={desktopOpened}
+                                    onClick={toggleDesktop}
+                                    visibleFrom="sm"
+                                    size="sm"
+                                />
+                            </>
+                        )}
+                    </Group>
                 </Group>
             </AppShell.Header>
 
@@ -90,16 +96,20 @@ export function Shell({ children }: { children: React.ReactNode }) {
             )}
 
             <AppShell.Main>
-                {!isOnline && (
-                    <Center className={clsx(gstyles.offline)}>
-                        <Alert
-                            title="You are Offline"
-                            icon={<IconNetworkOff />}
-                            color="red.9"
-                        />
-                    </Center>
-                )}
-                {children}
+                {/** pos relative for global loading overlay, eg (admin dashboard loading) */}
+                <Container pos={"relative"}>
+                    {!isOnline && (
+                        <Center className={clsx(gstyles.offline)}>
+                            <Alert
+                                title="You are Offline"
+                                icon={<IconNetworkOff />}
+                                color="red.9"
+                            />
+                        </Center>
+                    )}
+
+                    {children}
+                </Container>
             </AppShell.Main>
         </AppShell>
     );

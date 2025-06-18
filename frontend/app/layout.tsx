@@ -30,6 +30,7 @@ import { ModeToggle } from "@/components/ui/mode-toggle";
 import { RouterTransition } from "@/components/ui/router-transition";
 import { SocketProvider } from "@/lib/contexts/socket-provider";
 import type { Metadata } from "next";
+import { Shell } from "@/components/ui/shell";
 
 export const metadata: Metadata = {
     title: "The Culling Games",
@@ -80,11 +81,7 @@ export default function RootLayout({
                             }
                             socketPath="/ws"
                         >
-                            {/** pos relative for global loading overlay, eg (admin dashboard loading) */}
-                            <Container size={"lg"} pos={"relative"}>
-                                <ModeToggle />
-                                {children}
-                            </Container>
+                            <Shell>{children}</Shell>
                         </SocketProvider>
                     </TanstackProviders>
                 </MantineProvider>

@@ -114,9 +114,7 @@ export function UserMenu() {
                         {userInfo?.player && (
                             <Indicator
                                 size={7}
-                                color={getColorFromId(
-                                    userInfo.player.id + userInfo.id
-                                )}
+                                color={getColorFromId(userInfo.player.id)}
                             />
                         )}
                     </Group>
@@ -174,9 +172,7 @@ export function UserMenu() {
                             stroke={1.5}
                             color={
                                 userInfo.player
-                                    ? getColorFromId(
-                                          userInfo.player.id + userInfo.id
-                                      )
+                                    ? getColorFromId(userInfo.player.id)
                                     : theme.colors.green[7]
                             }
                         />
