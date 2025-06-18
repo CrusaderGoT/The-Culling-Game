@@ -18,7 +18,7 @@ import { VoteDrawer } from "@/components/vote/vote-drawer";
 import { DisplayAPIError } from "@/components/ui/display-api-error";
 import { useAuth } from "@/lib/contexts/auth-provider";
 import { useLatestMatch } from "@/lib/hooks/matches";
-import { useGetPlayers } from "@/lib/hooks/players";
+import { useGetMatchPlayers } from "@/lib/hooks/players";
 import gstyles from "@/styles/global.module.css";
 import clsx from "clsx";
 import dayjs from "dayjs";
@@ -94,7 +94,7 @@ export function LiveMatch({ ongoing = false }: { ongoing: boolean }) {
         isPending: playersIsPending,
         error: playersError,
         refetchFailed,
-    } = useGetPlayers(token, playerIds);
+    } = useGetMatchPlayers(token, playerIds);
 
     const validPlayers = useMemo(() => {
         return players?.filter((player) => player !== undefined) || [];

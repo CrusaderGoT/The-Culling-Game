@@ -15,12 +15,13 @@ from app.models.player import (
     PlayerInfo,
 )
 from app.utils.barrier import fix_barrier_deactivation_task_fail
-from app.utils.config import Tag, UserException
+from app.utils.config import PlayerException, Tag, UserException
 from app.utils.dependencies import atp, colony, session
 from app.utils.player import (
     calculate_points,
     edit_player_helper,
     get_alive_player,
+    get_player,
     points_required_for_upgrade,
 )
 from app.utils.user import (
@@ -64,7 +65,10 @@ def create_player(
             raise UserException(userdb, status.HTTP_406_NOT_ACCEPTABLE, err_msg)
         # check if user already has a player
         elif userdb.player:
-            err_msg = f"{userdb.username} already has a player '{userdb.player.name}'. Edit player instead."
+            if not userdb.player.alive:
+                err_msg = f"Player '{userdb.player.name}' with ID '{userdb.player.id}' has died. Contact an admin to revive them."
+            else:
+                err_msg = f"{userdb.username} already has a player '{userdb.player.name}'. Edit player instead."
             raise UserException(userdb, status.HTTP_409_CONFLICT, err_msg)
         else:  # user has no player
             # ct router instances, for ct_ins; enumerate to get index for CTApp number
@@ -100,8 +104,12 @@ def create_player(
 )
 def my_player(session: session, current_user: active_user):
     if current_user.player and type(current_user.player.id) is int:
-        player = get_alive_player(session, current_user.player.id)
+        player = get_player(session, current_user.player.id)
         if player:
+            if not player.alive:
+                err_msg = f"Your player '{player.name}' with ID '{player.id}' has died. Contact an admin to revive them."
+                raise PlayerException(player=player, detail=err_msg)
+
             # deactive any potential barrier end task fails
             fix_barrier_deactivation_task_fail(player.barrier_technique, session)
             return player
@@ -130,9 +138,11 @@ def get_players(
     gender: Annotated[Player.Gender | None, Query()] = None,
     age: Annotated[int | None, Query(ge=10, le=102)] = None,
     role: Annotated[str | None, Query()] = None,
-    alive: Annotated[bool, Query()] = True,
+    alive: Annotated[bool, Query()] = False,
 ):
-    statement = select(Player).offset(offset).limit(limit)
+    statement = (
+        select(Player).offset(offset).limit(limit).where(or_(Player.alive == alive))
+    )
     # if clauses to add a where/or clause to the statement
     if gender is not None:
         statement = statement.where(or_(Player.gender == gender))
@@ -140,8 +150,7 @@ def get_players(
         statement = statement.where(or_(Player.age == age))
     if role is not None:
         statement = statement.where(or_(Player.role == role))
-    if not alive:
-        statement = statement.where(or_(Player.alive == False))
+
     # execute
     players = session.exec(statement).all()
     # if slim return info without cursed technique info and user info
@@ -160,11 +169,17 @@ def get_players(
 def a_player(
     *,
     player_id: Annotated[int, Path()],
-    alive: Annotated[bool, Query()] = True,
+    alive: Annotated[
+        bool, Query(description="whether the player has to be alive")
+    ] = True,
     session: session,
 ):
-    player = get_alive_player(session=session, player_id=player_id, alive=alive)
+    player = get_player(session=session, player_id=player_id)
     if player:
+        if alive and not player.alive:  # player has to be alive
+            err_msg = f"Player '{player.name}' with ID '{player.id}' has died. Contact an admin to revive them."
+            raise PlayerException(player=player, detail=err_msg)
+
         # deactive any potential barrier end task fails
         fix_barrier_deactivation_task_fail(player.barrier_technique, session)
         return player

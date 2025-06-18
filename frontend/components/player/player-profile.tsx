@@ -20,7 +20,7 @@ import {
     Space,
     Stack,
     Text,
-    Tooltip,
+    Tooltip
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconInfoCircle } from "@tabler/icons-react";
@@ -52,65 +52,61 @@ export function PlayerProfile() {
     }
 
     // Now we can safely check the data
-    if (!player.data) {
-        return <CreatePlayerForm />;
-    } else {
-        return (
-            <Stack mx="auto">
-                <EditPlayerModal
-                    player={player.data}
-                    opened={openedEditPlayer}
-                    close={closeEditPlayer}
-                />
-                <DeletePlayerModal
-                    player={player.data}
-                    opened={openedDeletePlayer}
-                    close={closeDeletePlayer}
-                />
-                <Group justify="space-between">
-                    <Button size="compact-xs" onClick={openEditPlayer}>
-                        Edit Player
-                    </Button>
-                    <Button
-                        size="compact-xs"
-                        color="red"
-                        onClick={openDeletePlayer}
+    return (
+        <Stack mx="auto">
+            <EditPlayerModal
+                player={player.data}
+                opened={openedEditPlayer}
+                close={closeEditPlayer}
+            />
+            <DeletePlayerModal
+                player={player.data}
+                opened={openedDeletePlayer}
+                close={closeDeletePlayer}
+            />
+            <Group justify="space-between">
+                <Button size="compact-xs" onClick={openEditPlayer}>
+                    Edit Player
+                </Button>
+                <Button
+                    size="compact-xs"
+                    color="red"
+                    onClick={openDeletePlayer}
+                >
+                    Delete Player
+                </Button>
+            </Group>
+            <PlayerCard player={player.data} />
+            {player.data.grade > 0 && (
+                <Group justify="center" gap={3}>
+                    <Text size="sm" c={"deepred"}>
+                        Upgrade Your Player
+                    </Text>
+                    <Tooltip
+                        label={"upgrade to access more advanced techniques"}
+                        events={{ focus: false, hover: true, touch: true }}
                     >
-                        Delete Player
-                    </Button>
+                        <IconInfoCircle size={12} />
+                    </Tooltip>
                 </Group>
-                <PlayerCard player={player.data} />
-                {player.data.grade > 0 && (
-                    <Group justify="center" gap={3}>
-                        <Text size="sm" c={"deepred"}>
-                            Upgrade Your Player
-                        </Text>
-                        <Tooltip
-                            label={"upgrade to access more advanced techniques"}
-                            events={{ focus: false, hover: true, touch: true }}
-                        >
-                            <IconInfoCircle size={12} />
-                        </Tooltip>
+            )}
+            <UpgradePlayerSlider player={player.data} />
+
+            <Space />
+
+            {/* Render charts only if the player has participated in matches */}
+            {player.data.matches.length > 0 && (
+                <>
+                    <Text ta={"center"} size="sm">
+                        Player Match Charts
+                    </Text>
+                    <Group>
+                        <PlayerCtAppVoteChart player={player.data} />
                     </Group>
-                )}
-                <UpgradePlayerSlider player={player.data} />
-
-                <Space />
-
-                {/* Render charts only if the player has participated in matches */}
-                {player.data.matches.length > 0 && (
-                    <>
-                        <Text ta={"center"} size="sm">
-                            Player Match Charts
-                        </Text>
-                        <Group>
-                            <PlayerCtAppVoteChart player={player.data} />
-                        </Group>
-                    </>
-                )}
-            </Stack>
-        );
-    }
+                </>
+            )}
+        </Stack>
+    );
 }
 
 /**

@@ -18,9 +18,9 @@ from app.utils.barrier import (
     schedule_deactivate_domain,
     schedule_deactivate_simple_domain,
 )
-from app.utils.player import get_alive_player
 from app.utils.config import PlayerException, Tag
 from app.utils.dependencies import atp, session
+from app.utils.player import get_alive_player
 from fastapi import (
     APIRouter,
     BackgroundTasks,

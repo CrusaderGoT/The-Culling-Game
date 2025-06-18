@@ -40,7 +40,7 @@ export function PlayerCard({
                 points += vote.point;
             }
         });
-        return points;
+        return points.toFixed(1);
     }, [match?.votes, player.id]);
 
     return (

@@ -71,6 +71,8 @@ export function DeletePlayerModal({
             opened={opened}
             onClose={close}
             transitionProps={{ transition: "fade", duration: 200 }}
+            centered
+            size={"xs"}
         >
             <Stack>
                 <Alert

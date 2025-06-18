@@ -47,8 +47,8 @@ export function MatchVoteChart({ players, votes }: MatchVoteChartProps) {
             }
 
             // Update vote points
-            const currentPoints = (voteData.get(ctAppName) as number) || 0;
-            voteData.set(ctAppName, currentPoints + vote.point);
+            const currentPoints = Number(voteData.get(ctAppName)) || 0;
+            voteData.set(ctAppName, (currentPoints + vote.point).toFixed(1));
 
             // Add series entry if not exists
             if (!series.some((s) => s.name === ctAppName)) {
@@ -117,6 +117,11 @@ export function MatchVoteChart({ players, votes }: MatchVoteChartProps) {
             xAxisLabel="Vote Points"
             tooltipAnimationDuration={200}
             barChartProps={{ maxBarSize: 50 }}
+            xAxisProps={{
+                domain([_, dataMax]) {
+                    return [0, dataMax];
+                },
+            }}
             yAxisProps={{
                 type: "category",
                 tick: renderCustomYAxisTick,

@@ -1047,6 +1047,9 @@ export type APlayerData = {
         player_id: number;
     };
     query?: {
+        /**
+         * whether the player has to be alive
+         */
         alive?: boolean;
     };
     url: '/player/{player_id}';

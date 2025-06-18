@@ -50,11 +50,16 @@ export const useCurrentPlayer = (token: string) => {
     return query;
 };
 
-export const useGetPlayer = (token: string, playerId: number) => {
+export const useGetPlayer = (
+    token: string,
+    playerId: number,
+    alive: boolean = true
+) => {
     const query = useQuery({
         ...aPlayerOptions({
             headers: authHeader(token),
             path: { player_id: playerId },
+            query: { alive: alive },
         }),
         enabled: !!token, // run only if token is available
     });
@@ -63,7 +68,7 @@ export const useGetPlayer = (token: string, playerId: number) => {
 };
 
 // Custom hook for fetching multiple players
-export const useGetPlayers = (token: string, playerIds: number[]) => {
+export const useGetMatchPlayers = (token: string, playerIds: number[]) => {
     // Filter out any invalid IDs (0, null, undefined)
     const validPlayerIds = playerIds.filter((id) => id && id !== 0);
 
@@ -73,7 +78,7 @@ export const useGetPlayers = (token: string, playerIds: number[]) => {
             ...aPlayerOptions({
                 headers: authHeader(token),
                 path: { player_id: playerId },
-                query: { alive: false },
+                query: { alive: false }, // get even dead player
             }),
             enabled: !!token && !!playerId, // Only run query if we have both token and playerId
             staleTime: Infinity,
