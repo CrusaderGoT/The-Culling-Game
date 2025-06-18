@@ -18,9 +18,7 @@ import {
 } from "@mantine/core";
 
 import {
-    IconAdjustmentsPin,
     IconDashboard,
-    IconDashboardFilled,
     IconDotsVertical,
     IconFish,
     IconLogout,
@@ -116,7 +114,9 @@ export function UserMenu() {
                         {userInfo?.player && (
                             <Indicator
                                 size={7}
-                                color={getColorFromId(userInfo.player.id)}
+                                color={getColorFromId(
+                                    userInfo.player.id + userInfo.id
+                                )}
                             />
                         )}
                     </Group>
@@ -174,7 +174,9 @@ export function UserMenu() {
                             stroke={1.5}
                             color={
                                 userInfo.player
-                                    ? getColorFromId(userInfo.player.id)
+                                    ? getColorFromId(
+                                          userInfo.player.id + userInfo.id
+                                      )
                                     : theme.colors.green[7]
                             }
                         />
