@@ -1,7 +1,7 @@
 "use client";
 
-import { UserMenu } from "@/components/ui//user-menu";
 import { ModeToggle } from "@/components/ui/mode-toggle";
+import { UserMenu } from "@/components/ui/user-menu";
 import { ActionIcon, AppShell, Burger, Group } from "@mantine/core";
 import { IconHome } from "@tabler/icons-react";
 import clsx from "clsx";
