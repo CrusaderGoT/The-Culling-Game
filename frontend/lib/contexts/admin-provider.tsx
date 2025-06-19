@@ -44,7 +44,7 @@ export function AdminProvider({ children }: { children: ReactNode }) {
     const { data, error, isPending, refetch } = useCurrentAdmin(token);
 
     // Memoize context value for efficiency
-    const contextValue = useMemo(
+    const contextValue: AdminContextProp = useMemo(
         () => ({
             admin: data,
             isPending,

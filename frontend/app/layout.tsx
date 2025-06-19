@@ -25,7 +25,8 @@ import Neuropol from "@/fonts/NeuropolFont";
 import Nexarust from "@/fonts/NexarustFont";
 
 import { RouterTransition } from "@/components/ui/router-transition";
-import { Shell } from "@/components/ui/shell";
+import { ShellApp } from "@/components/ui/shell/shell-app";
+import { ShellContextProvider } from "@/lib/contexts/shell-context-provider";
 import { SocketProvider } from "@/lib/contexts/socket-provider";
 import type { Metadata } from "next";
 
@@ -78,7 +79,9 @@ export default function RootLayout({
                             }
                             socketPath="/ws"
                         >
-                            <Shell>{children}</Shell>
+                            <ShellContextProvider>
+                                <ShellApp>{children}</ShellApp>
+                            </ShellContextProvider>
                         </SocketProvider>
                     </TanstackProviders>
                 </MantineProvider>
