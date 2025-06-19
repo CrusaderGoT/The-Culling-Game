@@ -80,7 +80,7 @@ function DeleteMatchModal({
                     allowNegative={false}
                     allowDecimal={false}
                     prefix="No. "
-                    leftSection={<IconMatchstick />}
+                    leftSection={<IconTrash />}
                     error={error && getAPIErrorMessage(error)}
                 />
                 <Group justify="space-between">
@@ -93,6 +93,7 @@ function DeleteMatchModal({
                                 },
                             });
                         }}
+                        color="red"
                     >
                         Delete Match
                     </Button>
