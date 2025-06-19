@@ -2,7 +2,7 @@
 
 import { AdminInfo } from "@/api/client";
 import { AdminAccessDenied } from "@/components/ui/admin-access-denied";
-import { useAuth } from "@/lib/contexts/auth-provider";
+import { useAuth } from "@/lib/contexts/auth-context-provider";
 import { useCurrentAdmin } from "@/lib/hooks/admins";
 import { LoadingOverlay } from "@mantine/core";
 import { createContext, ReactNode, useContext, useMemo } from "react";
@@ -38,7 +38,7 @@ export const AdminContext = createContext<AdminContextProp>({
  *
  * @returns The context provider wrapping the children, or a loading/error message.
  */
-export function AdminProvider({ children }: { children: ReactNode }) {
+export function AdminContextProvider({ children }: { children: ReactNode }) {
     const { token } = useAuth();
 
     const { data, error, isPending, refetch } = useCurrentAdmin(token);

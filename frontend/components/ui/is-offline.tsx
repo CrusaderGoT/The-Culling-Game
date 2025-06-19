@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth } from "@/lib/contexts/auth-provider";
+import { useAuth } from "@/lib/contexts/auth-context-provider";
 import gstyles from "@/styles/global.module.css";
 import { Alert, Center } from "@mantine/core";
 import { IconNetworkOff } from "@tabler/icons-react";

@@ -1,8 +1,10 @@
 "use client";
 
-import { useAuth } from "@/lib/contexts/auth-provider";
+import { useAuth } from "@/lib/contexts/auth-context-provider";
 import { useShellContext } from "@/lib/contexts/shell-context-provider";
+import gstyles from "@/styles/global.module.css";
 import { AppShell } from "@mantine/core";
+import clsx from "clsx";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 
@@ -28,6 +30,8 @@ export function ShellNavbar() {
     ]);
 
     return userInfo?.admin && pathname.startsWith("/admin") ? (
-        <AppShell.Navbar p="md">Navbar{userInfo.admin.id}</AppShell.Navbar>
+        <AppShell.Navbar p="md" className={clsx(gstyles.highZ)}>
+            Navbar
+        </AppShell.Navbar>
     ) : null;
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { Grade, PlayerInfo } from "@/api/client";
-import { useAuth } from "@/lib/contexts/auth-provider";
+import { useAuth } from "@/lib/contexts/auth-context-provider";
 import { useDeletePlayer, useUpgradePlayer } from "@/lib/hooks/players";
 import gstyles from "@/styles/global.module.css";
 import {

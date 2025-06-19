@@ -19,17 +19,17 @@ import {
 
 import {
     IconDashboard,
-    IconDotsVertical,
     IconFish,
     IconLogout,
     IconSettings,
     IconTrash,
     IconUser,
+    IconUserCog,
 } from "@tabler/icons-react";
 
 import { forwardRef } from "react";
 
-import { useAuth } from "@/lib/contexts/auth-provider";
+import { useAuth } from "@/lib/contexts/auth-context-provider";
 import { deleteSession } from "@/lib/session";
 import { getColorFromId } from "@/lib/utils";
 import Link from "next/link";
@@ -43,7 +43,7 @@ const UserButton = forwardRef<HTMLButtonElement, UserButtonProps>(
     ({ user, ...others }: UserButtonProps, ref) => (
         <UnstyledButton ref={ref} {...others} visibleFrom="sm">
             <Group>
-                <Avatar name={user.username} />
+                <Avatar name={user.username} src={user.player?.picture} />
                 <Box flex={1}>
                     <Group>
                         <Text size="sm" fw={500}>
@@ -66,10 +66,12 @@ const UserButton = forwardRef<HTMLButtonElement, UserButtonProps>(
 
 UserButton.displayName = "UserButton";
 
-function UserButtonAlt() {
+function UserButtonAlt({ user }: { user: UserInfo }) {
     return (
-        <ActionIcon variant="transparent" hiddenFrom="sm">
-            <IconDotsVertical />
+        <ActionIcon variant="transparent" hiddenFrom="sm" radius={"lg"}>
+            <Avatar src={user.player?.picture}>
+                <IconUserCog />
+            </Avatar>
         </ActionIcon>
     );
 }
@@ -88,7 +90,7 @@ export function UserMenu() {
             <Box>
                 <Skeleton height={38} width={220} visibleFrom="sm" />
 
-                <Skeleton height={28} width={5} mr={"sm"} hiddenFrom="sm" />
+                <Skeleton height={28} width={5} circle hiddenFrom="sm" />
             </Box>
         );
 
@@ -99,11 +101,13 @@ export function UserMenu() {
             trigger="click-hover"
             withArrow
             transitionProps={{ transition: "rotate-left", duration: 150 }}
+            offset={25}
         >
             <Menu.Target>
                 <Group>
+                    <UserButtonAlt user={userInfo} />
+
                     <UserButton user={userInfo} />
-                    <UserButtonAlt />
                 </Group>
             </Menu.Target>
 

@@ -16,7 +16,7 @@ import { MatchVoteChart } from "@/components/match/match-vote-chart";
 import { VoteDrawer } from "@/components/vote/vote-drawer";
 
 import { DisplayAPIError } from "@/components/ui/display-api-error";
-import { useAuth } from "@/lib/contexts/auth-provider";
+import { useAuth } from "@/lib/contexts/auth-context-provider";
 import { useLatestMatch } from "@/lib/hooks/matches";
 import { useGetMatchPlayers } from "@/lib/hooks/players";
 import gstyles from "@/styles/global.module.css";
@@ -27,7 +27,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 export function LiveMatch({ ongoing = false }: { ongoing: boolean }) {
-    const { token, user: {userInfo} } = useAuth();
+    const { token } = useAuth();
 
     const router = useRouter();
 
@@ -151,8 +151,8 @@ export function LiveMatch({ ongoing = false }: { ongoing: boolean }) {
                     component={Image}
                     height={1024}
                     width={1024}
-                    h={{ base: 512, md: 768 }}
-                    w={{ base: 512, md: 768 }}
+                    h={{ base: 256, md: 512, lg: 768 }}
+                    w={{ base: 256, md: 512, lg: 768 }}
                     mx={"auto"}
                 />
             </Stack>

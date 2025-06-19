@@ -170,9 +170,17 @@ async def delete_match(
             # get the match
             match = get_match(session=session, match_id=match_id)
             if match is not None:
+                colony = match.colony
+                winner = match.winner
                 session.delete(match)
                 session.commit()
-                return match
+                # construct deleted match non list (since list can be empty) relations to avoid detached error
+                relations_update = {
+                    "colony": colony,
+                    "winner": winner,
+                }
+                deleted_match = Match.model_validate(match, update=relations_update)
+                return deleted_match
             else:
                 raise HTTPException(
                     status.HTTP_404_NOT_FOUND, f"Match with Id: {match_id}, Not Found"

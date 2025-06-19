@@ -15,7 +15,7 @@ import { zodResolver } from "@mantine/form";
 import { z } from "zod";
 
 import { DisplayAPIError } from "@/components/ui/display-api-error";
-import { useAuth } from "@/lib/contexts/auth-provider";
+import { useAuth } from "@/lib/contexts/auth-context-provider";
 import { useCastVote } from "@/lib/hooks/matches";
 
 export function VoteForm({ votes, matchId }: VoteFormType) {

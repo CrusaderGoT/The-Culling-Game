@@ -3,6 +3,7 @@
 import { useShellContext } from "@/lib/contexts/shell-context-provider";
 import { AppShell, Container } from "@mantine/core";
 import { usePathname } from "next/navigation";
+import { ShellHeader } from "./shell-header";
 
 export function ShellApp({ children }: { children: React.ReactNode }) {
     const { navbarProps } = useShellContext();
@@ -28,9 +29,11 @@ export function ShellApp({ children }: { children: React.ReactNode }) {
             }
             padding={"md"}
         >
-            <AppShell.Main>
-                {/** pos relative for global loading overlay, eg (admin dashboard loading) */}
-                <Container pos={"relative"}>{children}</Container>
+            <ShellHeader />
+
+            {/** pos relative for global loading overlay, eg (admin dashboard loading) */}
+            <AppShell.Main pos={"relative"}>
+                <Container>{children}</Container>
             </AppShell.Main>
         </AppShell>
     );

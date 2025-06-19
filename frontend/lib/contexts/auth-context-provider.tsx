@@ -41,7 +41,7 @@ export const AuthContext = createContext<ContextProp>({
     },
 });
 
-export function AuthProvider({ children }: { children: ReactNode }) {
+export function AuthContextProvider({ children }: { children: ReactNode }) {
     const path = usePathname() || "/match";
     const [token, setToken] = useState<string>("");
     const [refreshToken, setRefreshToken] = useState<string>("");

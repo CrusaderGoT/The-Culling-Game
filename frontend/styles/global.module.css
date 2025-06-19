@@ -1,8 +1,3 @@
-.stickyTop {
-  position: sticky;
-  top: 15;
-}
-
 .highZ {
   z-index: 666;
 }

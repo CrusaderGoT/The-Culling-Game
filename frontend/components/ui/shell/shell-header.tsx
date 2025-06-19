@@ -19,45 +19,51 @@ export function ShellHeader() {
     const publicPathnames = ["/", "/login", "/signup"];
 
     return (
-        <AppShell.Header withBorder={!publicPathnames.includes(pathname)}>
-            <Group justify="space-between" className={clsx(gstyles.highZ)}>
+        <AppShell.Header
+            withBorder={!publicPathnames.includes(pathname)}
+            className={clsx(gstyles.highZ)}
+            p={{ base: "xs", "640px": "md" }}
+            px={{ base: "md", md: "xl" }}
+        >
+            <Group justify="space-between">
                 <ModeToggle />
 
-                <Group
-                    justify="flex-end"
-                    align="center"
-                    gap={"xl"}
-                    p={{ base: "xs", "640px": "md" }}
-                    pr={"md"}
-                    flex={1}
-                >
-                    <ActionIcon
-                        variant="transparent"
-                        component={Link}
-                        href="/match"
+                {!publicPathnames.includes(pathname) && (
+                    <Group
+                        justify="flex-end"
+                        align="center"
+                        gap={"xl"}
+                        flex={1}
                     >
-                        <IconHome />
-                    </ActionIcon>
+                        <ActionIcon
+                            variant="transparent"
+                            component={Link}
+                            href="/match"
+                        >
+                            <IconHome />
+                        </ActionIcon>
 
-                    <UserMenu />
+                        <UserMenu />
 
-                    {navbarProps.adminUser && pathname.startsWith("/admin") && (
-                        <>
-                            <Burger
-                                opened={navbarProps.mobileOpened}
-                                onClick={navbarProps.toggleMobile}
-                                hiddenFrom="sm"
-                                size="sm"
-                            />
-                            <Burger
-                                opened={navbarProps.desktopOpened}
-                                onClick={navbarProps.toggleDesktop}
-                                visibleFrom="sm"
-                                size="sm"
-                            />
-                        </>
-                    )}
-                </Group>
+                        {navbarProps.adminUser &&
+                            pathname.startsWith("/admin") && (
+                                <>
+                                    <Burger
+                                        opened={navbarProps.mobileOpened}
+                                        onClick={navbarProps.toggleMobile}
+                                        hiddenFrom="sm"
+                                        size="sm"
+                                    />
+                                    <Burger
+                                        opened={navbarProps.desktopOpened}
+                                        onClick={navbarProps.toggleDesktop}
+                                        visibleFrom="sm"
+                                        size="sm"
+                                    />
+                                </>
+                            )}
+                    </Group>
+                )}
             </Group>
         </AppShell.Header>
     );

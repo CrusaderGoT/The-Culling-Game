@@ -3,7 +3,7 @@
 import { IsOffline } from "@/components/ui/is-offline";
 import { ShellHeader } from "@/components/ui/shell/shell-header";
 import { ShellNavbar } from "@/components/ui/shell/shell-navbar";
-import { AuthProvider } from "@/lib/contexts/auth-provider";
+import { AuthContextProvider } from "@/lib/contexts/auth-context-provider";
 
 export default async function ProtectedLayout({
     children,
@@ -11,11 +11,11 @@ export default async function ProtectedLayout({
     children: React.ReactNode;
 }) {
     return (
-        <AuthProvider>
+        <AuthContextProvider>
             <IsOffline />
             <ShellHeader />
             <ShellNavbar />
             {children}
-        </AuthProvider>
+        </AuthContextProvider>
     );
 }

@@ -119,7 +119,7 @@ export function MatchVoteChart({ players, votes }: MatchVoteChartProps) {
             barChartProps={{ maxBarSize: 50 }}
             xAxisProps={{
                 domain([_, dataMax]) {
-                    return [0, dataMax];
+                    return [0, Number(dataMax.toFixed(1))];
                 },
             }}
             yAxisProps={{

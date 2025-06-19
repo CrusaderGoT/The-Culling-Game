@@ -1,7 +1,7 @@
 "use client";
 
 import { getAPIErrorMessage } from "@/components/ui/display-api-error";
-import { useAuth } from "@/lib/contexts/auth-provider";
+import { useAuth } from "@/lib/contexts/auth-context-provider";
 import { useDeleteMatch } from "@/lib/hooks/admins";
 import {
     ActionIcon,
@@ -15,19 +15,19 @@ import {
     TooltipFloating,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import {
-    IconMatchstick,
-    IconTrash,
-    IconTrashFilled,
-} from "@tabler/icons-react";
+import { IconMatchstick, IconTrash, IconTrashX } from "@tabler/icons-react";
 import { useState } from "react";
 
-export function DeleteMatchAction() {
+export function DeleteMatchAction({ small = false }: { small?: boolean }) {
     const [opened, { open, close }] = useDisclosure(false);
 
     return (
-        <Flex>
-            <DeleteMatchButton open={open} />
+        <Flex justify={"space-evenly"}>
+            {small ? (
+                <DeleteMatchButtonSmall open={open} />
+            ) : (
+                <DeleteMatchButton open={open} />
+            )}
 
             <DeleteMatchModal opened={opened} close={close} />
         </Flex>
@@ -37,7 +37,7 @@ export function DeleteMatchAction() {
 function DeleteMatchButton({ open }: { open: () => void }) {
     return (
         <TooltipFloating label="Delete Match">
-            <ActionIcon flex={1} h={200} onClick={open} color="deepred">
+            <ActionIcon flex={1} h={200} onClick={open} color="violet">
                 <Group gap={"xs"}>
                     <IconTrash size={50} /> <IconMatchstick size={50} />
                 </Group>
@@ -69,17 +69,17 @@ function DeleteMatchModal({
         >
             <Stack>
                 <NumberInput
-                    label="Part"
+                    label="Match number"
                     withAsterisk
-                    description="Match part to Delete"
-                    placeholder="try the current match number or higher"
+                    description="Match number to Delete"
+                    placeholder="enter match number"
                     value={value}
                     onChange={setValue}
                     clampBehavior="strict"
                     min={1}
                     allowNegative={false}
                     allowDecimal={false}
-                    prefix="Part "
+                    prefix="No. "
                     leftSection={<IconMatchstick />}
                     error={error && getAPIErrorMessage(error)}
                 />
@@ -105,28 +105,19 @@ function DeleteMatchModal({
     );
 }
 
-export function DeleteMatchAction2({ matchId }: { matchId: number }) {
-    const { token } = useAuth();
-
-    const { mutateAsync } = useDeleteMatch(token);
-
+export function DeleteMatchButtonSmall({ open }: { open: () => void }) {
     return (
         <Tooltip
             label="Delete Match"
             events={{ focus: false, hover: true, touch: true }}
         >
             <ActionIcon
-                onClick={async () => {
-                    await mutateAsync({
-                        query: {
-                            match_id: matchId,
-                        },
-                    });
-                }}
+                onClick={open}
                 color="deepred"
                 size={"xs"}
+                variant="subtle"
             >
-                <IconTrashFilled size={16} />
+                <IconTrashX size={16} />
             </ActionIcon>
         </Tooltip>
     );

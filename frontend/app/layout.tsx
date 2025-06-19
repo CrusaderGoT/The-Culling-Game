@@ -27,7 +27,7 @@ import Nexarust from "@/fonts/NexarustFont";
 import { RouterTransition } from "@/components/ui/router-transition";
 import { ShellApp } from "@/components/ui/shell/shell-app";
 import { ShellContextProvider } from "@/lib/contexts/shell-context-provider";
-import { SocketProvider } from "@/lib/contexts/socket-provider";
+import { SocketContextProvider } from "@/lib/contexts/socket-context-provider";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -71,7 +71,7 @@ export default function RootLayout({
                     <RouterTransition />
                     <Notifications />
                     <TanstackProviders>
-                        <SocketProvider
+                        <SocketContextProvider
                             serverUrl={
                                 process.env.NODE_ENV === "production"
                                     ? "https://the-culling-games.up.railway.app"
@@ -82,7 +82,7 @@ export default function RootLayout({
                             <ShellContextProvider>
                                 <ShellApp>{children}</ShellApp>
                             </ShellContextProvider>
-                        </SocketProvider>
+                        </SocketContextProvider>
                     </TanstackProviders>
                 </MantineProvider>
             </body>

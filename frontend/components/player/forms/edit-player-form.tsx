@@ -11,7 +11,7 @@ import {
     useEditPlayerForm,
 } from "@/components/player/forms/edit-player-form-context";
 import { DisplayAPIError } from "@/components/ui/display-api-error";
-import { useAuth } from "@/lib/contexts/auth-provider";
+import { useAuth } from "@/lib/contexts/auth-context-provider";
 import { useEditPlayer } from "@/lib/hooks/players";
 import { Button, Group, Stack } from "@mantine/core";
 import { zodResolver } from "mantine-form-zod-resolver";

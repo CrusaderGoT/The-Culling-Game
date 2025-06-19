@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth } from "@/lib/contexts/auth-provider";
+import { useAuth } from "@/lib/contexts/auth-context-provider";
 import { useCreateMatch } from "@/lib/hooks/admins";
 import {
     ActionIcon,

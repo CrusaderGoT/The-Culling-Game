@@ -9,7 +9,7 @@ import {
     UpgradePlayerSlider,
 } from "@/components/player/player-crud";
 import { DisplayAPIError } from "@/components/ui/display-api-error";
-import { useAuth } from "@/lib/contexts/auth-provider";
+import { useAuth } from "@/lib/contexts/auth-context-provider";
 import { useCurrentPlayer } from "@/lib/hooks/players";
 import { calculateCtAppPoints } from "@/lib/utils";
 import { DonutChart } from "@mantine/charts";

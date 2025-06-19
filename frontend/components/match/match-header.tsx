@@ -1,14 +1,22 @@
 "use client";
 
 import { MatchInfo } from "@/api/client";
-import { useAuth } from "@/lib/contexts/auth-provider";
+import { useAuth } from "@/lib/contexts/auth-context-provider";
 import { checkAdminPermission, getColorFromId } from "@/lib/utils";
-import { Badge, Code, Group, Indicator, Text } from "@mantine/core";
+import {
+    Badge,
+    Box,
+    Code,
+    Divider,
+    Group,
+    Indicator,
+    Text,
+} from "@mantine/core";
 import { IconCrown, IconSparkles } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { DeleteMatchAction2 } from "../admin/match/delete-match";
+import { DeleteMatchAction } from "../admin/match/delete-match";
 
 // Extend dayjs with plugins
 dayjs.extend(duration);
@@ -55,7 +63,11 @@ export function MatchHeader({
                 {match.part}
             </Badge>
 
-            <Text size="xs">Colony: {colony}</Text>
+            <Box ta={"center"}>
+                <Text size="xs">{`No. ${match.id}`}</Text>
+                <Divider />
+                <Text size="xs">Colony: {colony}</Text>
+            </Box>
 
             {match.winner ? (
                 <Badge
@@ -76,7 +88,7 @@ export function MatchHeader({
 
             {userInfo?.admin &&
                 checkAdminPermission(userInfo.admin, "match", 4) && (
-                    <DeleteMatchAction2 matchId={match.id} />
+                    <DeleteMatchAction small />
                 )}
         </Group>
     );

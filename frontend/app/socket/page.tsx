@@ -4,7 +4,7 @@ import {
     useSocket,
     useSocketEmit,
     useSocketEvent,
-} from "@/lib/contexts/socket-provider";
+} from "@/lib/contexts/socket-context-provider";
 import {
     Button,
     Group,
