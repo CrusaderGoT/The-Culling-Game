@@ -141,7 +141,6 @@ class ATPTest(SQLModel):
     domain_duration: timedelta = timedelta(seconds=5)
     simple_domain_duration: timedelta = timedelta(seconds=5)
 
-    vote_binding_vow_limit: int = 3
     vote_limit: int = 5
 
     limit_binding_vow: int = 5
@@ -159,6 +158,9 @@ class ATPTest(SQLModel):
     winner_point: float = 5.0
 
     delay_begin_match: timedelta = timedelta(seconds=60)
+    bt_min_grade: int = 3
+    limit_reverse_cursed_technique: int = 5
+    reverse_cursed_technique_point: float = 0.5
 
 
 def override_dependencies(session):

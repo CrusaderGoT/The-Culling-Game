@@ -11,6 +11,8 @@ from app.models.admin import (
     PermissionInfo,
     PermissionRequest,
 )
+from app.routers.admin.players import router as player_router
+from app.routers.admin.users import router as user_router
 from app.utils.admin import (
     ADMIN_UNAUTHORIZED_EXCEPTION,
     admin_allow_permissions,
@@ -21,10 +23,6 @@ from app.utils.dependencies import session
 from app.utils.user import get_user, id_name_email
 from dotenv import load_dotenv
 from fastapi import APIRouter, Body, Depends, HTTPException, Query, status
-
-from app.routers.admin.users import router as user_router
-
-from app.routers.admin.players import router as player_router
 
 load_dotenv()  # load for env used in this modules
 
@@ -290,3 +288,14 @@ def demo_superuser(
     session.commit()
     session.refresh(admin_user)
     return admin_user
+
+
+@router.get(
+    "/me",
+    response_model=AdminInfo,
+    response_description="An Admin",
+    summary="Get the logged in admin",
+    status_code=status.HTTP_200_OK,
+)
+def current_admin(admin: admin_user) -> AdminUser:
+    return admin

@@ -6,17 +6,18 @@ from datetime import datetime, timezone
 from random import choice, sample
 from typing import Sequence
 
-from fastapi import HTTPException, status
-from sqlmodel import and_, exists, not_, select
+from fastapi import status
+from sqlmodel import and_, exists, select
 
+from app.models.base import MatchPlayerLink
 from app.models.colony import Colony
 from app.models.match import Match
 from app.models.player import Player
+from app.models.user import User
+from app.utils.config import MatchCreationException
 from app.utils.dependencies import atp, session
 from app.utils.player import (
-    get_player,
-    get_players_not_in_part,
-    select_players_fought_in_part,
+    get_alive_player,
 )
 
 
@@ -45,80 +46,207 @@ def get_last_created_match(session: session):
     return last_match
 
 
-def create_new_match(session: session, part: int, atp: atp):
-    "creates a new match"
-    # fetch colonies that has atleast one player that hasn't fought in the specified part query
-    result = colonies_with_players_available_for_part(session, part)
-    if (
-        result and (colony_id := choice(result)) is not None
-    ):  # list is not empty and contains int (randomly chosen)
-        # Fetch players from the selected colony who have not fought in the specified part.
-        players_not_in_part = get_players_not_in_part(colony_id, part, session)
-        # Randomly select 2 players from the colony for the match
-        players = random_players_for_match(session, players_not_in_part, colony_id)
-        # create match
-        # Ensure begin and end are timezone-aware (UTC)
-        now_utc = datetime.now(timezone.utc)
-        begin = now_utc + atp.delay_begin_match  # match begins in timedelta
-        end = begin + atp.match_duration  # match ends in timedelta
+def create_new_match(session: session, part: int, atp) -> Match:
+    """Creates a new match with optimized player selection logic."""
 
-        # Explicitly set tzinfo to UTC in case atp.delay_begin_match or atp.match_duration are naive
-        if begin.tzinfo is None or begin.tzinfo.utcoffset(begin) is None:
-            begin = begin.replace(tzinfo=timezone.utc)
-        if end.tzinfo is None or end.tzinfo.utcoffset(end) is None:
-            end = end.replace(tzinfo=timezone.utc)
-        new_match = Match(
-            begin=begin, end=end, part=part, colony_id=colony_id, players=players
-        )
-        return new_match
-    else:
-        detail = f"No colony with players who haven't fought in part {part}. Begin/Try part {part + 1}. Else no player yet..."
-        raise HTTPException(status.HTTP_404_NOT_FOUND, detail=detail)
+    # Get eligible colony with available players
+    colony_id = _get_eligible_colony(session, part)
+
+    # Get players for the match
+    players = _get_match_players(session, colony_id, part)
+
+    # Create and return the match
+    return _create_match_instance(colony_id, part, players, atp)
 
 
-def random_players_for_match(
-    session: session, players_not_in_part: Sequence[Player], colony_id: int
-):
-    """Randomly select 2 players from the colony who haven't fought in the part before.\n
-    if only one player is available, pair them with any other player from the colony.\n
-    raises HTTPException if only one player in colony"""
-    if len(players_not_in_part) == 1:
-        # fetch all players in colony, excluding the single player_not in_part
-        all_players_query = select(Player).where(
-            Player.colony_id == colony_id, Player.id != players_not_in_part[0].id
-        )
-        all_players = session.exec(all_players_query).all()
+def _get_eligible_colony(session: session, part: int) -> int:
+    """Get a random colony that has available players for the given part."""
 
-        if not all_players:  # means only one player in colony
-            err_msg = f"Only one player in Colony {players_not_in_part[0].colony_id}, cannot make match. Try again or add a player to the colony"
-            raise HTTPException(status.HTTP_412_PRECONDITION_FAILED, err_msg)
+    # First validate the part number before doing queries
+    last_match = get_last_created_match(session)
+    _validate_part_number(part, last_match)
+
+    eligible_colonies = _get_colonies_with_available_players(session, part)
+
+    if not eligible_colonies:
+        # specific error message based on context
+        if last_match:
+            next_part = last_match.part + 1
+            raise MatchCreationException(
+                f"No colony has players available for part {part}. "
+                f"Consider starting part {next_part} or add more players."
+            )
         else:
-            player1 = players_not_in_part[0]  # the only player available
-            player2 = choice(
-                all_players
-            )  # Randomly select another player from the same colony
+            # First match scenario
+            raise MatchCreationException(
+                "No colonies with available players found. "
+                "Please ensure there are colonies with at least 2 alive players who have users."
+            )
 
-    else:  # players available are more than 2
-        # Randomly select two unique players from those who haven't fought in the specified part
-        player1, player2 = sample(players_not_in_part, 2)
-    return [player1, player2]
+    return choice(eligible_colonies)
 
 
-def colonies_with_players_available_for_part(session: session, part: int):
-    "Main query to get colonies IDs with at least one player who hasn't fought in the specified part"
-    subquery_select = select_players_fought_in_part(part=part)
-    statement = select(Colony.id).where(
+def _validate_part_number(part: int, last_match: Match | None) -> None:
+    """Validate that the part number is valid based on the last match."""
+    if not last_match:
+        return  # No validation needed for first match
+
+    if part < last_match.part:
+        raise MatchCreationException(
+            f"Invalid match part. Must be equal to or greater than last part ({last_match.part})",
+            status.HTTP_406_NOT_ACCEPTABLE,
+        )
+
+    if part > last_match.part + 1:
+        raise MatchCreationException(
+            f"Invalid match part. Next part must be {last_match.part + 1}",
+            status.HTTP_406_NOT_ACCEPTABLE,
+        )
+
+
+def _get_colonies_with_available_players(session: session, part: int) -> list[int]:
+    """
+    Get colony IDs that have at least one eligible player for the given part.
+
+    Optimized to use a single query with EXISTS clause.
+    """
+    # Subquery for players who have already fought in this part
+    fought_players_subq = (
+        select(MatchPlayerLink.player_id)
+        .join(Match, MatchPlayerLink.match_id == Match.id)
+        .where(Match.part == part)
+    )
+
+    # Main query: colonies with at least one available player
+    stmt = select(Colony.id).where(
+        Colony.id.is_not(None),  # Ensure non-null IDs
         exists(
-            select(Player.id).where(
+            select(1)  # Use literal 1 instead of Player.id for better performance
+            .select_from(Player)
+            .join(User, Player.user_id == User.id)  # Explicit join condition
+            .where(
                 and_(
                     Player.colony_id == Colony.id,
-                    not_(Player.id.in_(subquery_select)),  # type: ignore
+                    Player.alive.is_(True),
+                    ~Player.id.in_(fought_players_subq),
                 )
+            )
+        ),
+    )
+
+    # Convert to list and filter out any None values (defensive programming)
+    result = session.exec(stmt).all()
+    return [colony_id for colony_id in result if colony_id is not None]
+
+
+def _get_match_players(session: session, colony_id: int, part: int) -> list[Player]:
+    """Get two players for a match from the specified colony."""
+    # First, get players who haven't fought in this part
+    available_players = _get_available_players_for_part(session, colony_id, part)
+
+    if len(available_players) >= 2:
+        # Optimal case: pick 2 from available players
+        return sample(available_players, 2)
+
+    elif len(available_players) == 1:
+        # Get a second player from any other alive player in the colony
+        return _get_mixed_player_pair(session, colony_id, available_players[0])
+
+    else:
+        # No available players - this shouldn't happen if colony selection worked correctly
+        raise MatchCreationException(
+            f"No available players in colony {colony_id} for part {part}",
+            status.HTTP_404_NOT_FOUND,
+        )
+
+
+def _get_available_players_for_part(
+    session: session, colony_id: int, part: int
+) -> Sequence[Player]:
+    """
+    Get players from a colony who haven't fought in the specified part.
+
+    Optimized query using LEFT JOIN with NULL check.
+    """
+    # Subquery for matches in this part
+    part_matches_subq = select(Match.id).where(Match.part == part)
+
+    query = (
+        select(Player)
+        .join(User, Player.user_id == User.id)
+        .outerjoin(
+            MatchPlayerLink,
+            and_(
+                MatchPlayerLink.player_id == Player.id,
+                MatchPlayerLink.match_id.in_(part_matches_subq),
+            ),
+        )
+        .where(
+            and_(
+                Player.colony_id == colony_id,
+                Player.alive.is_(True),
+                MatchPlayerLink.player_id.is_(None),  # Haven't fought in this part
             )
         )
     )
-    result = session.exec(statement).all()
-    return result
+
+    return session.exec(query).all()
+
+
+def _get_mixed_player_pair(
+    session: session, colony_id: int, primary_player: Player
+) -> list[Player]:
+    """
+    Get a pair where one player hasn't fought in the part and another is any available player.
+    """
+    # Get any other alive player from the colony
+    other_players_query = (
+        select(Player)
+        .join(User, Player.user_id == User.id)
+        .where(
+            and_(
+                Player.colony_id == colony_id,
+                Player.alive.is_(True),
+                Player.id != primary_player.id,
+            )
+        )
+    )
+
+    other_players = session.exec(other_players_query).all()
+
+    if not other_players:
+        raise MatchCreationException(
+            f"Colony {colony_id} has only one alive player. "
+            "At least 2 players are required to create a match.",
+            status.HTTP_412_PRECONDITION_FAILED,
+        )
+
+    partner = choice(other_players)
+    return [primary_player, partner]
+
+
+def _create_match_instance(
+    colony_id: int, part: int, players: list[Player], atp
+) -> Match:
+    """Create a Match instance with proper timezone handling."""
+    now_utc = datetime.now(timezone.utc)
+
+    # Calculate match timing
+    begin = now_utc + atp.delay_begin_match
+    end = begin + atp.match_duration
+
+    # Ensure timezone awareness (defensive programming)
+    begin = _ensure_utc_timezone(begin)
+    end = _ensure_utc_timezone(end)
+
+    return Match(begin=begin, end=end, part=part, colony_id=colony_id, players=players)
+
+
+def _ensure_utc_timezone(dt: datetime) -> datetime:
+    """Ensure datetime is timezone-aware and in UTC."""
+    if dt.tzinfo is None or dt.tzinfo.utcoffset(dt) is None:
+        return dt.replace(tzinfo=timezone.utc)
+    return dt
 
 
 def schedule_assign_match_winner(*, match_id: int, session: session, atp: atp):
@@ -152,17 +280,6 @@ def schedule_assign_match_winner(*, match_id: int, session: session, atp: atp):
             session.commit()
 
 
-def assign_match_winner(match_id: int, session: session, atp: atp):
-    match = get_match(session, match_id)
-    if match:
-        winner = get_match_winner(match, session)
-        if not winner:
-            print("NO WINNER!!")
-        else:
-            player = Player.model_validate(winner)
-            print(player.model_dump())
-
-
 def get_match_winner(match: Match, session: session):
     """
     return the player that won the match, else return None
@@ -186,7 +303,8 @@ def get_match_winner(match: Match, session: session):
         if most_votes[1] == least_votes[1]:
             return None
         else:
-            winner = get_player(session, player_id=most_votes[0])
+            winner = get_alive_player(session, player_id=most_votes[0])
+            # calculate if loser player dies here
             return winner
     else:
         return None

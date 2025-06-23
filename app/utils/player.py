@@ -1,10 +1,8 @@
 from typing import Literal
 
 from fastapi import HTTPException, status
-from sqlmodel import Session, and_, not_, select
+from sqlmodel import select
 
-from app.models.base import MatchPlayerLink
-from app.models.match import Match
 from app.models.player import (
     CTApp,
     CursedTechnique,
@@ -16,49 +14,21 @@ from app.models.player import (
 from app.utils.dependencies import session
 
 
+def get_alive_player(session: session, player_id: int):
+    "for getting an alive player from the database"
+    player = session.get(Player, player_id)
+
+    if player and not player.alive:
+        return None
+    else:
+        return player
+
+
 def get_player(session: session, player_id: int):
     "for getting a player from the database"
     player = session.get(Player, player_id)
-    if player:
-        return player
-    else:
-        return None
 
-
-def get_players_not_in_part(colony_id: int, part: int, session: Session):
-    """
-    Fetch players from a specified colony who haven't fought in a match for the given part.
-    """
-    # Subquery to get player IDs who have fought in the specified part
-    part_matches_subquery = (
-        select(MatchPlayerLink.player_id)
-        .join(Match, MatchPlayerLink.match_id == Match.id)
-        .where(Match.part == part)
-    ).subquery()
-
-    part_matches_select = select(part_matches_subquery.c.player_id)
-
-    # Query to get players in the specified colony who haven't fought in the part
-    players_not_in_part_query = select(Player).where(
-        and_(Player.colony_id == colony_id, not_(Player.id.in_(part_matches_select)))
-    )
-
-    players_not_in_part = session.exec(players_not_in_part_query).all()
-
-    return players_not_in_part
-
-
-def select_players_fought_in_part(part: int):
-    """Subquery to get player IDs who have fought in the specified part\n
-    returns a select statement"""
-    subquery = (
-        select(MatchPlayerLink.player_id)
-        .join(Match, MatchPlayerLink.match_id == Match.id)  # type: ignore
-        .where(Match.part == part)
-    ).subquery(name=f"matches_in_part_{part}")
-    # Convert the subquery into a select() construct for use in the IN clause
-    subquery_select = select(subquery.c.player_id)
-    return subquery_select
+    return player
 
 
 def points_required_for_upgrade(grade: Player.Grade):

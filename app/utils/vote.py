@@ -21,7 +21,8 @@ def get_vote_point(
     vote_point = atp.vote_point
     unchanged_vote_point = atp.vote_point  # for use in adding of technique buff
 
-    # 1. limit vote of player with a binding vow to no of binding vows they have used
+    # 1. limit vote for a player with a binding vow
+    # to minus of the number of binding vows they have used
     if (
         player_bt  # player has a barrier tech
         and (  # barrier records exist in this match

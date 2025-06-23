@@ -1,6 +1,6 @@
+import random
 import time
 from datetime import UTC, datetime, timezone
-from typing import Literal
 
 from fastapi import HTTPException, status
 from sqlmodel import select
@@ -36,7 +36,7 @@ def conditions_for_barrier_tech(
     if player is not None:
         if match is not None:
             if player.user_id != current_user.id:
-                msg = "cannot activate simple domain of another player"
+                msg = "cannot activate barrier technique of another player"
                 raise UserException(current_user, status.HTTP_406_NOT_ACCEPTABLE, msg)
             else:
                 if ongoing_match(match) is True:
@@ -110,10 +110,10 @@ def activate_domain(
         barrier_record.domain_counter += 1
         session.add(barrier_record)
     else:  # no barrier detail
-        new_barrier_detail = BarrierRecord(
+        new_barrier_record = BarrierRecord(
             domain_counter=1, match=match, barrier_tech=barrier_tech
         )
-        session.add(new_barrier_detail)
+        session.add(new_barrier_record)
     # commits
     session.add(barrier_tech)
     session.commit()
@@ -159,7 +159,7 @@ def schedule_deactivate_domain(barrier_tech: BarrierTech, session: session):
 def activate_simple_domain(
     barrier_tech: BarrierTech,
     barrier_record: BarrierRecord | None,
-    match,
+    match: Match,
     session: session,
     atp: atp,
 ):
@@ -177,10 +177,10 @@ def activate_simple_domain(
         barrier_record.simple_domain_counter += 1
         session.add(barrier_record)
     else:  # no barrier detail
-        new_barrier_detail = BarrierRecord(
+        new_barrier_record = BarrierRecord(
             simple_domain_counter=1, match=match, barrier_tech=barrier_tech
         )
-        session.add(new_barrier_detail)
+        session.add(new_barrier_record)
     # commits
     session.add(barrier_tech)
     session.commit()
@@ -198,7 +198,7 @@ def deactivate_simple_domain(barrier_tech: BarrierTech, session: session):
 
 def schedule_deactivate_simple_domain(barrier_tech: BarrierTech, session: session):
     "function for the background task of deactivating a simple domain"
-    
+
     # Ensure end_time is timezone-aware (UTC); if not, make it so
     if (barrier_tech.sd_end_time) and (
         barrier_tech.sd_end_time.tzinfo is None
@@ -229,7 +229,7 @@ def schedule_deactivate_simple_domain(barrier_tech: BarrierTech, session: sessio
 def activate_binding_vow(
     barrier_tech: BarrierTech,
     barrier_record: BarrierRecord | None,
-    match,
+    match: Match,
     session: session,
     atp: atp,
 ):
@@ -246,10 +246,10 @@ def activate_binding_vow(
         barrier_record.binding_vow_counter += 1
         session.add(barrier_record)
     else:  # no barrier detail
-        new_barrier_detail = BarrierRecord(
+        new_barrier_record = BarrierRecord(
             binding_vow_counter=1, match=match, barrier_tech=barrier_tech
         )
-        session.add(new_barrier_detail)
+        session.add(new_barrier_record)
     # commits
     session.add(barrier_tech)
     session.commit()
@@ -292,21 +292,32 @@ def schedule_deactivate_binding_vow(barrier_tech: BarrierTech, session: session)
             continue  # loop again
 
 
-def activate_barrier_tech(
-    technique: Literal["domain_expansion", "simple_domain", "binding_vow"],
+def activate_reverse_cursed_technique(
     barrier_tech: BarrierTech,
     barrier_record: BarrierRecord | None,
     match: Match,
     session: session,
     atp: atp,
 ):
-    "function for a match/case implementation of barrier techniques"
-    # make the variables depending on which technique to activate
-    match technique:
-        case "simple_domain":
-            activate_simple_domain(barrier_tech, barrier_record, match, session, atp)
-        case "domain_expansion":
-            activate_domain(barrier_tech, barrier_record, match, session, atp)
+    barrier_tech.player.points += atp.reverse_cursed_technique_point
+    # add/record the detail
+    # the barrier detail should commited here
+    if barrier_record is not None:
+        barrier_record.reverse_cursed_technique_counter += 1
+        session.add(barrier_record)
+    else:  # no barrier detail
+        new_barrier_record = BarrierRecord(
+            reverse_cursed_technique_counter=1,
+            match=match,
+            barrier_tech=barrier_tech,
+        )
+        session.add(new_barrier_record)
+
+    # commits
+    session.add(barrier_tech)
+    session.commit()
+    session.refresh(barrier_tech)
+    return barrier_tech
 
 
 def fix_barrier_deactivation_task_fail(
@@ -330,3 +341,26 @@ def fix_barrier_deactivation_task_fail(
             deactivate_simple_domain(barrier_tech, session)
     else:
         pass
+
+
+def black_flash(current_vote_point: float, rng: random.Random = random.Random()):
+    """
+    Determine whether a “Black Flash” activates, using Beta distribution.
+    """
+
+    if current_vote_point <= 0:  # must be > 0
+        return False
+
+    impact = 0.000001  # Representing the precise timing
+    scaled_impact = 1.0 - impact * 1000  # Scaled threshold
+
+    # Using betavariate for less rare but still special Black Flash
+    # betavariate(first_number, second_number):
+    # - First number (current_vote): How often you get big values (HIGHER = more Black Flash)
+    # - Second number (1): How consistent it is
+    # (LOWER = more chaos, HIGHER = more predictable) -> with value relative to (current_vote_point)
+    # Think: (how_often_special_happens, how_crazy_or_calm)
+    # used 1 because current_vote_point will be 0.2 lower and around 1 when high
+    flash_chance = rng.betavariate(current_vote_point, 1)
+
+    return flash_chance >= scaled_impact

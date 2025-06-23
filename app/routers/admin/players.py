@@ -1,24 +1,21 @@
 from typing import Annotated
 
-from app.utils.player import edit_player_helper
-from fastapi import Body, HTTPException, status
-
-from ...auth.dependencies import admin_user
-from ...models.base import BasePermission, ModelName
-from ...models.player import (
+from app.auth.dependencies import admin_user
+from app.models.base import BasePermission, ModelName
+from app.models.player import (
     EditCT,
     EditCTApp,
     EditPlayer,
     PlayerInfo,
 )
-from ...utils.admin import (
+from app.utils.admin import (
     ADMIN_UNAUTHORIZED_EXCEPTION,
     check_if_admin_has_crud_permission,
 )
-from ...utils.dependencies import session
-from ...utils.player import get_player
-from fastapi import APIRouter
-
+from app.utils.config import PlayerException
+from app.utils.dependencies import session
+from app.utils.player import edit_player_helper, get_player
+from fastapi import APIRouter, Body, HTTPException, status
 
 # Create your API routes here
 router = APIRouter()
@@ -54,10 +51,14 @@ def admin_edit_player(
         raise ADMIN_UNAUTHORIZED_EXCEPTION(admin)
 
     # check if player exists
-    playerdb = get_player(session, player_id=player_id)
+    playerdb = get_player(session=session, player_id=player_id)
 
     if not playerdb:
         raise HTTPException(status.HTTP_404_NOT_FOUND)
+
+    if not playerdb.alive:
+        err_msg = f"Player '{playerdb.name}' with ID '{playerdb.id}' has died. Revive them first."
+        raise PlayerException(player=playerdb, detail=err_msg)
 
     # pass: edit player details
     edited_player = edit_player_helper(

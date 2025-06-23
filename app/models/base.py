@@ -13,7 +13,7 @@ from enum import Enum, IntEnum
 from pathlib import Path
 from typing import Annotated, Union
 
-from pydantic import EmailStr, StringConstraints
+from pydantic import EmailStr, HttpUrl, StringConstraints
 from sqlmodel import TIMESTAMP, Column, Field, SQLModel
 
 from ..models.table import (
@@ -123,6 +123,9 @@ class BasePlayer(SQLModel):
         max_length=50,
         description="The role of the player, e.g., doctor, lawyer, student, curse user, sorcerer etc.",
     )
+    picture: Annotated[str | None, HttpUrl | None] = Field(
+        default=None, description="the picture of the player"
+    )
 
 
 class BasePlayerInfo(BasePlayer):
@@ -138,6 +141,7 @@ class BasePlayerInfo(BasePlayer):
     created: date
     grade: BasePlayer.Grade
     points: float
+    alive: bool
 
 
 # CURSED TECHNIQUE
@@ -356,32 +360,30 @@ class BaseBarrierTech(SQLModel):
 class BaseVote(SQLModel):
     """
     ### The base class for a vote
-    `player_id: int = Field(foreign_key="player.id", ondelete="RESTRICT")`
-    `ct_app_id: int = Field(foreign_key="ctapp.id", ondelete="RESTRICT")`
+    `player_id: = Field(foreign_key="player.id", ondelete="RESTRICT", index=True)`
+    `ct_app_id: = Field(foreign_key="ctapp.id", ondelete="RESTRICT", index=True)`
     """
 
-    player_id: int | None = Field(
-        default=None, foreign_key="player.id", ondelete="RESTRICT", index=True
-    )
-    ct_app_id: int | None = Field(
-        default=None, foreign_key="ctapp.id", ondelete="RESTRICT", index=True
-    )
+    player_id: int = Field(foreign_key="player.id", ondelete="RESTRICT", index=True)
+    ct_app_id: int = Field(foreign_key="ctapp.id", ondelete="RESTRICT", index=True)
 
 
 class ActionTimePoint(SQLModel):
-    "class for duration, limit, point, etc. of techniques, match, etc."
+    "class for duration, limit, points cost, etc. of techniques, match, etc."
 
     match_duration: timedelta = timedelta(minutes=10)
     domain_duration: timedelta = timedelta(minutes=5)
     simple_domain_duration: timedelta = timedelta(minutes=5)
     binding_vow_duration: timedelta = timedelta(minutes=5)
 
-    vote_binding_vow_limit: int = 3
+    bt_min_grade: int = 3
+
     vote_limit: int = 5
 
     limit_binding_vow: int = 5
     limit_domain_expansion: int = 5
     limit_simple_domain: int = 5
+    limit_reverse_cursed_technique: int = 5
 
     cost_binding_vow: float = 2.0
     cost_domain_expansion: float = 2.0
@@ -390,6 +392,8 @@ class ActionTimePoint(SQLModel):
     vote_point: float = 0.2
     domain_expansion_point: float = 4.0
     simple_domain_point: float = 2.0
+    reverse_cursed_technique_point: float = 0.5
+    black_flash_point: float = 2.5
 
     winner_point: float = 5.0
 
@@ -404,9 +408,43 @@ class BaseVoteInfo(BaseVote):
     """
 
     id: int
-    user_id: int = Field(description="the id of the user that casted their votes")
+    user_id: int | None = Field(
+        description="the id of the user that casted their votes"
+    )
+    "userid; optional for when a user is deleted"
     point: float = Field(description="the point a vote carries")
     has_been_added: bool = Field(
         default=False,
         description="whether or not the vote point has been added to a player's point",
+    )
+
+
+class BaseBarrierRecord(SQLModel):
+    """
+    base class for barrier records\n
+    ```
+    domain_counter: int = Field(
+        default=0, description="the number of times a domain is activated"
+    )
+    simple_domain_counter: int = Field(
+        default=0, description="the number of times a simple domain is activated"
+    )
+    binding_vow_counter: int = Field(
+        default=0, description="the number of times a binding vow is activated"
+    )
+    ```
+    """
+
+    domain_counter: int = Field(
+        default=0, description="the number of times a domain is activated"
+    )
+    simple_domain_counter: int = Field(
+        default=0, description="the number of times a simple domain is activated"
+    )
+    binding_vow_counter: int = Field(
+        default=0, description="the number of times a binding vow is activated"
+    )
+    reverse_cursed_technique_counter: int = Field(
+        default=0,
+        description="the number of times a reverse cursed technique is activated",
     )

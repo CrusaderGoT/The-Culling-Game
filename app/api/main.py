@@ -3,12 +3,9 @@ from uuid import uuid4, uuid5
 
 from fastapi import Body, Depends, HTTPException, status
 from fastapi.encoders import jsonable_encoder
-from fastapi.openapi.docs import (
-    get_swagger_ui_html,
-    get_swagger_ui_oauth2_redirect_html,
-)
 from fastapi.responses import HTMLResponse
 from fastapi.security import OAuth2PasswordRequestForm
+from scalar_fastapi import get_scalar_api_reference
 from sqlmodel import or_, select
 
 from app.api.setting import app, settings, sio
@@ -35,6 +32,7 @@ app.include_router(barriers.router)
 app.include_router(colonies.router)
 app.include_router(admins.superuser_router)
 app.include_router(admins.router)
+
 
 # LOGIN
 @app.post(
@@ -210,20 +208,12 @@ def create_user(
 
 
 @app.get("/docs", include_in_schema=False)
-async def custom_swagger_ui_html():
-    return get_swagger_ui_html(
+async def scalar_html():
+    return get_scalar_api_reference(
         openapi_url=app.openapi_url,  # type: ignore
-        title=f"{app.title} - Swagger UI",
-        oauth2_redirect_url=app.swagger_ui_oauth2_redirect_url,
-        swagger_js_url="https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js",
-        swagger_css_url="https://unpkg.com/swagger-ui-dist@5/swagger-ui.css",
-        swagger_favicon_url="/static/images/Kogane.png",
+        title=app.title,
+        scalar_favicon_url="static/favicon.ico",
     )
-
-
-@app.get(app.swagger_ui_oauth2_redirect_url, include_in_schema=False)  # type: ignore
-async def swagger_ui_redirect():
-    return get_swagger_ui_oauth2_redirect_html()
 
 
 @app.get("/", response_class=HTMLResponse)

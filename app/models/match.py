@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 
 from sqlmodel import Field, Relationship
 
-from ..models.barrier import BarrierRecord
+from ..models.barrier import BarrierRecord, BarrierRecordInfo
 from ..models.base import (
     BaseColonyInfo,
     BaseMatch,
@@ -56,28 +56,4 @@ class MatchInfo(BaseMatchInfo):
     players: list["BasePlayerInfo"]
     colony: "BaseColonyInfo"
     votes: list["BaseVoteInfo"]
-
-
-""" 
-
-    location_id: int = Field(foreign_key='location.id')
-    location: "Location" = Relationship(back_populates="matches")
-    
-
-class BaseLocation(SQLModel):
-    latitude: float | None = Field(default=None)
-    longitude: float | None = Field(default=None)
-    image: FilePath | FileUrl
-    enviromental_condition: str
-
-class Location(BaseLocation, table=True):
-    id: int | None = Field(default=None, primary_key=True)
-    colony_id: int = Field(foreign_key='colony.id')
-    colony: "Colony" = Relationship(back_populates="locations")
-    # typically a location will have just one match
-    # the m_2_1 relation is a fallback for situations a location has to be used again
-    matches: list["Match"] = Relationship(back_populates="location")
-
-
-
-"""
+    barrier_records: list["BarrierRecordInfo"]

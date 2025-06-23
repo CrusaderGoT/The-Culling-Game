@@ -15,11 +15,12 @@ from app.models.player import (
     PlayerInfo,
 )
 from app.utils.barrier import fix_barrier_deactivation_task_fail
-from app.utils.config import Tag, UserException
-from app.utils.dependencies import colony, session
+from app.utils.config import PlayerException, Tag, UserException
+from app.utils.dependencies import atp, colony, session
 from app.utils.player import (
     calculate_points,
     edit_player_helper,
+    get_alive_player,
     get_player,
     points_required_for_upgrade,
 )
@@ -64,7 +65,10 @@ def create_player(
             raise UserException(userdb, status.HTTP_406_NOT_ACCEPTABLE, err_msg)
         # check if user already has a player
         elif userdb.player:
-            err_msg = f"{userdb.username} already has a player '{userdb.player.name}'. Edit player instead."
+            if not userdb.player.alive:
+                err_msg = f"Player '{userdb.player.name}' with ID '{userdb.player.id}' has died. Contact an admin to revive them."
+            else:
+                err_msg = f"{userdb.username} already has a player '{userdb.player.name}'. Edit player instead."
             raise UserException(userdb, status.HTTP_409_CONFLICT, err_msg)
         else:  # user has no player
             # ct router instances, for ct_ins; enumerate to get index for CTApp number
@@ -102,6 +106,10 @@ def my_player(session: session, current_user: active_user):
     if current_user.player and type(current_user.player.id) is int:
         player = get_player(session, current_user.player.id)
         if player:
+            if not player.alive:
+                err_msg = f"Your player '{player.name}' with ID '{player.id}' has died. Contact an admin to revive them."
+                raise PlayerException(player=player, detail=err_msg)
+
             # deactive any potential barrier end task fails
             fix_barrier_deactivation_task_fail(player.barrier_technique, session)
             return player
@@ -130,8 +138,11 @@ def get_players(
     gender: Annotated[Player.Gender | None, Query()] = None,
     age: Annotated[int | None, Query(ge=10, le=102)] = None,
     role: Annotated[str | None, Query()] = None,
+    alive: Annotated[bool, Query()] = False,
 ):
-    statement = select(Player).offset(offset).limit(limit)
+    statement = (
+        select(Player).offset(offset).limit(limit).where(or_(Player.alive == alive))
+    )
     # if clauses to add a where/or clause to the statement
     if gender is not None:
         statement = statement.where(or_(Player.gender == gender))
@@ -139,6 +150,7 @@ def get_players(
         statement = statement.where(or_(Player.age == age))
     if role is not None:
         statement = statement.where(or_(Player.role == role))
+
     # execute
     players = session.exec(statement).all()
     # if slim return info without cursed technique info and user info
@@ -154,9 +166,20 @@ def get_players(
     response_description="A Player",
     summary="Get a player with their ID",
 )
-def a_player(player_id: Annotated[int, Path()], session: session):
-    player = get_player(session, player_id)
+def a_player(
+    *,
+    player_id: Annotated[int, Path()],
+    alive: Annotated[
+        bool, Query(description="whether the player has to be alive")
+    ] = True,
+    session: session,
+):
+    player = get_player(session=session, player_id=player_id)
     if player:
+        if alive and not player.alive:  # player has to be alive
+            err_msg = f"Player '{player.name}' with ID '{player.id}' has died. Contact an admin to revive them."
+            raise PlayerException(player=player, detail=err_msg)
+
         # deactive any potential barrier end task fails
         fix_barrier_deactivation_task_fail(player.barrier_technique, session)
         return player
@@ -185,7 +208,7 @@ def edit_player(
     \nTo check an application number, first get a player info using the **'/players/{player_id}'** request.
     \nElse the application will be disregarded, valid numbers are 1-5.
     """
-    playerdb = get_player(session, player_id)
+    playerdb = get_alive_player(session=session, player_id=player_id)
     if playerdb:
         if playerdb.user_id != current_user.id:
             raise UserException(current_user, detail="Can only edit your own player.")
@@ -216,30 +239,46 @@ def edit_player(
     summary="Delete a player",
 )
 def delete_player(player_id: int, session: session, current_user: active_user):
-    playerdb = session.get(Player, player_id)
+    playerdb = get_alive_player(session=session, player_id=player_id)
     if playerdb:
         if playerdb.user_id == current_user.id:  # logged in user matches players user
-            # colony is not deleted, but assigned to a variable
-            # to avoid detached error when/if fetched later, after playerdb is deleted
-            colony = playerdb.colony
-            # add ct apps to  a variable and add/append to delete session
-            ct_apps = playerdb.cursed_technique.applications
-            for app in ct_apps:
-                session.delete(app)
-            else:  # after for loop
-                session.delete(playerdb.cursed_technique)
-                session.delete(playerdb)
+            # if player has a match, set their status to dead instead (to avoid not null violation)
+            if (len(playerdb.matches) > 0) or (len(playerdb.votes) > 0):
+                playerdb.alive = False
+                session.add(playerdb)
+                # commit relevant changes
                 session.commit()
-            # create a new player info. This is done because after player is deleted
-            # it is removed from the session(detached state), and returning the playerdb
-            # will attempt to fetch its respective user and colony, and will fail.
-            # having the user(current user) and colony(colony) in variables
-            # prevents this failure, but i think it is better to be explicit, as to avoid potential bugs.
-            update_user_colony = {"colony": colony, "user": current_user}
-            deleted_player = PlayerInfo.model_validate(
-                playerdb, update=update_user_colony
-            )
-            return deleted_player
+                session.refresh(playerdb)
+                return playerdb
+            else:  # thoroughly delete player
+                # colony is not deleted, but assigned to a variable
+                # to avoid detached error when/if fetched later, after playerdb is deleted
+                colony = playerdb.colony
+                # get player barrier tech here (to avoid confirm_deleted_rows warning)
+                barrier_tech = playerdb.barrier_technique
+                # add ct apps to  a variable and add/append to delete session
+                ct_apps = playerdb.cursed_technique.applications
+                for app in ct_apps:
+                    session.delete(app)
+                else:  # after for loop
+                    if barrier_tech:
+                        session.delete(barrier_tech)
+                    session.delete(playerdb.cursed_technique)
+                    session.delete(playerdb)
+
+                    # commit relevant changes
+                    session.commit()
+
+                    # create a new player info. This is done because after player is deleted
+                    # it is removed from the session(detached state), and returning the playerdb
+                    # will attempt to fetch its respective user and colony, and will fail.
+                    # having the user(current user) and colony(colony) in variables
+                    # prevents this failure, but i think it is better to be explicit, as to avoid potential bugs.
+                    update_user_colony = {"colony": colony, "user": current_user}
+                    deleted_player = PlayerInfo.model_validate(
+                        playerdb, update=update_user_colony
+                    )
+                    return deleted_player
         else:  # player user don't match
             err_msg = "Attempting to delete another player."
             raise HTTPException(status.HTTP_401_UNAUTHORIZED, err_msg)
@@ -254,10 +293,11 @@ def upgrade_player(
     session: session,
     grade_up: Annotated[Player.Grade, Query(description="specified upgrade")],
     current_user: active_user,
+    atp: atp,
 ):
     """function for uprading the grade of a player.\n
     **points required.**"""
-    player = session.get(Player, player_id)
+    player = get_alive_player(session=session, player_id=player_id)
     if player is not None:
         if player != current_user.player:
             msg = "cannot upgrade another player; wrong player id."
@@ -279,7 +319,9 @@ def upgrade_player(
                 # check if player points is enough
                 if player_points >= needed_points:  # there is enough
                     # check if they have reached the level to access Barrier Tech
-                    if gu <= 2 and cg > 2:  # grant barrier technique
+                    if (
+                        gu <= atp.bt_min_grade and cg > atp.bt_min_grade
+                    ):  # grant barrier technique
                         new_barrier_tech = BarrierTech(player=player)
                         session.add(new_barrier_tech)
                     # upgrade and deduct points

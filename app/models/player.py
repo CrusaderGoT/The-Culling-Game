@@ -3,8 +3,9 @@
 on the database and will be used as schemas/response/request data in the API schema. All SQLModels"""
 
 from datetime import date
-from typing import TYPE_CHECKING, Union
+from typing import TYPE_CHECKING, Annotated, Union
 
+from pydantic import HttpUrl
 from sqlmodel import Field, Relationship, SQLModel
 
 from ..models.barrier import BarrierTech, BarrierTechInfo
@@ -17,6 +18,7 @@ from ..models.base import (
     BasePlayer,
     BasePlayerInfo,
     BaseUserInfo,
+    BaseVoteInfo,
     MatchPlayerLink,
 )
 from .vote import Vote
@@ -57,6 +59,7 @@ class Player(BasePlayer, table=True):
         default=None, foreign_key="colony.id", ondelete="SET NULL", index=True
     )
     colony: "Colony" = Relationship(back_populates="players")
+    alive: bool = Field(default=True, description="living status of the player")
 
 
 class CreatePlayer(BasePlayer):
@@ -125,6 +128,7 @@ class PlayerInfo(BasePlayerInfo):
     colony: BaseColonyInfo | None
     user: BaseUserInfo | None
     matches: list[BaseMatchInfo]
+    votes: list["BaseVoteInfo"]
 
 
 class CTInfo(BaseCTInfo):
@@ -150,6 +154,9 @@ class EditPlayer(SQLModel):
         min_length=3,
         max_length=50,
         description="The role of the player, e.g., doctor, lawyer, student, curse user, sorcerer etc.",
+    )
+    picture: Annotated[str | None, HttpUrl | None] = Field(
+        default=None, description="the picture of the player"
     )
 
 
