@@ -668,6 +668,11 @@ export const zGetLastestMatchResponse = zMatchInfo;
 
 export const zDeleteMatchResponse = zMatchInfo;
 
+export const zMatchWinnerResponse = z.union([
+    zMatchInfo,
+    z.string()
+]);
+
 export const zDomainExpansionResponse = zBarrierTechInfo;
 
 export const zSimpleDomainResponse = zBarrierTechInfo;
@@ -676,7 +681,11 @@ export const zBindindVowResponse = zBarrierTechInfo;
 
 export const zReverseCursedTechniqueResponse = zBarrierTechInfo;
 
+export const zDeactivateDomainExpansionResponse = zBarrierTechInfo;
+
 export const zGetColoniesResponse = z.array(zColonyInfo);
+
+export const zDemoSuperuserResponse = zAdminInfo;
 
 export const zAdminEditUserResponse = zUserInfo;
 

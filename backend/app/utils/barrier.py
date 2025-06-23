@@ -5,6 +5,7 @@ from datetime import UTC, datetime, timezone
 from fastapi import HTTPException, status
 from sqlmodel import select
 
+from app.api.broker import broker
 from app.models.barrier import BarrierRecord, BarrierTech
 from app.models.match import Match
 from app.models.player import Player
@@ -121,6 +122,7 @@ def activate_domain(
     return barrier_tech
 
 
+@broker.task
 def deactivate_domain(barrier_tech: BarrierTech, session: session):
     # deactivate domain
     barrier_tech.de_end_time = None
@@ -188,6 +190,7 @@ def activate_simple_domain(
     return barrier_tech
 
 
+@broker.task
 def deactivate_simple_domain(barrier_tech: BarrierTech, session: session):
     # deactivate simple domain
     barrier_tech.sd_end_time = None
@@ -257,6 +260,7 @@ def activate_binding_vow(
     return barrier_tech
 
 
+@broker.task
 def deactivate_binding_vow(barrier_tech: BarrierTech, session: session):
     barrier_tech.binding_vow = False
     barrier_tech.bv_end_time = None
@@ -338,6 +342,13 @@ def fix_barrier_deactivation_task_fail(
         ) >= end_time:  # should have ended, but backgroud task failed
             # deactivate simple domain
             deactivate_simple_domain(barrier_tech, session)
+
+        # for BV
+        if (end_time := barrier_tech.bv_end_time) is not None and datetime.now(
+            UTC
+        ) >= end_time:  # should have ended, but backgroud task failed
+            # deactivate simple domain
+            deactivate_binding_vow(barrier_tech, session)
     else:
         pass
 

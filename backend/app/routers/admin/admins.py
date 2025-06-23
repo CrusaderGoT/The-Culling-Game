@@ -273,7 +273,10 @@ def remove_permission(
         return userdb.admin
 
 
-@superuser_router.post("/superuser/{user}")
+@superuser_router.post(
+    "/superuser/{user}",
+    response_model=AdminInfo,
+)
 def demo_superuser(
     user: id_name_email, code: Annotated[UUID, Query()], session: session
 ):

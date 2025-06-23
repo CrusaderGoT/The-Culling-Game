@@ -10,16 +10,28 @@ from app.models.player import (
     EditCTApp,
     EditPlayer,
     Player,
+    PlayerInfo,
 )
+from app.models.user import User
+from app.utils.config import PlayerException
 from app.utils.dependencies import session
 
 
 def get_alive_player(session: session, player_id: int):
-    "for getting an alive player from the database"
+    """
+    for getting an alive player from the database or
+    raise a PlayerException if player is dead
+    """
     player = session.get(Player, player_id)
 
     if player and not player.alive:
-        return None
+        err_msg = (
+            f"Player '{player.name}' with ID '{player.id}' has died. Revive them first."
+        )
+        raise PlayerException(
+            player=player, detail=err_msg, code=status.HTTP_406_NOT_ACCEPTABLE
+        )
+
     else:
         return player
 
@@ -71,7 +83,7 @@ def calculate_points(
         raise HTTPException(status.HTTP_428_PRECONDITION_REQUIRED, detail=msg)
 
 
-def edit_player_helper(
+def _edit_player_helper(
     *,
     playerdb: Player,
     player: EditPlayer | None,
@@ -123,3 +135,45 @@ def edit_player_helper(
                     )
                     ct_app.sqlmodel_update(ct_app_data)
     return playerdb
+
+
+def _delete_player_helper(
+    *, player: Player, player_user: User | None, session: session
+):
+    # if player has a match, set their status to dead instead (to avoid not null violation)
+    if (len(player.matches) > 0) or (len(player.votes) > 0):
+        player.alive = False
+        session.add(player)
+        # commit relevant changes
+        session.commit()
+        session.refresh(player)
+        return player
+    else:  # thoroughly delete player
+        # colony is not deleted, but assigned to a variable
+        # to avoid detached error when/if fetched later, after player is deleted
+        colony = player.colony
+        # get player barrier tech here (to avoid confirm_deleted_rows warning)
+        barrier_tech = player.barrier_technique
+        # add ct apps to  a variable and add/append to delete session
+        ct_apps = player.cursed_technique.applications
+        for app in ct_apps:
+            session.delete(app)
+        else:  # after for loop
+            if barrier_tech:
+                session.delete(barrier_tech)
+            session.delete(player.cursed_technique)
+            session.delete(player)
+
+            # commit relevant changes
+            session.commit()
+
+            # create a new player info. This is done because after player is deleted
+            # it is removed from the session(detached state), and returning the playerdb
+            # will attempt to fetch its respective user and colony, and will fail.
+            # having the user(player_user) and colony(colony) in variables
+            # prevents this failure, but i think it is better to be explicit, as to avoid potential bugs.
+            update_user_colony = {"colony": colony, "user": player_user}
+            deleted_player = PlayerInfo.model_validate(
+                player, update=update_user_colony
+            )
+            return deleted_player

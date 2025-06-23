@@ -14,15 +14,19 @@ from app.utils.admin import (
 )
 from app.utils.config import PlayerException
 from app.utils.dependencies import session
-from app.utils.player import edit_player_helper, get_player
-from fastapi import APIRouter, Body, HTTPException, status
+from app.utils.player import (
+    _delete_player_helper,
+    _edit_player_helper,
+    get_alive_player,
+)
+from fastapi import APIRouter, Body, HTTPException, Path, status
 
 # Create your API routes here
 router = APIRouter()
 
 
 @router.patch(
-    "/edit-player",
+    "/edit-player/{player_id}",
     response_model=PlayerInfo,
     status_code=status.HTTP_200_OK,
     response_description="Edited Player",
@@ -30,7 +34,7 @@ router = APIRouter()
 )
 def admin_edit_player(
     *,
-    player_id: int,
+    player_id: Annotated[int, Path(description="the player id")],
     session: session,
     player: Annotated[EditPlayer | None, Body()] = None,
     cursed_technique: Annotated[EditCT | None, Body()] = None,
@@ -51,17 +55,19 @@ def admin_edit_player(
         raise ADMIN_UNAUTHORIZED_EXCEPTION(admin)
 
     # check if player exists
-    playerdb = get_player(session=session, player_id=player_id)
+    playerdb = get_alive_player(session=session, player_id=player_id)
 
     if not playerdb:
-        raise HTTPException(status.HTTP_404_NOT_FOUND)
+        raise HTTPException(
+            status.HTTP_404_NOT_FOUND, detail=f"player with ID {player_id} not found"
+        )
 
     if not playerdb.alive:
         err_msg = f"Player '{playerdb.name}' with ID '{playerdb.id}' has died. Revive them first."
         raise PlayerException(player=playerdb, detail=err_msg)
 
     # pass: edit player details
-    edited_player = edit_player_helper(
+    edited_player = _edit_player_helper(
         playerdb=playerdb,
         player=player,
         cursed_technique=cursed_technique,
@@ -77,13 +83,17 @@ def admin_edit_player(
 
 
 @router.delete(
-    "/delete-player",
+    "/delete-player/{player_id}",
     response_model=PlayerInfo,
     status_code=status.HTTP_200_OK,
     response_description="A deleted player",
     summary="Admin deletion of a player",
 )
-def admin_delete_player(player_id: int, session: session, admin: admin_user):
+def admin_delete_player(
+    player_id: Annotated[int, Path(description="the player id")],
+    session: session,
+    admin: admin_user,
+):
     "API for admin deletion of a player"
 
     # check if admin has permission for action
@@ -96,3 +106,17 @@ def admin_delete_player(player_id: int, session: session, admin: admin_user):
 
     if not permission:
         raise ADMIN_UNAUTHORIZED_EXCEPTION(admin)
+
+    # delete player
+    player = get_alive_player(session=session, player_id=player_id)
+
+    if not player:
+        raise HTTPException(
+            status.HTTP_404_NOT_FOUND, detail=f"player with ID {player_id} not found"
+        )
+
+    deleted_player = _delete_player_helper(
+        player=player, player_user=player.user, session=session
+    )
+
+    return deleted_player

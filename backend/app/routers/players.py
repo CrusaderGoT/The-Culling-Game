@@ -14,12 +14,12 @@ from app.models.player import (
     Player,
     PlayerInfo,
 )
-from app.utils.barrier import fix_barrier_deactivation_task_fail
 from app.utils.config import PlayerException, Tag, UserException
 from app.utils.dependencies import atp, colony, session
 from app.utils.player import (
+    _delete_player_helper,
+    _edit_player_helper,
     calculate_points,
-    edit_player_helper,
     get_alive_player,
     get_player,
     points_required_for_upgrade,
@@ -110,8 +110,6 @@ def my_player(session: session, current_user: active_user):
                 err_msg = f"Your player '{player.name}' with ID '{player.id}' has died. Contact an admin to revive them."
                 raise PlayerException(player=player, detail=err_msg)
 
-            # deactive any potential barrier end task fails
-            fix_barrier_deactivation_task_fail(player.barrier_technique, session)
             return player
         else:
             err_msg = "User has no Player"
@@ -168,7 +166,7 @@ def get_players(
 )
 def a_player(
     *,
-    player_id: Annotated[int, Path()],
+    player_id: Annotated[int, Path(description="the player id")],
     alive: Annotated[
         bool, Query(description="whether the player has to be alive")
     ] = True,
@@ -180,8 +178,6 @@ def a_player(
             err_msg = f"Player '{player.name}' with ID '{player.id}' has died. Contact an admin to revive them."
             raise PlayerException(player=player, detail=err_msg)
 
-        # deactive any potential barrier end task fails
-        fix_barrier_deactivation_task_fail(player.barrier_technique, session)
         return player
     else:
         err_msg = f"player ID '{player_id}' not found"
@@ -197,7 +193,7 @@ def a_player(
 )
 def edit_player(
     *,
-    player_id: int,
+    player_id: Annotated[int, Path(description="the player id")],
     session: session,
     current_user: active_user,
     player: Annotated[EditPlayer | None, Body()] = None,
@@ -213,7 +209,7 @@ def edit_player(
         if playerdb.user_id != current_user.id:
             raise UserException(current_user, detail="Can only edit your own player.")
         else:  # update database infos
-            edited_player = edit_player_helper(
+            edited_player = _edit_player_helper(
                 playerdb=playerdb,
                 player=player,
                 cursed_technique=cursed_technique,
@@ -238,47 +234,18 @@ def edit_player(
     response_description="A deleted player",
     summary="Delete a player",
 )
-def delete_player(player_id: int, session: session, current_user: active_user):
+def delete_player(
+    player_id: Annotated[int, Path(description="the player id")],
+    session: session,
+    current_user: active_user,
+):
     playerdb = get_alive_player(session=session, player_id=player_id)
     if playerdb:
         if playerdb.user_id == current_user.id:  # logged in user matches players user
-            # if player has a match, set their status to dead instead (to avoid not null violation)
-            if (len(playerdb.matches) > 0) or (len(playerdb.votes) > 0):
-                playerdb.alive = False
-                session.add(playerdb)
-                # commit relevant changes
-                session.commit()
-                session.refresh(playerdb)
-                return playerdb
-            else:  # thoroughly delete player
-                # colony is not deleted, but assigned to a variable
-                # to avoid detached error when/if fetched later, after playerdb is deleted
-                colony = playerdb.colony
-                # get player barrier tech here (to avoid confirm_deleted_rows warning)
-                barrier_tech = playerdb.barrier_technique
-                # add ct apps to  a variable and add/append to delete session
-                ct_apps = playerdb.cursed_technique.applications
-                for app in ct_apps:
-                    session.delete(app)
-                else:  # after for loop
-                    if barrier_tech:
-                        session.delete(barrier_tech)
-                    session.delete(playerdb.cursed_technique)
-                    session.delete(playerdb)
-
-                    # commit relevant changes
-                    session.commit()
-
-                    # create a new player info. This is done because after player is deleted
-                    # it is removed from the session(detached state), and returning the playerdb
-                    # will attempt to fetch its respective user and colony, and will fail.
-                    # having the user(current user) and colony(colony) in variables
-                    # prevents this failure, but i think it is better to be explicit, as to avoid potential bugs.
-                    update_user_colony = {"colony": colony, "user": current_user}
-                    deleted_player = PlayerInfo.model_validate(
-                        playerdb, update=update_user_colony
-                    )
-                    return deleted_player
+            deleted_player = _delete_player_helper(
+                player=playerdb, player_user=current_user, session=session
+            )
+            return deleted_player
         else:  # player user don't match
             err_msg = "Attempting to delete another player."
             raise HTTPException(status.HTTP_401_UNAUTHORIZED, err_msg)

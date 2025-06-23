@@ -45,6 +45,7 @@ from alembic.operations import MigrationScript
 # add your model's MetaData object here
 # for 'autogenerate' support
 # from myapp import mymodel
+# import all models that have table=True
 from app.models.admin import *
 from app.models.barrier import *
 from app.models.colony import *

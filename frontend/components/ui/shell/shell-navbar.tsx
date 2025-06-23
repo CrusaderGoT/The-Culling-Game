@@ -3,9 +3,10 @@
 import { useAuth } from "@/lib/contexts/auth-context-provider";
 import { useShellContext } from "@/lib/contexts/shell-context-provider";
 import gstyles from "@/styles/global.module.css";
-import { AppShell } from "@mantine/core";
+import { AppShell, ScrollArea } from "@mantine/core";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
+import { ShellNavLinks } from "./shell-navlinks";
 
 export function ShellNavbar() {
     const {
@@ -30,7 +31,9 @@ export function ShellNavbar() {
 
     return userInfo?.admin && pathname.startsWith("/admin") ? (
         <AppShell.Navbar p="md" className={gstyles.highZ}>
-            Navbar
+            <AppShell.Section component={ScrollArea}>
+                <ShellNavLinks closeNavbar={navbarProps.toggleMobile} />
+            </AppShell.Section>
         </AppShell.Navbar>
     ) : null;
 }

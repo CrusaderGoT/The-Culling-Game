@@ -3,6 +3,8 @@
 from datetime import UTC, datetime
 from typing import Annotated
 
+from app.api.broker import redis_source
+from app.api.setting import settings
 from app.auth.dependencies import active_user, oauth2_scheme
 from app.models.barrier import BarrierTech, BarrierTechInfo
 from app.models.match import Match
@@ -13,21 +15,19 @@ from app.utils.barrier import (
     activate_reverse_cursed_technique,
     activate_simple_domain,
     conditions_for_barrier_tech,
+    deactivate_binding_vow,
+    deactivate_domain,
+    deactivate_simple_domain,
     fix_barrier_deactivation_task_fail,
-    schedule_deactivate_binding_vow,
-    schedule_deactivate_domain,
-    schedule_deactivate_simple_domain,
 )
 from app.utils.config import PlayerException, Tag
 from app.utils.dependencies import atp, session
 from app.utils.player import get_alive_player
 from fastapi import (
     APIRouter,
-    BackgroundTasks,
     Depends,
     HTTPException,
     Path,
-    Query,
     status,
 )
 
@@ -36,13 +36,12 @@ router = APIRouter(
 )
 
 
-@router.post("/activate/domain/{player_id}", response_model=BarrierTechInfo)
-def domain_expansion(
+@router.post("/activate/domain/{player_id}/{match_id}", response_model=BarrierTechInfo)
+async def domain_expansion(
     player_id: Annotated[int, Path()],
-    match_id: Annotated[int, Query()],
+    match_id: Annotated[int, Path()],
     current_user: active_user,
     session: session,
-    background: BackgroundTasks,
     atp: atp,
 ) -> BarrierTech:
     """Activates the domain of a player in an ongoing match.\n
@@ -114,18 +113,23 @@ def domain_expansion(
         barrier_tech = activate_domain(
             barrier_tech, barrier_record, match, session, atp
         )
-        # schedule background task for deactivation
-        background.add_task(schedule_deactivate_domain, barrier_tech, session)
+
+        # for now use only in dev mode
+        if barrier_tech.bv_end_time is not None and settings.debug:
+            # schedule background task for deactivation
+            await deactivate_domain.schedule_by_time(
+                redis_source, barrier_tech.bv_end_time, barrier_tech, session
+            )
+
         return barrier_tech
 
 
-@router.post("/activate/simple/{player_id}", response_model=BarrierTechInfo)
-def simple_domain(
+@router.post("/activate/simple/{player_id}/{match_id}", response_model=BarrierTechInfo)
+async def simple_domain(
     player_id: Annotated[int, Path()],
-    match_id: Annotated[int, Query()],
+    match_id: Annotated[int, Path()],
     current_user: active_user,
     session: session,
-    background: BackgroundTasks,
     atp: atp,
 ) -> BarrierTech:
     """
@@ -217,18 +221,23 @@ def simple_domain(
         barrier_tech = activate_simple_domain(
             barrier_tech, barrier_record, match, session, atp
         )
+
         # schedule background task for deactivation
-        background.add_task(schedule_deactivate_simple_domain, barrier_tech, session)
+        if barrier_tech.sd_end_time is not None and settings.debug:
+            # schedule background task for deactivation
+            await deactivate_simple_domain.schedule_by_time(
+                redis_source, barrier_tech.sd_end_time, barrier_tech, session
+            )
+
         return barrier_tech
 
 
-@router.post("/activate/binding/{player_id}", response_model=BarrierTechInfo)
-def bindind_vow(
+@router.post("/activate/binding/{player_id}/{match_id}", response_model=BarrierTechInfo)
+async def bindind_vow(
     player_id: Annotated[int, Path()],
-    match_id: Annotated[int, Query()],
+    match_id: Annotated[int, Path()],
     current_user: active_user,
     session: session,
-    background: BackgroundTasks,
     atp: atp,
 ):
     "activates a binding vow"
@@ -300,14 +309,20 @@ def bindind_vow(
         barrier_tech = activate_binding_vow(
             barrier_tech, barrier_record, match, session, atp
         )
-        background.add_task(schedule_deactivate_binding_vow, barrier_tech, session)
+
+        if barrier_tech.bv_end_time is not None and settings.debug:
+            # schedule background task for deactivation
+            await deactivate_binding_vow.schedule_by_time(
+                redis_source, barrier_tech.bv_end_time, barrier_tech, session
+            )
+
         return barrier_tech
 
 
-@router.post("/activate/rct/{player_id}", response_model=BarrierTechInfo)
+@router.post("/activate/rct/{player_id}/{match_id}", response_model=BarrierTechInfo)
 def reverse_cursed_technique(
     player_id: Annotated[int, Path()],
-    match_id: Annotated[int, Query()],
+    match_id: Annotated[int, Path()],
     current_user: active_user,
     session: session,
     atp: atp,
@@ -334,7 +349,7 @@ def reverse_cursed_technique(
         )
 
     # 1. check if they have a barrier record for this match
-    # and if they have reach their limit
+    # and if they have reached their limit
     if (
         barrier_record
         and (count := barrier_record.reverse_cursed_technique_counter)
@@ -352,3 +367,32 @@ def reverse_cursed_technique(
             barrier_tech, barrier_record, match, session, atp
         )
         return barrier_tech
+
+
+@router.post("/deactivate/barrier/{player_id}", response_model=BarrierTechInfo)
+def deactivate_domain_expansion(player_id: Annotated[int, Path()], session: session):
+    """
+    deactivates any expired barrier technique\n
+    does nothing if barrier tech should still be active.\n
+    if player has no barrier tech, will raise an error
+    """
+
+    # get a living player
+    player_alive = get_alive_player(session=session, player_id=player_id)
+
+    if not player_alive:
+        raise HTTPException(
+            status.HTTP_404_NOT_FOUND, f"Player {player_id}, does not exist."
+        )
+
+    if not player_alive.barrier_technique:
+        msg = "player has no barrier technique"
+        raise PlayerException(
+            player=player_alive,
+            code=status.HTTP_400_BAD_REQUEST,
+            detail=msg,
+        )
+
+    fix_barrier_deactivation_task_fail(player_alive.barrier_technique, session)
+
+    return player_alive.barrier_technique

@@ -9,6 +9,7 @@ from typing import Sequence
 from fastapi import status
 from sqlmodel import and_, exists, select
 
+from app.api.broker import broker
 from app.models.base import MatchPlayerLink
 from app.models.colony import Colony
 from app.models.match import Match
@@ -17,7 +18,7 @@ from app.models.user import User
 from app.utils.config import MatchCreationException
 from app.utils.dependencies import atp, session
 from app.utils.player import (
-    get_alive_player,
+    get_player,
 )
 
 
@@ -269,18 +270,11 @@ def schedule_assign_match_winner(*, match_id: int, session: session, atp: atp):
         continue  # run loop again after sleep
 
     else:  # runs after the match is ended
-        winner = get_match_winner(match, session)
-        if not winner:
-            return
-        else:
-            # Assign winner extra points and update the match record
-            match.winner = winner
-            winner.points += atp.winner_point
-            session.add(match)
-            session.commit()
+        assign_match_winner(match=match, atp=atp, session=session)
 
 
-def get_match_winner(match: Match, session: session):
+@broker.task
+def assign_match_winner(match: Match, atp: atp, session: session):
     """
     return the player that won the match, else return None
     """
@@ -301,10 +295,30 @@ def get_match_winner(match: Match, session: session):
         ]  # (player_id: int, vote_points: float)
 
         if most_votes[1] == least_votes[1]:
-            return None
+            # make draw
+            match.draw = True
+            session.add(match)
+            session.commit()
+            session.refresh(match)
+            return match
         else:
-            winner = get_alive_player(session, player_id=most_votes[0])
-            # calculate if loser player dies here
-            return winner
+            winner = get_player(session, player_id=most_votes[0])
+            if not winner:
+                # most likely won't happen; if seen check for potential bugs
+                return "Winner Not Found"
+            else:
+                # Assign winner extra points and update the match record
+                match.winner = winner
+                winner.points += atp.winner_point
+                match.draw = False  # redundancy for avoiding draw
+                session.add(match)
+                session.commit()
+                session.refresh(match)
+                return match
     else:
-        return None
+        # make draw
+        match.draw = True
+        session.add(match)
+        session.commit()
+        session.refresh(match)
+        return match

@@ -1,31 +1,33 @@
 """module for the match routers"""
 
-from typing import Annotated
+from typing import Annotated, Union
 
+from app.api.broker import redis_source
+from app.api.setting import settings
+from app.auth.dependencies import admin_user, oauth2_scheme
+from app.models.admin import Permission
+from app.models.base import ModelName
+from app.models.match import Match, MatchInfo
+from app.models.player import PlayerInfo
+from app.routers.votes import router as vote_router
+from app.utils.config import AdminException, Tag
+from app.utils.dependencies import atp, session
 from app.utils.match import (
+    assign_match_winner,
     create_new_match,
     get_last_created_match,
     get_match,
     ongoing_match,
-    schedule_assign_match_winner,
 )
 from fastapi import (
     APIRouter,
-    BackgroundTasks,
     Depends,
     HTTPException,
+    Path,
     Query,
     status,
 )
 from sqlmodel import select
-
-from ..auth.dependencies import admin_user, oauth2_scheme
-from ..models.admin import Permission
-from ..models.base import ModelName
-from ..models.match import Match, MatchInfo
-from ..utils.config import AdminException, Tag
-from ..utils.dependencies import atp, session
-from .votes import router as vote_router
 
 # write you match api routes here
 
@@ -41,7 +43,6 @@ async def create_match(
     session: session,
     admin: admin_user,
     atp: atp,
-    background: BackgroundTasks,
 ):
     """path operation for automatically creating a match, requires a part query."""
     # first get the permission for creating match
@@ -66,13 +67,15 @@ async def create_match(
                     session.add(new_match)
                     session.commit()
                     session.refresh(new_match)
-                    background.add_task(
-                        schedule_assign_match_winner,
-                        match_id=new_match.id,  # type: ignore
-                        session=session,
-                        atp=atp,
-                    )
+
+                    # schedule assign match winner
+                    if settings.debug:
+                        await assign_match_winner.schedule_by_time(
+                            redis_source, new_match.end, new_match, atp, session
+                        )
+
                     return new_match
+
             else:  # Not a single match have been create; Create match anyway
                 new_match = create_new_match(session, part, atp)
                 session.add(new_match)
@@ -93,7 +96,7 @@ async def create_match(
 
 
 @router.get("/all", response_model=list[MatchInfo])
-async def get_matches(
+def get_matches(
     session: session,
     offset: Annotated[int, Query(ge=0)] = 0,
     limit: Annotated[int, Query(le=30)] = 10,
@@ -108,7 +111,7 @@ async def get_matches(
 
 
 @router.get("/latest", response_model=MatchInfo)
-async def get_lastest_match(
+def get_lastest_match(
     session: session,
     ongoing: Annotated[bool, Query(description="should be an ongoing match")] = False,
 ):
@@ -125,9 +128,9 @@ async def get_lastest_match(
         raise HTTPException(status.HTTP_404_NOT_FOUND, "No latest match")
 
 
-@router.delete("/delete", response_model=MatchInfo)
-async def delete_match(
-    match_id: Annotated[int, Query()],
+@router.delete("/delete/{match_id}", response_model=MatchInfo)
+def delete_match(
+    match_id: Annotated[int, Path()],
     session: session,
     admin: admin_user,
 ):
@@ -196,3 +199,25 @@ async def delete_match(
             status.HTTP_403_FORBIDDEN,
             detail="Permission to delete a match does not exist, contact a superuser",
         )
+
+
+@router.post("/winner/{match_id}", response_model=Union[MatchInfo, str])
+def match_winner(
+    match_id: Annotated[int, Path()],
+    atp: atp,
+    session: session,
+):
+    "calculates, assigns, and returns the winner of a match, or 'DRAW' is draw."
+
+    # get match
+    match = get_match(session=session, match_id=match_id)
+
+    if not match:
+        raise HTTPException(
+            status.HTTP_404_NOT_FOUND, f"Match with ID {match_id} not found"
+        )
+
+    # perform process
+    match_winner = assign_match_winner(match=match, atp=atp, session=session)
+
+    return match_winner
