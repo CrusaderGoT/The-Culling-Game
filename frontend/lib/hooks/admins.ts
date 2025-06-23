@@ -4,14 +4,12 @@ import {
     currentAdminOptions,
     deleteMatchMutation,
     demoSuperuserMutation,
-    getLastestMatchQueryKey,
     grantPermissionMutation,
     newPermissionMutation,
     removePermissionMutation,
 } from "@/api/client/@tanstack/react-query.gen";
 import { getAPIErrorMessage } from "@/components/ui/display-api-error";
 import { authHeader } from "@/lib/constants/AUTHCONSTANTS";
-import { queryClient } from "@/lib/query-client/get-query-client";
 import { notifications } from "@mantine/notifications";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
@@ -44,9 +42,6 @@ export const useCreateMatch = (token: string) => {
                 message: `match part ${match.part}: colony ${match.colony.country} started successfully`,
                 color: "deepred",
             });
-            queryClient.invalidateQueries({
-                queryKey: [getLastestMatchQueryKey()],
-            });
         },
     });
     return mutation;
@@ -69,9 +64,6 @@ export const useDeleteMatch = (token: string) => {
             notifications.show({
                 message: `match part ${match.part}: colony ${match.colony.country} deleted successfully`,
                 color: "blue",
-            });
-            queryClient.invalidateQueries({
-                queryKey: [getLastestMatchQueryKey()],
             });
         },
     });
