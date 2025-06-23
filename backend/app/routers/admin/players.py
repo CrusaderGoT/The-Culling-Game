@@ -66,6 +66,10 @@ def admin_edit_player(
         err_msg = f"Player '{playerdb.name}' with ID '{playerdb.id}' has died. Revive them first."
         raise PlayerException(player=playerdb, detail=err_msg)
 
+    if not playerdb.alive:
+        err_msg = f"Player '{playerdb.name}' with ID '{playerdb.id}' has died. Revive them first."
+        raise PlayerException(player=playerdb, detail=err_msg)
+
     # pass: edit player details
     edited_player = _edit_player_helper(
         playerdb=playerdb,

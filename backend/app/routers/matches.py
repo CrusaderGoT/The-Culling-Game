@@ -8,7 +8,6 @@ from app.auth.dependencies import admin_user, oauth2_scheme
 from app.models.admin import Permission
 from app.models.base import ModelName
 from app.models.match import Match, MatchInfo
-from app.models.player import PlayerInfo
 from app.routers.votes import router as vote_router
 from app.utils.config import AdminException, Tag
 from app.utils.dependencies import atp, session
@@ -19,14 +18,7 @@ from app.utils.match import (
     get_match,
     ongoing_match,
 )
-from fastapi import (
-    APIRouter,
-    Depends,
-    HTTPException,
-    Path,
-    Query,
-    status,
-)
+from fastapi import APIRouter, Depends, HTTPException, Path, Query, status
 from sqlmodel import select
 
 # write you match api routes here

@@ -16,6 +16,15 @@ wheels = [
 ]
 
 [[package]]
+name = "aiosmtplib"
+version = "2.0.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/8f/66/64d78bcb36c0a3da4610d5564c0422cb726051fb5dbd136a8839d8b91574/aiosmtplib-2.0.2.tar.gz", hash = "sha256:138599a3227605d29a9081b646415e9e793796ca05322a78f69179f0135016a3", size = 56295 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/66/be/6902c91523a5faedee22e260e17fc23521fd63b2fec46dd5e5fcda62da8f/aiosmtplib-2.0.2-py3-none-any.whl", hash = "sha256:1e631a7a3936d3e11c6a144fb8ffd94bb4a99b714f2cb433e825d88b698e37bc", size = 27149 },
+]
+
+[[package]]
 name = "alembic"
 version = "1.13.2"
 source = { registry = "https://pypi.org/simple" }
@@ -718,6 +727,15 @@ wheels = [
 ]
 
 [[package]]
+name = "pytz"
+version = "2025.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/f8/bf/abbd3cdfb8fbc7fb3d4d38d320f2441b1e7cbe29be4f23797b4a2b5d8aac/pytz-2025.2.tar.gz", hash = "sha256:360b9e3dbb49a209c21ad61809c7fb453643e048b38924c765813546746e81c3", size = 320884 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/81/c4/34e93fe5f5429d7570ec1fa436f1986fb1f00c3e0f43a589fe2bbcd22c3f/pytz-2025.2-py2.py3-none-any.whl", hash = "sha256:5ddf76296dd8c44c26eb8f4b6f35488f3ccbf6fbbd7adee0b7262d43f0ec2f00", size = 509225 },
+]
+
+[[package]]
 name = "pyyaml"
 version = "6.0.1"
 source = { registry = "https://pypi.org/simple" }
@@ -1270,6 +1288,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/c9/4a/44d3c295350d776427904d73c189e10aeae66d7f555bb2feee16d1e4ba5a/wsproto-1.2.0.tar.gz", hash = "sha256:ad565f26ecb92588a3e43bc3d96164de84cd9902482b130d0ddbaa9664a85065", size = 53425 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/78/58/e860788190eba3bcce367f74d29c4675466ce8dddfba85f7827588416f01/wsproto-1.2.0-py3-none-any.whl", hash = "sha256:b9acddd652b585d75b20477888c56642fdade28bdfd3579aa24a4d2c037dd736", size = 24226 },
+]
+
+[[package]]
+name = "zipp"
+version = "3.22.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/12/b6/7b3d16792fdf94f146bed92be90b4eb4563569eca91513c8609aebf0c167/zipp-3.22.0.tar.gz", hash = "sha256:dd2f28c3ce4bc67507bfd3781d21b7bb2be31103b51a4553ad7d90b84e57ace5", size = 25257 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ad/da/f64669af4cae46f17b90798a827519ce3737d31dbafad65d391e49643dc4/zipp-3.22.0-py3-none-any.whl", hash = "sha256:fe208f65f2aca48b81f9e6fd8cf7b8b32c26375266b009b413d45306b6148343", size = 9796 },
 ]
 
 [[package]]
