@@ -321,7 +321,6 @@ def activate_reverse_cursed_technique(
     session.add(barrier_tech)
     session.commit()
     session.refresh(barrier_tech)
-    return barrier_tech
 
 
 def fix_barrier_deactivation_task_fail(

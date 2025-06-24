@@ -244,11 +244,7 @@ taskiq-dependencies==1.5.7
     # via taskiq
 taskiq-fastapi==0.3.5
     # via the-culling-game-backend (pyproject.toml)
-<<<<<<< HEAD
 taskiq-redis==1.0.9
-=======
-taskiq-nats==0.5.1
->>>>>>> 69944e004760daf1211f3507aa01443d70af5660
     # via the-culling-game-backend (pyproject.toml)
 typer==0.12.3
     # via

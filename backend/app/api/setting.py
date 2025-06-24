@@ -4,8 +4,6 @@ from contextlib import asynccontextmanager
 from uuid import UUID
 
 import socketio
-
-# import taskiq_fastapi
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
