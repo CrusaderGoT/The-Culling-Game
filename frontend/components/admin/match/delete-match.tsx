@@ -88,7 +88,7 @@ function DeleteMatchModal({
                         disabled={!value}
                         onClick={async () => {
                             await mutateAsync({
-                                path: {
+                                query: {
                                     match_id: Number(value),
                                 },
                             });

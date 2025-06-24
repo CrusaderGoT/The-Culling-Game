@@ -4,10 +4,12 @@ import {
     deletePlayerMutation,
     editPlayerMutation,
     myPlayerOptions,
+    myPlayerQueryKey,
     upgradePlayerMutation,
 } from "@/api/client/@tanstack/react-query.gen";
 import { getAPIErrorMessage } from "@/components/ui/display-api-error";
 import { authHeader } from "@/lib/constants/AUTHCONSTANTS";
+import { queryClient } from "@/lib/query-client/get-query-client";
 import { notifications } from "@mantine/notifications";
 import { useMutation, useQueries, useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
@@ -147,6 +149,9 @@ export const useEditPlayer = (token: string) => {
                 message: `player detail(s) edited successfully`,
                 color: "green",
             });
+            queryClient.invalidateQueries({
+                queryKey: [myPlayerQueryKey()],
+            });
         },
     });
 
@@ -173,6 +178,9 @@ export const useDeletePlayer = (token: string) => {
                 message: `player deleted successfully`,
                 color: "red",
             });
+            queryClient.invalidateQueries({
+                queryKey: [myPlayerQueryKey()],
+            });
             router.push("/match");
         },
     });
@@ -197,6 +205,9 @@ export const useUpgradePlayer = (token: string) => {
             notifications.show({
                 message: `player's grade upgraded successfully`,
                 color: "green",
+            });
+            queryClient.invalidateQueries({
+                queryKey: [myPlayerQueryKey()],
             });
         },
     });
