@@ -4,14 +4,15 @@ from contextlib import asynccontextmanager
 from uuid import UUID
 
 import socketio
+import taskiq_fastapi
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.routing import APIRoute
 from fastapi.staticfiles import StaticFiles
 from pydantic_settings import BaseSettings
-
-from app.api.broker import broker
+from taskiq import InMemoryBroker, TaskiqScheduler, ZeroMQBroker
+from taskiq_redis import ListRedisScheduleSource
 
 
 class Settings(BaseSettings):
@@ -22,7 +23,6 @@ class Settings(BaseSettings):
     algorithm: str = "HS256"
     code: UUID = UUID("a24cd617-5d2e-4317-970d-162f315d0397")
     debug: bool = False
-    enviroment: str = "developement"
     access_token_expire: int = 900_000
     "in milliseconds"
     refresh_token_expire: int = 604_800_000
@@ -32,8 +32,20 @@ class Settings(BaseSettings):
 settings = Settings()
 
 
-def custom_generate_unique_id(route: APIRoute):
-    return f"{route.name}"
+if settings.debug:
+    broker = InMemoryBroker()
+else:
+    broker = ZeroMQBroker()
+
+
+# Here's the source that is used to store scheduled tasks
+redis_source = ListRedisScheduleSource("redis://localhost:6379/0")
+
+
+taskiq_fastapi.init(broker, "app.api.main:app")
+
+
+scheduler = TaskiqScheduler(broker, sources=[redis_source])
 
 
 # lifespan event
@@ -47,6 +59,10 @@ async def lifespan(app: FastAPI):
 
     if not broker.is_worker_process:
         await broker.shutdown()
+
+
+def custom_generate_unique_id(route: APIRoute):
+    return f"{route.name}"
 
 
 # initialize fastapi

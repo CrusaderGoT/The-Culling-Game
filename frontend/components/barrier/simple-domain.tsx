@@ -43,8 +43,10 @@ export function SimpleDomainAction({
                 }
                 onClick={async () => {
                     await mutateAsync({
-                        path: { player_id: barrierTech.player_id },
-                        query: { match_id: match.id },
+                        path: {
+                            player_id: barrierTech.player_id,
+                            match_id: match.id,
+                        },
                     });
                 }}
             >

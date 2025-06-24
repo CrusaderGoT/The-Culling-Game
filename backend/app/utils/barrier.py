@@ -5,7 +5,7 @@ from datetime import UTC, datetime, timezone
 from fastapi import HTTPException, status
 from sqlmodel import select
 
-from app.api.broker import broker
+from app.api.setting import broker
 from app.models.barrier import BarrierRecord, BarrierTech
 from app.models.match import Match
 from app.models.player import Player
@@ -321,6 +321,7 @@ def activate_reverse_cursed_technique(
     session.add(barrier_tech)
     session.commit()
     session.refresh(barrier_tech)
+    return barrier_tech
 
 
 def fix_barrier_deactivation_task_fail(

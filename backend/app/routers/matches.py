@@ -2,13 +2,11 @@
 
 from typing import Annotated, Union
 
-from app.api.broker import redis_source
-from app.api.setting import settings
+from app.api.setting import redis_source, settings
 from app.auth.dependencies import admin_user, oauth2_scheme
 from app.models.admin import Permission
 from app.models.base import ModelName
 from app.models.match import Match, MatchInfo
-from app.models.player import PlayerInfo
 from app.routers.votes import router as vote_router
 from app.utils.config import AdminException, Tag
 from app.utils.dependencies import atp, session

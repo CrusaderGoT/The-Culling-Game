@@ -9,7 +9,7 @@ from typing import Sequence
 from fastapi import status
 from sqlmodel import and_, exists, select
 
-from app.api.broker import broker
+from app.api.setting import broker
 from app.models.base import MatchPlayerLink
 from app.models.colony import Colony
 from app.models.match import Match
