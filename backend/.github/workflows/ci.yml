@@ -31,3 +31,5 @@ jobs:
 
       - name: Run Tests
         run: uv run pytest -v
+        env:
+          DEBUG: true
