@@ -131,7 +131,8 @@ export function AuthContextProvider({ children }: { children: ReactNode }) {
                 message: "Session Expired Log In To Continue",
                 color: "yellow",
             });
-            return; // redirect to login is handled in the use effect
+
+            redirect(`/login?next=${encodeURIComponent(path)}`);
         },
         onSuccess: async (t) => {
             if (!mountedRef) return;
@@ -206,6 +207,7 @@ export function AuthContextProvider({ children }: { children: ReactNode }) {
         // Scenario 3: Token has expired
         const shouldRefresh =
             refreshToken &&
+            !refreshError && // this prevents loop when fail
             isOnline &&
             ((isError && !isLoading) || (!token && !isLoading) || tokenExpired);
 
@@ -214,16 +216,13 @@ export function AuthContextProvider({ children }: { children: ReactNode }) {
                 const rt = await mutateAsync({
                     body: { refresh_token: refreshToken },
                 });
-
-                if (!rt) {
-                    redirect(`/login?next=${encodeURIComponent(path)}`);
-                }
             }
             refreshTokenAsyncMutate();
         }
     }, [
         isError,
         refreshToken,
+        refreshError,
         isRefreshing,
         isLoading,
         mutateAsync,
