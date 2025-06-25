@@ -330,7 +330,7 @@ export class MatchesService {
     
     /**
      * Match Winner
-     * calculates, assigns, and returns the winner of a match, or 'DRAW' is draw.
+     * calculates, assigns, and returns the winner of a match, or draw is True if Draw.
      */
     public static matchWinner<ThrowOnError extends boolean = false>(options: Options<MatchWinnerData, ThrowOnError>) {
         return (options.client ?? _heyApiClient).post<MatchWinnerResponse, MatchWinnerError, ThrowOnError>({

@@ -526,7 +526,7 @@ export const matchWinnerQueryKey = (options: Options<MatchWinnerData>) => create
 
 /**
  * Match Winner
- * calculates, assigns, and returns the winner of a match, or 'DRAW' is draw.
+ * calculates, assigns, and returns the winner of a match, or draw is True if Draw.
  */
 export const matchWinnerOptions = (options: Options<MatchWinnerData>) => {
     return queryOptions({
@@ -545,7 +545,7 @@ export const matchWinnerOptions = (options: Options<MatchWinnerData>) => {
 
 /**
  * Match Winner
- * calculates, assigns, and returns the winner of a match, or 'DRAW' is draw.
+ * calculates, assigns, and returns the winner of a match, or draw is True if Draw.
  */
 export const matchWinnerMutation = (options?: Partial<Options<MatchWinnerData>>): UseMutationOptions<MatchWinnerResponse, MatchWinnerError, Options<MatchWinnerData>> => {
     const mutationOptions: UseMutationOptions<MatchWinnerResponse, MatchWinnerError, Options<MatchWinnerData>> = {

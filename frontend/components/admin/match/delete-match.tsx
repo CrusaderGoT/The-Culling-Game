@@ -57,7 +57,7 @@ function DeleteMatchModal({
 
     const [value, setValue] = useState<string | number>("");
 
-    const { mutateAsync, error } = useDeleteMatch(token);
+    const { mutateAsync, error, isPending } = useDeleteMatch(token);
 
     return (
         <Modal
@@ -85,7 +85,7 @@ function DeleteMatchModal({
                 />
                 <Group justify="space-between">
                     <Button
-                        disabled={!value}
+                        disabled={!value || isPending}
                         onClick={async () => {
                             await mutateAsync({
                                 path: {

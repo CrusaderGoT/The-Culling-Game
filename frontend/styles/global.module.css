@@ -21,3 +21,8 @@
 .markLabel {
   display: none;
 }
+
+.wrapSingleLongText {
+  overflow-wrap: break-word;
+  white-space: normal;
+}

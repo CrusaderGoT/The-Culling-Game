@@ -49,7 +49,7 @@ function CreateMatchModal({
 
     const [value, setValue] = useState<string | number>("");
 
-    const { mutateAsync, error } = useCreateMatch(token);
+    const { mutateAsync, error, isPending } = useCreateMatch(token);
 
     return (
         <Modal
@@ -77,7 +77,7 @@ function CreateMatchModal({
                 />
                 <Group justify="space-between">
                     <Button
-                        disabled={!value}
+                        disabled={!value || isPending}
                         onClick={async () => {
                             await mutateAsync({
                                 query: {

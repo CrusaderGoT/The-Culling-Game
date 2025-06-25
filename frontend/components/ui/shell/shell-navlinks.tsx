@@ -1,7 +1,12 @@
 "use client";
 
 import { NavLink, Stack } from "@mantine/core";
-import { Icon, Icon123 } from "@tabler/icons-react";
+import {
+    Icon,
+    IconFish,
+    IconMatchstick,
+    IconUserShield,
+} from "@tabler/icons-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -17,19 +22,19 @@ const navLinkData: NavLinkDataType = [
     {
         href: "/admin/dashboard",
         label: "dashboard",
-        leftSection: Icon123,
-        description: "main admin interface",
+        leftSection: IconUserShield,
     },
     {
         href: "/admin/match",
         label: "matches",
-        leftSection: Icon123,
-        description: "match interface",
+        leftSection: IconMatchstick,
+        description: "matches interface",
     },
     {
         href: "/admin/player",
         label: "players",
-        leftSection: Icon123,
+        leftSection: IconFish,
+        description: "players interface",
     },
 ];
 

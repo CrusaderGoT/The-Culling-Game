@@ -2,7 +2,7 @@
 """module for defining the `match` `location` and `vote` models that will be used to perform CRUD operation
 on the database and will be used as schemas/response/request data in the API schema. All SQLModels"""
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Union
 
 from sqlmodel import Field, Relationship
 
@@ -39,8 +39,10 @@ class Match(BaseMatch, table=True):
         index=True,
         description="The winner of the match (player Id)",
     )
-    winner: "Player" = Relationship(back_populates="wins")
-    draw: bool = Field(description="whether the match was a draw", index=True, default=False)
+    winner: Union["Player", None] = Relationship(back_populates="wins")
+    draw: bool = Field(
+        description="whether the match was a draw", index=True, default=False
+    )
     # child rels
     # typically will have only two unique players in a match
     players: list["Player"] = Relationship(

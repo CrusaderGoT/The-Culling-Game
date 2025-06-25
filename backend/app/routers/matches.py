@@ -205,7 +205,7 @@ def match_winner(
     atp: atp,
     session: session,
 ):
-    "calculates, assigns, and returns the winner of a match, or 'DRAW' is draw."
+    "calculates, assigns, and returns the winner of a match, or draw is True if Draw."
 
     # get match
     match = get_match(session=session, match_id=match_id)

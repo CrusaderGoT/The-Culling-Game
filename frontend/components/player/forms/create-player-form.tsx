@@ -25,7 +25,7 @@ import {
     ScrollAreaAutosize,
     Stack,
     Stepper,
-    Text
+    Text,
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 
@@ -41,6 +41,9 @@ import { zodResolver } from "mantine-form-zod-resolver";
 import { redirect } from "next/navigation";
 
 import { useState } from "react";
+
+import gstyles from "@/styles/global.module.css";
+import clsx from "clsx";
 
 export function CreatePlayerForm() {
     // Constants
@@ -217,7 +220,9 @@ export function CreatePlayerForm() {
 
                         <Stepper.Completed>
                             {Object.keys(form.errors).length > 0 ? (
-                                <Center>
+                                <Center
+                                    className={clsx(gstyles.wrapSingleLongText)}
+                                >
                                     <ScrollAreaAutosize mah={300}>
                                         <Text c="red" fw={500} mb="md">
                                             Some fields have errors. Please
@@ -255,7 +260,9 @@ export function CreatePlayerForm() {
                                     </ScrollAreaAutosize>
                                 </Center>
                             ) : (
-                                <Stack>
+                                <Stack
+                                    className={clsx(gstyles.wrapSingleLongText)}
+                                >
                                     <ScrollAreaAutosize mah="60vh">
                                         <Divider
                                             label="Confirm your player information"
