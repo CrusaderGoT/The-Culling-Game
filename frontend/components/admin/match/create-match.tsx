@@ -1,16 +1,15 @@
 "use client";
 
+import { BigActionButton } from "@/components/ui/big-action-button";
 import { useAuth } from "@/lib/contexts/auth-context-provider";
 import { useCreateMatch } from "@/lib/hooks/admins";
 import {
-    ActionIcon,
     Button,
     Flex,
     Group,
     Modal,
     NumberInput,
-    Stack,
-    TooltipFloating,
+    Stack
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconMatchstick } from "@tabler/icons-react";
@@ -22,19 +21,14 @@ export function CreateMatchAction() {
 
     return (
         <Flex>
-            <CreateMatchButton open={open} />
+            <BigActionButton
+                onclick={open}
+                label="Create Match"
+                color="deepred"
+                icons={[IconMatchstick]}
+            />
             <CreateMatchModal opened={opened} close={close} />
         </Flex>
-    );
-}
-
-function CreateMatchButton({ open }: { open: () => void }) {
-    return (
-        <TooltipFloating label="Create Match">
-            <ActionIcon flex={1} h={200} onClick={open} color="deepred">
-                <IconMatchstick size={50} />
-            </ActionIcon>
-        </TooltipFloating>
     );
 }
 

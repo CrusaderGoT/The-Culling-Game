@@ -1,5 +1,6 @@
 "use client";
 
+import { BigActionButton } from "@/components/ui/big-action-button";
 import { getAPIErrorMessage } from "@/components/ui/display-api-error";
 import { useAuth } from "@/lib/contexts/auth-context-provider";
 import { useDeleteMatch } from "@/lib/hooks/admins";
@@ -26,23 +27,16 @@ export function DeleteMatchAction({ small = false }: { small?: boolean }) {
             {small ? (
                 <DeleteMatchButtonSmall open={open} />
             ) : (
-                <DeleteMatchButton open={open} />
+                <BigActionButton
+                    onclick={open}
+                    label="Delete Match"
+                    color="violet"
+                    icons={[IconTrash, IconMatchstick]}
+                />
             )}
 
             <DeleteMatchModal opened={opened} close={close} />
         </Flex>
-    );
-}
-
-function DeleteMatchButton({ open }: { open: () => void }) {
-    return (
-        <TooltipFloating label="Delete Match">
-            <ActionIcon flex={1} h={200} onClick={open} color="violet">
-                <Group gap={"xs"}>
-                    <IconTrash size={50} /> <IconMatchstick size={50} />
-                </Group>
-            </ActionIcon>
-        </TooltipFloating>
     );
 }
 
