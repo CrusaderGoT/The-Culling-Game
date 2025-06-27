@@ -273,12 +273,13 @@ def schedule_assign_match_winner(*, match_id: int, session: session, atp: atp):
         assign_match_winner(match=match, atp=atp, session=session)
 
 
-def _make_match_winner(session: session, match: Match, winner: Player, atp: atp):
+def _make_match_winner(session: Session, match: Match, winner: Player, atp: ATP):
     """
     Update the winner's points and finalize the match as not a draw.
     return Match
     """
     winner.points += atp.winner_point
+    match.winner = winner  # Actually assign the winner
     match.draw = False  # redundancy for avoiding draw
     session.add(match)
     session.commit()
@@ -286,8 +287,8 @@ def _make_match_winner(session: session, match: Match, winner: Player, atp: atp)
     return match
 
 
-def _make_match_draw(session: session, match: Match):
-    "make the match a draw"
+def _make_match_draw(session: Session, match: Match):
+    """make the match a draw"""
     match.draw = True
     session.add(match)
     session.commit()
@@ -296,13 +297,13 @@ def _make_match_draw(session: session, match: Match):
 
 
 @broker.task
-def assign_match_winner(match: Match, atp: atp, session: session):
+def assign_match_winner(match: Match, atp: ATP, session: Session):
     """
     Determine the winner of a match or declare it a draw.
 
     Parameters:
         match (Match): The match object for which the winner is to be determined.
-        atp (Any): Configuration object containing match-related settings like winner points.
+        atp (ATP): Configuration object containing match-related settings like winner points.
         session (Session): Database session object for querying and updating match/player data.
 
     Returns:
@@ -316,45 +317,50 @@ def assign_match_winner(match: Match, atp: atp, session: session):
         raise MatchException("match already has a winner or it is a draw")
 
     if not match.votes:
-        # make draw
-        match = _make_match_draw(session=session, match=match)
-        return match
+        # make draw - no votes means draw
+        return _make_match_draw(session=session, match=match)
 
     cnt: Counter[int] = Counter()  # initialize empty counter dict
     # aggregate players vote points
     for vote in match.votes:
-        cnt[vote.player_id] += vote.point  # type: ignore ; counter is meant for int but doesn't discrimate float
+        cnt[vote.player_id] += vote.point
 
-    # get the players votes is sorted highest to lowest
+    # get the players votes sorted highest to lowest
     votes_hierarchy = cnt.most_common()  # [(player_id: int, vote_points: float)]
 
-    if len(votes_hierarchy) == 1:  # only one player got voted
+    if len(votes_hierarchy) == 0:
+        # Edge case: somehow no votes after filtering
+        return _make_match_draw(session=session, match=match)
+    
+    if len(votes_hierarchy) == 1:
+        # only one player got voted - they win
         winner = get_player(session, player_id=votes_hierarchy[0][0])
         if not winner:
-            # This scenario is unexpected. It may indicate a bug if the winner cannot be found despite valid votes.
-            # Log the error or raise a specific exception for better debugging
             raise MatchException(
                 "Winner could not be retrieved. This may indicate a data inconsistency issue."
             )
+        return _make_match_winner(session, match, winner, atp)
 
-    # more than 1 player got a vote
-    # get the player with least votes and most votes
-    most_votes = votes_hierarchy[0]
-    least_votes = votes_hierarchy[-1]  # (player_id: int, vote_points: float)
+    # Check for ties at the top
+    highest_vote_count = votes_hierarchy[0][1]
+    players_with_highest_votes = [
+        player_id for player_id, vote_count in votes_hierarchy 
+        if vote_count == highest_vote_count
+    ]
+    
+    if len(players_with_highest_votes) > 1:
+        # Tie for first place - make it a draw
+        return _make_match_draw(session=session, match=match)
+    
+    # Clear winner exists
+    winner = get_player(session, player_id=votes_hierarchy[0][0])
+    if not winner:
+        raise MatchException(
+            "Winner could not be retrieved. This may indicate a data inconsistency issue."
+        )
+    
+    return _make_match_winner(session, match, winner, atp)
 
-    if most_votes[1] == least_votes[1]:
-        # make draw
-        match = _make_match_draw(session=session, match=match)
-        return match
-    else:
-        winner = get_player(session, player_id=most_votes[0])
-        if not winner:
-            # This scenario is unexpected. It may indicate a bug if the winner cannot be found despite valid votes.
-            # Log the error or raise a specific exception for better debugging
-            raise MatchException(
-                "Winner could not be retrieved. This may indicate a data inconsistency issue."
-            )
-        else:
-            # Assign winner extra points and update the match record
-            match = _make_match_winner(session, match, winner, atp)
-            return match
+
+ 
+        
