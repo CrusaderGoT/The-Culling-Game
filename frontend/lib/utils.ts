@@ -85,28 +85,21 @@ export function calculateCtAppPoints(player: PlayerInfo) {
     return data;
 }
 /**
- * Checks if the given admin has a specific permission level for a particular model.
- *
- * Permission levels are structured as follows:
- *   READ = 1
- *   CREATE = 2
- *   UPDATE = 3
- *   DELETE = 4
+ * Checks if the given admin has all specified permission levels for a particular model.
  *
  * @param admin - The admin user whose permissions are being checked.
  * @param model - The name of the model to check permissions against.
- * @param level - The required permission level to verify.
- * @returns `true` if the admin has the specified permission level for the model, otherwise `false`.
+ * @param levels - An array of required permission levels to verify. [1=CREATE, 2=READ, 3=UPDATE, 4=DELETE]
+ * @returns `true` if the admin has all specified permission levels for the model, otherwise `false`.
  */
-
 export function checkAdminPermission(
     admin: AdminInfo | BaseAdminInfo,
     model: ModelName,
-    level: PermissionLevel
+    levels: PermissionLevel[]
 ) {
-    const hasPermission = admin.permissions.some(
-        (perm) => perm.model === model && perm.level === level
+    return levels.every((level) =>
+        admin.permissions.some(
+            (perm) => perm.model === model && perm.level === level
+        )
     );
-
-    return hasPermission;
 }

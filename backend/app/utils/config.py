@@ -28,7 +28,7 @@ class UserException(Exception):
         self,
         user: User,
         code: int = status.HTTP_400_BAD_REQUEST,
-        detail: Any = "An Error Occured with this User",
+        detail: Any = "An Error Occurred with this User",
         headers: dict[str, str] | None = None,
     ) -> None:
         self.user = UserInfo.model_validate(user)
@@ -49,7 +49,7 @@ class AdminException(Exception):
         self,
         admin: AdminUser,
         code: int = status.HTTP_400_BAD_REQUEST,
-        detail: Any = "An Error Occured with this Admin",
+        detail: Any = "An Error Occurred with this Admin",
         headers: dict[str, str] | None = None,
     ) -> None:
         self.admin = AdminInfo.model_validate(admin)
@@ -70,7 +70,7 @@ class PlayerException(Exception):
         self,
         player: Player,
         code: int = status.HTTP_400_BAD_REQUEST,
-        detail: Any = "An Error Occured with this Player",
+        detail: Any = "An Error Occurred with this Player",
         headers: dict[str, str] | None = None,
     ) -> None:
         self.player = PlayerInfo.model_validate(player)
@@ -84,12 +84,12 @@ async def player_exception_handler(request: Request, exc: PlayerException):
     return JSONResponse(status_code=exc.code, content=exc.detail)
 
 
-class MatchCreationException(Exception):
+class MatchException(Exception):
     """Custom exception for match creation errors"""
 
     def __init__(
         self,
-        detail: str,
+        detail: Any,
         code: int = status.HTTP_400_BAD_REQUEST,
         headers: dict[str, str] | None = None,
     ):
@@ -98,10 +98,8 @@ class MatchCreationException(Exception):
         self.headers = headers
 
 
-@app.exception_handler(MatchCreationException)
-async def match_creation_exception_handler(
-    request: Request, exc: MatchCreationException
-):
+@app.exception_handler(MatchException)
+async def match_creation_exception_handler(request: Request, exc: MatchException):
     return JSONResponse(status_code=exc.code, content=exc.detail)
 
 

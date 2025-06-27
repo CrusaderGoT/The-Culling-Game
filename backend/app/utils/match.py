@@ -15,7 +15,7 @@ from app.models.colony import Colony
 from app.models.match import Match
 from app.models.player import Player
 from app.models.user import User
-from app.utils.config import MatchCreationException
+from app.utils.config import MatchException
 from app.utils.dependencies import atp, session
 from app.utils.player import (
     get_player,
@@ -73,13 +73,13 @@ def _get_eligible_colony(session: session, part: int) -> int:
         # specific error message based on context
         if last_match:
             next_part = last_match.part + 1
-            raise MatchCreationException(
+            raise MatchException(
                 f"No colony has players available for part {part}. "
                 f"Consider starting part {next_part} or add more players."
             )
         else:
             # First match scenario
-            raise MatchCreationException(
+            raise MatchException(
                 "No colonies with available players found. "
                 "Please ensure there are colonies with at least 2 alive players who have users."
             )
@@ -93,13 +93,13 @@ def _validate_part_number(part: int, last_match: Match | None) -> None:
         return  # No validation needed for first match
 
     if part < last_match.part:
-        raise MatchCreationException(
+        raise MatchException(
             f"Invalid match part. Must be equal to or greater than last part ({last_match.part})",
             status.HTTP_406_NOT_ACCEPTABLE,
         )
 
     if part > last_match.part + 1:
-        raise MatchCreationException(
+        raise MatchException(
             f"Invalid match part. Next part must be {last_match.part + 1}",
             status.HTTP_406_NOT_ACCEPTABLE,
         )
@@ -155,7 +155,7 @@ def _get_match_players(session: session, colony_id: int, part: int) -> list[Play
 
     else:
         # No available players - this shouldn't happen if colony selection worked correctly
-        raise MatchCreationException(
+        raise MatchException(
             f"No available players in colony {colony_id} for part {part}",
             status.HTTP_404_NOT_FOUND,
         )
@@ -216,7 +216,7 @@ def _get_mixed_player_pair(
     other_players = session.exec(other_players_query).all()
 
     if not other_players:
-        raise MatchCreationException(
+        raise MatchException(
             f"Colony {colony_id} has only one alive player. "
             "At least 2 players are required to create a match.",
             status.HTTP_412_PRECONDITION_FAILED,
@@ -273,52 +273,88 @@ def schedule_assign_match_winner(*, match_id: int, session: session, atp: atp):
         assign_match_winner(match=match, atp=atp, session=session)
 
 
+def _make_match_winner(session: session, match: Match, winner: Player, atp: atp):
+    """
+    Update the winner's points and finalize the match as not a draw.
+    return Match
+    """
+    winner.points += atp.winner_point
+    match.draw = False  # redundancy for avoiding draw
+    session.add(match)
+    session.commit()
+    session.refresh(match)
+    return match
+
+
+def _make_match_draw(session: session, match: Match):
+    "make the match a draw"
+    match.draw = True
+    session.add(match)
+    session.commit()
+    session.refresh(match)
+    return match
+
+
 @broker.task
 def assign_match_winner(match: Match, atp: atp, session: session):
     """
-    return the player that won the match, else return None
+    Determine the winner of a match or declare it a draw.
+
+    Parameters:
+        match (Match): The match object for which the winner is to be determined.
+        atp (Any): Configuration object containing match-related settings like winner points.
+        session (Session): Database session object for querying and updating match/player data.
+
+    Returns:
+        Match: The updated match object with the winner or draw status.
     """
 
-    if match.votes:
-        cnt = Counter()  # initialize counter dict
-        # aggregate players vote points
-        for vote in match.votes:
-            cnt[vote.player_id] += vote.point  # type: ignore ; counter is meant for int but doesn't discrimate float
+    if ongoing_match(match):
+        raise MatchException("match is still ongoing")
 
-        # get the player with most votes
-        most_votes = cnt.most_common(1)[0]  # (player_id: int, vote_points: float)
+    if match.winner or match.draw:
+        raise MatchException("match already has a winner or it is a draw")
 
-        # get the player with least votes
-        n = 1  # n least common
-        least_votes = cnt.most_common(1)[: -n - 1 : -1][
-            0
-        ]  # (player_id: int, vote_points: float)
-
-        if most_votes[1] == least_votes[1]:
-            # make draw
-            match.draw = True
-            session.add(match)
-            session.commit()
-            session.refresh(match)
-            return match
-        else:
-            winner = get_player(session, player_id=most_votes[0])
-            if not winner:
-                # most likely won't happen; if seen check for potential bugs
-                return "Winner Not Found"
-            else:
-                # Assign winner extra points and update the match record
-                match.winner = winner
-                winner.points += atp.winner_point
-                match.draw = False  # redundancy for avoiding draw
-                session.add(match)
-                session.commit()
-                session.refresh(match)
-                return match
-    else:
+    if not match.votes:
         # make draw
-        match.draw = True
-        session.add(match)
-        session.commit()
-        session.refresh(match)
+        match = _make_match_draw(session=session, match=match)
         return match
+
+    cnt: Counter[int] = Counter()  # initialize empty counter dict
+    # aggregate players vote points
+    for vote in match.votes:
+        cnt[vote.player_id] += vote.point  # type: ignore ; counter is meant for int but doesn't discrimate float
+
+    # get the players votes is sorted highest to lowest
+    votes_hierarchy = cnt.most_common()  # [(player_id: int, vote_points: float)]
+
+    if len(votes_hierarchy) == 1:  # only one player got voted
+        winner = get_player(session, player_id=votes_hierarchy[0][0])
+        if not winner:
+            # This scenario is unexpected. It may indicate a bug if the winner cannot be found despite valid votes.
+            # Log the error or raise a specific exception for better debugging
+            raise MatchException(
+                "Winner could not be retrieved. This may indicate a data inconsistency issue."
+            )
+
+    # more than 1 player got a vote
+    # get the player with least votes and most votes
+    most_votes = votes_hierarchy[0]
+    least_votes = votes_hierarchy[-1]  # (player_id: int, vote_points: float)
+
+    if most_votes[1] == least_votes[1]:
+        # make draw
+        match = _make_match_draw(session=session, match=match)
+        return match
+    else:
+        winner = get_player(session, player_id=most_votes[0])
+        if not winner:
+            # This scenario is unexpected. It may indicate a bug if the winner cannot be found despite valid votes.
+            # Log the error or raise a specific exception for better debugging
+            raise MatchException(
+                "Winner could not be retrieved. This may indicate a data inconsistency issue."
+            )
+        else:
+            # Assign winner extra points and update the match record
+            match = _make_match_winner(session, match, winner, atp)
+            return match

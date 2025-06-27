@@ -297,6 +297,9 @@ class BaseMatch(SQLModel):
     begin: datetime
     end: datetime
     part: int
+    draw: bool = Field(
+        description="whether the match was a draw", index=True, default=False
+    )
     """
 
     begin: datetime = Field(
@@ -308,6 +311,9 @@ class BaseMatch(SQLModel):
         description="The end time of the match",
     )
     part: int
+    draw: bool = Field(
+        description="whether the match was a draw", index=True, default=False
+    )
 
 
 class BaseMatchInfo(BaseMatch):

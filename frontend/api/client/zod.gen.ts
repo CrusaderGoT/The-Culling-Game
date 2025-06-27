@@ -327,6 +327,7 @@ export const zBaseMatchInfo = z.object({
     begin: z.string().datetime(),
     end: z.string().datetime(),
     part: z.number().int(),
+    draw: z.boolean().optional().default(false),
     id: z.number().int(),
     winner: z.union([
         zBasePlayerInfo,
@@ -538,6 +539,7 @@ export const zMatchInfo = z.object({
     begin: z.string().datetime(),
     end: z.string().datetime(),
     part: z.number().int(),
+    draw: z.boolean().optional().default(false),
     id: z.number().int(),
     winner: z.union([
         zBasePlayerInfo,
@@ -668,10 +670,7 @@ export const zGetLastestMatchResponse = zMatchInfo;
 
 export const zDeleteMatchResponse = zMatchInfo;
 
-export const zMatchWinnerResponse = z.union([
-    zMatchInfo,
-    z.string()
-]);
+export const zMatchWinnerResponse = zMatchInfo;
 
 export const zDomainExpansionResponse = zBarrierTechInfo;
 

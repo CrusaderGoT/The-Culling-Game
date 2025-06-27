@@ -2,7 +2,7 @@
 
 import { BigActionButton } from "@/components/ui/big-action-button";
 import { useAuth } from "@/lib/contexts/auth-context-provider";
-import { useCreateAdmin } from "@/lib/hooks/admins";
+import { useCreateAdmin } from "@/lib/hooks/admins/admin";
 import { Button, Flex, Group, Modal, Stack, TextInput } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconUserShield, IconUserUp } from "@tabler/icons-react";
@@ -42,7 +42,7 @@ function CreateAdminModal({
         <Modal
             opened={opened}
             onClose={close}
-            title="Create a new Match"
+            title="Create a new Admin"
             centered
             size={"xs"}
         >

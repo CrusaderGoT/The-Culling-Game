@@ -40,9 +40,7 @@ class Match(BaseMatch, table=True):
         description="The winner of the match (player Id)",
     )
     winner: Union["Player", None] = Relationship(back_populates="wins")
-    draw: bool = Field(
-        description="whether the match was a draw", index=True, default=False
-    )
+
     # child rels
     # typically will have only two unique players in a match
     players: list["Player"] = Relationship(

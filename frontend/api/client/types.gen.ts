@@ -150,6 +150,10 @@ export type BaseMatchInfo = {
      */
     end: string;
     part: number;
+    /**
+     * whether the match was a draw
+     */
+    draw?: boolean;
     id: number;
     winner: BasePlayerInfo | null;
 };
@@ -705,6 +709,10 @@ export type MatchInfo = {
      */
     end: string;
     part: number;
+    /**
+     * whether the match was a draw
+     */
+    draw?: boolean;
     id: number;
     winner: BasePlayerInfo | null;
     players: Array<BasePlayerInfo>;
@@ -1332,7 +1340,7 @@ export type MatchWinnerResponses = {
     /**
      * Successful Response
      */
-    200: MatchInfo | string;
+    200: MatchInfo;
 };
 
 export type MatchWinnerResponse = MatchWinnerResponses[keyof MatchWinnerResponses];

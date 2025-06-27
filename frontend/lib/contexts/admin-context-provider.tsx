@@ -3,7 +3,7 @@
 import { AdminInfo } from "@/api/client";
 import { AdminAccessDenied } from "@/components/ui/admin-access-denied";
 import { useAuth } from "@/lib/contexts/auth-context-provider";
-import { useCurrentAdmin } from "@/lib/hooks/admins";
+import { useCurrentAdmin } from "@/lib/hooks/admins/admin";
 import { LoadingOverlay } from "@mantine/core";
 import { createContext, ReactNode, useContext, useMemo } from "react";
 

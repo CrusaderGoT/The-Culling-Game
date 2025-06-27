@@ -1,6 +1,8 @@
 "use client";
 
 import { MatchInfo } from "@/api/client";
+import { AssignMatchWinnerAction } from "@/components/admin/match/assign-match-winner";
+import { DeleteMatchAction } from "@/components/admin/match/delete-match";
 import { useAuth } from "@/lib/contexts/auth-context-provider";
 import { checkAdminPermission, getColorFromId } from "@/lib/utils";
 import {
@@ -16,7 +18,6 @@ import { IconCrown, IconSparkles } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { DeleteMatchAction } from "../admin/match/delete-match";
 
 // Extend dayjs with plugins
 dayjs.extend(duration);
@@ -80,6 +81,8 @@ export function MatchHeader({
                         {match.winner.name}
                     </Text>
                 </Badge>
+            ) : match.draw ? (
+                <Text size="xs">Draw</Text>
             ) : null}
 
             <Code color={isEnded ? "red" : undefined}>
@@ -87,8 +90,13 @@ export function MatchHeader({
             </Code>
 
             {userInfo?.admin &&
-                checkAdminPermission(userInfo.admin, "match", 4) && (
+                checkAdminPermission(userInfo.admin, "match", [4]) && (
                     <DeleteMatchAction small />
+                )}
+
+            {userInfo?.admin &&
+                checkAdminPermission(userInfo.admin, "match", [2, 3]) && (
+                    <AssignMatchWinnerAction small />
                 )}
         </Group>
     );

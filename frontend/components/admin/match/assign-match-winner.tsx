@@ -3,7 +3,7 @@
 import { BigActionButton } from "@/components/ui/big-action-button";
 import { getAPIErrorMessage } from "@/components/ui/display-api-error";
 import { useAuth } from "@/lib/contexts/auth-context-provider";
-import { useDeleteMatch } from "@/lib/hooks/admins/match";
+import { useAssignMatchWinner } from "@/lib/hooks/admins/match";
 import {
     ActionIcon,
     Button,
@@ -15,31 +15,35 @@ import {
     Tooltip,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { IconMatchstick, IconTrash, IconTrashX } from "@tabler/icons-react";
+import { IconCrown, IconMatchstick } from "@tabler/icons-react";
 import { useState } from "react";
 
-export function DeleteMatchAction({ small = false }: { small?: boolean }) {
+export function AssignMatchWinnerAction({
+    small = false,
+}: {
+    small?: boolean;
+}) {
     const [opened, { open, close }] = useDisclosure(false);
 
     return (
         <Flex justify={"space-evenly"}>
             {small ? (
-                <DeleteMatchButtonSmall open={open} />
+                <AssignMatchWinnerButtonSmall open={open} />
             ) : (
                 <BigActionButton
                     onclick={open}
-                    label="Delete Match"
-                    color="violet"
-                    icons={[IconTrash, IconMatchstick]}
+                    label="Assign Match Winner"
+                    color="blue"
+                    icons={[IconCrown, IconMatchstick]}
                 />
             )}
 
-            <DeleteMatchModal opened={opened} close={close} />
+            <AssignMatchWinnerModal opened={opened} close={close} />
         </Flex>
     );
 }
 
-function DeleteMatchModal({
+function AssignMatchWinnerModal({
     opened,
     close,
 }: {
@@ -50,13 +54,13 @@ function DeleteMatchModal({
 
     const [value, setValue] = useState<string | number>("");
 
-    const { mutateAsync, error, isPending } = useDeleteMatch(token);
+    const { mutateAsync, error, isPending } = useAssignMatchWinner(token);
 
     return (
         <Modal
             opened={opened}
             onClose={close}
-            title="Delete a new Match"
+            title="Assign Winner to a Match"
             centered
             size={"xs"}
         >
@@ -64,7 +68,7 @@ function DeleteMatchModal({
                 <NumberInput
                     label="Match number"
                     withAsterisk
-                    description="Match number to Delete"
+                    description="Match number to Assign Winner"
                     placeholder="enter match number"
                     value={value}
                     onChange={setValue}
@@ -73,8 +77,8 @@ function DeleteMatchModal({
                     allowNegative={false}
                     allowDecimal={false}
                     prefix="No. "
-                    leftSection={<IconTrash />}
-                    error={error && getAPIErrorMessage(error)}
+                    leftSection={<IconCrown />}
+                    error={error && value && getAPIErrorMessage(error)}
                 />
                 <Group justify="space-between">
                     <Button
@@ -86,9 +90,9 @@ function DeleteMatchModal({
                                 },
                             });
                         }}
-                        color="red"
+                        color="grape"
                     >
-                        Delete Match
+                        Assign Match Winner
                     </Button>
                     <Button variant="default" onClick={() => close()}>
                         Close
@@ -99,19 +103,19 @@ function DeleteMatchModal({
     );
 }
 
-export function DeleteMatchButtonSmall({ open }: { open: () => void }) {
+export function AssignMatchWinnerButtonSmall({ open }: { open: () => void }) {
     return (
         <Tooltip
-            label="Delete Match"
+            label="Assign Match Winner"
             events={{ focus: false, hover: true, touch: true }}
         >
             <ActionIcon
                 onClick={open}
-                color="deepred"
+                color="grape"
                 size={"xs"}
                 variant="subtle"
             >
-                <IconTrashX size={16} />
+                <IconCrown size={16} />
             </ActionIcon>
         </Tooltip>
     );

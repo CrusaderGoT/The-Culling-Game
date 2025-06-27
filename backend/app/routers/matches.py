@@ -1,6 +1,6 @@
 """module for the match routers"""
 
-from typing import Annotated, Union
+from typing import Annotated
 
 from app.api.setting import redis_source, settings
 from app.auth.dependencies import admin_user, oauth2_scheme
@@ -199,7 +199,7 @@ def delete_match(
         )
 
 
-@router.post("/winner/{match_id}", response_model=Union[MatchInfo, str])
+@router.post("/winner/{match_id}", response_model=MatchInfo)
 def match_winner(
     match_id: Annotated[int, Path()],
     atp: atp,
