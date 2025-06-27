@@ -273,7 +273,7 @@ def schedule_assign_match_winner(*, match_id: int, session: session, atp: atp):
         assign_match_winner(match=match, atp=atp, session=session)
 
 
-def _make_match_winner(session: Session, match: Match, winner: Player, atp: ATP):
+def _make_match_winner(session: session, match: Match, winner: Player, atp: atp):
     """
     Update the winner's points and finalize the match as not a draw.
     return Match
@@ -287,7 +287,7 @@ def _make_match_winner(session: Session, match: Match, winner: Player, atp: ATP)
     return match
 
 
-def _make_match_draw(session: Session, match: Match):
+def _make_match_draw(session: session, match: Match):
     """make the match a draw"""
     match.draw = True
     session.add(match)
@@ -297,7 +297,7 @@ def _make_match_draw(session: Session, match: Match):
 
 
 @broker.task
-def assign_match_winner(match: Match, atp: ATP, session: Session):
+def assign_match_winner(match: Match, atp: atp, session: session):
     """
     Determine the winner of a match or declare it a draw.
 
