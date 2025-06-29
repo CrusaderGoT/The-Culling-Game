@@ -44,7 +44,14 @@ export function PlayerCard({
     }, [match?.votes, player.id]);
 
     return (
-        <Paper withBorder p={"xs"} className={clsx(styles.fullHeight)}>
+        <Paper
+            withBorder
+            p={"xs"}
+            className={clsx(
+                styles.fullHeight,
+                !player.alive && styles.disabledState
+            )}
+        >
             <Stack className={clsx(styles.fullHeight, styles.spaceBetween)}>
                 <Group p={5} className={clsx(styles.spaceBetween)}>
                     <Badge
