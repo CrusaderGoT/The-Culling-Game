@@ -17,6 +17,7 @@ import { VoteDrawer } from "@/components/vote/vote-drawer";
 
 import { DisplayAPIError } from "@/components/ui/display-api-error";
 import { useAuth } from "@/lib/contexts/auth-context-provider";
+import { useAssignMatchWinner } from "@/lib/hooks/admins/match";
 import { useLatestMatch } from "@/lib/hooks/matches";
 import { useGetMatchPlayers } from "@/lib/hooks/players";
 import gstyles from "@/styles/global.module.css";
@@ -85,6 +86,19 @@ export function LiveMatch({ ongoing = false }: { ongoing: boolean }) {
         // Cleanup interval on unmount
         return () => clearInterval(interval);
     }, [match]);
+
+    const { mutateAsync } = useAssignMatchWinner(token);
+
+    // effect for making match winner
+    useEffect(() => {
+        async function assignMatchWinner(matchId: number) {
+            await mutateAsync({ path: { match_id: matchId } });
+        }
+
+        if (!match || match.winner || !isEnded) return;
+
+        assignMatchWinner(match.id);
+    }, [match, isEnded, mutateAsync, match?.winner]);
 
     // Extract player IDs from match data safely
     const playerIds = match?.players?.map((player) => player.id) || [];
