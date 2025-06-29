@@ -69,12 +69,12 @@ export function calculateCtAppPoints(player: PlayerInfo) {
         const ctAppId = vote.ct_app_id;
         const ctAppPoints = ctAppPointsMap.get(ctAppId);
         if (ctAppPoints) {
-            ctAppPoints.value += vote.point;
+            Number((ctAppPoints.value += vote.point).toFixed(1));
         } else {
             // In case vote references a ctapp not in ctAppMap
             ctAppPointsMap.set(ctAppId, {
                 name: `Application ID ${ctAppId}`,
-                value: vote.point,
+                value: Number(vote.point.toFixed(1)),
                 color: getColorFromId(ctAppId),
                 key: ctAppId,
             });

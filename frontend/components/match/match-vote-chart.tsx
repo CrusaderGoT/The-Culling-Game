@@ -54,7 +54,7 @@ export function MatchVoteChart({ players, votes }: MatchVoteChartProps) {
             if (!series.some((s) => s.name === ctAppName)) {
                 series.push({
                     name: ctAppName,
-                    color: getColorFromId(vote.ct_app_id + vote.point),
+                    color: getColorFromId(vote.ct_app_id),
                 });
             }
         });

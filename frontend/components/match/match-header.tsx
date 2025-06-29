@@ -73,10 +73,10 @@ export function MatchHeader({
 
             {match.winner ? (
                 <Badge
-                    variant="light"
+                    variant="dot"
                     size="xs"
-                    color="indigo"
-                    leftSection={<IconCrown size={15} />}
+                    color={getColorFromId(match.winner.id)}
+                    leftSection={<IconCrown size={14} />}
                     rightSection={
                         <Avatar
                             src={match.winner.picture}
