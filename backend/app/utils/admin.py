@@ -121,7 +121,10 @@ def check_perm_exist_or_exc(
     if not permission_exist:
         raise HTTPException(
             status.HTTP_403_FORBIDDEN,
-            detail=f"Permission {permission_level} for {model_name} does not exist in the system",
+            detail=(
+                f"Permission {permission_level.name} "
+                f"for {model_name.capitalize()} does not exist in the system"
+            ),
         )
 
 
