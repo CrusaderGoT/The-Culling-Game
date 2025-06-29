@@ -8,7 +8,8 @@ from app.models.admin import Permission
 from app.models.base import ModelName
 from app.models.match import Match, MatchInfo
 from app.routers.votes import router as vote_router
-from app.utils.config import AdminException, Tag
+from app.utils.admin import ADMIN_UNAUTHORIZED_EXCEPTION, check_admin_permission
+from app.utils.config import Tag
 from app.utils.dependencies import atp, session
 from app.utils.match import (
     assign_match_winner,
@@ -43,54 +44,46 @@ async def create_match(
     atp: atp,
 ):
     """path operation for automatically creating a match, requires a part query."""
-    # first get the permission for creating match
-    permission = session.exec(
-        select(Permission)
-        .where(Permission.model == ModelName.match)
-        .where(Permission.level == Permission.PermissionLevel.CREATE)
-    ).first()
+    # first get the permission for creating match, and
+    # check if admin user has permission
+    permission = check_admin_permission(
+        session=session,
+        admin=admin,
+        model_name=ModelName.match,
+        permission_level=Permission.PermissionLevel.CREATE,
+    )
 
-    if permission is not None:
-        # check if admin user has permission
-        if permission in admin.permissions or admin.is_superuser:
-            # get the last match that was created, to check if it has ended
-            last_match = get_last_created_match(session)
-            if last_match is not None:
-                # check if it has ended
-                if ongoing_match(last_match) is True:
-                    msg = f"Previous Match: ID {last_match.id}, part {last_match.part} has not ended"
-                    raise HTTPException(status.HTTP_406_NOT_ACCEPTABLE, msg)
-                else:  # previous match has ended; create match
-                    new_match = create_new_match(session, part, atp)
-                    session.add(new_match)
-                    session.commit()
-                    session.refresh(new_match)
-
-                    # schedule assign match winner
-                    if settings.debug:
-                        await assign_match_winner.schedule_by_time(
-                            redis_source, new_match.end, new_match, atp, session
-                        )
-
-                    return new_match
-
-            else:  # Not a single match have been create; Create match anyway
+    if permission:
+        # get the last match that was created, to check if it has ended
+        last_match = get_last_created_match(session)
+        if last_match is not None:
+            # check if it has ended
+            if ongoing_match(last_match) is True:
+                msg = f"Previous Match: ID {last_match.id}, part {last_match.part} has not ended"
+                raise HTTPException(status.HTTP_406_NOT_ACCEPTABLE, msg)
+            else:  # previous match has ended; create match
                 new_match = create_new_match(session, part, atp)
                 session.add(new_match)
                 session.commit()
                 session.refresh(new_match)
+
+                # schedule assign match winner
+                if settings.debug:
+                    await assign_match_winner.schedule_by_time(
+                        redis_source, new_match.end, new_match, atp, session
+                    )
+
                 return new_match
-        else:  # admin doesn't have permission to create match
-            raise AdminException(
-                admin,
-                code=status.HTTP_401_UNAUTHORIZED,
-                detail=f"{admin.user.username} doesn't have permission to create a {ModelName.match}.",
-            )
+
+        else:  # Not a single match have been create; Create match anyway
+            new_match = create_new_match(session, part, atp)
+            session.add(new_match)
+            session.commit()
+            session.refresh(new_match)
+            return new_match
+
     else:
-        raise HTTPException(
-            status.HTTP_403_FORBIDDEN,
-            detail="Permission to create a match does not exist, contact a superuser",
-        )
+        raise ADMIN_UNAUTHORIZED_EXCEPTION(admin)
 
 
 @router.get("/all", response_model=list[MatchInfo])
@@ -159,44 +152,38 @@ def delete_match(
         AdminException: If the admin does not have the authorization to delete the match
                        (401 Unauthorized).
     """
-    # first get the permission for creating match
-    permission = session.exec(
-        select(Permission)
-        .where(Permission.model == ModelName.match)
-        .where(Permission.level == Permission.PermissionLevel.DELETE)
-    ).first()
-    if permission is not None:
-        # check if admin user has permission
-        if permission in admin.permissions or admin.is_superuser:
-            # get the match
-            match = get_match(session=session, match_id=match_id)
-            if match is not None:
-                colony = match.colony
-                winner = match.winner
-                session.delete(match)
-                session.commit()
-                # construct deleted match non list (since list can be empty) relations to avoid detached error
-                relations_update = {
-                    "colony": colony,
-                    "winner": winner,
-                }
-                deleted_match = Match.model_validate(match, update=relations_update)
-                return deleted_match
-            else:
-                raise HTTPException(
-                    status.HTTP_404_NOT_FOUND, f"Match with Id: {match_id}, Not Found"
-                )
-        else:  # admin doesn't have permission to create match
-            raise AdminException(
-                admin,
-                code=status.HTTP_401_UNAUTHORIZED,
-                detail=f"{admin.user.username} doesn't have permission to create a match.",
+
+    # first get the permission for deleting match, and
+    # check if admin user has permission
+    permission = check_admin_permission(
+        session=session,
+        admin=admin,
+        model_name=ModelName.match,
+        permission_level=Permission.PermissionLevel.DELETE,
+    )
+
+    if permission:
+        # get the match
+        match = get_match(session=session, match_id=match_id)
+        if match is not None:
+            colony = match.colony
+            winner = match.winner
+            session.delete(match)
+            session.commit()
+            # construct deleted match non list (since list can be empty) relations to avoid detached error
+            relations_update = {
+                "colony": colony,
+                "winner": winner,
+            }
+            deleted_match = Match.model_validate(match, update=relations_update)
+            return deleted_match
+        else:
+            raise HTTPException(
+                status.HTTP_404_NOT_FOUND, f"Match with Id: {match_id}, Not Found"
             )
+
     else:
-        raise HTTPException(
-            status.HTTP_403_FORBIDDEN,
-            detail="Permission to delete a match does not exist, contact a superuser",
-        )
+        raise ADMIN_UNAUTHORIZED_EXCEPTION(admin)
 
 
 @router.post("/winner/{match_id}", response_model=MatchInfo)

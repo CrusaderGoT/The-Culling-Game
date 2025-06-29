@@ -18,7 +18,7 @@ from app.routers.admin.users import router as user_router
 from app.utils.admin import (
     ADMIN_UNAUTHORIZED_EXCEPTION,
     admin_allow_permissions,
-    check_if_admin_has_crud_permission,
+    check_admin_permission,
     superuser_allow_permissions,
 )
 from app.utils.config import AdminException, Tag, UserException
@@ -57,7 +57,7 @@ def create_admin(
     """Creates an admin user with specified permissions."""
 
     # check if admin has perm to create admins
-    permission = check_if_admin_has_crud_permission(
+    permission = check_admin_permission(
         session=session,
         admin=p_admin,
         model_name=ModelName.adminuser,
@@ -195,7 +195,7 @@ def grant_permission(
         Admin:
             The updated admin object for the target user, reflecting the newly granted permissions.
     """
-    permission = check_if_admin_has_crud_permission(
+    permission = check_admin_permission(
         session=session,
         admin=p_admin,
         model_name=ModelName.adminuser,
@@ -277,7 +277,7 @@ def remove_permission(
 ):
     """remove permission(s) of an admin. A superuser is required"""
 
-    permission = check_if_admin_has_crud_permission(
+    permission = check_admin_permission(
         session=session,
         admin=p_admin,
         model_name=ModelName.adminuser,

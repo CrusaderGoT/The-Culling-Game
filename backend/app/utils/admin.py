@@ -1,4 +1,4 @@
-from fastapi import status
+from fastapi import HTTPException, status
 from sqlmodel import select
 
 from app.auth.dependencies import admin_user
@@ -71,13 +71,30 @@ def admin_allow_permissions(
     return new_permissions
 
 
-def check_if_admin_has_crud_permission(
+def check_admin_permission(
     session: session,
     admin: AdminUser,
     model_name: str,
     permission_level: Permission.PermissionLevel,
-):
-    # check if admin user has appropriate permission
+) -> bool:
+    """
+    Check if an admin has the specified permission level for a model.
+
+    Args:
+        session: Database session
+        admin: The admin user to check
+        model_name: Name of the model to check permissions for
+        permission_level: Required permission level
+
+    Returns:
+        bool: True if admin has permission, False otherwise
+
+    Raises:
+        HTTPException: If the permission does not exist in the system
+    """
+    check_perm_exist_or_exc(session, model_name, permission_level)
+
+    # Check if admin has the permission
     permission = session.exec(
         select(Permission)
         .where(Permission.admins.any(id=admin.id))
@@ -85,10 +102,27 @@ def check_if_admin_has_crud_permission(
         .where(Permission.level == permission_level)
     ).first()
 
-    if permission:
-        return True
+    return bool(permission)
 
-    return False
+
+def check_perm_exist_or_exc(
+    session: session,
+    model_name: str,
+    permission_level: Permission.PermissionLevel,
+):
+    "checks if a permission exists, else raises HTTPException"
+    # Check if permission exists in system
+    permission_exist = session.exec(
+        select(Permission)
+        .where(Permission.model == model_name)
+        .where(Permission.level == permission_level)
+    ).first()
+
+    if not permission_exist:
+        raise HTTPException(
+            status.HTTP_403_FORBIDDEN,
+            detail=f"Permission {permission_level} for {model_name} does not exist in the system",
+        )
 
 
 def ADMIN_UNAUTHORIZED_EXCEPTION(admin: admin_user):

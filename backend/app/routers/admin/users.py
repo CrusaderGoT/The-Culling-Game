@@ -8,7 +8,7 @@ from app.models.base import ModelName
 from app.models.user import EditUser, UserInfo
 from app.utils.admin import (
     ADMIN_UNAUTHORIZED_EXCEPTION,
-    check_if_admin_has_crud_permission,
+    check_admin_permission,
 )
 from app.utils.dependencies import session
 from app.utils.user import edit_user_helper, get_user, id_name_email
@@ -32,7 +32,7 @@ def admin_edit_user(
     session: session,
 ):
     # check if admin user has appropriate permission
-    permission = check_if_admin_has_crud_permission(
+    permission = check_admin_permission(
         session=session,
         admin=admin,
         model_name=ModelName.user,
@@ -72,7 +72,7 @@ def admin_edit_user(
 )
 def admin_delete_user(user: id_name_email, session: session, admin: admin_user):
     # check for permission
-    permission = check_if_admin_has_crud_permission(
+    permission = check_admin_permission(
         session=session,
         admin=admin,
         model_name=ModelName.user,

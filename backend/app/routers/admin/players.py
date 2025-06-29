@@ -10,7 +10,7 @@ from app.models.player import (
 )
 from app.utils.admin import (
     ADMIN_UNAUTHORIZED_EXCEPTION,
-    check_if_admin_has_crud_permission,
+    check_admin_permission,
 )
 from app.utils.config import PlayerException
 from app.utils.dependencies import session
@@ -44,7 +44,7 @@ def admin_edit_player(
     "admin api for editing a plauyer"
 
     # check if admin has permission for action
-    permission = check_if_admin_has_crud_permission(
+    permission = check_admin_permission(
         session=session,
         admin=admin,
         model_name=ModelName.player,
@@ -97,7 +97,7 @@ def admin_delete_player(
     "API for admin deletion of a player"
 
     # check if admin has permission for action
-    permission = check_if_admin_has_crud_permission(
+    permission = check_admin_permission(
         session=session,
         admin=admin,
         model_name=ModelName.player,
