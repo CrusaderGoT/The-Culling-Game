@@ -6,6 +6,7 @@ import { DeleteMatchAction } from "@/components/admin/match/delete-match";
 import { useAuth } from "@/lib/contexts/auth-context-provider";
 import { checkAdminPermission, getColorFromId } from "@/lib/utils";
 import {
+    Avatar,
     Badge,
     Box,
     Code,
@@ -76,8 +77,14 @@ export function MatchHeader({
                     size="xs"
                     color="indigo"
                     leftSection={<IconCrown size={15} />}
+                    rightSection={
+                        <Avatar
+                            src={match.winner.picture}
+                            name={match.winner.name}
+                        />
+                    }
                 >
-                    <Text size="xs" truncate="end" maw={50}>
+                    <Text size="xs" truncate="end" maw={100}>
                         {match.winner.name}
                     </Text>
                 </Badge>

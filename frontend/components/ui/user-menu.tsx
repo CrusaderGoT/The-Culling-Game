@@ -68,7 +68,7 @@ UserButton.displayName = "UserButton";
 
 function UserButtonAlt({ user }: { user: UserInfo }) {
     return (
-        <ActionIcon variant="transparent" hiddenFrom="sm" radius={"lg"}>
+        <ActionIcon variant="light" hiddenFrom="sm" radius={"lg"}>
             <Avatar src={user.player?.picture}>
                 <IconUserCog />
             </Avatar>
