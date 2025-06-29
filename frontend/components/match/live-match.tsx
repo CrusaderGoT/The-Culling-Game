@@ -95,10 +95,10 @@ export function LiveMatch({ ongoing = false }: { ongoing: boolean }) {
             await mutateAsync({ path: { match_id: matchId } });
         }
 
-        if (!match || match.winner || !isEnded) return;
+        if (!match || !isEnded || match.winner || match.draw) return;
 
         assignMatchWinner(match.id);
-    }, [match, isEnded, mutateAsync, match?.winner]);
+    }, [match, isEnded, mutateAsync, match?.winner, match?.draw]);
 
     // Extract player IDs from match data safely
     const playerIds = match?.players?.map((player) => player.id) || [];
