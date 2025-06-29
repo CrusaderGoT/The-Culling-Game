@@ -13,7 +13,7 @@ export function ShellApp({ children }: { children: React.ReactNode }) {
     return (
         <AppShell
             header={{
-                height: { base: 50, "640px": 70 },
+                height: 50,
             }}
             navbar={
                 navbarProps.adminUser && pathname.startsWith("/admin")

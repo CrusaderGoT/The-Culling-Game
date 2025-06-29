@@ -11,11 +11,14 @@ from app.models.admin import (
     PermissionInfo,
     PermissionRequest,
 )
+from app.models.base import BasePermission
+from app.models.table import ModelName
 from app.routers.admin.players import router as player_router
 from app.routers.admin.users import router as user_router
 from app.utils.admin import (
     ADMIN_UNAUTHORIZED_EXCEPTION,
     admin_allow_permissions,
+    check_if_admin_has_crud_permission,
     superuser_allow_permissions,
 )
 from app.utils.config import AdminException, Tag, UserException
@@ -52,6 +55,17 @@ def create_admin(
     ],  # List of permissions to assign to the new admin
 ):
     """Creates an admin user with specified permissions."""
+
+    # check if admin has perm to create admins
+    permission = check_if_admin_has_crud_permission(
+        session=session,
+        admin=p_admin,
+        model_name=ModelName.adminuser,
+        permission_level=BasePermission.PermissionLevel.CREATE,
+    )
+
+    if not permission:
+        raise ADMIN_UNAUTHORIZED_EXCEPTION(p_admin)
 
     # Fetch the user from the database
     userdb = get_user(session, user)
@@ -154,6 +168,16 @@ def grant_permission(
     user: id_name_email,  # user -> admin to be granted permissions
     session: session,
 ):
+    permission = check_if_admin_has_crud_permission(
+        session=session,
+        admin=p_admin,
+        model_name=ModelName.adminuser,
+        permission_level=BasePermission.PermissionLevel.UPDATE,
+    )
+
+    if not permission:
+        raise ADMIN_UNAUTHORIZED_EXCEPTION(p_admin)
+
     # check if user exist and is an admin
     userdb = get_user(session=session, user_name_id_email=user)
 
@@ -223,6 +247,16 @@ def remove_permission(
     session: session,
 ):
     """remove permission(s) of an admin. A superuser is required"""
+
+    permission = check_if_admin_has_crud_permission(
+        session=session,
+        admin=p_admin,
+        model_name=ModelName.adminuser,
+        permission_level=BasePermission.PermissionLevel.UPDATE,
+    )
+
+    if not permission:
+        raise ADMIN_UNAUTHORIZED_EXCEPTION(p_admin)
 
     # check if user exist and is an admin
     userdb = get_user(session=session, user_name_id_email=user)

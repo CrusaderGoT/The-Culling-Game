@@ -1,9 +1,9 @@
 .offline {
   position: fixed;
-  top: 100px;
   left: 50%;
   top: 50%;
-  transform: translateX(-50%), translateY(-50%);
+  transform: translate(-50%, -50%);
+  /* For Safari compatibility */
   -webkit-backdrop-filter: blur(20px);
   backdrop-filter: blur(20px);
   z-index: 555;

@@ -19,7 +19,7 @@ export function ShellHeader() {
     return (
         <AppShell.Header
             withBorder={!publicPathnames.includes(pathname)}
-            p={{ base: "xs", "640px": "md" }}
+            p={{ base: "xs" }}
             px={{ base: "md", md: "xl" }}
         >
             <Group justify="space-between">
