@@ -2,7 +2,6 @@
 
 import { useAuth } from "@/lib/contexts/auth-context-provider";
 import { useShellContext } from "@/lib/contexts/shell-context-provider";
-import gstyles from "@/styles/global.module.css";
 import { AppShell, ScrollArea } from "@mantine/core";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
@@ -30,7 +29,7 @@ export function ShellNavbar() {
     ]);
 
     return userInfo?.admin && pathname.startsWith("/admin") ? (
-        <AppShell.Navbar p="md" className={gstyles.highZ}>
+        <AppShell.Navbar p="md">
             <AppShell.Section component={ScrollArea}>
                 <ShellNavLinks closeNavbar={navbarProps.toggleMobile} />
             </AppShell.Section>

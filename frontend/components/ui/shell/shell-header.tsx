@@ -4,11 +4,9 @@ import { ModeToggle } from "@/components/ui/mode-toggle";
 import { UserMenu } from "@/components/ui/user-menu";
 import { ActionIcon, AppShell, Burger, Group } from "@mantine/core";
 import { IconHome } from "@tabler/icons-react";
-import clsx from "clsx";
 import Link from "next/link";
 
 import { useShellContext } from "@/lib/contexts/shell-context-provider";
-import gstyles from "@/styles/global.module.css";
 import { usePathname } from "next/navigation";
 
 export function ShellHeader() {
@@ -21,7 +19,6 @@ export function ShellHeader() {
     return (
         <AppShell.Header
             withBorder={!publicPathnames.includes(pathname)}
-            className={clsx(gstyles.highZ)}
             p={{ base: "xs", "640px": "md" }}
             px={{ base: "md", md: "xl" }}
         >

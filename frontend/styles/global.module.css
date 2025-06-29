@@ -1,12 +1,9 @@
-.highZ {
-  z-index: 666;
-}
-
 .offline {
   position: fixed;
   top: 100px;
   left: 50%;
-  transform: translateX(-50%);
+  top: 50%;
+  transform: translateX(-50%), translateY(-50%);
   -webkit-backdrop-filter: blur(20px);
   backdrop-filter: blur(20px);
   z-index: 555;
