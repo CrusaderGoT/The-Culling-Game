@@ -168,6 +168,33 @@ def grant_permission(
     user: id_name_email,  # user -> admin to be granted permissions
     session: session,
 ):
+    """
+    Grants specified permissions to an admin user.
+    This function allows an admin user (`p_admin`) to grant a list of permissions to another admin user (`user`).
+    It performs several checks to ensure that the granting admin has the necessary privileges,
+    the target user exists and is an admin, and that only unique, non-duplicate permissions are granted.\f
+    Args:
+        permissions (list[PermissionRequest]):
+            The list of permissions to be granted to the target admin user.
+        p_admin (admin_user):
+            The admin user who is attempting to grant the permissions.
+        user (id_name_email):
+            The identifier (id, name, or email) of the user to whom permissions are to be granted.
+        session (session):
+            The database session used for querying and committing changes.
+    Raises:
+        ADMIN_UNAUTHORIZED_EXCEPTION:
+            If the granting admin does not have sufficient privileges.
+        HTTPException:
+            If the target user does not exist.
+        UserException:
+            If the target user exists but is not an admin.
+        AdminException:
+            If no permissions can be granted (either due to lack of authority or because the target admin already has all requested permissions).
+    Returns:
+        Admin:
+            The updated admin object for the target user, reflecting the newly granted permissions.
+    """
     permission = check_if_admin_has_crud_permission(
         session=session,
         admin=p_admin,
@@ -175,7 +202,9 @@ def grant_permission(
         permission_level=BasePermission.PermissionLevel.UPDATE,
     )
 
-    if not permission:
+    if (
+        not permission and not p_admin.is_superuser
+    ):  # super users can grant without restriction
         raise ADMIN_UNAUTHORIZED_EXCEPTION(p_admin)
 
     # check if user exist and is an admin
