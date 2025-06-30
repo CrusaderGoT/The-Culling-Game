@@ -60,6 +60,7 @@ class BaseUser(SQLModel):
     username: UsernameRegex = Field(
         index=True,
         unique=True,
+        min_length=4,
         description="the username of the user",
         schema_extra={"examples": ["Gojo-Senpai", "username_pattern", "1AboveAll"]},
     )
@@ -110,7 +111,7 @@ class BasePlayer(SQLModel):
 
     name: str = Field(
         index=True,
-        min_length=2,
+        min_length=4,
         max_length=50,
         nullable=False,
         description="The name of the player, must be between 2 and 50 characters",

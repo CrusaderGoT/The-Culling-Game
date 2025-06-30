@@ -1016,6 +1016,10 @@ export const newPermissionMutation = (options?: Partial<Options<NewPermissionDat
 
 /**
  * Grant Permission
+ * Grants specified permissions to an admin user.
+ * This function allows an admin user (`p_admin`) to grant a list of permissions to another admin user (`user`).
+ * It performs several checks to ensure that the granting admin has the necessary privileges,
+ * the target user exists and is an admin, and that only unique, non-duplicate permissions are granted.
  */
 export const grantPermissionMutation = (options?: Partial<Options<GrantPermissionData>>): UseMutationOptions<GrantPermissionResponse, GrantPermissionError, Options<GrantPermissionData>> => {
     const mutationOptions: UseMutationOptions<GrantPermissionResponse, GrantPermissionError, Options<GrantPermissionData>> = {

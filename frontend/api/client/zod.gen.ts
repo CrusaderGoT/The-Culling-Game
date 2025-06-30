@@ -225,7 +225,7 @@ export const zCountry = z.enum([
 ]);
 
 export const zBaseUserInfo = z.object({
-    username: z.string().regex(/^[A-Za-z][A-Za-z0-9_-]{2,19}$/),
+    username: z.string().min(4).regex(/^[A-Za-z][A-Za-z0-9_-]{2,19}$/),
     email: z.string().email(),
     country: z.union([
         zCountry,
@@ -305,7 +305,7 @@ export const zGender = z.enum([
 export const zGrade = z.unknown();
 
 export const zBasePlayerInfo = z.object({
-    name: z.string().min(2).max(50),
+    name: z.string().min(4).max(50),
     gender: zGender,
     age: z.number().int().gte(10).lte(102),
     role: z.union([
@@ -409,7 +409,7 @@ export const zBodyAdminEditPlayer = z.object({
 });
 
 export const zCreatePlayer = z.object({
-    name: z.string().min(2).max(50),
+    name: z.string().min(4).max(50),
     gender: zGender,
     age: z.number().int().gte(10).lte(102),
     role: z.union([
@@ -500,7 +500,7 @@ export const zCreateCtApp = z.object({
 });
 
 export const zCreateUser = z.object({
-    username: z.string().regex(/^[A-Za-z][A-Za-z0-9_-]{2,19}$/),
+    username: z.string().min(4).regex(/^[A-Za-z][A-Za-z0-9_-]{2,19}$/),
     email: z.string().email(),
     country: z.union([
         zCountry,
@@ -564,7 +564,7 @@ export const zPermissionRequest = z.object({
 });
 
 export const zPlayerInfo = z.object({
-    name: z.string().min(2).max(50),
+    name: z.string().min(4).max(50),
     gender: zGender,
     age: z.number().int().gte(10).lte(102),
     role: z.union([
@@ -617,7 +617,7 @@ export const zTokenData = z.object({
 });
 
 export const zUserInfo = z.object({
-    username: z.string().regex(/^[A-Za-z][A-Za-z0-9_-]{2,19}$/),
+    username: z.string().min(4).regex(/^[A-Za-z][A-Za-z0-9_-]{2,19}$/),
     email: z.string().email(),
     country: z.union([
         zCountry,

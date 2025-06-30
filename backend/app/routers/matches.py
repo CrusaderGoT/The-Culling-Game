@@ -2,7 +2,6 @@
 
 from typing import Annotated
 
-from app.api.setting import redis_source, settings
 from app.auth.dependencies import admin_user, oauth2_scheme
 from app.models.admin import Permission
 from app.models.base import ModelName
@@ -66,12 +65,6 @@ async def create_match(
                 session.add(new_match)
                 session.commit()
                 session.refresh(new_match)
-
-                # schedule assign match winner
-                if settings.debug:
-                    await assign_match_winner.schedule_by_time(
-                        redis_source, new_match.end, new_match, atp, session
-                    )
 
                 return new_match
 

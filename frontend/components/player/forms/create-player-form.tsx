@@ -21,6 +21,7 @@ import {
     Center,
     Divider,
     Group,
+    LoadingOverlay,
     Paper,
     ScrollAreaAutosize,
     Stack,
@@ -38,7 +39,7 @@ import {
 } from "@tabler/icons-react";
 
 import { zodResolver } from "mantine-form-zod-resolver";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 import { useState } from "react";
 
@@ -46,6 +47,8 @@ import gstyles from "@/styles/global.module.css";
 import clsx from "clsx";
 
 export function CreatePlayerForm() {
+    const router = useRouter();
+
     // Constants
     const FIELD_KEYS = [
         "player", // step 0
@@ -143,20 +146,30 @@ export function CreatePlayerForm() {
             path: { user: userInfo.id },
         });
 
-        if (!newPlayer) {
-            notifications.show({
-                message: "Failed to create player. Please try again.",
-                color: "red",
-            });
+        `if (!newPlayer) {
             createPlayerReset();
             return;
         } else {
-            redirect("/player");
-        }
+            router.refresh();
+        }`
     }
 
     return (
         <Paper radius="md" p="md" withBorder>
+            <LoadingOverlay
+                visible={createPlayerIsPending}
+                zIndex={600}
+                overlayProps={{ radius: "sm", blur: 0 }}
+                loaderProps={{ type: "bars" }}
+            />
+            <LoadingOverlay
+                visible={createPlayerIsPending}
+                overlayProps={{ radius: "sm", blur: 2 }}
+                loaderProps={{
+                    children: `Creating your Player...`,
+                    pt: 100,
+                }}
+            />
             <CreatePlayerFormProvider form={form}>
                 <form onSubmit={form.onSubmit(handleSubmit)}>
                     <Stepper
@@ -293,7 +306,10 @@ export function CreatePlayerForm() {
                                     <Button
                                         type="submit"
                                         loading={createPlayerIsPending}
-                                        disabled={createPlayerIsPending || createPlayerIsSuccess}
+                                        disabled={
+                                            createPlayerIsPending ||
+                                            createPlayerIsSuccess
+                                        }
                                         size="md"
                                     >
                                         Create Player

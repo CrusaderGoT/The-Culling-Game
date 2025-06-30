@@ -601,6 +601,10 @@ export class AdminsService {
     
     /**
      * Grant Permission
+     * Grants specified permissions to an admin user.
+     * This function allows an admin user (`p_admin`) to grant a list of permissions to another admin user (`user`).
+     * It performs several checks to ensure that the granting admin has the necessary privileges,
+     * the target user exists and is an admin, and that only unique, non-duplicate permissions are granted.
      */
     public static grantPermission<ThrowOnError extends boolean = false>(options: Options<GrantPermissionData, ThrowOnError>) {
         return (options.client ?? _heyApiClient).patch<GrantPermissionResponse, GrantPermissionError, ThrowOnError>({

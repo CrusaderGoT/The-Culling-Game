@@ -211,9 +211,7 @@ def grant_permission(
     userdb = get_user(session=session, user_name_id_email=user)
 
     if not userdb:
-        raise HTTPException(
-            status.HTTP_404_NOT_FOUND, f"User {id_name_email} not found"
-        )
+        raise HTTPException(status.HTTP_404_NOT_FOUND, f"User {user} not found")
 
     if not userdb.admin:
         raise UserException(

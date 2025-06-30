@@ -32,6 +32,9 @@ export const useCreatePlayer = (token: string) => {
                 message: `player ${player.name} created successfully`,
                 color: "green",
             });
+            queryClient.invalidateQueries({
+                queryKey: [{ id: myPlayerQueryKey()[0]._id }],
+            });
         },
     });
 

@@ -165,8 +165,7 @@ export function LiveMatch({ ongoing = false }: { ongoing: boolean }) {
                     component={Image}
                     height={1024}
                     width={1024}
-                    h={{ base: 256, md: 512, lg: 768 }}
-                    w={{ base: 256, md: 512, lg: 768 }}
+                    flex={1}
                     mx={"auto"}
                 />
             </Stack>
