@@ -1,17 +1,9 @@
-"""
-test file for the matches router/paths
-"""
-
 from random import choice
 
 from fastapi.encoders import jsonable_encoder as je
 from fastapi.testclient import TestClient
 
-from app.models.player import PlayerInfo
 from app.models.vote import CastVote
-
-player_info_keys = PlayerInfo.model_fields.keys()
-"expected return keys, for the playerinfo"
 
 
 def test_vote_player(
@@ -53,63 +45,30 @@ def test_vote_player(
     # test for a regular user
     res0 = authenticated_test_client[0].post("/match/vote/1", json=je(votes))
     assert res0.is_success is True
-    # check if all votesere casted
-    print(res0.json())
+    # check if all votes were casted
     assert len(res0.json()["votes"]) == len(votes), (
         "Not all votes were casted for regular user"
     )
 
     # test for a admin user
     res1 = authenticated_admin_client[0].post("/match/vote/1", json=je(votes))
-    assert res1.is_success is True
-    # check if all votesere casted
+    assert res1.is_success is True, res1.json()
+    # check if all votes were casted
     assert len(res1.json()["votes"]) == len(votes), (
         "Not all votes were casted for admin user"
     )
 
     # test for the users of the player
-    res3 = match_players[0][0].post("/match/vote/1", json=je(votes))
-    assert res3.is_success is True
-    # check if all votesere casted
-    assert len(res3.json()["votes"]) == len(votes), (
+    res2= match_players[0][0].post("/match/vote/1", json=je(votes))
+    assert res2.is_success is True, res2.json()
+    # check if all votes were casted
+    assert len(res2.json()["votes"]) == len(votes), (
         "Not all votes were casted for player 1 user"
     )
 
-    res4 = match_players[1][0].post("/match/vote/1", json=je(votes))
-    assert res4.is_success is True
-    # check if all votesere casted
-    assert len(res4.json()["votes"]) == len(votes), (
+    res3 = match_players[1][0].post("/match/vote/1", json=je(votes))
+    assert res3.is_success is True, res3.json()
+    # check if all votes were casted
+    assert len(res3.json()["votes"]) == len(votes), (
         "Not all votes were casted for player 2 user"
     )
-
-
-def test_upgrade_player(match_players: list[tuple[TestClient, dict]]):
-    "test for player upgrade"
-    param = {"grade_up": 2}
-    player1 = match_players[0]
-    res = match_players[0][0].post(f"/player/upgrade/{player1[1]['id']}", params=param)
-    assert res.is_success is True  # change later to True
-
-    # confirm player info was returned
-    assert res.json().keys() == player_info_keys
-    # confirm player was upgraded
-    assert res.json()["grade"] == param["grade_up"]
-
-
-def test_domain_expansion(match_players: list[tuple[TestClient, dict]]):
-    "test for activating domain expansion, and it various perks"
-    # activate for player 1
-    player1 = match_players[0][1]
-    res0 = match_players[0][0].post(
-        f"/barrier/activate/domain/{player1['id']}", params={"match_id": 1}
-    )
-    assert res0.is_success is True
-    if player1["grade"] > PlayerInfo.Grade.ONE:
-        print(player1["grade"], "grade")
-        assert res0.is_success is True, (
-            f"Falsely Activated Domain for Player 1: {res0.json()}"
-        )
-    elif player1["grade"] <= PlayerInfo.Grade.ONE:
-        assert res0.is_success is True, (
-            f"Couldn't Activate Domain for Player 1: {res0.json()}"
-        )

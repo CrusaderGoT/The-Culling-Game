@@ -47,12 +47,10 @@ def test_grant_permission(authenticated_admin_client: tuple[TestClient, dict]):
     modelname = ModelName.match
     permissions = [PermissionRequest(model=modelname, levels=levels)]
     user = authenticated_admin_client[1]["id"]
-    print(user, "user")
     res = authenticated_admin_client[0].patch(
         f"admin/grant-permission/{user}", json=je(permissions)
     )
-    print(res.json())
-    assert res.is_success is True
+    assert res.is_success is True, res.json()
 
 
 def test_create_match(
@@ -62,5 +60,4 @@ def test_create_match(
     "test function for creating a match"
     # test create match
     res = authenticated_admin_client[0].post("/match/create?part=1")
-    print(authenticated_admin_client[1]["id"])
-    assert res.is_success is True
+    assert res.is_success is True, res.json()

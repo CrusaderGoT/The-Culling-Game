@@ -47,34 +47,24 @@ def setup_test_database(test_engine):
     SQLModel.metadata.drop_all(test_engine)
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="session")
 def test_session(test_engine):
     """
-    `create a new database session that commits at the end of the test`
+    `create a new database session for overriding`
     """
     with Session(test_engine) as session:
         yield session
 
 
-@pytest.fixture(scope="module", autouse=True)
+@pytest.fixture(scope="session", autouse=True)
 def override_app_dependencies(test_session):
     yield override_dependencies(test_session)
     app.dependency_overrides = {}
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture(scope="session")
 def test_client():
     "create a test client that uses the test_session"
-    with TestClient(app) as tst_cli:
-        yield tst_cli
-
-
-@pytest.fixture(scope="module")
-def module_test_client():
-    """
-    create a test client that uses the test_session.\n
-    `for module scope use`
-    """
     with TestClient(app) as tst_cli:
         yield tst_cli
 
@@ -89,32 +79,33 @@ def authenticated_test_client(test_client) -> tuple[TestClient, dict]:
     return client, test_user
 
 
-@pytest.fixture(scope="module")
-def authenticated_admin_client(module_test_client) -> tuple[TestClient, dict]:
+@pytest.fixture(scope="session")
+def authenticated_admin_client(test_client) -> tuple[TestClient, dict]:
     "an aunthenticated admin client, that commits"
-    test_user = create_test_user(module_test_client).json()
-    token = login_test_user(module_test_client, test_user["id"])
-    client = setup_authenticated_client(module_test_client, token)
+    test_user = create_test_user(test_client).json()
+    token = login_test_user(test_client, test_user["id"])
+    client = setup_authenticated_client(test_client, token)
     code = settings.code
-    super_user_res = module_test_client.post(
+    super_user_res = test_client.post(
         f"/admin/superuser/{test_user['id']}", params={"code": code}
     )
     assert super_user_res.is_success is True
     return client, test_user
 
 
-@pytest.fixture(scope="module")
-def match_players(module_test_client) -> list[tuple[TestClient, dict]]:
+@pytest.fixture(scope="session")
+def match_players(test_client) -> list[tuple[TestClient, dict]]:
     """
     Create players and authenticated clients for match tests.
     Returns a list of tuples: (authenticated client, player data).
+    This fixture is session-scoped and runs only once for all tests.
     """
     players_info = []
     for _ in range(2):
         # Create a new test user
-        test_user = create_test_user(module_test_client)
+        test_user = create_test_user(test_client)
         assert test_user.is_success is True
-        token = login_test_user(module_test_client, test_user.json()["id"])
+        token = login_test_user(test_client, test_user.json()["id"])
         assert token
 
         # Create a new authenticated client for this user

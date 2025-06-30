@@ -62,6 +62,13 @@ async def vote(
                     if player_id not in fighters_dict and player_id is not None:
                         fighters_dict[player_id] = []
                     fighters_dict[player_id].append(ct_app_id)
+
+                # check if no valid fighter/player
+                if not fighters_dict:
+                    raise HTTPException(
+                        status.HTTP_400_BAD_REQUEST, "No valid players to vote for"
+                    )
+
                 # votes to be added and commited to session
                 new_votes: list[Vote] = list()
                 # message for player with binding vow limit
@@ -131,6 +138,13 @@ async def vote(
                         expected_limit if expected_limit > 0 else 0
                     )  # incase prev vote is > 5; i.e e_l results in a negative number
                     new_votes = new_votes[:real_limit]
+
+                    # check if no new votes
+                    if not new_votes:
+                        raise HTTPException(
+                            status.HTTP_406_NOT_ACCEPTABLE, "No valid vote was cast"
+                        )
+
                     session.add_all(new_votes)
                     session.commit()  # this commit increases player points also
                     [session.refresh(v) for v in new_votes]
