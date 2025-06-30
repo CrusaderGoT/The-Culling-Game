@@ -267,7 +267,6 @@ def upgrade_player(
     player = get_alive_player(session=session, player_id=player_id)
     if player is not None:
         if player != current_user.player:
-            print(player, "seppp" ,current_user.player)
             msg = "cannot upgrade another player; wrong player id."
             raise UserException(current_user, status.HTTP_401_UNAUTHORIZED, msg)
         else:

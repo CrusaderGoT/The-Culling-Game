@@ -176,6 +176,7 @@ export function CreateUserForm() {
                     <Button
                         color="green"
                         type="submit"
+                        loading={createUserIsPending || loginUserIsPending}
                         disabled={createUserIsPending || loginUserIsPending}
                     >
                         Create User

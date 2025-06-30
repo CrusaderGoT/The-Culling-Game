@@ -107,7 +107,11 @@ export function LoginForm() {
                     </Flex>
 
                     <Stack my={"md"}>
-                        <Button type="submit" disabled={loginUserIsPending}>
+                        <Button
+                            type="submit"
+                            loading={loginUserIsPending || loginUserIsSuccess}
+                            disabled={loginUserIsPending || loginUserIsSuccess}
+                        >
                             Login
                         </Button>
 

@@ -35,8 +35,8 @@ export function ColonyCircle() {
             <AspectRatio
                 ref={ref}
                 ratio={1}
-                h={{ base: 300, sm: 400, md: 500, lg: 600 }}
-                w={{ base: 300, sm: 400, md: 500, lg: 600 }}
+                h={{ base: 500, sm: 600, md: 700, lg: 800 }}
+                w={{ base: 500, sm: 600, md: 700, lg: 800 }}
                 className={`${styles.colonyCircle}`}
             >
                 <BackgroundImage

@@ -1,5 +1,5 @@
 .colonyContainer {
-  height: 90vh;
+  height: max-content;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -26,14 +26,14 @@
   position: absolute;
   top: 50%;
   color: #fff;
-  transform: translateY(-50%) translateX(15px);
+  transform: translateY(-50%) translateX(10px);
   transition: letter-spacing 1.4s ease-out, top 1.4s ease-in-out,
     transform 1.4s ease-out;
 }
 
 .colonyCircle:hover .colonyText {
-  letter-spacing: 0.2em;
-  top: 12%;
+  letter-spacing: 0.3em;
+  top: 20%;
   transform: translateX(0);
 }
 
@@ -63,7 +63,7 @@
 
 .colonyWarning {
   position: absolute;
-  bottom: 30%;
+  bottom: 35%;
   margin: 10px;
   font-size: 10px;
   line-height: 1.5rem;
@@ -73,6 +73,7 @@
   opacity: 0;
   transition: opacity 3s ease-in;
   overflow-wrap: break-word;
+  white-space: normal;
   word-break: break-word;
   max-height: 50%;
 }
@@ -89,7 +90,7 @@
 
 .colonyEnterBtn {
   position: absolute;
-  bottom: 15%;
+  bottom: 20%;
   opacity: 0;
   pointer-events: none;
   transition: opacity 3s ease-in-out;

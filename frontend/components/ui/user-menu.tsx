@@ -43,7 +43,11 @@ const UserButton = forwardRef<HTMLButtonElement, UserButtonProps>(
     ({ user, ...others }: UserButtonProps, ref) => (
         <UnstyledButton ref={ref} {...others} visibleFrom="sm">
             <Group>
-                <Avatar name={user.username} src={user.player?.picture} />
+                <Avatar
+                    name={user.username}
+                    size={30}
+                    src={user.player?.picture}
+                />
                 <Box flex={1}>
                     <Group>
                         <Text size="sm" fw={500}>
@@ -70,7 +74,7 @@ function UserButtonAlt({ user }: { user: UserInfo }) {
     return (
         <ActionIcon variant="light" hiddenFrom="sm" radius={"lg"}>
             <Avatar src={user.player?.picture}>
-                <IconUserCog />
+                <IconUserCog color="gold" />
             </Avatar>
         </ActionIcon>
     );

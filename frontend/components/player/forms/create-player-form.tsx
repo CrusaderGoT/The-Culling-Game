@@ -121,6 +121,7 @@ export function CreatePlayerForm() {
 
     const {
         isPending: createPlayerIsPending,
+        isSuccess: createPlayerIsSuccess,
         mutateAsync: createPlayerMutate,
         error: createPlayerError,
         reset: createPlayerReset,
@@ -292,6 +293,7 @@ export function CreatePlayerForm() {
                                     <Button
                                         type="submit"
                                         loading={createPlayerIsPending}
+                                        disabled={createPlayerIsPending || createPlayerIsSuccess}
                                         size="md"
                                     >
                                         Create Player

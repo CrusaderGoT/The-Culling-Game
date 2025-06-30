@@ -44,7 +44,7 @@ async def vote(
             ).all()
             if (
                 vote_count := len(prev_votes)
-            ) >= atp.vote_limit:  # if it has exceeded vote limt, no more votes
+            ) >= atp.vote_limit:  # if it has exceeded vote limit, no more votes
                 raise HTTPException(
                     status.HTTP_423_LOCKED, f"{vote_count} votes limit reached"
                 )
