@@ -88,7 +88,7 @@ export function LoginForm() {
                 />
 
                 <form onSubmit={form.onSubmit(handleSubmit)}>
-                    <Flex direction={{ base: "column", md: "row" }} gap={"md"}>
+                    <Flex direction={{ base: "column", sm: "row" }} gap={"md"}>
                         <TextInput
                             flex={1}
                             label="Username"
