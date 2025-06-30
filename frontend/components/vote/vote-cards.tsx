@@ -25,8 +25,6 @@ type VoteCardProp = {
 };
 
 export function VoteCards({ player, value, setValue, color }: VoteCardProp) {
-    const [opened, { close, open }] = useDisclosure(false);
-
     const RenderCard = (
         application: (typeof player.cursed_technique.applications)[0]
     ) => {
@@ -41,8 +39,9 @@ export function VoteCards({ player, value, setValue, color }: VoteCardProp) {
 
         return (
             <Popover
-                width="60%"
+                width="70%"
                 withArrow
+                arrowSize={10}
                 shadow="md"
                 opened={opened}
                 key={application.id}
@@ -93,7 +92,7 @@ export function VoteCards({ player, value, setValue, color }: VoteCardProp) {
                         size="sm"
                         className={clsx(gstyles.wrapSingleLongText)}
                     >
-                        {application.application}{" "}
+                        {application.application}
                     </Text>
                 </Popover.Dropdown>
             </Popover>
