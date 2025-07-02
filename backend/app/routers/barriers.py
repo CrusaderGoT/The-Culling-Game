@@ -114,11 +114,11 @@ async def domain_expansion(
         )
 
         # for now use only in dev mode
-        if barrier_tech.bv_end_time is not None and settings.debug:
+        """if barrier_tech.bv_end_time is not None and settings.debug:
             # schedule background task for deactivation
             await deactivate_domain.schedule_by_time(
                 redis_source, barrier_tech.bv_end_time, barrier_tech, session
-            )
+            )"""
 
         return barrier_tech
 
@@ -222,11 +222,11 @@ async def simple_domain(
         )
 
         # schedule background task for deactivation
-        if barrier_tech.sd_end_time is not None and settings.debug:
+        """if barrier_tech.sd_end_time is not None and settings.debug:
             # schedule background task for deactivation
             await deactivate_simple_domain.schedule_by_time(
                 redis_source, barrier_tech.sd_end_time, barrier_tech, session
-            )
+            )"""
 
         return barrier_tech
 
@@ -309,11 +309,11 @@ async def bindind_vow(
             barrier_tech, barrier_record, match, session, atp
         )
 
-        if barrier_tech.bv_end_time is not None and settings.debug:
+        """if barrier_tech.bv_end_time is not None and settings.debug:
             # schedule background task for deactivation
             await deactivate_binding_vow.schedule_by_time(
                 redis_source, barrier_tech.bv_end_time, barrier_tech, session
-            )
+            )"""
 
         return barrier_tech
 

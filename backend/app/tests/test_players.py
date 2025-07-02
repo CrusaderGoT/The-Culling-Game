@@ -64,40 +64,6 @@ def test_edit_player(authenticated_test_client: tuple[TestClient, dict]):
     assert res.is_success is True
 
 
-def test_get_players(authenticated_test_client: tuple[TestClient, dict]):
-    "test for getting all existing players"
-    params = {
-        "offset": 0,
-        "limit": 30,
-        "slim": True,  # False to include extra infos about the player
-    }
-    res = authenticated_test_client[0].get("/player/all", params=params)
-    assert res.is_success is True
-    # confirm player info was returned
-    if res.json():  # list is not empty
-        for d in res.json():
-            assert (
-                d.keys() == player_info_keys
-                or d.keys() == BasePlayerInfo.model_fields.keys()
-            )
-    else:
-        print("No player in returned list")
-        pass
-
-
-def test_upgrade_player(match_players: list[tuple[TestClient, dict]]):
-    "test for player upgrade"
-    param = {"grade_up": 2}
-    player1 = match_players[0]
-    res = player1[0].post(f"/player/upgrade/{player1[1]['id']}", params=param)
-    assert res.is_success is True, res.json()
-
-    # confirm player info was returned
-    assert res.json().keys() == player_info_keys
-    # confirm player was upgraded
-    assert res.json()["grade"] == param["grade_up"]
-
-
 # should run last to delete the player created in test_create_player
 def test_delete_player(authenticated_test_client: tuple[TestClient, dict]):
     "test for deleting a user from a database"

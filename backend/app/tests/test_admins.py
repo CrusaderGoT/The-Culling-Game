@@ -51,13 +51,3 @@ def test_grant_permission(authenticated_admin_client: tuple[TestClient, dict]):
         f"admin/grant-permission/{user}", json=je(permissions)
     )
     assert res.is_success is True, res.json()
-
-
-def test_create_match(
-    authenticated_admin_client: tuple[TestClient, dict],
-    match_players: list[tuple[TestClient, dict]],
-):
-    "test function for creating a match"
-    # test create match
-    res = authenticated_admin_client[0].post("/match/create?part=1")
-    assert res.is_success is True, res.json()

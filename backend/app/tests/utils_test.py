@@ -1,24 +1,25 @@
 import random
 import string
 from datetime import timedelta
-from random import choice, sample
+from random import sample
+from secrets import choice
 
 from fastapi.encoders import jsonable_encoder as je
 from fastapi.testclient import TestClient
-from sqlmodel import Session, SQLModel, func, select
+from sqlmodel import Session, SQLModel
 
 from app.api.main import app
-from app.models.colony import Colony
-from app.models.player import CreateCT, CreateCTApp, CreatePlayer, Player
+from app.models.player import CreateCT, CreateCTApp, CreatePlayer
 from app.models.user import Country, CreateUser
-from app.utils.dependencies import _atp_def, get_or_create_colony, get_session
+from app.models.vote import CastVote
+from app.utils.dependencies import _atp_def, get_session
 
 
 # UTILS
 def gen_rand_username():
     first_char = random.choice(string.ascii_letters)
     allowed_chars = string.ascii_letters + string.digits + "_-"
-    rest = "".join(random.choices(allowed_chars, k=random.randint(2, 19)))
+    rest = "".join(random.choices(allowed_chars, k=random.randint(4, 19)))
     username = first_char + rest
     # Ensure length between 3 and 20
     return username[:20]
@@ -32,7 +33,10 @@ def gen_rand_email():
 
 def player_payload():
     c_player_payload = CreatePlayer(
-        name="testplayer", gender=CreatePlayer.Gender("male"), age=25, role="programmer"
+        name=gen_rand_username(),
+        gender=CreatePlayer.Gender("male"),
+        age=25,
+        role="programmer",
     )
     c_ct = CreateCT(
         name="git push",
@@ -85,6 +89,25 @@ def user_password():
     return "Password45@"
 
 
+def votes_payload(player1, player2):
+    "votes for use in test"
+    votes_payload = [
+        CastVote(
+            player_id=player1[1]["id"],  # player 1 ID
+            ct_app_id=choice(
+                [app["id"] for app in player1[1]["cursed_technique"]["applications"]]
+            ),  # random select from player 1 ct apps
+        ),
+        CastVote(
+            player_id=player2[1]["id"],  # player 2 ID
+            ct_app_id=choice(
+                [app["id"] for app in player2[1]["cursed_technique"]["applications"]]
+            ),  # random select from player 2 ct apps
+        ),
+    ]
+    return votes_payload
+
+
 def create_test_player(authenticated_test_client: tuple[TestClient, dict]):
     "creates a test player, and returns the Reponse object"
     user = authenticated_test_client[1]
@@ -108,30 +131,6 @@ def create_test_user(test_client: TestClient):
 
 
 # DEPENDENCIES
-
-
-def get_or_create_colony_test(session: Session):
-    """
-    returns a colony with less than 10 PLAYERS or returns a new base colony.
-    `for tests`."""
-    # get a random colony to add the player
-    subquery = (
-        select(Colony.id, func.count(Player.id).label("player_count"))
-        .join(Player, isouter=True)
-        .group_by(Colony.id)
-        .having(func.count(Player.id) < 10)
-    ).subquery()
-    colony = session.exec(
-        select(Colony).where(Colony.id.in_(select(subquery.c.id)))
-    ).first()
-    if colony:
-        return colony
-    else:  # return new colony instance
-        # select a random country
-        countries = list(Country)
-        country = choice([c for c in countries])
-        colony = Colony(country=country)
-        return colony
 
 
 class ATPTest(SQLModel):
@@ -163,12 +162,14 @@ class ATPTest(SQLModel):
     reverse_cursed_technique_point: float = 0.5
 
 
-def override_dependencies(session):
+def override_dependencies(session: Session):
     """Central function for overriding dependencies."""
-    app.dependency_overrides[get_session] = lambda: session
-    app.dependency_overrides[get_or_create_colony] = lambda: get_or_create_colony_test(
-        session
-    )
+
+    def get_session_override():
+        return session
+
+    app.dependency_overrides[get_session] = get_session_override
+
     app.dependency_overrides[_atp_def] = ATPTest
 
 
