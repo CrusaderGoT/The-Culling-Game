@@ -136,7 +136,7 @@ def get_players(
     gender: Annotated[Player.Gender | None, Query()] = None,
     age: Annotated[int | None, Query(ge=10, le=102)] = None,
     role: Annotated[str | None, Query()] = None,
-    alive: Annotated[bool, Query()] = False,
+    alive: Annotated[bool, Query()] = True,
 ):
     statement = (
         select(Player).offset(offset).limit(limit).where(or_(Player.alive == alive))
@@ -154,6 +154,13 @@ def get_players(
     # if slim return info without cursed technique info and user info
     if slim is True:
         players = [BasePlayerInfo.model_validate(player) for player in players]
+
+    if not players:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No players found matching the specified criteria",
+        )
+
     return players
 
 

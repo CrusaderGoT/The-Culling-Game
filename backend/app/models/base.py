@@ -8,6 +8,7 @@ should be imported only in other model modules.\n
 
 import json
 import os
+import uuid
 from datetime import date, datetime, timedelta
 from enum import Enum, IntEnum
 from pathlib import Path
@@ -278,6 +279,7 @@ class BaseAdminInfo(SQLModel):
     `permissions: list[BasePermissionInfo]`
     """
 
+    id: uuid.UUID
     is_superuser: bool
     permissions: list[BasePermissionInfo]
 
@@ -285,7 +287,7 @@ class BaseAdminInfo(SQLModel):
 class AdminPermissionLink(SQLModel, table=True):
     "the m2m link table for an admin and permission(s)"
 
-    admin_id: int | None = Field(
+    admin_id: uuid.UUID | None = Field(
         default=None, foreign_key="adminuser.id", primary_key=True
     )
     permission_id: int | None = Field(

@@ -19,6 +19,7 @@ from app.models.base import (
 if TYPE_CHECKING:
     from .user import User
 
+import uuid
 
 # write your admin models here
 
@@ -26,7 +27,7 @@ if TYPE_CHECKING:
 class AdminUser(SQLModel, table=True):
     "an admin user as stored in the database"
 
-    id: int | None = Field(default=None, primary_key=True)
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     permissions: list["Permission"] = Relationship(
         back_populates="admins", link_model=AdminPermissionLink
     )
@@ -60,7 +61,6 @@ class PermissionRequest(BasePermission):
 class AdminInfo(BaseAdminInfo):
     "the admin info for client side"
 
-    id: int
     user: "BaseUserInfo"
 
 

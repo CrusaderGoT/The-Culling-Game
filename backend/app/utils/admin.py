@@ -3,6 +3,7 @@ from sqlmodel import select
 
 from app.auth.dependencies import admin_user
 from app.models.admin import AdminUser, Permission, PermissionRequest
+from app.models.table import ModelName
 from app.utils.config import AdminException
 from app.utils.dependencies import session
 
@@ -29,8 +30,7 @@ def superuser_allow_permissions(permissions: list[PermissionRequest], session: s
                 )
                 perm = session.exec(stmt).one()
             except Exception:  # If the permission does not exist, create a new one
-                name = f"can_perform_{level.name}_{level.value}_operations_on_{permission.model.name}"
-                perm = Permission(model=permission.model, level=level, name=name)
+                perm = _make_permission_to_create(permission.model, level=level)
 
             new_permissions.append(perm)
 
@@ -74,38 +74,63 @@ def admin_allow_permissions(
 def check_admin_permission(
     session: session,
     admin: AdminUser,
-    model_name: str,
+    model_name: ModelName,
     permission_level: Permission.PermissionLevel,
 ) -> bool:
     """
-    Check if an admin has the specified permission level for a model.
-
+    Checks if an admin user has the required permission level for a specific model.
+    If the permission does not exist in the system and the admin is a superuser,
+    the permission is created and assigned to the superuser.
     Args:
-        session: Database session
-        admin: The admin user to check
-        model_name: Name of the model to check permissions for
-        permission_level: Required permission level
-
+        session (session): The database session used for querying and committing changes.
+        admin (AdminUser): The admin user whose permissions are being checked.
+        model_name (ModelName): The name of the model for which the permission is required.
+        permission_level (Permission.PermissionLevel): The required permission level.
     Returns:
-        bool: True if admin has permission, False otherwise
-
+        bool: True if the admin has the required permission, False otherwise.
     Raises:
-        HTTPException: If the permission does not exist in the system
+        HTTPException: If the permission does not exist and the admin is not a superuser.
     """
-    check_perm_exist_or_exc(session, model_name, permission_level)
 
-    # Check if admin has the permission
-    permission = session.exec(
-        select(Permission)
-        .where(Permission.admins.any(id=admin.id))
-        .where(Permission.model == model_name)
-        .where(Permission.level == permission_level)
-    ).first()
+    exist = check_permission_exist(session, model_name, permission_level)
 
-    return bool(permission)
+    if not exist and not admin.is_superuser:
+        raise HTTPException(
+            status.HTTP_403_FORBIDDEN,
+            detail=(
+                f"You do not have the permission for this action. "
+                f"Permission {permission_level.name} "
+                f"for {model_name.capitalize()} does not exist in the system, "
+                f"Contact a Superuser to create it."
+            ),
+        )
+    elif not exist and admin.is_superuser:
+        # create permission
+        new_perm = _make_permission_to_create(model=model_name, level=permission_level)
+
+        # add perm to superuser
+        admin.permissions.extend([new_perm])
+
+        # make commits
+        session.add(new_perm)
+        session.add(admin)
+        session.commit()
+        # return true for super user
+        return True
+
+    else:
+        # Check if admin has the permission
+        permission = session.exec(
+            select(Permission)
+            .where(Permission.admins.any(id=admin.id))
+            .where(Permission.model == model_name)
+            .where(Permission.level == permission_level)
+        ).first()
+
+        return bool(permission)
 
 
-def check_perm_exist_or_exc(
+def check_permission_exist(
     session: session,
     model_name: str,
     permission_level: Permission.PermissionLevel,
@@ -118,14 +143,7 @@ def check_perm_exist_or_exc(
         .where(Permission.level == permission_level)
     ).first()
 
-    if not permission_exist:
-        raise HTTPException(
-            status.HTTP_403_FORBIDDEN,
-            detail=(
-                f"Permission {permission_level.name} "
-                f"for {model_name.capitalize()} does not exist in the system"
-            ),
-        )
+    return permission_exist
 
 
 def ADMIN_UNAUTHORIZED_EXCEPTION(admin: admin_user):
@@ -134,3 +152,12 @@ def ADMIN_UNAUTHORIZED_EXCEPTION(admin: admin_user):
         code=status.HTTP_401_UNAUTHORIZED,
         detail=f"You '{admin.user.username}' do not have the permission for this action",
     )
+
+
+def _make_permission_to_create(model: ModelName, level: Permission.PermissionLevel):
+    "helper function for construct a Permission. IT IS NOT COMMITED"
+
+    name = f"can_perform_{level.name}_{level.value}_operations_on_{model.name}"
+    perm = Permission(model=model, level=level, name=name)
+
+    return perm

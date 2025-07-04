@@ -5,10 +5,17 @@ The models that will be used as schemas/response/request data in the API schema.
 import re
 from datetime import date
 from enum import Enum
-from typing import TYPE_CHECKING, Annotated, Union
+from typing import TYPE_CHECKING, Annotated, ClassVar, Union
 from uuid import UUID
 
-from pydantic import EmailStr, StringConstraints, ValidationInfo, field_validator
+from pydantic import (
+    EmailStr,
+    StringConstraints,
+    ValidationInfo,
+    field_validator,
+)
+from sqlalchemy import func
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlmodel import Field, Relationship, SQLModel
 
 from ..models.base import (
@@ -33,12 +40,8 @@ class User(BaseUser, table=True):
     "The user as stored in the database"
 
     id: int | None = Field(default=None, primary_key=True)
-    usernamedb: str = Field(
-        description="username as stored in the database. lowercase",
-        index=True,
-        unique=True,
-    )
-    "username as stored in the database. lowercase"
+    usernamedb: ClassVar
+    "username in lowercase"
     created: date = Field(default=date.today())
     password: str = Field(description="the user's hashed password")
     # child rel
@@ -54,6 +57,16 @@ class User(BaseUser, table=True):
     refresh_token_key: UUID | None = (
         None  # for validating and invalidating refresh tokens
     )
+
+    @hybrid_property
+    def usernamedb(self):
+        "username in lowercase"
+        return self.username.lower().strip()
+
+    @usernamedb.inplace.expression
+    @classmethod
+    def _usernamedb_expression(cls):
+        return func.lower(func.trim(cls.username))
 
 
 PASSWORD_PATTERN = re.compile(

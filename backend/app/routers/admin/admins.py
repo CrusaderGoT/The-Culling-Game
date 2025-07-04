@@ -25,7 +25,7 @@ from app.utils.config import AdminException, Tag, UserException
 from app.utils.dependencies import session
 from app.utils.user import get_user, id_name_email
 from dotenv import load_dotenv
-from fastapi import APIRouter, Body, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, status
 
 load_dotenv()  # load for env used in this modules
 
@@ -127,14 +127,30 @@ def new_permission(
     permissions: Annotated[list[PermissionRequest], Body()],
     session: session,
 ):
-    "for creating new permissions; only doable by a superuser"
-    # check if the user is a super user
-    if not admin.is_superuser:
-        raise AdminException(
-            admin,
-            status.HTTP_401_UNAUTHORIZED,
-            "only super users can create permissions",
-        )
+    """
+    Creates new permissions for admin users in the system.
+    This function validates admin authorization, processes permission requests,
+    and adds new non-duplicate permissions to the database.
+    Args:
+        admin (admin_user): The admin user making the request
+        permissions (list[PermissionRequest]): List of permission requests to be created
+        session (session): Database session object
+    Returns:
+        list[Permission]: List of newly created permission objects
+    Raises:
+        ADMIN_UNAUTHORIZED_EXCEPTION: If admin lacks required permissions
+        HTTPException: If no new valid permissions are provided (422)
+
+    """
+
+    # check if the user is not a super user and does not have right perm
+    if not check_admin_permission(
+        session=session,
+        admin=admin,
+        model_name=ModelName.permission,
+        permission_level=BasePermission.PermissionLevel.CREATE,
+    ):
+        raise ADMIN_UNAUTHORIZED_EXCEPTION(admin)
 
     # get or initialized permissions (i.e, both existing and not-existing permissions)
     grant_permissions = superuser_allow_permissions(
@@ -159,13 +175,13 @@ def new_permission(
     return new_permissions
 
 
-@router.patch("/grant-permission/{user}", response_model=AdminInfo)
+@router.patch("/grant-permission/{admin_id}", response_model=AdminInfo)
 def grant_permission(
     permissions: Annotated[
         list[PermissionRequest], Body()
     ],  # permissions to be granted (permissions)
     p_admin: admin_user,  # admin user who wants to grant the permissions
-    user: id_name_email,  # user -> admin to be granted permissions
+    admin_id: Annotated[UUID, Path()],  # admin to be granted permissions
     session: session,
 ):
     """
@@ -207,17 +223,17 @@ def grant_permission(
     ):  # super users can grant without restriction
         raise ADMIN_UNAUTHORIZED_EXCEPTION(p_admin)
 
-    # check if user exist and is an admin
-    userdb = get_user(session=session, user_name_id_email=user)
+    # check if admin exist
+    admin = session.get(AdminUser, admin_id)
 
-    if not userdb:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, f"User {user} not found")
+    if not admin:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Admin not found")
 
-    if not userdb.admin:
+    if not admin:
         raise UserException(
-            user=userdb,
+            user=admin,
             code=status.HTTP_428_PRECONDITION_REQUIRED,
-            detail=f"'{userdb.username}' is not an Admin. Make them an Admin first",
+            detail=f"'{admin.username}' is not an Admin. Make them an Admin first",
         )
 
     # check if p_admin is a super user
@@ -241,68 +257,54 @@ def grant_permission(
             detail=f"You '{p_admin.user.username}' cannot grant any of the permission(s) requested.",
         )
 
-    # get permissions that the userdb admin doesn't already have.
+    # get permissions that the admin admin doesn't already have.
     # This is to prevent Unique Constraint Errors,
     # and also not have an admin with duplicate permissions.
-    unique_permissions = [
-        p for p in approved_permissions if p not in userdb.admin.permissions
-    ]
+    unique_permissions = [p for p in approved_permissions if p not in admin.permissions]
 
     # check if approved unique permissions is empty
     if not unique_permissions:
         raise AdminException(
             admin=p_admin,
             code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=f"Admin '{userdb.username}' already has all of the sent permission(s) or you '{p_admin.user.username}' cannot grant some of the permission.",
+            detail=f"Admin '{admin.user.username}' already has all of the sent permission(s) or you '{p_admin.user.username}' cannot grant some of the permission.",
         )
 
     # assign approved permissions to the user/admin
-    userdb.admin.permissions.extend(unique_permissions)
-    session.add(userdb)
+    admin.permissions.extend(unique_permissions)
+    session.add(admin)
     session.commit()
-    session.refresh(userdb)
-    return userdb.admin
+    session.refresh(admin)
+    return admin
 
 
-@router.patch("/remove-permission/{user}", response_model=AdminInfo)
+@router.patch("/remove-permission/{admin_id}", response_model=AdminInfo)
 def remove_permission(
     permissions: Annotated[
         list[PermissionRequest], Body()
     ],  # permission(s) to be removed
     p_admin: admin_user,  # admin user who wants to remove the permission(s)
-    user: id_name_email,  # user -> admin to removed their permission(s)
+    admin_id: Annotated[UUID, Path()],  # user -> admin to removed their permission(s)
     session: session,
 ):
     """remove permission(s) of an admin. A superuser is required"""
 
-    permission = check_admin_permission(
-        session=session,
-        admin=p_admin,
-        model_name=ModelName.adminuser,
-        permission_level=BasePermission.PermissionLevel.UPDATE,
-    )
-
-    if not permission:
-        raise ADMIN_UNAUTHORIZED_EXCEPTION(p_admin)
-
-    # check if user exist and is an admin
-    userdb = get_user(session=session, user_name_id_email=user)
-
-    if not userdb:
-        raise HTTPException(
-            status.HTTP_404_NOT_FOUND, f"User {id_name_email} not found"
-        )
-
-    if not userdb.admin:
-        raise UserException(
-            user=userdb,
-            code=status.HTTP_428_PRECONDITION_REQUIRED,
-            detail=f"'{userdb.username}' is not an Admin. Make them an Admin first",
-        )
-
     # only superusers can remove a permission
     if not p_admin.is_superuser:
         raise ADMIN_UNAUTHORIZED_EXCEPTION(p_admin)
+
+    # check if admin exist
+    admin = session.get(AdminUser, admin_id)
+
+    if not admin:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Admin not found")
+
+    if not admin:
+        raise UserException(
+            user=admin,
+            code=status.HTTP_428_PRECONDITION_REQUIRED,
+            detail=f"'{admin.username}' is not an Admin. Make them an Admin first",
+        )
 
     # admin is a superuser. get the permission(s) to remove
     permissions_to_remove = superuser_allow_permissions(
@@ -312,7 +314,7 @@ def remove_permission(
     # make sure perm(s) to remove are perms the admin current have
     # this also makes sure all permissions exist
     actual_perms_to_remove = [
-        p for p in permissions_to_remove if p in userdb.admin.permissions
+        p for p in permissions_to_remove if p in admin.permissions
     ]
 
     # check if the filtered perms is empty
@@ -325,13 +327,13 @@ def remove_permission(
 
     # removed permission
     for perm in actual_perms_to_remove:
-        userdb.admin.permissions.remove(perm)
+        admin.permissions.remove(perm)
     else:  # runs after above loop
         # commit to session
-        session.add(userdb)
+        session.add(admin)
         session.commit()
-        session.refresh(userdb)
-        return userdb.admin
+        session.refresh(admin)
+        return admin
 
 
 @superuser_router.post(

@@ -1,31 +1,57 @@
+"""
+utils for test. DO NOT USE FIXTURE NAMES HERE!!!
+"""
+
 import random
 import string
-from datetime import timedelta
-from random import sample
-from secrets import choice
+from datetime import date, datetime, timedelta
+from random import choice, sample
+from typing import Any
 
 from fastapi.encoders import jsonable_encoder as je
 from fastapi.testclient import TestClient
-from sqlmodel import Session, SQLModel
+from sqlmodel import Session, SQLModel, select
 
 from app.api.main import app
-from app.models.player import CreateCT, CreateCTApp, CreatePlayer
-from app.models.user import Country, CreateUser
-from app.models.vote import CastVote
+from app.auth.credentials import PasswordAuth as pw
+from app.models.admin import AdminUser, Permission, PermissionInfo, PermissionRequest
+from app.models.base import BasePermission, ModelName
+from app.models.player import (
+    CreateCT,
+    CreateCTApp,
+    CreatePlayer,
+    Player,
+    PlayerInfo,
+)
+from app.models.user import Country, CreateUser, User, UserInfo
+from app.utils.admin import _make_permission_to_create
 from app.utils.dependencies import _atp_def, get_session
 
 
 # UTILS
-def gen_rand_username():
+def generate_random_string(length: int = 10) -> str:
+    """
+    Generate random string of specified length using letters, digits and special chars.
+    First character is always a letter.
+    Args:
+        length: Length of string to generate (default 10)
+    Returns:
+        Random string of specified length
+    """
     first_char = random.choice(string.ascii_letters)
     allowed_chars = string.ascii_letters + string.digits + "_-"
-    rest = "".join(random.choices(allowed_chars, k=random.randint(4, 19)))
-    username = first_char + rest
-    # Ensure length between 3 and 20
-    return username[:20]
+    rest = "".join(random.choices(allowed_chars, k=length - 1))
+    return first_char + rest
 
 
-def gen_rand_email():
+def break_string(word: str, count: int = 50, sep: str | None = None):
+    if sep is None:
+        sep = word[0]
+
+    return " ".join(word.split(sep=sep)[:count])
+
+
+def generate_random_email():
     alphas = [*"a b c d e f g h i j k l m n o p q r s t u v w x y z _".split(" ")]
     email = "".join(sample(alphas, k=8)) + "@example.com"
     return email
@@ -33,35 +59,35 @@ def gen_rand_email():
 
 def player_payload():
     c_player_payload = CreatePlayer(
-        name=gen_rand_username(),
-        gender=CreatePlayer.Gender("male"),
-        age=25,
-        role="programmer",
+        name=generate_random_string(),
+        gender=choice(list(CreatePlayer.Gender)),
+        age=random.randint(18, 102),
+        role=generate_random_string(),
     )
     c_ct = CreateCT(
         name="git push",
-        definition="A powerful technique that allows the user to instantly synchronize their progress with the collective knowledge base, ensuring that all changes are safely stored and retrievable by allies. This technique is especially effective when used on Fridays, granting additional reliability and trust among team members.",
+        definition=break_string(generate_random_string(200)),
     )
     c_ct_apps = [
         CreateCTApp(
-            name="first",
-            application="This is the first application, which is at least 50 characters long and provides a detailed example for testing purposes.",
+            name=generate_random_string(),
+            application=break_string(generate_random_string(200)),
         ),
         CreateCTApp(
-            name="second",
-            application="This is the second application, also more than 50 characters long, ensuring the test data meets the required length constraints.",
+            name=generate_random_string(),
+            application=break_string(generate_random_string(200)),
         ),
         CreateCTApp(
-            name="third",
-            application="Here is the third application, and it too exceeds 50 characters, offering enough content for robust validation in tests.",
+            name=generate_random_string(),
+            application=break_string(generate_random_string(200)),
         ),
         CreateCTApp(
-            name="fourth",
-            application="Fourth application example, definitely longer than 50 characters, designed to thoroughly test the application's requirements.",
+            name=generate_random_string(),
+            application=break_string(generate_random_string(200)),
         ),
         CreateCTApp(
-            name="fifth",
-            application="Fifth application, making sure it is at least 50 characters long, so all test cases are properly covered and validated.",
+            name=generate_random_string(),
+            application=break_string(generate_random_string(200)),
         ),
     ]
     player_dict = {
@@ -75,9 +101,9 @@ def player_payload():
 
 def user_payload():
     pyld = CreateUser(
-        username=gen_rand_username(),
-        email=gen_rand_email(),
-        country=Country("NG"),
+        username=generate_random_string(),
+        email=generate_random_email(),
+        country=choice(list(Country)),
         password=user_password(),
         confirm_password=user_password(),
     )
@@ -89,45 +115,35 @@ def user_password():
     return "Password45@"
 
 
-def votes_payload(player1, player2):
-    "votes for use in test"
-    votes_payload = [
-        CastVote(
-            player_id=player1[1]["id"],  # player 1 ID
-            ct_app_id=choice(
-                [app["id"] for app in player1[1]["cursed_technique"]["applications"]]
-            ),  # random select from player 1 ct apps
-        ),
-        CastVote(
-            player_id=player2[1]["id"],  # player 2 ID
-            ct_app_id=choice(
-                [app["id"] for app in player2[1]["cursed_technique"]["applications"]]
-            ),  # random select from player 2 ct apps
-        ),
-    ]
-    return votes_payload
+def hashed_password(password: str):
+    return pw().hash_password(password)
 
 
-def create_test_player(authenticated_test_client: tuple[TestClient, dict]):
-    "creates a test player, and returns the Reponse object"
-    user = authenticated_test_client[1]
-    created_res = authenticated_test_client[0].post(
-        f"/player/create/{user['id']}", json=je(player_payload())
-    )
-    # check status is created
-    assert created_res.status_code == 201
-    return created_res
-
-
-def create_test_user(test_client: TestClient):
+def create_test_user(ts):
     """creates a brand new test user. returns the user info\n
     should typically be used in a function
     that uses the test_client pytest fixture as an arg."""
     create_user_payload = user_payload()
-    new_user_res = test_client.post("/signup", json=je(create_user_payload))
+    new_user_res = ts.post("/signup", json=je(create_user_payload))
     # check status is created
     assert new_user_res.status_code == 201
     return new_user_res
+
+
+def create_authenticated_player(ts) -> tuple[TestClient, dict]:
+    test_user = create_test_user(ts)
+    assert test_user.is_success is True
+    user_data = test_user.json()
+
+    token = login_test_user(ts, user_data["id"])
+    assert token
+
+    auth_client = setup_authenticated_client(ts, token)
+    player_res = create_test_player((auth_client, user_data))
+    assert player_res.is_success is True
+
+    player_data = (auth_client, player_res.json())
+    return player_data
 
 
 # DEPENDENCIES
@@ -162,11 +178,11 @@ class ATPTest(SQLModel):
     reverse_cursed_technique_point: float = 0.5
 
 
-def override_dependencies(session: Session):
+def override_dependencies(ss: Session):
     """Central function for overriding dependencies."""
 
     def get_session_override():
-        return session
+        return ss
 
     app.dependency_overrides[get_session] = get_session_override
 
@@ -174,15 +190,259 @@ def override_dependencies(session: Session):
 
 
 def login_test_user(
-    client: TestClient, username: str, password: str = user_password()
+    cl: TestClient, username: str, password: str = user_password()
 ) -> str:
     """Helper to log in a test user and return their token."""
-    response = client.post("/login", data={"username": username, "password": password})
+    response = cl.post("/login", data={"username": username, "password": password})
     assert response.is_success is True
     return response.json().get("access_token")
 
 
-def setup_authenticated_client(client: TestClient, token: str):
+def setup_authenticated_client(cl: TestClient, token: str):
     """Set up a client with the given token."""
-    client.headers.update({"Authorization": f"Bearer {token}"})
-    return client
+    cl.headers.update({"Authorization": f"Bearer {token}"})
+    return cl
+
+
+def match_part():
+    return 1
+
+
+def compare_fields(expected: dict, actual: dict, keys: set | None = None):
+    """
+    Helper function to compare fields between two dictionaries.
+    :param expected: The expected dictionary.
+    :param actual: The actual dictionary.
+    :param keys: Optional set of keys to compare. If None, compares common keys.
+    """
+    keys_to_compare = keys or set(expected.keys()) & set(actual.keys())
+    for k in keys_to_compare:
+        if isinstance(expected[k], Country):
+            assert Country(actual[k]) == expected[k]
+        elif isinstance(expected[k], datetime):
+            assert datetime.fromisoformat(actual[k]) == expected[k]
+        elif isinstance(expected[k], date):
+            assert date.fromisoformat(actual[k]) == expected[k]
+        else:
+            assert actual[k] == expected[k], (
+                f"Mismatch for key '{k}': {str(actual[k])} != {expected[k]}"
+            )
+
+
+def get_client_user(cli: TestClient):
+    "return the user info of an authorized client"
+    response = cli.get("/users/me")
+
+    # check status is successful
+    assert response.is_success is True
+
+    user_info = UserInfo.model_validate(response.json())
+
+    return user_info
+
+
+def create_client_player(cli: TestClient, payload: dict):
+    "create and return a client player"
+    # get user
+    user = get_client_user(cli)
+
+    response = cli.post(f"/player/create/{user.id}", json=je(payload))
+
+    # check status is created and success
+    assert response.status_code == 201
+    assert response.is_success is True
+
+    return PlayerInfo.model_validate(response.json())
+
+
+def compare_players(player_info: PlayerInfo | dict | Player, payload: dict):
+    """
+    Compare player information with a payload dictionary.
+    This function compares a PlayerInfo object or dictionary containing player data
+    against an expected payload dictionary. It validates basic player information,
+    cursed technique details, and technique applications.
+    Parameters:
+    ----------
+    player_info : Union[PlayerInfo, dict]
+        The player information to validate, either as a PlayerInfo object or dictionary
+        (from create_client_player or a response or create_session_player)
+    payload : dict
+        The expected payload dictionary to compare against from player_payload
+    Raises:
+    -------
+    AssertionError
+        If any field comparison fails to match between player_info and payload
+    Notes:
+    -----
+    The function checks the following fields:
+    - Basic player info (name, age, role, gender)
+    - Cursed technique info (name, definition)
+    - Cursed technique applications
+    """
+
+    if isinstance(player_info, PlayerInfo):
+        player_dict = player_info.model_dump()
+
+    elif isinstance(player_info, Player):
+        player_dict = player_info.model_dump()
+
+    else:
+        player_dict = player_info
+
+    # compare player basic info
+    assert je(payload)["player"]["name"] == player_dict["name"]
+    assert je(payload)["player"]["age"] == player_dict["age"]
+    assert je(payload)["player"]["role"] == player_dict["role"]
+    assert je(payload)["player"]["gender"] == player_dict["gender"]
+
+    # compare player cursed technique info
+    assert (
+        je(payload)["cursed_technique"]["name"]
+        == player_dict["cursed_technique"]["name"]
+    )
+    assert (
+        je(payload)["cursed_technique"]["definition"]
+        == player_dict["cursed_technique"]["definition"]
+    )
+
+    # compare player cursed technique applications info
+    for actual, expect in zip(
+        player_dict["cursed_technique"]["applications"], je(payload)["applications"]
+    ):
+        compare_fields(expect, actual)
+
+
+def permission_payload(models: dict[ModelName, set[BasePermission.PermissionLevel]]):
+    payload: list[PermissionRequest] = []
+
+    for model, levels in models.items():
+        payload.append(
+            PermissionRequest(model=model, levels=levels),
+        )
+
+    return payload
+
+
+def create_user_via_session(ses: Session):
+    """
+    adds a User to the session.
+    ### Note: User password is hashed in the database,
+    ### but the object is returned with its plain text password, for convinence.
+    ### update with rehased password, if it will be commited again.
+    """
+    # make user via session
+    payload = user_payload()
+    update = {"password": hashed_password(payload.password)}
+    user = User.model_validate(payload, update=update)
+
+    ses.add(user)
+    ses.commit()
+    ses.refresh(user)
+
+    plaintext_pw_update = {"password": payload.password}
+
+    user = User.model_validate(user, update=plaintext_pw_update)
+
+    return user
+
+
+def grant_admin_client_permission_via_session(
+    ses: Session, admin_cli: TestClient, permission: Permission
+):
+    # add perm to session
+    ses.add(permission)
+
+    # get admin client admin table
+    admin_user = get_client_user(admin_cli)
+
+    admin = ses.exec(
+        select(AdminUser).where(AdminUser.user_id == admin_user.id)
+    ).first()
+    assert admin is not None, "Admin client AdminUser does not exist"
+
+    admin.permissions.append(permission)
+    ses.add(admin)
+
+    ses.commit()
+
+
+def grant_admin_permission_via_session(
+    ses: Session, admin: AdminUser, permission: Permission
+):
+    # add perm to session
+    ses.add(permission)
+
+    admin.permissions.append(permission)
+    ses.add(admin)
+
+    ses.commit()
+
+
+def create_admin_via_session(ses: Session, user: User, is_superuser: bool = False):
+    # make admin superuser
+    admin = AdminUser(user_id=user.id, is_superuser=is_superuser)
+    ses.add(admin)
+
+    # commit
+    ses.commit()
+    ses.refresh(admin)
+
+    # Verify the authenticated user matches the superuser response
+    assert user.id == admin.user.id, (
+        f"User and Admin client, User ID mismatch: {user.id} != {admin.user.id}"
+    )
+
+    return admin
+
+
+def assert_permissions_in_payload(response_data: Any, payload: list[PermissionRequest]):
+    """
+    Asserts that given permissions in payload exist in the response data.
+
+    This function validates that the permissions specified in the payload match with the
+    permissions in the response data by comparing their model and level attributes.
+
+    Args:
+        response_data (Any): The response data containing permissions information
+        payload (list[PermissionRequest]): List of permission requests to validate
+
+    Returns:
+        None
+
+    Raises:
+        AssertionError: If the permissions in payload are not found in response data
+    """
+
+    assert permissions_in_payload(response_data, payload), (
+        "Permission(s) from payload does not exist in admin permissions"
+    )
+
+
+def permissions_in_payload(response_data: Any, payload: list[PermissionRequest]):
+    perm_payload_to_perms = map_perm_request_to_permissions(payload)
+    admin_permissions = [PermissionInfo.model_validate(p) for p in response_data]
+    perm_payload_in_perms = next(
+        (
+            perm_load
+            for perm_load in perm_payload_to_perms
+            for admin_perm in admin_permissions
+            if perm_load.model == admin_perm.model
+            and perm_load.level == admin_perm.level
+        ),
+        None,
+    )
+    return perm_payload_in_perms
+
+
+def map_perm_request_to_permissions(perm_request: list[PermissionRequest]):
+    perm_list: list[Permission] = []
+
+    for perm_r in perm_request:
+        for level in perm_r.levels:
+            perm = _make_permission_to_create(
+                perm_r.model,
+                level,
+            )
+            perm_list.append(perm)
+
+    return perm_list

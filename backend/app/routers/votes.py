@@ -64,9 +64,10 @@ async def vote(
                     fighters_dict[player_id].append(ct_app_id)
 
                 # check if no valid fighter/player
-                if not fighters_dict:
+                if not fighters_dict.keys():
                     raise HTTPException(
-                        status.HTTP_400_BAD_REQUEST, "No valid players to vote for"
+                        status.HTTP_400_BAD_REQUEST,
+                        "No eligible players or cursed technique applications sent for voting in this match.",
                     )
 
                 # votes to be added and commited to session
@@ -142,7 +143,8 @@ async def vote(
                     # check if no new votes
                     if not new_votes:
                         raise HTTPException(
-                            status.HTTP_406_NOT_ACCEPTABLE, "No valid vote was cast"
+                            status.HTTP_406_NOT_ACCEPTABLE,
+                            "No valid votes were cast. Please ensure you are voting for eligible players and have not exceeded your vote limit.",
                         )
 
                     session.add_all(new_votes)

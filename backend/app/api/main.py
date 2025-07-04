@@ -195,7 +195,6 @@ def create_user(
             hashed_pw = pw_auth.hash_password(user.password)
             update = {
                 "password": hashed_pw,  # store hashed password
-                "usernamedb": l_username,  # store the usernamedb in lowercase
             }
             new_user_db = User.model_validate(user, update=update)
             session.add(new_user_db)
