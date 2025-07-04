@@ -155,7 +155,7 @@ def ADMIN_UNAUTHORIZED_EXCEPTION(admin: admin_user):
 
 
 def _make_permission_to_create(model: ModelName, level: Permission.PermissionLevel):
-    "helper function for construct a Permission. IT IS NOT COMMITED"
+    "helper function for constructing a Permission. IT IS NOT COMMITED"
 
     name = f"can_perform_{level.name}_{level.value}_operations_on_{model.name}"
     perm = Permission(model=model, level=level, name=name)

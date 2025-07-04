@@ -15,8 +15,8 @@ from app.utils.admin import (
 from app.utils.config import PlayerException
 from app.utils.dependencies import session
 from app.utils.player import (
-    _delete_player_helper,
-    _edit_player_helper,
+    delete_player_helper,
+    edit_player_helper,
     get_alive_player,
 )
 from fastapi import APIRouter, Body, HTTPException, Path, status
@@ -67,7 +67,7 @@ def admin_edit_player(
         raise PlayerException(player=playerdb, detail=err_msg)
 
     # pass: edit player details
-    edited_player = _edit_player_helper(
+    edited_player = edit_player_helper(
         playerdb=playerdb,
         player=player,
         cursed_technique=cursed_technique,
@@ -115,7 +115,7 @@ def admin_delete_player(
             status.HTTP_404_NOT_FOUND, detail=f"player with ID {player_id} not found"
         )
 
-    deleted_player = _delete_player_helper(
+    deleted_player = delete_player_helper(
         player=player, player_user=player.user, session=session
     )
 

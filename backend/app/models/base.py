@@ -94,13 +94,6 @@ class BasePlayer(SQLModel):
     `role: str | None = None`
     """
 
-    class Gender(str, Enum):
-        "the player gender options"
-
-        m = "male"
-        f = "female"
-        nb = "non-binary"
-
     class Grade(IntEnum):
         "the enum class for player grades"
 
@@ -109,6 +102,13 @@ class BasePlayer(SQLModel):
         TWO = 2
         THREE = 3
         FOUR = 4
+
+    class Gender(str, Enum):
+        "the player gender options"
+
+        m = "male"
+        f = "female"
+        nb = "non-binary"
 
     name: str = Field(
         index=True,
@@ -375,6 +375,16 @@ class BaseVote(SQLModel):
 
     player_id: int = Field(foreign_key="player.id", ondelete="RESTRICT", index=True)
     ct_app_id: int = Field(foreign_key="ctapp.id", ondelete="RESTRICT", index=True)
+
+
+class PlayerUpgradeCost(Enum):
+    "Class containing the upgrade costs for player grades"
+
+    SPECIAL = 20
+    ONE = 15
+    TWO = 10
+    THREE = 5
+    FOUR = 0
 
 
 class ActionTimePoint(SQLModel):

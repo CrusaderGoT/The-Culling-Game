@@ -3,6 +3,7 @@ from typing import Literal
 from fastapi import HTTPException, status
 from sqlmodel import select
 
+from app.models.base import PlayerUpgradeCost
 from app.models.player import (
     CTApp,
     CursedTechnique,
@@ -47,11 +48,11 @@ def points_required_for_upgrade(grade: Player.Grade):
     "returns the points required for an upgrade"
     points_dict = dict(
         [
-            (4, 0.2),
-            (3, 0.2),
-            (2, 0.4),
-            (1, 0.4),
-            (0, 0.6),
+            (4, PlayerUpgradeCost.FOUR),
+            (3, PlayerUpgradeCost.THREE),
+            (2, PlayerUpgradeCost.TWO),
+            (1, PlayerUpgradeCost.ONE),
+            (0, PlayerUpgradeCost.FOUR),
         ]
     )
     return points_dict[grade.value]
@@ -83,7 +84,7 @@ def calculate_points(
         raise HTTPException(status.HTTP_428_PRECONDITION_REQUIRED, detail=msg)
 
 
-def _edit_player_helper(
+def edit_player_helper(
     *,
     playerdb: Player,
     player: EditPlayer | None,
@@ -137,9 +138,7 @@ def _edit_player_helper(
     return playerdb
 
 
-def _delete_player_helper(
-    *, player: Player, player_user: User | None, session: session
-):
+def delete_player_helper(*, player: Player, player_user: User | None, session: session):
     # if player has a match, set their status to dead instead (to avoid not null violation)
     if (len(player.matches) > 0) or (len(player.votes) > 0):
         player.alive = False

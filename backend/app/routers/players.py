@@ -17,9 +17,9 @@ from app.models.player import (
 from app.utils.config import PlayerException, Tag, UserException
 from app.utils.dependencies import atp, colony, session
 from app.utils.player import (
-    _delete_player_helper,
-    _edit_player_helper,
     calculate_points,
+    delete_player_helper,
+    edit_player_helper,
     get_alive_player,
     get_player,
     points_required_for_upgrade,
@@ -216,7 +216,7 @@ def edit_player(
         if playerdb.user_id != current_user.id:
             raise UserException(current_user, detail="Can only edit your own player.")
         else:  # update database infos
-            edited_player = _edit_player_helper(
+            edited_player = edit_player_helper(
                 playerdb=playerdb,
                 player=player,
                 cursed_technique=cursed_technique,
@@ -249,7 +249,7 @@ def delete_player(
     playerdb = get_alive_player(session=session, player_id=player_id)
     if playerdb:
         if playerdb.user_id == current_user.id:  # logged in user matches players user
-            deleted_player = _delete_player_helper(
+            deleted_player = delete_player_helper(
                 player=playerdb, player_user=current_user, session=session
             )
             return deleted_player
