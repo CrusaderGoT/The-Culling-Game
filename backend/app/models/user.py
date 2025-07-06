@@ -45,11 +45,13 @@ class User(BaseUser, table=True):
     created: date = Field(default=date.today())
     password: str = Field(description="the user's hashed password")
     # child rel
-    player: "Player" = Relationship(back_populates="user")
+    player: "Player" = Relationship(
+        back_populates="user", sa_relationship_kwargs={"single_parent": True}
+    )
     admin: "AdminUser" = Relationship(
         back_populates="user",
         cascade_delete=True,
-        # the following arg makes it so if you delete an admin the user is delete also
+        # the following arg makes it so if you delete an admin the user is deleted also
         sa_relationship_kwargs={"single_parent": True, "cascade": "all, delete"},
     )
     votes: list["Vote"] = Relationship(back_populates="user")

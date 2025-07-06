@@ -6,8 +6,6 @@ from app.models.player import (
     CreateCT,
     CreateCTApp,
     CreatePlayer,
-    CTApp,
-    CursedTechnique,
     EditCT,
     EditCTApp,
     EditPlayer,
@@ -18,6 +16,7 @@ from app.utils.config import PlayerException, Tag, UserException
 from app.utils.dependencies import atp, colony, session
 from app.utils.player import (
     calculate_points,
+    create_player_helper,
     delete_player_helper,
     edit_player_helper,
     get_alive_player,
@@ -71,24 +70,14 @@ def create_player(
                 err_msg = f"{userdb.username} already has a player '{userdb.player.name}'. Edit player instead."
             raise UserException(userdb, status.HTTP_409_CONFLICT, err_msg)
         else:  # user has no player
-            # ct router instances, for ct_ins; enumerate to get index for CTApp number
-            ct_apps_ins = [
-                CTApp.model_validate(ct_app, update={"number": inx + 1})
-                for inx, ct_app in enumerate(applications)
-            ]
-            update_ct = {"applications": ct_apps_ins}
-            ct_ins = CursedTechnique.model_validate(
-                cursed_technique, update=update_ct
-            )  # cursed technique instance
-            update_player = {
-                "cursed_technique": ct_ins,
-                "user": userdb,
-                "colony": colony,
-            }
-            new_player = Player.model_validate(player, update=update_player)
-            session.add(new_player)
-            session.commit()
-            session.refresh(new_player)
+            new_player = create_player_helper(
+                colony=colony,
+                user=userdb,
+                player=player,
+                cursed_technique=cursed_technique,
+                applications=applications,
+                session=session,
+            )
             return new_player
     else:  # no user found
         err_msg = f"User '{user}' not found"

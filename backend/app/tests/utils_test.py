@@ -20,12 +20,14 @@ from app.models.player import (
     CreateCT,
     CreateCTApp,
     CreatePlayer,
+    CursedTechnique,
     Player,
     PlayerInfo,
 )
 from app.models.user import Country, CreateUser, User, UserInfo
 from app.utils.admin import _make_permission_to_create
-from app.utils.dependencies import _atp_def, get_session
+from app.utils.dependencies import _atp_def, get_or_create_colony, get_session
+from app.utils.player import create_player_helper
 
 
 # UTILS
@@ -206,6 +208,9 @@ def setup_authenticated_client(cl: TestClient, token: str):
 
 def match_part():
     return 1
+
+
+# New Utils
 
 
 def compare_fields(expected: dict, actual: dict, keys: set | None = None):
@@ -446,3 +451,20 @@ def map_perm_request_to_permissions(perm_request: list[PermissionRequest]):
             perm_list.append(perm)
 
     return perm_list
+
+
+def create_player_via_session(ses: Session):
+    "adds a Player to session"
+    # create the user first
+    user = create_user_via_session(ses)
+    # rehash password, because it will
+
+    # make player
+    payload = player_payload()
+
+    # get colony
+    colony = get_or_create_colony(ses)
+
+    new_player = create_player_helper(colony=colony, user=user, session=ses, **payload)
+
+    return new_player

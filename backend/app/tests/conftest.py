@@ -46,24 +46,6 @@ def client_fixture(session: Session):
     app.dependency_overrides.clear()
 
 
-@pytest.fixture(name="player")
-def session_player_fixture(authorized_client: TestClient):
-    """add player to session"""
-
-    payload = player_payload()
-    player = create_client_player(authorized_client, payload)
-
-    res = authorized_client.get("/player/me")
-    assert res.is_success is True
-
-    assert player.id == res.json()["id"]
-
-    if player.user:
-        assert player.user.id == res.json()["user"]["id"]
-
-    yield player
-
-
 @pytest.fixture(name="authorized_client")
 def authorized_client_fixture(client: TestClient, session: Session):
     user = create_user_via_session(session)

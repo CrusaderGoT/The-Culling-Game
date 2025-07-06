@@ -74,9 +74,7 @@ class CursedTechnique(BaseCT, table=True):
 
     id: int | None = Field(default=None, primary_key=True)
     # parent rel
-    player_id: int | None = Field(
-        default=None, foreign_key="player.id", ondelete="CASCADE", index=True
-    )
+    player_id: int = Field(foreign_key="player.id", ondelete="CASCADE", index=True)
     player: Player = Relationship(
         back_populates="cursed_technique",
         # the following argument makes it so that if the cursed tech is deleted, the player will be deleted also
@@ -104,9 +102,7 @@ class CTApp(BaseCTApp, table=True):
     id: int | None = Field(default=None, primary_key=True)
     number: int = Field(ge=1, le=5)
     # parent rel
-    ct_id: int | None = Field(
-        default=None, foreign_key="cursedtechnique.id", index=True, ondelete="CASCADE"
-    )
+    ct_id: int = Field(foreign_key="cursedtechnique.id", index=True, ondelete="CASCADE")
     ct: CursedTechnique = Relationship(back_populates="applications")
     # child rel
     votes: list["Vote"] = Relationship(back_populates="ct_app")

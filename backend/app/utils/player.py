@@ -4,7 +4,11 @@ from fastapi import HTTPException, status
 from sqlmodel import select
 
 from app.models.base import PlayerUpgradeCost
+from app.models.colony import Colony
 from app.models.player import (
+    CreateCT,
+    CreateCTApp,
+    CreatePlayer,
     CTApp,
     CursedTechnique,
     EditCT,
@@ -55,7 +59,7 @@ def points_required_for_upgrade(grade: Player.Grade):
             (0, PlayerUpgradeCost.FOUR),
         ]
     )
-    return points_dict[grade.value]
+    return points_dict[grade.value].value
 
 
 def calculate_points(
@@ -176,3 +180,35 @@ def delete_player_helper(*, player: Player, player_user: User | None, session: s
                 player, update=update_user_colony
             )
             return deleted_player
+
+
+def create_player_helper(
+    colony: Colony,
+    user: User,
+    player: CreatePlayer,
+    cursed_technique: CreateCT,
+    applications: list[CreateCTApp],
+    session: session,
+):
+    # ct app instances, for ct_ins; enumerate to get index for CTApp number
+    ct_apps_instance = [
+        CTApp(number=inx + 1, **ct_app.model_dump())
+        for inx, ct_app in enumerate(applications)
+    ]
+
+    # cursed technique instance
+    ct_instance = CursedTechnique(
+        applications=ct_apps_instance, **cursed_technique.model_dump()
+    )
+
+    # player instance
+    new_player = Player(
+        user_id=user.id,
+        cursed_technique=ct_instance,
+        colony=colony,
+        **player.model_dump(),
+    )
+    session.add(new_player)
+    session.commit()
+    session.refresh(new_player)
+    return new_player
