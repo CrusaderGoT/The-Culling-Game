@@ -261,7 +261,7 @@ def upgrade_player(
     """function for uprading the grade of a player.\n
     **points required.**"""
     player = get_alive_player(session=session, player_id=player_id)
-    if player is not None:
+    if player is not None and player.id is not None:
         if player != current_user.player:
             msg = "cannot upgrade another player; wrong player id."
             raise UserException(current_user, status.HTTP_401_UNAUTHORIZED, msg)
@@ -285,7 +285,7 @@ def upgrade_player(
                     if (
                         gu <= atp.bt_min_grade and cg > atp.bt_min_grade
                     ):  # grant barrier technique
-                        new_barrier_tech = BarrierTech(player=player)
+                        new_barrier_tech = BarrierTech(player_id=player.id)
                         session.add(new_barrier_tech)
                     # upgrade and deduct points
                     player.grade = grade_up

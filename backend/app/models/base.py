@@ -288,7 +288,7 @@ class AdminPermissionLink(SQLModel, table=True):
     "the m2m link table for an admin and permission(s)"
 
     admin_id: uuid.UUID | None = Field(
-        default=None, foreign_key="adminuser.id", primary_key=True
+        default=None, foreign_key="admin.id", primary_key=True
     )
     permission_id: int | None = Field(
         default=None, foreign_key="permission.id", primary_key=True
@@ -369,12 +369,12 @@ class BaseBarrierTech(SQLModel):
 class BaseVote(SQLModel):
     """
     ### The base class for a vote
-    `player_id: = Field(foreign_key="player.id", ondelete="RESTRICT", index=True)`
-    `ct_app_id: = Field(foreign_key="ctapp.id", ondelete="RESTRICT", index=True)`
+    `player_id: = Field(foreign_key="player.id", ondelete="CASCADE", index=True)`
+    `ct_app_id: = Field(foreign_key="ctapp.id", ondelete="CASCADE", index=True)`
     """
 
-    player_id: int = Field(foreign_key="player.id", ondelete="RESTRICT", index=True)
-    ct_app_id: int = Field(foreign_key="ctapp.id", ondelete="RESTRICT", index=True)
+    player_id: int = Field(foreign_key="player.id", ondelete="CASCADE", index=True)
+    ct_app_id: int = Field(foreign_key="ctapp.id", ondelete="CASCADE", index=True)
 
 
 class PlayerUpgradeCost(Enum):

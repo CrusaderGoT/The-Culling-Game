@@ -1,9 +1,30 @@
 import json
 import os
+
+# for preventing empty revision
+# for typing purposes
+from collections.abc import Iterable
 from logging.config import fileConfig
 from pathlib import Path
 
 from alembic import context
+from alembic.environment import MigrationContext
+
+# this typing-only import requires alembic  1.12.1 or above
+from alembic.operations import MigrationScript
+from app.api.setting import settings
+
+# add your model's MetaData object here
+# for 'autogenerate' support
+# from myapp import mymodel
+# import all models that have table=True
+from app.models.admin import *
+from app.models.barrier import *
+from app.models.colony import *
+from app.models.match import *
+from app.models.player import *
+from app.models.user import *
+from app.models.vote import *
 from dotenv import load_dotenv
 from sqlalchemy import engine_from_config, pool
 from sqlmodel import SQLModel
@@ -24,7 +45,7 @@ if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
 # Retrieve DATABASE_URL from environment variables
-database_url = os.getenv("DATABASE_URL")
+database_url = settings.database_url
 
 if not database_url:
     raise ValueError("DATABASE_URL environment variable is not set.")
@@ -32,27 +53,6 @@ if not database_url:
 # Replace the sqlalchemy.url in the alembic.ini file dynamically
 config.set_main_option("sqlalchemy.url", database_url)
 
-
-# for preventing empty revision
-# for typing purposes
-from collections.abc import Iterable
-
-from alembic.environment import MigrationContext
-
-# this typing-only import requires alembic  1.12.1 or above
-from alembic.operations import MigrationScript
-
-# add your model's MetaData object here
-# for 'autogenerate' support
-# from myapp import mymodel
-# import all models that have table=True
-from app.models.admin import *
-from app.models.barrier import *
-from app.models.colony import *
-from app.models.match import *
-from app.models.player import *
-from app.models.user import *
-from app.models.vote import *
 
 # target_metadata = mymodel.Base.metadata
 target_metadata = SQLModel.metadata

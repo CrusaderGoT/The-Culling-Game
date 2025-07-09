@@ -3,7 +3,6 @@
 from datetime import UTC, datetime
 from typing import Annotated
 
-from app.api.setting import redis_source, settings
 from app.auth.dependencies import active_user, oauth2_scheme
 from app.models.barrier import BarrierTech, BarrierTechInfo
 from app.models.match import Match
@@ -14,9 +13,6 @@ from app.utils.barrier import (
     activate_reverse_cursed_technique,
     activate_simple_domain,
     conditions_for_barrier_tech,
-    deactivate_binding_vow,
-    deactivate_domain,
-    deactivate_simple_domain,
     fix_barrier_deactivation_task_fail,
 )
 from app.utils.config import PlayerException, Tag

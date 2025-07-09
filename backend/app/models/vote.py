@@ -55,9 +55,7 @@ class Vote(BaseVote, table=True):
     user_id: int | None = Field(
         default=None, foreign_key="user.id", ondelete="SET NULL", index=True
     )
-    match_id: int | None = Field(
-        default=None, foreign_key="match.id", ondelete="CASCADE", index=True
-    )
+    match_id: int = Field(foreign_key="match.id", ondelete="CASCADE", index=True)
     user: "User" = Relationship(back_populates="votes")  # the user casting their votes
 
     match: "Match" = Relationship(

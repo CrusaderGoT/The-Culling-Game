@@ -31,7 +31,7 @@ async def vote(
     """
     # first check if match exists
     match = get_match(session, match_id)
-    if match is not None:
+    if match is not None and match.id:
         # check if match still ongoing
         if ongoing_match(match) is True:
             # check if user has voted before, and get previous votes
@@ -89,7 +89,7 @@ async def vote(
                             player = [
                                 p for p in match.players if p.id == vote.player_id
                             ][0]
-                            if player:
+                            if player and player.id:
                                 # get the opposing player, for their BT check against player
                                 opposing_player = [
                                     p for p in match.players if p.id != player.id
@@ -115,15 +115,15 @@ async def vote(
                                         vote_point *= atp.black_flash_point
 
                                     # Create and add the vote
-                                    update_vote = {
-                                        "user": voter,
-                                        "match": match,
-                                        "point": vote_point,
-                                        "has_been_added": True,
-                                    }
-                                    casted_vote = Vote.model_validate(
-                                        vote, update=update_vote
+                                    casted_vote = Vote(
+                                        user_id=voter.id,
+                                        player_id=player.id,
+                                        ct_app_id=vote.ct_app_id,
+                                        match_id=match.id,
+                                        point=vote_point,
+                                        has_been_added=True,
                                     )
+
                                     new_votes.append(casted_vote)
                                     # add the vote points to players points
                                     player.points = round(player.points + vote_point, 1)

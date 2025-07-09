@@ -3,7 +3,18 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
     /* config options here */
     experimental: {
-        optimizePackageImports: ["@mantine/core", "@mantine/hooks"],
+        optimizePackageImports: [
+            "@mantine/core",
+            "@mantine/hooks",
+            "@tabler/icons-react",
+            "recharts",
+            "@mantine/charts",
+            "@mantine/form",
+            "@mantine/notifications",
+            "@mantine/nprogress",
+            "clsx",
+            "dayjs",
+        ],
     },
     crossOrigin: "use-credentials",
     images: {

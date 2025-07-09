@@ -47,7 +47,7 @@ def get_last_created_match(session: session):
     return last_match
 
 
-def create_new_match(session: session, part: int, atp) -> Match:
+def create_new_match(session: session, part: int, atp: atp) -> Match:
     """Creates a new match with optimized player selection logic."""
 
     # Get eligible colony with available players
@@ -57,7 +57,13 @@ def create_new_match(session: session, part: int, atp) -> Match:
     players = _get_match_players(session, colony_id, part)
 
     # Create and return the match
-    return _create_match_instance(colony_id, part, players, atp)
+    new_match = _create_match_instance(colony_id, part, players, atp)
+
+    session.add(new_match)
+    session.commit()
+    session.refresh(new_match)
+
+    return new_match
 
 
 def _get_eligible_colony(session: session, part: int) -> int:
@@ -270,7 +276,7 @@ def schedule_assign_match_winner(*, match_id: int, session: session, atp: atp):
         continue  # run loop again after sleep
 
     else:  # runs after the match is ended
-        assign_match_winner(match=match, atp=atp, session=session)
+        assign_match_winner_helper(match=match, atp=atp, session=session)
 
 
 def _make_match_winner(session: session, match: Match, winner: Player, atp: atp):
@@ -297,7 +303,7 @@ def _make_match_draw(session: session, match: Match):
 
 
 @broker.task
-def assign_match_winner(match: Match, atp: atp, session: session):
+def assign_match_winner_helper(match: Match, atp: atp, session: session):
     """
     Determine the winner of a match or declare it a draw.
 
@@ -331,7 +337,7 @@ def assign_match_winner(match: Match, atp: atp, session: session):
     if len(votes_hierarchy) == 0:
         # Edge case: somehow no votes after filtering
         return _make_match_draw(session=session, match=match)
-    
+
     if len(votes_hierarchy) == 1:
         # only one player got voted - they win
         winner = get_player(session, player_id=votes_hierarchy[0][0])
@@ -344,23 +350,20 @@ def assign_match_winner(match: Match, atp: atp, session: session):
     # Check for ties at the top
     highest_vote_count = votes_hierarchy[0][1]
     players_with_highest_votes = [
-        player_id for player_id, vote_count in votes_hierarchy 
+        player_id
+        for player_id, vote_count in votes_hierarchy
         if vote_count == highest_vote_count
     ]
-    
+
     if len(players_with_highest_votes) > 1:
         # Tie for first place - make it a draw
         return _make_match_draw(session=session, match=match)
-    
+
     # Clear winner exists
     winner = get_player(session, player_id=votes_hierarchy[0][0])
     if not winner:
         raise MatchException(
             "Winner could not be retrieved. This may indicate a data inconsistency issue."
         )
-    
+
     return _make_match_winner(session, match, winner, atp)
-
-
- 
-        

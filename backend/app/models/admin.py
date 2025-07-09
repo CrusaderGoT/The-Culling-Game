@@ -24,16 +24,14 @@ import uuid
 # write your admin models here
 
 
-class AdminUser(SQLModel, table=True):
+class Admin(SQLModel, table=True):
     "an admin user as stored in the database"
 
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     permissions: list["Permission"] = Relationship(
         back_populates="admins", link_model=AdminPermissionLink
     )
-    user_id: int | None = Field(
-        default=None, foreign_key="user.id", ondelete="CASCADE", index=True
-    )
+    user_id: int = Field(foreign_key="user.id", ondelete="CASCADE", index=True)
     user: "User" = Relationship(back_populates="admin")
     is_superuser: bool = Field(default=False)
 
@@ -46,7 +44,7 @@ class Permission(BasePermission, table=True):
     level: BasePermission.PermissionLevel = Field(
         description="Permission name", index=True
     )
-    admins: list[AdminUser] = Relationship(
+    admins: list[Admin] = Relationship(
         back_populates="permissions", link_model=AdminPermissionLink
     )
 

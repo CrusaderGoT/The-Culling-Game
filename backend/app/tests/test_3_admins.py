@@ -55,7 +55,7 @@ def test_create_admin_by_perm_admin_same_perm_payload(admin_client, session):
     "test for creating admin, by admin and superuser"
     # give admin the permission
     create_admin_perm = _make_permission_to_create(
-        model=ModelName.adminuser, level=Permission.PermissionLevel.CREATE
+        model=ModelName.admin, level=Permission.PermissionLevel.CREATE
     )
     grant_admin_client_permission_via_session(session, admin_client, create_admin_perm)
 
@@ -65,7 +65,7 @@ def test_create_admin_by_perm_admin_same_perm_payload(admin_client, session):
     # make payload match admin client perms
     payload = permission_payload(
         {
-            ModelName.adminuser: {
+            ModelName.admin: {
                 BasePermission.PermissionLevel.CREATE,
             }
         }
@@ -87,7 +87,7 @@ def test_create_admin_by_perm_admin_diff_perm_payload(admin_client, session):
     "test for creating admin, by admin and superuser"
     # give admin the permission
     create_admin_perm = _make_permission_to_create(
-        model=ModelName.adminuser, level=Permission.PermissionLevel.CREATE
+        model=ModelName.admin, level=Permission.PermissionLevel.CREATE
     )
     grant_admin_client_permission_via_session(session, admin_client, create_admin_perm)
 
@@ -238,7 +238,7 @@ def test_grant_permission_by_perm_admin_client_diff_perm_payload(admin_client, s
     "function for testing creation of new permissions"
     # give admin perm to update other admins
     update_admin_perm = _make_permission_to_create(
-        ModelName.adminuser,
+        ModelName.admin,
         BasePermission.PermissionLevel.UPDATE,
     )
     grant_admin_client_permission_via_session(session, admin_client, update_admin_perm)
@@ -273,14 +273,14 @@ def test_grant_permission_by_perm_admin_client_some_same_perm_payload(
     "function for testing creation of new permissions"
     # give admin perm to update other admins
     update_admin_perm = _make_permission_to_create(
-        ModelName.adminuser,
+        ModelName.admin,
         BasePermission.PermissionLevel.UPDATE,
     )
     grant_admin_client_permission_via_session(session, admin_client, update_admin_perm)
 
     some_same_perm_payload = permission_payload(
         {
-            ModelName.adminuser: {
+            ModelName.admin: {
                 BasePermission.PermissionLevel.CREATE,
                 BasePermission.PermissionLevel.READ,
                 BasePermission.PermissionLevel.UPDATE,
@@ -325,7 +325,7 @@ def test_grant_permission_by_superuser(superuser_client, session):
     "function for testing creation of new permissions"
     # give admin perm to update other admins
     update_admin_perm = _make_permission_to_create(
-        ModelName.adminuser,
+        ModelName.admin,
         BasePermission.PermissionLevel.UPDATE,
     )
     grant_admin_client_permission_via_session(
@@ -430,7 +430,7 @@ def test_grant_permission_by_perm_admin_client_same_perm_payload(admin_client, s
 
     same_perm_payload = permission_payload(
         {
-            ModelName.adminuser: {
+            ModelName.admin: {
                 BasePermission.PermissionLevel.UPDATE,
             }
         }

@@ -46,7 +46,7 @@ class Match(BaseMatch, table=True):
     players: list["Player"] = Relationship(
         back_populates="matches", link_model=MatchPlayerLink
     )
-    votes: list["Vote"] = Relationship(back_populates="match")
+    votes: list["Vote"] = Relationship(back_populates="match", cascade_delete=True)
     # typically only one per player, if barrier tech is used
     barrier_records: list["BarrierRecord"] = Relationship(back_populates="match")
 

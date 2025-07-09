@@ -2,7 +2,7 @@ from fastapi import HTTPException, status
 from sqlmodel import select
 
 from app.auth.dependencies import admin_user
-from app.models.admin import AdminUser, Permission, PermissionRequest
+from app.models.admin import Admin, Permission, PermissionRequest
 from app.models.table import ModelName
 from app.utils.config import AdminException
 from app.utils.dependencies import session
@@ -38,7 +38,7 @@ def superuser_allow_permissions(permissions: list[PermissionRequest], session: s
 
 
 def admin_allow_permissions(
-    admin: AdminUser, permissions: list[PermissionRequest], session: session
+    admin: Admin, permissions: list[PermissionRequest], session: session
 ):
     """
     Abstract helper for granting permissions as an **Admin**.\n
@@ -73,7 +73,7 @@ def admin_allow_permissions(
 
 def check_admin_permission(
     session: session,
-    admin: AdminUser,
+    admin: Admin,
     model_name: ModelName,
     permission_level: Permission.PermissionLevel,
 ) -> bool:

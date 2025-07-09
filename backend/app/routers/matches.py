@@ -11,7 +11,7 @@ from app.utils.admin import ADMIN_UNAUTHORIZED_EXCEPTION, check_admin_permission
 from app.utils.config import Tag
 from app.utils.dependencies import atp, session
 from app.utils.match import (
-    assign_match_winner,
+    assign_match_winner_helper,
     create_new_match,
     get_last_created_match,
     get_match,
@@ -62,9 +62,6 @@ async def create_match(
                 raise HTTPException(status.HTTP_406_NOT_ACCEPTABLE, msg)
             else:  # previous match has ended; create match
                 new_match = create_new_match(session, part, atp)
-                session.add(new_match)
-                session.commit()
-                session.refresh(new_match)
 
                 return new_match
 
@@ -159,17 +156,14 @@ def delete_match(
         # get the match
         match = get_match(session=session, match_id=match_id)
         if match is not None:
-            colony = match.colony
-            winner = match.winner
+            # express deleted match non list (since list can be empty) relations, to avoid detached error
+            match.colony
+            match.winner
+
             session.delete(match)
             session.commit()
-            # construct deleted match non list (since list can be empty) relations to avoid detached error
-            relations_update = {
-                "colony": colony,
-                "winner": winner,
-            }
-            deleted_match = Match.model_validate(match, update=relations_update)
-            return deleted_match
+
+            return match
         else:
             raise HTTPException(
                 status.HTTP_404_NOT_FOUND, f"Match with Id: {match_id}, Not Found"
@@ -180,7 +174,7 @@ def delete_match(
 
 
 @router.post("/winner/{match_id}", response_model=MatchInfo)
-def match_winner(
+def assign_match_winner(
     match_id: Annotated[int, Path()],
     atp: atp,
     session: session,
@@ -196,6 +190,6 @@ def match_winner(
         )
 
     # perform process
-    match_winner = assign_match_winner(match=match, atp=atp, session=session)
+    match_winner = assign_match_winner_helper(match=match, atp=atp, session=session)
 
     return match_winner

@@ -15,7 +15,6 @@ from app.models.player import (
     EditCTApp,
     EditPlayer,
     Player,
-    PlayerInfo,
 )
 from app.models.user import User
 from app.utils.config import PlayerException
@@ -152,34 +151,21 @@ def delete_player_helper(*, player: Player, player_user: User | None, session: s
         session.refresh(player)
         return player
     else:  # thoroughly delete player
-        # colony is not deleted, but assigned to a variable
-        # to avoid detached error when/if fetched later, after player is deleted
-        colony = player.colony
-        # get player barrier tech here (to avoid confirm_deleted_rows warning)
-        barrier_tech = player.barrier_technique
-        # add ct apps to  a variable and add/append to delete session
-        ct_apps = player.cursed_technique.applications
-        for app in ct_apps:
-            session.delete(app)
-        else:  # after for loop
-            if barrier_tech:
-                session.delete(barrier_tech)
-            session.delete(player.cursed_technique)
-            session.delete(player)
+        # express colony to avoid detached error when/if fetched later, after player is deleted
+        player.colony
 
-            # commit relevant changes
-            session.commit()
+        session.delete(player)
 
-            # create a new player info. This is done because after player is deleted
-            # it is removed from the session(detached state), and returning the playerdb
-            # will attempt to fetch its respective user and colony, and will fail.
-            # having the user(player_user) and colony(colony) in variables
-            # prevents this failure, but i think it is better to be explicit, as to avoid potential bugs.
-            update_user_colony = {"colony": colony, "user": player_user}
-            deleted_player = PlayerInfo.model_validate(
-                player, update=update_user_colony
-            )
-            return deleted_player
+        # commit relevant changes
+        session.commit()
+
+        # create a new player info. This is done because after player is deleted
+        # it is removed from the session(detached state), and returning the playerdb
+        # will attempt to fetch its respective user and colony, and will fail.
+        # having the user(player_user) and colony(colony) in variables
+        # prevents this failure, but i think it is better to be explicit, as to avoid potential bugs.
+
+        return player
 
 
 def create_player_helper(

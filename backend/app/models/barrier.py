@@ -20,9 +20,7 @@ class BarrierTech(BaseBarrierTech, table=True):
 
     id: int | None = Field(default=None, primary_key=True)
     # parent rel
-    player_id: int | None = Field(
-        default=None, foreign_key="player.id", ondelete="CASCADE"
-    )
+    player_id: int = Field(foreign_key="player.id", ondelete="CASCADE")
     player: "Player" = Relationship(back_populates="barrier_technique")
     # child rel
     records: list["BarrierRecord"] = Relationship(back_populates="barrier_tech")

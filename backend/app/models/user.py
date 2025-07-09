@@ -29,7 +29,7 @@ from ..models.base import (
 
 if TYPE_CHECKING:
     from ..models.player import Player
-    from .admin import AdminUser
+    from .admin import Admin
     from .vote import Vote
 
 
@@ -48,7 +48,7 @@ class User(BaseUser, table=True):
     player: "Player" = Relationship(
         back_populates="user", sa_relationship_kwargs={"single_parent": True}
     )
-    admin: "AdminUser" = Relationship(
+    admin: "Admin" = Relationship(
         back_populates="user",
         cascade_delete=True,
         # the following arg makes it so if you delete an admin the user is deleted also
@@ -93,7 +93,7 @@ class CreateUser(BaseUser):
         # Use re.fullmatch so the entire password string is checked.
         if not PASSWORD_PATTERN.fullmatch(value):
             raise ValueError(
-                "Password must be at least 8 characters long, include at least one lowercase letter, one uppercase letter, one digit, and one special character (@, $, !, %, *, ?, &, #)."
+                "Password must be at least 8 characters long, include at least one lowercase letter, one uppercase letter, one digit, and one special character from (@, $, !, %, *, ?, &, #)."
             )
         return value
 

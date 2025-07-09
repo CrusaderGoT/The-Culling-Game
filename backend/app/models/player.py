@@ -40,16 +40,18 @@ class Player(BasePlayer, table=True):
     points: float = Field(default=0.0, description="the overall points of a player")
     created: date = Field(default=date.today(), index=True)
     # child relations
-    cursed_technique: "CursedTechnique" = Relationship(back_populates="player")
+    cursed_technique: "CursedTechnique" = Relationship(
+        back_populates="player", cascade_delete=True
+    )
     # barrier techniques are only available to player of grade 2 up, implement later.
     barrier_technique: Union["BarrierTech", None] = Relationship(
-        back_populates="player"
+        back_populates="player", cascade_delete=True
     )
     matches: list["Match"] = Relationship(
         back_populates="players", link_model=MatchPlayerLink
     )
     wins: list["Match"] = Relationship(back_populates="winner")
-    votes: list["Vote"] = Relationship(back_populates="player")
+    votes: list["Vote"] = Relationship(back_populates="player", cascade_delete=True)
     # parent relations
     user_id: int | None = Field(
         default=None, foreign_key="user.id", ondelete="SET NULL", index=True
@@ -105,7 +107,7 @@ class CTApp(BaseCTApp, table=True):
     ct_id: int = Field(foreign_key="cursedtechnique.id", index=True, ondelete="CASCADE")
     ct: CursedTechnique = Relationship(back_populates="applications")
     # child rel
-    votes: list["Vote"] = Relationship(back_populates="ct_app")
+    votes: list["Vote"] = Relationship(back_populates="ct_app", cascade_delete=True)
 
 
 class CreateCTApp(BaseCTApp):

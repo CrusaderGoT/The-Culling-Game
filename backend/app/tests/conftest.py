@@ -6,16 +6,10 @@ from fastapi.testclient import TestClient
 from sqlmodel import Session, SQLModel, StaticPool, create_engine
 
 from app.api.main import app
-from app.models.admin import AdminUser
-from app.models.user import User
 from app.tests.utils_test import (
     create_admin_via_session,
-    create_client_player,
     create_user_via_session,
-    hashed_password,
     override_dependencies,
-    player_payload,
-    user_payload,
 )
 
 load_dotenv(".env.test")

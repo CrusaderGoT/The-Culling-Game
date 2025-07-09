@@ -12,7 +12,7 @@ from fastapi import Request, status
 from fastapi.responses import JSONResponse
 
 from app.api.setting import app
-from app.models.admin import AdminInfo, AdminUser
+from app.models.admin import Admin, AdminInfo
 from app.models.player import Player, PlayerInfo
 from app.models.user import User, UserInfo
 
@@ -47,7 +47,7 @@ class AdminException(Exception):
 
     def __init__(
         self,
-        admin: AdminUser,
+        admin: Admin,
         code: int = status.HTTP_400_BAD_REQUEST,
         detail: Any = "An Error Occurred with this Admin",
         headers: dict[str, str] | None = None,

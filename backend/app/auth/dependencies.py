@@ -8,7 +8,7 @@ from app.models.user import User
 from app.utils.dependencies import session
 from app.utils.user import get_user
 
-from ..models.admin import AdminUser
+from ..models.admin import Admin
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 """A dependency of the OAuth2PasswordBearer class."""
@@ -57,6 +57,6 @@ def get_admin_user(token: Annotated[str, Depends(oauth2_scheme)], session: sessi
     return user.admin
 
 
-admin_user = Annotated[AdminUser, Depends(get_admin_user)]
+admin_user = Annotated[Admin, Depends(get_admin_user)]
 """returns an admin user.\n
 An alias dependency of the `get_admin_user` function."""

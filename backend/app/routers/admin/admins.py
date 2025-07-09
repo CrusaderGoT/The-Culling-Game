@@ -6,8 +6,8 @@ from uuid import UUID
 from app.api.setting import settings
 from app.auth.dependencies import admin_user, get_admin_user, oauth2_scheme
 from app.models.admin import (
+    Admin,
     AdminInfo,
-    AdminUser,
     PermissionInfo,
     PermissionRequest,
 )
@@ -60,7 +60,7 @@ def create_admin(
     permission = check_admin_permission(
         session=session,
         admin=p_admin,
-        model_name=ModelName.adminuser,
+        model_name=ModelName.admin,
         permission_level=BasePermission.PermissionLevel.CREATE,
     )
 
@@ -70,7 +70,7 @@ def create_admin(
     # Fetch the user from the database
     userdb = get_user(session, user)
 
-    if userdb is None:
+    if not userdb or userdb.id is None:
         # Raise 404 error if the user does not exist in the database
         raise HTTPException(
             status.HTTP_404_NOT_FOUND,
@@ -86,7 +86,7 @@ def create_admin(
         )
 
     # Check if the user is already an admin
-    if userdb.admin is not None:
+    if userdb.admin:
         raise AdminException(
             userdb.admin,
             status.HTTP_417_EXPECTATION_FAILED,
@@ -114,7 +114,7 @@ def create_admin(
 
     # Once all permissions are processed, create the new admin user
     # Create the new admin with the filtered permissions
-    new_admin = AdminUser(permissions=new_permissions, user=userdb)
+    new_admin = Admin(permissions=new_permissions, user=userdb, user_id=userdb.id)
     session.add(new_admin)
     session.commit()
     session.refresh(new_admin)
@@ -214,7 +214,7 @@ def grant_permission(
     permission = check_admin_permission(
         session=session,
         admin=p_admin,
-        model_name=ModelName.adminuser,
+        model_name=ModelName.admin,
         permission_level=BasePermission.PermissionLevel.UPDATE,
     )
 
@@ -224,7 +224,7 @@ def grant_permission(
         raise ADMIN_UNAUTHORIZED_EXCEPTION(p_admin)
 
     # check if admin exist
-    admin = session.get(AdminUser, admin_id)
+    admin = session.get(Admin, admin_id)
 
     if not admin:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Admin not found")
@@ -294,7 +294,7 @@ def remove_permission(
         raise ADMIN_UNAUTHORIZED_EXCEPTION(p_admin)
 
     # check if admin exist
-    admin = session.get(AdminUser, admin_id)
+    admin = session.get(Admin, admin_id)
 
     if not admin:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Admin not found")
@@ -345,11 +345,11 @@ def demo_superuser(
 ):
     # get the user
     userdb = get_user(session, user)
-    if not userdb:
+    if not userdb or userdb.id is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, f"user {user} not found")
     if code != settings.code:
         raise HTTPException(status.HTTP_405_METHOD_NOT_ALLOWED, "invalid code")
-    admin_user = AdminUser(is_superuser=True, user=userdb)
+    admin_user = Admin(is_superuser=True, user=userdb, user_id=userdb.id)
     session.add(admin_user)
     session.commit()
     session.refresh(admin_user)
@@ -363,5 +363,5 @@ def demo_superuser(
     summary="Get the logged in admin",
     status_code=status.HTTP_200_OK,
 )
-def current_admin(admin: admin_user) -> AdminUser:
+def current_admin(admin: admin_user) -> Admin:
     return admin

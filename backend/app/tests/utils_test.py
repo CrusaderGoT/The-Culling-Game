@@ -10,27 +10,29 @@ from typing import Any
 
 from fastapi.encoders import jsonable_encoder as je
 from fastapi.testclient import TestClient
-from sqlmodel import Session, SQLModel, select
+from sqlmodel import Session, select
 
 from app.api.main import app
 from app.auth.credentials import PasswordAuth as pw
-from app.models.admin import AdminUser, Permission, PermissionInfo, PermissionRequest
-from app.models.base import BasePermission, ModelName
+from app.models.admin import Admin, Permission, PermissionInfo, PermissionRequest
+from app.models.base import ActionTimePoint, BasePermission, ModelName
 from app.models.player import (
     CreateCT,
     CreateCTApp,
     CreatePlayer,
-    CursedTechnique,
     Player,
     PlayerInfo,
 )
 from app.models.user import Country, CreateUser, User, UserInfo
+from app.models.vote import Vote
 from app.utils.admin import _make_permission_to_create
 from app.utils.dependencies import _atp_def, get_or_create_colony, get_session
+from app.utils.match import create_new_match
 from app.utils.player import create_player_helper
 
+# PAYLOADS
 
-# UTILS
+
 def generate_random_string(length: int = 10) -> str:
     """
     Generate random string of specified length using letters, digits and special chars.
@@ -41,7 +43,7 @@ def generate_random_string(length: int = 10) -> str:
         Random string of specified length
     """
     first_char = random.choice(string.ascii_letters)
-    allowed_chars = string.ascii_letters + string.digits + "_-"
+    allowed_chars = string.ascii_letters + string.digits
     rest = "".join(random.choices(allowed_chars, k=length - 1))
     return first_char + rest
 
@@ -67,7 +69,7 @@ def player_payload():
         role=generate_random_string(),
     )
     c_ct = CreateCT(
-        name="git push",
+        name=generate_random_string(),
         definition=break_string(generate_random_string(200)),
     )
     c_ct_apps = [
@@ -102,61 +104,35 @@ def player_payload():
 
 
 def user_payload():
+    pw = user_password()
     pyld = CreateUser(
         username=generate_random_string(),
         email=generate_random_email(),
         country=choice(list(Country)),
-        password=user_password(),
-        confirm_password=user_password(),
+        password=pw,
+        confirm_password=pw,
     )
 
     return pyld
 
 
 def user_password():
-    return "Password45@"
+    return "Pw5@" + generate_random_string(8)
 
 
 def hashed_password(password: str):
     return pw().hash_password(password)
 
 
-def create_test_user(ts):
-    """creates a brand new test user. returns the user info\n
-    should typically be used in a function
-    that uses the test_client pytest fixture as an arg."""
-    create_user_payload = user_payload()
-    new_user_res = ts.post("/signup", json=je(create_user_payload))
-    # check status is created
-    assert new_user_res.status_code == 201
-    return new_user_res
-
-
-def create_authenticated_player(ts) -> tuple[TestClient, dict]:
-    test_user = create_test_user(ts)
-    assert test_user.is_success is True
-    user_data = test_user.json()
-
-    token = login_test_user(ts, user_data["id"])
-    assert token
-
-    auth_client = setup_authenticated_client(ts, token)
-    player_res = create_test_player((auth_client, user_data))
-    assert player_res.is_success is True
-
-    player_data = (auth_client, player_res.json())
-    return player_data
-
-
 # DEPENDENCIES
 
 
-class ATPTest(SQLModel):
+class ATPTest(ActionTimePoint):
     "class for duration, limit, point, etc. of techniques, match, etc. `for tests`"
 
-    match_duration: timedelta = timedelta(seconds=30)
-    domain_duration: timedelta = timedelta(seconds=5)
-    simple_domain_duration: timedelta = timedelta(seconds=5)
+    match_duration: timedelta = timedelta(seconds=5)
+    domain_duration: timedelta = timedelta(seconds=1)
+    simple_domain_duration: timedelta = timedelta(seconds=1)
 
     vote_limit: int = 5
 
@@ -174,7 +150,7 @@ class ATPTest(SQLModel):
 
     winner_point: float = 5.0
 
-    delay_begin_match: timedelta = timedelta(seconds=60)
+    delay_begin_match: timedelta = timedelta(seconds=0)
     bt_min_grade: int = 3
     limit_reverse_cursed_technique: int = 5
     reverse_cursed_technique_point: float = 0.5
@@ -360,9 +336,7 @@ def grant_admin_client_permission_via_session(
     # get admin client admin table
     admin_user = get_client_user(admin_cli)
 
-    admin = ses.exec(
-        select(AdminUser).where(AdminUser.user_id == admin_user.id)
-    ).first()
+    admin = ses.exec(select(Admin).where(Admin.user_id == admin_user.id)).first()
     assert admin is not None, "Admin client AdminUser does not exist"
 
     admin.permissions.append(permission)
@@ -372,7 +346,7 @@ def grant_admin_client_permission_via_session(
 
 
 def grant_admin_permission_via_session(
-    ses: Session, admin: AdminUser, permission: Permission
+    ses: Session, admin: Admin, permission: Permission
 ):
     # add perm to session
     ses.add(permission)
@@ -385,7 +359,9 @@ def grant_admin_permission_via_session(
 
 def create_admin_via_session(ses: Session, user: User, is_superuser: bool = False):
     # make admin superuser
-    admin = AdminUser(user_id=user.id, is_superuser=is_superuser)
+    assert user.id, "User has no ID."
+
+    admin = Admin(user_id=user.id, is_superuser=is_superuser)
     ses.add(admin)
 
     # commit
@@ -468,3 +444,64 @@ def create_player_via_session(ses: Session):
     new_player = create_player_helper(colony=colony, user=user, session=ses, **payload)
 
     return new_player
+
+
+def create_match_via_session(ses: Session, part: int):
+    "create a match via session"
+    # create players first
+    multiple_players_via_session(ses, 2)
+
+    atp = ATPTest()
+
+    match = create_new_match(ses, part, atp=atp)
+
+    return match
+
+
+def multiple_players_via_session(ses: Session, num: int = 2):
+    players: list[Player] = list()
+
+    for _ in range(num):
+        player = create_player_via_session(ses)
+        players.append(player)
+
+    assert players, "No players were created."
+    assert len(players) == num, "Players created, do not match number specified"
+
+    return players
+
+
+def cast_vote_via_session(
+    ses: Session,
+    match_id: int,
+    vote_point: float,
+    player_id: int,
+    ct_app_id: int,
+    anon_user: bool | int = False,
+):
+    "cast a vote via session"
+    # process and get the user id
+    if anon_user is True:
+        user_id = create_user_via_session(ses).id
+    elif anon_user is False:
+        user_id = None
+    elif isinstance(anon_user, int):
+        user_id = anon_user
+    else:
+        user_id = None
+
+    # Create and add the vote
+    vote = Vote(
+        player_id=player_id,
+        ct_app_id=ct_app_id,
+        match_id=match_id,
+        point=vote_point,
+        has_been_added=True,
+        user_id=user_id,
+    )
+
+    ses.add(vote)
+    ses.commit()
+    ses.refresh(vote)
+
+    return vote
