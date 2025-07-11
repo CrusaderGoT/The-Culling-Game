@@ -54,6 +54,8 @@ def test_get_matches(authorized_client, session):
     response = authorized_client.get("match/all")
     response_data = response.json()
 
+    assert response.is_success, ("Fetchig all matches failed", response_data)
+
     assert response.is_success, response_data
 
     # confirm match info was return

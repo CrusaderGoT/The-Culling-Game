@@ -24,7 +24,7 @@ from app.models.player import (
     PlayerInfo,
 )
 from app.models.user import Country, CreateUser, User, UserInfo
-from app.models.vote import Vote
+from app.models.vote import CastVote, ClientVoteInfo, Vote
 from app.utils.admin import _make_permission_to_create
 from app.utils.dependencies import _atp_def, get_or_create_colony, get_session
 from app.utils.match import create_new_match
@@ -505,3 +505,27 @@ def cast_vote_via_session(
     ses.refresh(vote)
 
     return vote
+
+
+def assert_valid_vote(
+    response_data: dict, votes_payload: CastVote, client: TestClient | None = None
+):
+    # validate response
+    response_votes = ClientVoteInfo.model_validate(response_data)
+
+    # response votes
+    res_votes = response_votes.votes[0]
+
+    # assert the right player was votes
+    assert res_votes.player_id == votes_payload.player_id
+    assert res_votes.ct_app_id == votes_payload.ct_app_id
+    # assert vote was added
+    assert res_votes.has_been_added
+    # assert point is base point
+    atp = ATPTest()
+    assert res_votes.point == atp.vote_point
+
+    if client:
+        # assert the auth client user was the one that cast the vote
+        client_user = get_client_user(client)
+        assert res_votes.user_id == client_user.id

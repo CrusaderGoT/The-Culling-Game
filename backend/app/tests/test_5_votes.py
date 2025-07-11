@@ -1,85 +1,162 @@
+"""
+test file for votes
+"""
+
+from random import choice, randint
+
 from fastapi.encoders import jsonable_encoder as je
 
+from app.models.vote import CastVote
+from app.tests.utils_test import (
+    ATPTest,
+    assert_valid_vote,
+    create_match_via_session,
+)
 
-def test_player1_vote(votes, player1):
-    "test voting of a player, using an auth client, admin client, and players etc."
 
-    # Debug: Print vote payload to understand structure
-    print(f"Vote payload: {votes}")
+def test_vote_by_authorized_client(authorized_client, session):
+    part = 1
+    match = create_match_via_session(session, part)
 
-    # test for the users of the player
-    res = player1[0].post("/match/vote/1", json=je(votes))
-    print(f"Player 1 vote response: {res.status_code} - {res.json()}")
-    assert res.is_success is True, f"Player 1 vote failed: {res.json()}"
-    # check if all votes were casted
-    assert len(res.json()["votes"]) == len(votes), (
-        "Not all votes were casted for player 1 client",
-        f"{res.json()}",
+    # assertions to qualify for vote
+    assert match.id, "Match via session must have an ID."
+
+    # vote for a player
+    player = choice(match.players)
+    assert player.id, "Player from Match via session must have an ID."
+
+    ct_app_id = choice([app.id for app in player.cursed_technique.applications])
+    assert ct_app_id, (
+        "Cursed Technique Application from Player in Match via session must have an ID."
     )
-    # check if all votes were made by correct user
-    for v in res.json()["votes"]:
-        assert v["user_id"] == player1[1]["id"], "incorrect user cast vote"
+
+    votes = [
+        CastVote(player_id=player.id, ct_app_id=ct_app_id)
+    ]  # votes should be a list
+
+    response = authorized_client.post(f"match/vote/{match.id}", json=je(votes))
+    response_data = response.json()
+    assert response.is_success, ("Vote by Authorized client failed", response_data)
+
+    assert_valid_vote(response.json(), votes[0], authorized_client)
 
 
-def test_player2_vote(votes, player2):
-    "test voting of a player, using an auth client, admin client, and players etc."
+def test_vote_by_non_auth_client(client, session):
+    part = 1
+    match = create_match_via_session(session, part)
 
-    # Debug: Print vote payload to understand structure
-    print(f"Vote payload: {votes}")
+    # assertions to qualify for vote
+    assert match.id, "Match via session must have an ID."
 
-    res = player2[0].post("/match/vote/1", json=je(votes))
-    print(f"Player 2 vote response: {res.status_code} - {res.json()}")
-    assert res.is_success is True, f"Player 2 vote failed: {res.json()}"
-    # check if all votes were casted
-    assert len(res.json()["votes"]) == len(votes), (
-        "Not all votes were casted for player 2 client",
-        f"{res.json()}",
+    # vote for a player
+    player = choice(match.players)
+    assert player.id, "Player from Match via session must have an ID."
+
+    ct_app_id = choice([app.id for app in player.cursed_technique.applications])
+    assert ct_app_id, (
+        "Cursed Technique Application from Player in Match via session must have an ID."
     )
-    # check if all votes were made by correct user
-    for v in res.json()["votes"]:
-        assert v["user_id"] == player2[1]["id"], "incorrect user cast vote"
+
+    votes = [
+        CastVote(player_id=player.id, ct_app_id=ct_app_id)
+    ]  # votes should be a list
+
+    response = client.post(f"match/vote/{match.id}", json=je(votes))
+    response_data = response.json()
+    assert response.is_client_error, ("Non authorized cient cannot vote", response_data)
 
 
-def test_user_vote(votes, authenticated_test_client):
-    "test voting of a player, using an auth client, admin client, and players etc."
+def test_vote_by_admin_client(admin_client, session):
+    part = 1
+    match = create_match_via_session(session, part)
 
-    # Debug: Print vote payload to understand structure
-    print(f"Vote payload: {votes}")
+    # assertions to qualify for vote
+    assert match.id, "Match via session must have an ID."
 
-    # test for a regular user
-    res0 = authenticated_test_client[0].post("/match/vote/1", json=je(votes))
-    print(f"Regular user vote response: {res0.status_code} - {res0.json()}")
-    assert res0.is_success is True, f"Regular user vote failed: {res0.json()}"
-    # check if all votes were casted
-    assert len(res0.json()["votes"]) == len(votes), (
-        "Not all votes were casted for authenticated_test_client",
-        f"{res0.json()}",
+    # vote for a player
+    player = choice(match.players)
+    assert player.id, "Player from Match via session must have an ID."
+
+    ct_app_id = choice([app.id for app in player.cursed_technique.applications])
+    assert ct_app_id, (
+        "Cursed Technique Application from Player in Match via session must have an ID."
     )
-    print(res0.json(), authenticated_test_client[1])
-    # check if all votes were made by correct user
-    for v in res0.json()["votes"]:
-        assert v["user_id"] == authenticated_test_client[1]["id"], (
-            "incorrect user cast vote"
+
+    votes = [
+        CastVote(player_id=player.id, ct_app_id=ct_app_id)
+    ]  # votes should be a list
+
+    response = admin_client.post(f"match/vote/{match.id}", json=je(votes))
+    response_data = response.json()
+    assert response.is_success, ("Vote by admin client failed", response_data)
+
+    # validate response
+    assert_valid_vote(response.json(), votes[0], admin_client)
+
+
+def test_vote_max_votes(authorized_client, session):
+    part = 1
+    match = create_match_via_session(session, part)
+
+    # assertions to qualify for vote
+    assert match.id, "Match via session must have an ID."
+
+    max = randint(1, 10)
+
+    # loop vote to max
+    for i in range(max):
+        # vote for a player
+        player = choice(match.players)
+        assert player.id, "Player from Match via session must have an ID."
+
+        # make votes
+        ct_app_ids = [app.id for app in player.cursed_technique.applications]
+
+        if i + 1 > len(ct_app_ids):
+            # randomly select a ct app id, to avoid IndexError: list index out of range
+            ct_app_id = choice(ct_app_ids)
+        else:
+            ct_app_id = ct_app_ids[i]
+
+        assert ct_app_id, (
+            "Cursed Technique Application from Player in Match via session must have an ID."
         )
 
+        votes = [
+            CastVote(player_id=player.id, ct_app_id=ct_app_id)
+        ]  # votes should be a list
 
-def test_admin_vote(votes, authenticated_admin_client):
-    "test voting of a player, using an auth client, admin client, and players etc."
+        response = authorized_client.post(f"match/vote/{match.id}", json=je(votes))
+        response_data = response.json()
 
-    # Debug: Print vote payload to understand structure
-    print(f"Vote payload: {votes}")
+        atp = ATPTest()
 
-    # test for a admin user
-    res = authenticated_admin_client[0].post("/match/vote/1", json=je(votes))
-    print(f"Admin user vote response: {res.status_code} - {res.json()}")
-    assert res.is_success is True, f"Admin vote failed: {res.json()}"
-    # check if all votes were casted
-    assert len(res.json()["votes"]) == len(votes), (
-        "Not all votes were casted for authenticated_admin_client",
-        f"{res.json()}",
-    )
-    # check if all votes were made by correct user
-    for v in res.json()["votes"]:
-        assert v["user_id"] == authenticated_admin_client[1]["id"], (
-            "incorrect user cast vote"
-        )
+        if i + 1 > atp.vote_limit:  # should raise a client error
+            assert response.is_client_error, (
+                "Exceeded vote limit should fail.",
+                response_data,
+            )
+        else:
+            assert response.is_success, ("Vote by admin client failed", response_data)
+
+            # validate response
+            assert_valid_vote(response_data, votes[0], authorized_client)
+
+
+def test_vote_no_valid_votes(admin_client, session):
+    part = 1
+    match = create_match_via_session(session, part)
+
+    # assertions to qualify for vote
+    assert match.id, "Match via session must have an ID."
+
+    # vote for a non valid player
+    player = randint(1, 100)
+
+    ct_app_id = randint(1, 100)
+
+    votes = [CastVote(player_id=player, ct_app_id=ct_app_id)]  # votes should be a list
+
+    response = admin_client.post(f"match/vote/{match.id}", json=je(votes))
+    response_data = response.json()
+    assert response.is_client_error, ("No valid votes should failed", response_data)
