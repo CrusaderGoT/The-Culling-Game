@@ -5,6 +5,7 @@ utils for test. DO NOT USE FIXTURE NAMES HERE!!!
 import random
 import string
 from datetime import date, datetime, timedelta
+from enum import IntEnum
 from random import choice, sample
 from typing import Any
 
@@ -15,7 +16,12 @@ from sqlmodel import Session, select
 from app.api.main import app
 from app.auth.credentials import PasswordAuth as pw
 from app.models.admin import Admin, Permission, PermissionInfo, PermissionRequest
-from app.models.base import ActionTimePoint, BasePermission, ModelName
+from app.models.base import (
+    ActionTimePoint,
+    BasePermission,
+    ModelName,
+    PlayerUpgradeCost,
+)
 from app.models.player import (
     CreateCT,
     CreateCTApp,
@@ -26,9 +32,10 @@ from app.models.player import (
 from app.models.user import Country, CreateUser, User, UserInfo
 from app.models.vote import CastVote, ClientVoteInfo, Vote
 from app.utils.admin import _make_permission_to_create
-from app.utils.dependencies import _atp_def, get_or_create_colony, get_session
+from app.utils.dependencies import _atp_def, _puc_def, get_or_create_colony, get_session
 from app.utils.match import create_new_match
-from app.utils.player import create_player_helper
+from app.utils.player import create_player_helper, get_player
+from app.models.barrier import BarrierTech
 
 # PAYLOADS
 
@@ -141,7 +148,7 @@ class ATPTest(ActionTimePoint):
     limit_simple_domain: int = 5
 
     cost_binding_vow: float = 0
-    cost_domain_expansion: float = 0
+    cost_domain_expansion: float = 10
     cost_simple_domain: float = 0
 
     vote_point: float = 0.2
@@ -156,15 +163,33 @@ class ATPTest(ActionTimePoint):
     reverse_cursed_technique_point: float = 0.5
 
 
-def override_dependencies(ss: Session):
+class PlayerUpgradeCostTest(IntEnum):
+    "Class containing the upgrade costs for player grades"
+
+    SPECIAL = 16
+    ONE = 8
+    TWO = 4
+    THREE = 2
+    FOUR = 0
+
+
+def override_dependencies(ses: Session):
     """Central function for overriding dependencies."""
 
-    def get_session_override():
-        return ss
+    def _get_session_override():
+        return ses
 
-    app.dependency_overrides[get_session] = get_session_override
+    def _puc_override():
+        return PlayerUpgradeCostTest
 
-    app.dependency_overrides[_atp_def] = ATPTest
+    def _atp_override():
+        return ATPTest()
+
+    app.dependency_overrides[get_session] = _get_session_override
+
+    app.dependency_overrides[_atp_def] = _atp_override
+
+    app.dependency_overrides[_puc_def] = _puc_override
 
 
 def login_test_user(
@@ -222,7 +247,7 @@ def get_client_user(cli: TestClient):
     return user_info
 
 
-def create_client_player(cli: TestClient, payload: dict):
+def create_player_via_client(cli: TestClient, payload: dict = player_payload()):
     "create and return a client player"
     # get user
     user = get_client_user(cli)
@@ -236,7 +261,7 @@ def create_client_player(cli: TestClient, payload: dict):
     return PlayerInfo.model_validate(response.json())
 
 
-def compare_players(player_info: PlayerInfo | dict | Player, payload: dict):
+def assert_compare_players(player_info: PlayerInfo | dict | Player, payload: dict):
     """
     Compare player information with a payload dictionary.
     This function compares a PlayerInfo object or dictionary containing player data
@@ -446,10 +471,10 @@ def create_player_via_session(ses: Session):
     return new_player
 
 
-def create_match_via_session(ses: Session, part: int):
+def create_match_via_session(ses: Session, part: int, no_of_players: int = 2):
     "create a match via session"
     # create players first
-    multiple_players_via_session(ses, 2)
+    multiple_players_via_session(ses, no_of_players)
 
     atp = ATPTest()
 
@@ -529,3 +554,47 @@ def assert_valid_vote(
         # assert the auth client user was the one that cast the vote
         client_user = get_client_user(client)
         assert res_votes.user_id == client_user.id
+
+
+def add_player_points_via_session(
+    player: Player | PlayerInfo, points: float, ses: Session
+):
+    "add points to a player"
+    if isinstance(player, PlayerInfo):
+        point_player = get_player(ses, player.id)
+        assert point_player, "Player not found. Trying to add points to player"
+    else:
+        point_player = player
+
+    point_player.points += points
+
+    ses.add(point_player)
+    ses.commit()
+    ses.refresh(point_player)
+
+    return point_player
+
+
+def upgrade_player_via_session(
+    ses: Session, player: Player | PlayerInfo, grade: Player.Grade
+):
+    if isinstance(player, PlayerInfo):
+        upgrade_player = get_player(ses, player.id)
+        assert upgrade_player, "Player not found. Trying to add points to player"
+    else:
+        upgrade_player = player
+
+    assert upgrade_player.id, "Player to upgrade must have an ID"
+
+    upgrade_player.grade = grade
+
+    if grade <= Player.Grade.THREE:
+        # add bt
+        bt = BarrierTech(player_id=upgrade_player.id)
+        ses.add(bt)
+        
+    ses.add(upgrade_player)
+    ses.commit()
+    ses.refresh(upgrade_player)
+
+    return upgrade_player

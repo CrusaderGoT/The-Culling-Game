@@ -147,7 +147,6 @@ export function AuthContextProvider({ children }: { children: ReactNode }) {
             setTokenExpiresIn(expDate);
             setTokenExpired(false); // Reset expired state
         },
-        retry: false, // one fail -> session is deleted
     });
 
     const { data: user, isPending: userIsPending } = useCurrentUser(

@@ -582,6 +582,6 @@ def test_remove_perm_by_unauth_client(client, session):
     )
 
     assert response.is_client_error, (
-        "Non authenticated client cannot remove permsissions from other admins",
+        "Non authenticated client cannot remove permsissions from admins",
         response.json(),
     )

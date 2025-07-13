@@ -13,7 +13,7 @@ from app.models.player import (
     PlayerInfo,
 )
 from app.utils.config import PlayerException, Tag, UserException
-from app.utils.dependencies import atp, colony, session
+from app.utils.dependencies import atp, colony, session, player_upgrade_cost
 from app.utils.player import (
     calculate_points,
     create_player_helper,
@@ -257,6 +257,7 @@ def upgrade_player(
     grade_up: Annotated[Player.Grade, Query(description="specified upgrade")],
     current_user: active_user,
     atp: atp,
+    upgrade_cost: player_upgrade_cost,
 ):
     """function for uprading the grade of a player.\n
     **points required.**"""
@@ -278,7 +279,7 @@ def upgrade_player(
             else:
                 player_points = player.points
                 # get the required points for upgrade
-                needed_points = points_required_for_upgrade(grade_up)
+                needed_points = points_required_for_upgrade(grade_up, upgrade_cost)
                 # check if player points is enough
                 if player_points >= needed_points:  # there is enough
                     # check if they have reached the level to access Barrier Tech

@@ -1,0 +1,70 @@
+"""
+test file for barriers
+"""
+
+from app.models.player import Player
+from app.tests.utils_test import (
+    ATPTest,
+    add_player_points_via_session,
+    create_match_via_session,
+    create_player_via_client,
+    create_player_via_session,
+    upgrade_player_via_session,
+)
+from app.models.barrier import BarrierTechInfo
+
+
+def test_domain_expansion(authorized_client, session):
+    "test for the effects of a domain expansion"
+    # create authorized client player
+    player = create_player_via_client(authorized_client)
+
+    # create match, no of players is one, in other to use the above player
+    match = create_match_via_session(session, part=1, no_of_players=1)
+
+    # add enough points
+    atp = ATPTest()
+    player = add_player_points_via_session(player, atp.cost_domain_expansion, session)
+
+    # upgrade player
+    player = upgrade_player_via_session(session, player, Player.Grade.ONE)
+
+    # cast domain
+    response = authorized_client.post(
+        f"/barrier/activate/domain/{player.id}/{match.id}"
+    )
+    response_data = response.json()
+
+    # confirm success
+    assert response.is_success, ("Domain expansion fail to activate", response_data)
+    response_barrier = BarrierTechInfo.model_validate(response_data)
+
+    assert response_barrier.domain_expansion
+
+
+def test_domain_expansion_by_diff_client_player(authorized_client, session):
+    "test for the effects of a domain expansion"
+    # create different player
+    player = create_player_via_session(session)
+
+    # create match, no of players is one, in other to use the above player
+    match = create_match_via_session(session, part=1, no_of_players=1)
+
+    # add enough points
+    atp = ATPTest()
+    player = add_player_points_via_session(player, atp.cost_domain_expansion, session)
+
+    # upgrade player
+    player = upgrade_player_via_session(session, player, Player.Grade.ONE)
+
+    # cast domain
+    response = authorized_client.post(
+        f"/barrier/activate/domain/{player.id}/{match.id}"
+    )
+    response_data = response.json()
+
+    # confirm
+    assert response.is_client_error, (
+        "Can not activate Domain expansion of another player",
+        response_data,
+    )

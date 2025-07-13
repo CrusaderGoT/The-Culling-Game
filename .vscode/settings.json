@@ -2,5 +2,6 @@
     "python.analysis.typeCheckingMode": "standard",
     "vscode-icons.associations.folders": {
         "worker": "gear",
-    }
+    },
+    "python.analysis.autoImportCompletions": false
 }

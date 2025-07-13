@@ -7,7 +7,7 @@ from fastapi import Depends
 from sqlmodel import Session, func, select
 
 from ..database.pgsql import engine
-from ..models.base import ActionTimePoint, Country
+from ..models.base import ActionTimePoint, Country, PlayerUpgradeCost
 from ..models.colony import Colony
 from ..models.player import Player
 
@@ -67,4 +67,15 @@ def _atp_def():
 atp = Annotated[ActionTimePoint, Depends(_atp_def)]
 """
 The Action Time Point as a dependency.
+"""
+
+
+def _puc_def():
+    "helper function to return PlayerUpgradeCost in a dependency"
+    return PlayerUpgradeCost
+
+
+player_upgrade_cost = Annotated[PlayerUpgradeCost, Depends(_puc_def)]
+"""
+The Player Upgrade Cost as a dependency.
 """

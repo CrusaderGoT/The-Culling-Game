@@ -377,7 +377,7 @@ class BaseVote(SQLModel):
     ct_app_id: int = Field(foreign_key="ctapp.id", ondelete="CASCADE", index=True)
 
 
-class PlayerUpgradeCost(Enum):
+class PlayerUpgradeCost(IntEnum):
     "Class containing the upgrade costs for player grades"
 
     SPECIAL = 20

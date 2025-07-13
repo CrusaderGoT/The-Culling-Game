@@ -14,6 +14,7 @@ from app.utils.config import PlayerException, UserException
 from app.utils.dependencies import atp, session
 from app.utils.match import ongoing_match
 from app.utils.player import calculate_points
+from app.models.base import ActionTimePoint
 
 
 def conditions_for_barrier_tech(
@@ -23,6 +24,7 @@ def conditions_for_barrier_tech(
     player: Player | None,
     match: Match | None,
     current_user: User,
+    atp: atp = ActionTimePoint()
 ):
     """
     function for meeting the conditions nesseccary for the use of a barrier tech.
@@ -65,7 +67,7 @@ def conditions_for_barrier_tech(
                     barrier_record = session.exec(st).first()
 
                     if barrier_tech is None:  # player has no barrier technique
-                        msg = f"'{player.name}' doesn't have a barrier technique, upgrade the player to grade 2, to unlock Barrier Techniques"
+                        msg = f"'{player.name}' doesn't have a barrier technique, upgrade the player to grade {atp.bt_min_grade}, to unlock Barrier Techniques"
                         raise PlayerException(
                             player=player,
                             code=status.HTTP_428_PRECONDITION_REQUIRED,

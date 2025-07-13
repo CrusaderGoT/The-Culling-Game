@@ -3,7 +3,6 @@ from typing import Literal
 from fastapi import HTTPException, status
 from sqlmodel import select
 
-from app.models.base import PlayerUpgradeCost
 from app.models.colony import Colony
 from app.models.player import (
     CreateCT,
@@ -18,7 +17,7 @@ from app.models.player import (
 )
 from app.models.user import User
 from app.utils.config import PlayerException
-from app.utils.dependencies import session
+from app.utils.dependencies import player_upgrade_cost, session
 
 
 def get_alive_player(session: session, player_id: int):
@@ -47,15 +46,15 @@ def get_player(session: session, player_id: int):
     return player
 
 
-def points_required_for_upgrade(grade: Player.Grade):
+def points_required_for_upgrade(grade: Player.Grade, cost: player_upgrade_cost):
     "returns the points required for an upgrade"
     points_dict = dict(
         [
-            (4, PlayerUpgradeCost.FOUR),
-            (3, PlayerUpgradeCost.THREE),
-            (2, PlayerUpgradeCost.TWO),
-            (1, PlayerUpgradeCost.ONE),
-            (0, PlayerUpgradeCost.FOUR),
+            (grade.FOUR.value, cost.FOUR),
+            (grade.THREE.value, cost.THREE),
+            (grade.TWO.value, cost.TWO),
+            (grade.ONE.value, cost.ONE),
+            (grade.SPECIAL.value, cost.SPECIAL),
         ]
     )
     return points_dict[grade.value].value
