@@ -8,7 +8,8 @@
 
 .colonyCircle {
   overflow: hidden;
-  clip-path: circle(50% at 50% 50%);
+  clip-path: circle(50%);
+  border-radius: 50%;
   cursor: default;
   display: flex;
   align-items: center;
@@ -16,6 +17,9 @@
   position: relative;
   z-index: 5;
   perspective: 800;
+  min-width: 200px;
+  min-height: 200px;
+  aspect-ratio: 1;
 }
 
 .colonyText {
@@ -33,7 +37,7 @@
 
 .colonyCircle:hover .colonyText {
   letter-spacing: 0.3em;
-  top: 20%;
+  top: 30%;
   transform: translateX(0);
 }
 
@@ -90,7 +94,7 @@
 
 .colonyEnterBtn {
   position: absolute;
-  bottom: 20%;
+  bottom: 22%;
   opacity: 0;
   pointer-events: none;
   transition: opacity 3s ease-in-out;
