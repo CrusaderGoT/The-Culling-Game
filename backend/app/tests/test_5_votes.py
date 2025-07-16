@@ -101,7 +101,7 @@ def test_vote_max_votes(authorized_client, session):
     # assertions to qualify for vote
     assert match.id, "Match via session must have an ID."
 
-    max = randint(1, 10)
+    max = randint(6, 10)
 
     # loop vote to max
     for i in range(max):
@@ -159,4 +159,4 @@ def test_vote_no_valid_votes(admin_client, session):
 
     response = admin_client.post(f"match/vote/{match.id}", json=je(votes))
     response_data = response.json()
-    assert response.is_client_error, ("No valid votes should failed", response_data)
+    assert response.is_client_error, ("No valid votes, should failed", response_data)

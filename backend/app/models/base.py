@@ -451,6 +451,10 @@ class BaseBarrierRecord(SQLModel):
     binding_vow_counter: int = Field(
         default=0, description="the number of times a binding vow is activated"
     )
+    reverse_cursed_technique_counter: int = Field(
+        default=0,
+        description="the number of times a reverse cursed technique is activated",
+    )
     ```
     """
 

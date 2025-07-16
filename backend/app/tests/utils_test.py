@@ -247,6 +247,18 @@ def get_client_user(cli: TestClient):
     return user_info
 
 
+def get_client_player(cli: TestClient):
+    "return the user info of an authorized client"
+    response = cli.get("/player/me")
+
+    # check status is successful
+    assert response.is_success is True
+
+    player_info = PlayerInfo.model_validate(response.json())
+
+    return player_info
+
+
 def create_player_via_client(cli: TestClient, payload: dict = player_payload()):
     "create and return a client player"
     # get user
@@ -592,7 +604,7 @@ def upgrade_player_via_session(
         # add bt
         bt = BarrierTech(player_id=upgrade_player.id)
         ses.add(bt)
-        
+
     ses.add(upgrade_player)
     ses.commit()
     ses.refresh(upgrade_player)
