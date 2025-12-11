@@ -188,7 +188,7 @@ python-multipart==0.0.9
     # via
     #   the-culling-game-backend (pyproject.toml)
     #   fastapi
-python-socketio==5.11.4
+python-socketio==5.14.0
     # via the-culling-game-backend (pyproject.toml)
 pytz==2025.2
     # via taskiq
