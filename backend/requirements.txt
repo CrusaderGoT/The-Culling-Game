@@ -267,7 +267,7 @@ ujson==5.10.0
     # via
     #   the-culling-game-backend (pyproject.toml)
     #   fastapi
-urllib3==2.2.3
+urllib3==2.6.0
     # via the-culling-game-backend (pyproject.toml)
 uvicorn==0.29.0
     # via
