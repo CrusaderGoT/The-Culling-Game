@@ -19,7 +19,7 @@ class Settings(BaseSettings):
     "class for env or default settings."
 
     database_url: str = (
-        "postgresql://postgres:crusader@localhost:5433/thecullinggamesdb"
+        "postgresql://postgres:crusader@localhost:5432/thecullinggamesdb"
     )
     secret_key: str = "7f820bef39dd81f92e9935b30f029a74af7b7d1c5d8c85c855d6b22d093d485c"
     algorithm: str = "HS256"
