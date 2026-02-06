@@ -3,5 +3,6 @@
     "vscode-icons.associations.folders": {
         "worker": "gear",
     },
-    "python.analysis.autoImportCompletions": false
+    "python.analysis.autoImportCompletions": false,
+    "git.enableCommitSigning": true
 }
