@@ -23,7 +23,7 @@
     "clsx": "^2.1.1",
     "dayjs": "^1.11.13",
     "mantine-form-zod-resolver": "^1.1.0",
-    "next": "15.2.4",
+    "next": "15.2.7",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "recharts": "^2.15.3",
