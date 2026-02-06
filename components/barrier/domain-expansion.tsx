@@ -1,11 +1,11 @@
 "use client";
 
 import { BarrierTechActionProp } from "@/components/barrier/activate-barriers";
-import { useAuth } from "@/lib/contexts/auth-provider";
-import { useDomainExpansion } from "@/lib/hooks/barrier";
+import { useAuth } from "@/lib/contexts/auth-context-provider";
+import { useDomainExpansion } from "@/lib/hooks/barriers";
 import { getColorFromId } from "@/lib/utils";
 import { ActionIcon, Text, Tooltip } from "@mantine/core";
-import { IconBalloonFilled } from "@tabler/icons-react";
+import { IconSphere } from "@tabler/icons-react";
 import { useMemo } from "react";
 
 export function DomainExpansionAction({
@@ -13,7 +13,10 @@ export function DomainExpansionAction({
     match,
     ended,
 }: BarrierTechActionProp) {
-    const { token } = useAuth();
+    const {
+        token,
+        user: { userInfo },
+    } = useAuth();
     const { mutateAsync, isPending } = useDomainExpansion(token);
 
     const domainUse = useMemo(() => {
@@ -35,11 +38,15 @@ export function DomainExpansionAction({
                 flex={1}
                 loading={isPending}
                 color={getColorFromId(domainUse)}
-                disabled={ended}
+                disabled={
+                    ended || userInfo?.player?.id !== barrierTech.player_id
+                }
                 onClick={async () => {
                     await mutateAsync({
-                        path: { player_id: barrierTech.player_id },
-                        query: { match_id: match.id },
+                        path: {
+                            player_id: barrierTech.player_id,
+                            match_id: match.id,
+                        },
                     });
                 }}
             >
@@ -49,7 +56,7 @@ export function DomainExpansionAction({
                     maw={200}
                     events={{ focus: false, hover: true, touch: true }}
                 >
-                    <IconBalloonFilled />
+                    <IconSphere size={18} />
                 </Tooltip>
             </ActionIcon>
             <ActionIcon.GroupSection

@@ -6,6 +6,7 @@ import {
 
 import { useMutation, useQuery } from "@tanstack/react-query";
 
+import { getAPIErrorMessage } from "@/components/ui/display-api-error";
 import { authHeader } from "@/lib/constants/AUTHCONSTANTS";
 import { queryClient } from "@/lib/query-client/get-query-client";
 import { createSession } from "@/lib/session";
@@ -15,9 +16,10 @@ export const useCreateUser = () => {
     const mutation = useMutation({
         ...createUserMutation(),
         onError: (error) => {
-            console.log(JSON.stringify(error.detail));
             notifications.show({
-                message: "An error occurred while creating your account.",
+                message: `An error occurred while creating your account. -> ${getAPIErrorMessage(
+                    error
+                )}`,
                 color: "red",
             });
         },
@@ -33,9 +35,10 @@ export const useLoginUser = () => {
     const mutation = useMutation({
         ...createTokenMutation(),
         onError: (error) => {
-            console.log(JSON.stringify(error));
             notifications.show({
-                message: "An error occurred during logging in",
+                message: `An error occurred during logging in -> ${getAPIErrorMessage(
+                    error
+                )}`,
                 color: "red",
             });
         },
@@ -52,6 +55,13 @@ export const useLoginUser = () => {
     return mutation;
 };
 
+/**
+ * Custom React hook to fetch the current user's data using a provided authentication token.
+ *
+ * @param token - The authentication token used for API requests.
+ * @param tokenError - Optional flag indicating if there is an error with the token; disables the query if true.
+ * @returns The result of the user query, including loading, error, and data states.
+ */
 export const useCurrentUser = (token: string, tokenError?: boolean) => {
     const query = useQuery({
         ...currentUserOptions({

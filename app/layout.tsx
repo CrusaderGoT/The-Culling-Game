@@ -1,21 +1,18 @@
 // Import styles of packages that you've installed.
 // All packages except `@mantine/hooks` require styles imports
 import "@mantine/charts/styles.css";
-import "@mantine/core/styles.css";
+import "@mantine/core/styles.layer.css";
 import "@mantine/notifications/styles.css";
 import "@mantine/nprogress/styles.css";
 
 import {
     ColorSchemeScript,
-    Container,
     DEFAULT_THEME,
     MantineProvider,
     createTheme,
     mantineHtmlProps,
     rem,
 } from "@mantine/core";
-
-import { NavigationProgress } from "@mantine/nprogress";
 
 import { Notifications } from "@mantine/notifications";
 
@@ -27,9 +24,10 @@ import Naluka from "@/fonts/NalukaFont";
 import Neuropol from "@/fonts/NeuropolFont";
 import Nexarust from "@/fonts/NexarustFont";
 
-import { ModeToggle } from "@/components/ui/mode-toggle";
-
-import { SocketProvider } from "@/lib/contexts/socket-context";
+import { RouterTransition } from "@/components/ui/router-transition";
+import { ShellApp } from "@/components/ui/shell/shell-app";
+import { ShellContextProvider } from "@/lib/contexts/shell-context-provider";
+import { SocketContextProvider } from "@/lib/contexts/socket-context-provider";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -70,10 +68,10 @@ export default function RootLayout({
             </head>
             <body>
                 <MantineProvider theme={theme}>
-                    <NavigationProgress />
+                    <RouterTransition />
                     <Notifications />
                     <TanstackProviders>
-                        <SocketProvider
+                        <SocketContextProvider
                             serverUrl={
                                 process.env.NODE_ENV === "production"
                                     ? "https://the-culling-games.up.railway.app"
@@ -81,11 +79,10 @@ export default function RootLayout({
                             }
                             socketPath="/ws"
                         >
-                            <Container size={"lg"}>
-                                <ModeToggle />
-                                {children}
-                            </Container>
-                        </SocketProvider>
+                            <ShellContextProvider>
+                                <ShellApp>{children}</ShellApp>
+                            </ShellContextProvider>
+                        </SocketContextProvider>
                     </TanstackProviders>
                 </MantineProvider>
             </body>

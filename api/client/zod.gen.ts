@@ -225,7 +225,7 @@ export const zCountry = z.enum([
 ]);
 
 export const zBaseUserInfo = z.object({
-    username: z.string().regex(/^[A-Za-z][A-Za-z0-9_-]{2,19}$/),
+    username: z.string().min(4).regex(/^[A-Za-z][A-Za-z0-9_-]{2,19}$/),
     email: z.string().email(),
     country: z.union([
         zCountry,
@@ -305,7 +305,7 @@ export const zGender = z.enum([
 export const zGrade = z.unknown();
 
 export const zBasePlayerInfo = z.object({
-    name: z.string().min(2).max(50),
+    name: z.string().min(4).max(50),
     gender: zGender,
     age: z.number().int().gte(10).lte(102),
     role: z.union([
@@ -327,6 +327,7 @@ export const zBaseMatchInfo = z.object({
     begin: z.string().datetime(),
     end: z.string().datetime(),
     part: z.number().int(),
+    draw: z.boolean().optional().default(false),
     id: z.number().int(),
     winner: z.union([
         zBasePlayerInfo,
@@ -408,7 +409,7 @@ export const zBodyAdminEditPlayer = z.object({
 });
 
 export const zCreatePlayer = z.object({
-    name: z.string().min(2).max(50),
+    name: z.string().min(4).max(50),
     gender: zGender,
     age: z.number().int().gte(10).lte(102),
     role: z.union([
@@ -499,7 +500,7 @@ export const zCreateCtApp = z.object({
 });
 
 export const zCreateUser = z.object({
-    username: z.string().regex(/^[A-Za-z][A-Za-z0-9_-]{2,19}$/),
+    username: z.string().min(4).regex(/^[A-Za-z][A-Za-z0-9_-]{2,19}$/),
     email: z.string().email(),
     country: z.union([
         zCountry,
@@ -538,6 +539,7 @@ export const zMatchInfo = z.object({
     begin: z.string().datetime(),
     end: z.string().datetime(),
     part: z.number().int(),
+    draw: z.boolean().optional().default(false),
     id: z.number().int(),
     winner: z.union([
         zBasePlayerInfo,
@@ -562,7 +564,7 @@ export const zPermissionRequest = z.object({
 });
 
 export const zPlayerInfo = z.object({
-    name: z.string().min(2).max(50),
+    name: z.string().min(4).max(50),
     gender: zGender,
     age: z.number().int().gte(10).lte(102),
     role: z.union([
@@ -591,7 +593,8 @@ export const zPlayerInfo = z.object({
         zBaseUserInfo,
         z.null()
     ]),
-    matches: z.array(zBaseMatchInfo)
+    matches: z.array(zBaseMatchInfo),
+    votes: z.array(zBaseVoteInfo)
 });
 
 export const zToken = z.object({
@@ -614,7 +617,7 @@ export const zTokenData = z.object({
 });
 
 export const zUserInfo = z.object({
-    username: z.string().regex(/^[A-Za-z][A-Za-z0-9_-]{2,19}$/),
+    username: z.string().min(4).regex(/^[A-Za-z][A-Za-z0-9_-]{2,19}$/),
     email: z.string().email(),
     country: z.union([
         zCountry,
@@ -665,6 +668,10 @@ export const zGetMatchesResponse = z.array(zMatchInfo);
 
 export const zGetLastestMatchResponse = zMatchInfo;
 
+export const zDeleteMatchResponse = zMatchInfo;
+
+export const zMatchWinnerResponse = zMatchInfo;
+
 export const zDomainExpansionResponse = zBarrierTechInfo;
 
 export const zSimpleDomainResponse = zBarrierTechInfo;
@@ -673,7 +680,11 @@ export const zBindindVowResponse = zBarrierTechInfo;
 
 export const zReverseCursedTechniqueResponse = zBarrierTechInfo;
 
+export const zDeactivateDomainExpansionResponse = zBarrierTechInfo;
+
 export const zGetColoniesResponse = z.array(zColonyInfo);
+
+export const zDemoSuperuserResponse = zAdminInfo;
 
 export const zAdminEditUserResponse = zUserInfo;
 
@@ -690,6 +701,8 @@ export const zNewPermissionResponse = z.array(zPermissionInfo);
 export const zGrantPermissionResponse = zAdminInfo;
 
 export const zRemovePermissionResponse = zAdminInfo;
+
+export const zCurrentAdminResponse = zAdminInfo;
 
 export const zCreateTokenResponse = zToken;
 

@@ -18,21 +18,20 @@ import {
 } from "@mantine/core";
 
 import {
-    IconDotsVertical,
+    IconDashboard,
     IconFish,
-    IconFishOff,
     IconLogout,
     IconSettings,
     IconTrash,
-    IconUserEdit,
+    IconUser,
+    IconUserCog,
 } from "@tabler/icons-react";
 
 import { forwardRef } from "react";
 
-import { useAuth } from "@/lib/contexts/auth-provider";
+import { useAuth } from "@/lib/contexts/auth-context-provider";
 import { deleteSession } from "@/lib/session";
 import { getColorFromId } from "@/lib/utils";
-import classes from "@/styles/user-menu.module.css";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -42,9 +41,13 @@ interface UserButtonProps extends React.ComponentPropsWithoutRef<"button"> {
 
 const UserButton = forwardRef<HTMLButtonElement, UserButtonProps>(
     ({ user, ...others }: UserButtonProps, ref) => (
-        <UnstyledButton ref={ref} {...others}>
+        <UnstyledButton ref={ref} {...others} visibleFrom="sm">
             <Group>
-                <Avatar name={user.username} />
+                <Avatar
+                    name={user.username}
+                    size={30}
+                    src={user.player?.picture}
+                />
                 <Box flex={1}>
                     <Group>
                         <Text size="sm" fw={500}>
@@ -67,10 +70,12 @@ const UserButton = forwardRef<HTMLButtonElement, UserButtonProps>(
 
 UserButton.displayName = "UserButton";
 
-function UserButtonAlt() {
+function UserButtonAlt({ user }: { user: UserInfo }) {
     return (
-        <ActionIcon variant="transparent" className={classes.menuAlt}>
-            <IconDotsVertical />
+        <ActionIcon variant="light" hiddenFrom="sm" radius={"lg"}>
+            <Avatar src={user.player?.picture}>
+                <IconUserCog color="gold" />
+            </Avatar>
         </ActionIcon>
     );
 }
@@ -87,14 +92,9 @@ export function UserMenu() {
     if (isPendingUser)
         return (
             <Box>
-                <Skeleton height={38} width={220} className={classes.menu} />
+                <Skeleton height={38} width={220} visibleFrom="sm" />
 
-                <Skeleton
-                    height={28}
-                    width={5}
-                    mr={"sm"}
-                    className={classes.menuAlt}
-                />
+                <Skeleton height={28} width={5} circle hiddenFrom="sm" />
             </Box>
         );
 
@@ -102,18 +102,21 @@ export function UserMenu() {
 
     return (
         <Menu
+            trigger="click-hover"
             withArrow
             transitionProps={{ transition: "rotate-left", duration: 150 }}
+            offset={25}
         >
             <Menu.Target>
                 <Group>
-                    <UserButton user={userInfo} className={classes.menu} />
-                    <UserButtonAlt />
+                    <UserButtonAlt user={userInfo} />
+
+                    <UserButton user={userInfo} />
                 </Group>
             </Menu.Target>
 
             <Menu.Dropdown>
-                <Box className={classes.menuAlt}>
+                <Box hiddenFrom="sm">
                     <Group justify="center" m={"xs"}>
                         <Text size="xs">{userInfo.username}</Text>
                         {userInfo?.player && (
@@ -127,17 +130,48 @@ export function UserMenu() {
                     <Menu.Divider />
                 </Box>
 
-                <Menu.Item
-                    leftSection={
-                        <IconUserEdit
-                            size={16}
-                            stroke={1.5}
-                            color={theme.colors.yellow[6]}
-                        />
-                    }
-                >
-                    Edit User
-                </Menu.Item>
+                {userInfo.admin && (
+                    <Menu.Item
+                        leftSection={<IconDashboard size={16} stroke={1.5} />}
+                        component={Link}
+                        href="/admin"
+                    >
+                        Admin Dashboard
+                    </Menu.Item>
+                )}
+
+                <Menu.Sub>
+                    <Menu.Sub.Target>
+                        <Menu.Sub.Item
+                            leftSection={
+                                <IconUser
+                                    size={16}
+                                    stroke={1.5}
+                                    color={getColorFromId(userInfo.id)}
+                                />
+                            }
+                        >
+                            User
+                        </Menu.Sub.Item>
+                    </Menu.Sub.Target>
+
+                    <Menu.Sub.Dropdown>
+                        <Menu.Item>Edit User</Menu.Item>
+
+                        <Menu.Item
+                            leftSection={
+                                <IconTrash
+                                    size={16}
+                                    stroke={1.5}
+                                    color={theme.colors.red[6]}
+                                />
+                            }
+                            color="red"
+                        >
+                            Delete User
+                        </Menu.Item>
+                    </Menu.Sub.Dropdown>
+                </Menu.Sub>
 
                 <Menu.Item
                     leftSection={
@@ -146,15 +180,15 @@ export function UserMenu() {
                             stroke={1.5}
                             color={
                                 userInfo.player
-                                    ? theme.colors.blue[5]
+                                    ? getColorFromId(userInfo.player.id)
                                     : theme.colors.green[7]
                             }
                         />
                     }
                     component={Link}
-                    href="/player/form"
+                    href="/player"
                 >
-                    {userInfo.player ? "Edit Player" : "Create Player"}
+                    {userInfo.player ? "Player Profile" : "Create Player"}
                 </Menu.Item>
 
                 <Menu.Label>Settings</Menu.Label>
@@ -172,35 +206,6 @@ export function UserMenu() {
                     }}
                 >
                     Logout
-                </Menu.Item>
-
-                <Menu.Divider />
-                <Menu.Label>Danger</Menu.Label>
-
-                <Menu.Item
-                    leftSection={
-                        <IconTrash
-                            size={16}
-                            stroke={1.5}
-                            color={theme.colors.red[6]}
-                        />
-                    }
-                    color="red"
-                >
-                    Delete User
-                </Menu.Item>
-
-                <Menu.Item
-                    leftSection={
-                        <IconFishOff
-                            size={16}
-                            stroke={1.5}
-                            color={theme.colors.red[6]}
-                        />
-                    }
-                    color="red"
-                >
-                    Delete Player
                 </Menu.Item>
             </Menu.Dropdown>
         </Menu>

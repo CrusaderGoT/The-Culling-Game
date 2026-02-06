@@ -1,6 +1,6 @@
 "use client";
 
-import circleClasses from "@/styles/colony-circle.module.css";
+import styles from "@/styles/colony-circle.module.css";
 import {
     ActionIcon,
     AspectRatio,
@@ -17,7 +17,6 @@ import { useHover } from "@mantine/hooks";
 import { IconDoorEnter } from "@tabler/icons-react";
 import Link from "next/link";
 
-import { useRouter } from "next/navigation";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 
 export function ColonyCircle() {
@@ -32,24 +31,24 @@ export function ColonyCircle() {
     }, [hovered]);
 
     return (
-        <Flex className={`${circleClasses.colonyContainer}`}>
+        <Flex className={`${styles.colonyContainer}`}>
             <AspectRatio
                 ref={ref}
                 ratio={1}
-                h={{ base: 300, sm: 400, md: 500, lg: 600 }}
-                w={{ base: 300, sm: 400, md: 500, lg: 600 }}
-                className={`${circleClasses.colonyCircle}`}
+                h={{ base: 500, sm: 600, md: 700, lg: 800 }}
+                w={{ base: 500, sm: 600, md: 700, lg: 800 }}
+                className={`${styles.colonyCircle}`}
             >
                 <BackgroundImage
                     src="/images/skyline-4.jpg"
-                    className={`${circleClasses.circleImage}`}
+                    className={`${styles.circleImage}`}
                     style={{
                         transform: scaleImage
                             ? "scale3d(2.5, 2.0, 2.3)"
                             : "scale3d(1, 1, 1)",
                     }}
                 >
-                    <Overlay className={`${circleClasses.circleOverlay}`} />
+                    <Overlay className={`${styles.circleOverlay}`} />
                 </BackgroundImage>
 
                 <CircleContent
@@ -71,11 +70,11 @@ function CircleContent({ circleHovered, setScaleImage }: CircleContentProp) {
 
     return (
         <Stack justify="center" align="center">
-            <Title order={2} className={`${circleClasses.colonyText}`}>
+            <Title order={2} className={`${styles.colonyText}`}>
                 COLONY
             </Title>
 
-            <Text className={`${circleClasses.colonyWarning}`}>
+            <Text className={`${styles.colonyWarning}`}>
                 {circleHovered &&
                     `a dangerous game known as the culling games is going on
                     inside. where players kill each other in a battle royale. do
@@ -88,7 +87,7 @@ function CircleContent({ circleHovered, setScaleImage }: CircleContentProp) {
                 color="deepred"
                 size={"xl"}
                 radius={"xl"}
-                className={`${circleClasses.colonyEnterBtn}`}
+                className={`${styles.colonyEnterBtn}`}
                 title={!loading ? "enter" : "making vows..."}
                 loading={loading}
                 component={Link}

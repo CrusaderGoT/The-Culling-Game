@@ -150,6 +150,10 @@ export type BaseMatchInfo = {
      */
     end: string;
     part: number;
+    /**
+     * whether the match was a draw
+     */
+    draw?: boolean;
     id: number;
     winner: BasePlayerInfo | null;
 };
@@ -705,6 +709,10 @@ export type MatchInfo = {
      */
     end: string;
     part: number;
+    /**
+     * whether the match was a draw
+     */
+    draw?: boolean;
     id: number;
     winner: BasePlayerInfo | null;
     players: Array<BasePlayerInfo>;
@@ -796,6 +804,7 @@ export type PlayerInfo = {
     colony: BaseColonyInfo | null;
     user: BaseUserInfo | null;
     matches: Array<BaseMatchInfo>;
+    votes: Array<BaseVoteInfo>;
 };
 
 /**
@@ -1017,6 +1026,7 @@ export type GetPlayersData = {
         gender?: Gender | null;
         age?: number | null;
         role?: string | null;
+        alive?: boolean;
     };
     url: '/player/all';
 };
@@ -1042,9 +1052,17 @@ export type GetPlayersResponse = GetPlayersResponses[keyof GetPlayersResponses];
 export type APlayerData = {
     body?: never;
     path: {
+        /**
+         * the player id
+         */
         player_id: number;
     };
-    query?: never;
+    query?: {
+        /**
+         * whether the player has to be alive
+         */
+        alive?: boolean;
+    };
     url: '/player/{player_id}';
 };
 
@@ -1069,6 +1087,9 @@ export type APlayerResponse = APlayerResponses[keyof APlayerResponses];
 export type EditPlayerData = {
     body?: BodyEditPlayer;
     path: {
+        /**
+         * the player id
+         */
         player_id: number;
     };
     query?: never;
@@ -1096,6 +1117,9 @@ export type EditPlayerResponse = EditPlayerResponses[keyof EditPlayerResponses];
 export type DeletePlayerData = {
     body?: never;
     path: {
+        /**
+         * the player id
+         */
         player_id: number;
     };
     query?: never;
@@ -1289,18 +1313,46 @@ export type DeleteMatchResponses = {
     /**
      * Successful Response
      */
-    200: unknown;
+    200: MatchInfo;
 };
+
+export type DeleteMatchResponse = DeleteMatchResponses[keyof DeleteMatchResponses];
+
+export type MatchWinnerData = {
+    body?: never;
+    path: {
+        match_id: number;
+    };
+    query?: never;
+    url: '/match/winner/{match_id}';
+};
+
+export type MatchWinnerErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type MatchWinnerError = MatchWinnerErrors[keyof MatchWinnerErrors];
+
+export type MatchWinnerResponses = {
+    /**
+     * Successful Response
+     */
+    200: MatchInfo;
+};
+
+export type MatchWinnerResponse = MatchWinnerResponses[keyof MatchWinnerResponses];
 
 export type DomainExpansionData = {
     body?: never;
     path: {
         player_id: number;
-    };
-    query: {
         match_id: number;
     };
-    url: '/barrier/activate/domain/{player_id}';
+    query?: never;
+    url: '/barrier/activate/domain/{player_id}/{match_id}';
 };
 
 export type DomainExpansionErrors = {
@@ -1325,11 +1377,10 @@ export type SimpleDomainData = {
     body?: never;
     path: {
         player_id: number;
-    };
-    query: {
         match_id: number;
     };
-    url: '/barrier/activate/simple/{player_id}';
+    query?: never;
+    url: '/barrier/activate/simple/{player_id}/{match_id}';
 };
 
 export type SimpleDomainErrors = {
@@ -1354,11 +1405,10 @@ export type BindindVowData = {
     body?: never;
     path: {
         player_id: number;
-    };
-    query: {
         match_id: number;
     };
-    url: '/barrier/activate/binding/{player_id}';
+    query?: never;
+    url: '/barrier/activate/binding/{player_id}/{match_id}';
 };
 
 export type BindindVowErrors = {
@@ -1383,11 +1433,10 @@ export type ReverseCursedTechniqueData = {
     body?: never;
     path: {
         player_id: number;
-    };
-    query: {
         match_id: number;
     };
-    url: '/barrier/activate/rct/{player_id}';
+    query?: never;
+    url: '/barrier/activate/rct/{player_id}/{match_id}';
 };
 
 export type ReverseCursedTechniqueErrors = {
@@ -1407,6 +1456,33 @@ export type ReverseCursedTechniqueResponses = {
 };
 
 export type ReverseCursedTechniqueResponse = ReverseCursedTechniqueResponses[keyof ReverseCursedTechniqueResponses];
+
+export type DeactivateDomainExpansionData = {
+    body?: never;
+    path: {
+        player_id: number;
+    };
+    query?: never;
+    url: '/barrier/deactivate/barrier/{player_id}';
+};
+
+export type DeactivateDomainExpansionErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type DeactivateDomainExpansionError = DeactivateDomainExpansionErrors[keyof DeactivateDomainExpansionErrors];
+
+export type DeactivateDomainExpansionResponses = {
+    /**
+     * Successful Response
+     */
+    200: BarrierTechInfo;
+};
+
+export type DeactivateDomainExpansionResponse = DeactivateDomainExpansionResponses[keyof DeactivateDomainExpansionResponses];
 
 export type GetColoniesData = {
     body?: never;
@@ -1463,8 +1539,10 @@ export type DemoSuperuserResponses = {
     /**
      * Successful Response
      */
-    200: unknown;
+    200: AdminInfo;
 };
+
+export type DemoSuperuserResponse = DemoSuperuserResponses[keyof DemoSuperuserResponses];
 
 export type AdminEditUserData = {
     body: EditUser;
@@ -1528,11 +1606,14 @@ export type AdminDeleteUserResponse = AdminDeleteUserResponses[keyof AdminDelete
 
 export type AdminEditPlayerData = {
     body?: BodyAdminEditPlayer;
-    path?: never;
-    query: {
+    path: {
+        /**
+         * the player id
+         */
         player_id: number;
     };
-    url: '/admin/edit-player';
+    query?: never;
+    url: '/admin/edit-player/{player_id}';
 };
 
 export type AdminEditPlayerErrors = {
@@ -1555,11 +1636,14 @@ export type AdminEditPlayerResponse = AdminEditPlayerResponses[keyof AdminEditPl
 
 export type AdminDeletePlayerData = {
     body?: never;
-    path?: never;
-    query: {
+    path: {
+        /**
+         * the player id
+         */
         player_id: number;
     };
-    url: '/admin/delete-player';
+    query?: never;
+    url: '/admin/delete-player/{player_id}';
 };
 
 export type AdminDeletePlayerErrors = {
@@ -1694,6 +1778,22 @@ export type RemovePermissionResponses = {
 };
 
 export type RemovePermissionResponse = RemovePermissionResponses[keyof RemovePermissionResponses];
+
+export type CurrentAdminData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/admin/me';
+};
+
+export type CurrentAdminResponses = {
+    /**
+     * An Admin
+     */
+    200: AdminInfo;
+};
+
+export type CurrentAdminResponse = CurrentAdminResponses[keyof CurrentAdminResponses];
 
 export type CreateTokenData = {
     body: BodyCreateToken;

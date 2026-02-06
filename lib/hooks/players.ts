@@ -1,14 +1,18 @@
 import {
     aPlayerOptions,
     createPlayerMutation,
-    currentUserQueryKey,
+    deletePlayerMutation,
+    editPlayerMutation,
     myPlayerOptions,
     myPlayerQueryKey,
+    upgradePlayerMutation,
 } from "@/api/client/@tanstack/react-query.gen";
+import { getAPIErrorMessage } from "@/components/ui/display-api-error";
 import { authHeader } from "@/lib/constants/AUTHCONSTANTS";
 import { queryClient } from "@/lib/query-client/get-query-client";
 import { notifications } from "@mantine/notifications";
 import { useMutation, useQueries, useQuery } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 
 export const useCreatePlayer = (token: string) => {
     const mutation = useMutation({
@@ -16,9 +20,10 @@ export const useCreatePlayer = (token: string) => {
             headers: authHeader(token),
         }),
         onError: (error) => {
-            console.error(JSON.stringify(error));
             notifications.show({
-                message: "An error occurred while creating player",
+                message: `An error occurred while creating player -> ${getAPIErrorMessage(
+                    error
+                )}`,
                 color: "red",
             });
         },
@@ -28,14 +33,7 @@ export const useCreatePlayer = (token: string) => {
                 color: "green",
             });
             queryClient.invalidateQueries({
-                queryKey: [
-                    myPlayerQueryKey({
-                        headers: authHeader(token),
-                    }),
-                    currentUserQueryKey({
-                        headers: authHeader(token),
-                    }),
-                ],
+                queryKey: [{ id: myPlayerQueryKey()[0]._id }],
             });
         },
     });
@@ -48,18 +46,23 @@ export const useCurrentPlayer = (token: string) => {
         ...myPlayerOptions({
             headers: authHeader(token),
         }),
-        refetchOnWindowFocus: false, // to avoid unwanted refretch
+        refetchOnWindowFocus: false, // to avoid unwanted refetch
         enabled: !!token, // run only if token is available
     });
 
     return query;
 };
 
-export const useGetPlayer = (token: string, playerId: number) => {
+export const useGetPlayer = (
+    token: string,
+    playerId: number,
+    alive: boolean = true
+) => {
     const query = useQuery({
         ...aPlayerOptions({
             headers: authHeader(token),
             path: { player_id: playerId },
+            query: { alive: alive },
         }),
         enabled: !!token, // run only if token is available
     });
@@ -68,7 +71,7 @@ export const useGetPlayer = (token: string, playerId: number) => {
 };
 
 // Custom hook for fetching multiple players
-export const useGetPlayers = (token: string, playerIds: number[]) => {
+export const useGetMatchPlayers = (token: string, playerIds: number[]) => {
     // Filter out any invalid IDs (0, null, undefined)
     const validPlayerIds = playerIds.filter((id) => id && id !== 0);
 
@@ -78,6 +81,7 @@ export const useGetPlayers = (token: string, playerIds: number[]) => {
             ...aPlayerOptions({
                 headers: authHeader(token),
                 path: { player_id: playerId },
+                query: { alive: false }, // get even dead player
             }),
             enabled: !!token && !!playerId, // Only run query if we have both token and playerId
             staleTime: Infinity,
@@ -128,4 +132,88 @@ export const useGetPlayers = (token: string, playerIds: number[]) => {
     });
 
     return playerQueries;
+};
+
+export const useEditPlayer = (token: string) => {
+    const mutation = useMutation({
+        ...editPlayerMutation({
+            headers: authHeader(token),
+        }),
+        onError: (error) => {
+            notifications.show({
+                message: `An error occurred while editing player detail(s) -> ${getAPIErrorMessage(
+                    error
+                )}`,
+                color: "red",
+            });
+        },
+        onSuccess: () => {
+            notifications.show({
+                message: `player detail(s) edited successfully`,
+                color: "green",
+            });
+            queryClient.invalidateQueries({
+                queryKey: [myPlayerQueryKey()],
+            });
+        },
+    });
+
+    return mutation;
+};
+
+export const useDeletePlayer = (token: string) => {
+    const router = useRouter();
+
+    const mutation = useMutation({
+        ...deletePlayerMutation({
+            headers: authHeader(token),
+        }),
+        onError: (error) => {
+            notifications.show({
+                message: `An error occurred while deleting player -> ${getAPIErrorMessage(
+                    error
+                )}`,
+                color: "yellow",
+            });
+        },
+        onSuccess: () => {
+            notifications.show({
+                message: `player deleted successfully`,
+                color: "red",
+            });
+            queryClient.invalidateQueries({
+                queryKey: [myPlayerQueryKey()],
+            });
+            router.push("/match");
+        },
+    });
+
+    return mutation;
+};
+
+export const useUpgradePlayer = (token: string) => {
+    const mutation = useMutation({
+        ...upgradePlayerMutation({
+            headers: authHeader(token),
+        }),
+        onError: (error) => {
+            notifications.show({
+                message: `An error occurred while upgrading player -> ${getAPIErrorMessage(
+                    error
+                )}`,
+                color: "yellow",
+            });
+        },
+        onSuccess: () => {
+            notifications.show({
+                message: `player's grade upgraded successfully`,
+                color: "green",
+            });
+            queryClient.invalidateQueries({
+                queryKey: [myPlayerQueryKey()],
+            });
+        },
+    });
+
+    return mutation;
 };

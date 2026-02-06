@@ -15,7 +15,7 @@ import {
 } from "@mantine/core";
 import { useMemo, useState } from "react";
 
-import exceedVoteClasses from "@/styles/exceed-vote.module.css";
+import styles from "@/styles/exceed-vote.module.css";
 import { notifications } from "@mantine/notifications";
 import { IconAlertCircle, IconAlertTriangle } from "@tabler/icons-react";
 import { QueryObserverResult } from "@tanstack/react-query";
@@ -136,12 +136,12 @@ export function VoteDrawer({
                         withBorder
                         withinPortal={false}
                         position={{ bottom: 20, left: 10 }}
-                        className={clsx(exceedVoteClasses.warningContainer)}
+                        className={clsx(styles.warningContainer)}
                     >
                         <Group wrap="nowrap">
                             <IconAlertCircle color="red" />
                             <Text
-                                className={clsx(exceedVoteClasses.warningText)}
+                                className={clsx(styles.warningText)}
                                 truncate="start"
                                 flex={1}
                             >

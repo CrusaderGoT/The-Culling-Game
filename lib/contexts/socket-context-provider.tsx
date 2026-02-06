@@ -30,7 +30,7 @@ interface SocketProviderProps {
     socketPath?: string;
 }
 
-export function SocketProvider({
+export function SocketContextProvider({
     children,
     serverUrl,
     socketPath = "/ws/socket.io/",

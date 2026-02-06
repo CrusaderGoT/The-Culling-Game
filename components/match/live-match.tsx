@@ -16,10 +16,11 @@ import { MatchVoteChart } from "@/components/match/match-vote-chart";
 import { VoteDrawer } from "@/components/vote/vote-drawer";
 
 import { DisplayAPIError } from "@/components/ui/display-api-error";
-import { useAuth } from "@/lib/contexts/auth-provider";
-import { useLatestMatch } from "@/lib/hooks/match";
-import { useGetPlayers } from "@/lib/hooks/players";
-import globalClasses from "@/styles/global.module.css";
+import { useAuth } from "@/lib/contexts/auth-context-provider";
+import { useAssignMatchWinner } from "@/lib/hooks/admins/match";
+import { useLatestMatch } from "@/lib/hooks/matches";
+import { useGetMatchPlayers } from "@/lib/hooks/players";
+import gstyles from "@/styles/global.module.css";
 import clsx from "clsx";
 import dayjs from "dayjs";
 import Image from "next/image";
@@ -86,6 +87,19 @@ export function LiveMatch({ ongoing = false }: { ongoing: boolean }) {
         return () => clearInterval(interval);
     }, [match]);
 
+    const { mutateAsync } = useAssignMatchWinner(token);
+
+    // effect for making match winner
+    useEffect(() => {
+        async function assignMatchWinner(matchId: number) {
+            await mutateAsync({ path: { match_id: matchId } });
+        }
+
+        if (!match || !isEnded || match.winner || match.draw) return;
+
+        assignMatchWinner(match.id);
+    }, [match, isEnded, mutateAsync, match?.winner, match?.draw]);
+
     // Extract player IDs from match data safely
     const playerIds = match?.players?.map((player) => player.id) || [];
 
@@ -94,7 +108,7 @@ export function LiveMatch({ ongoing = false }: { ongoing: boolean }) {
         isPending: playersIsPending,
         error: playersError,
         refetchFailed,
-    } = useGetPlayers(token, playerIds);
+    } = useGetMatchPlayers(token, playerIds);
 
     const validPlayers = useMemo(() => {
         return players?.filter((player) => player !== undefined) || [];
@@ -102,21 +116,26 @@ export function LiveMatch({ ongoing = false }: { ongoing: boolean }) {
 
     if (matchIsPending || playersIsPending) {
         return (
-            <Stack my={"md"}>
-                <Skeleton
-                    h={20}
-                    radius={"md"}
-                    className={clsx(globalClasses.matchHeader)}
-                />
+            <Stack>
+                <Skeleton h={40} radius={"md"} />
 
                 <Flex
                     justify="space-between"
                     gap={"xs"}
                     direction={{ base: "column", md: "row" }}
                 >
-                    {Array({ length: 2 }).map((_, index) => (
-                        <Skeleton key={index} h={400} />
-                    ))}
+                    <Skeleton h={330} />
+
+                    <Center
+                        // on small screens, give vertical margin; on md+, remove vertical margin
+                        my={{ base: "sm", md: 0 }}
+                        // on md+, give horizontal margin to push icon away from players
+                        mx={{ base: 0, md: "sm" }}
+                    >
+                        <Skeleton height={28} circle />
+                    </Center>
+
+                    <Skeleton h={330} />
                 </Flex>
             </Stack>
         );
@@ -146,8 +165,7 @@ export function LiveMatch({ ongoing = false }: { ongoing: boolean }) {
                     component={Image}
                     height={1024}
                     width={1024}
-                    h={{ base: 512, md: 768 }}
-                    w={{ base: 512, md: 768 }}
+                    flex={1}
                     mx={"auto"}
                 />
             </Stack>
@@ -155,7 +173,7 @@ export function LiveMatch({ ongoing = false }: { ongoing: boolean }) {
     }
 
     return (
-        <Stack my={"md"}>
+        <Stack>
             <Stack>
                 <Paper
                     withBorder
@@ -164,7 +182,7 @@ export function LiveMatch({ ongoing = false }: { ongoing: boolean }) {
                         backgroundColor: "Background",
                     }}
                     radius={"md"}
-                    className={clsx(globalClasses.matchHeader)}
+                    className={clsx(gstyles.matchHeader)}
                 >
                     <MatchHeader
                         match={match}

@@ -1,17 +1,9 @@
-.fixedTop {
-  position: fixed;
-  top: 15;
-}
-
-.highZ {
-  z-index: 666;
-}
-
 .offline {
   position: fixed;
-  top: 100px;
   left: 50%;
-  transform: translateX(-50%);
+  top: 50%;
+  transform: translate(-50%, -50%);
+  /* For Safari compatibility */
   -webkit-backdrop-filter: blur(20px);
   backdrop-filter: blur(20px);
   z-index: 555;
@@ -21,4 +13,14 @@
   position: sticky;
   top: 75px;
   z-index: 111;
+}
+
+.markLabel {
+  display: none;
+}
+
+.wrapSingleLongText {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-all;
 }

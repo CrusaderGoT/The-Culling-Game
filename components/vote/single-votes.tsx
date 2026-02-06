@@ -1,18 +1,18 @@
 "use client";
 
-import { MatchInfo, PlayerInfo } from "@/api/client";
-import { useAuth } from "@/lib/contexts/auth-provider";
-import { useCastVote } from "@/lib/hooks/match";
+import { BaseCtAppInfo, MatchInfo, PlayerInfo } from "@/api/client";
+import { useAuth } from "@/lib/contexts/auth-context-provider";
+import { useCastVote } from "@/lib/hooks/matches";
 import { getColorFromId } from "@/lib/utils";
 import { ActionIcon, Text, Tooltip } from "@mantine/core";
 import {
     Icon,
-    IconCactus,
-    IconHierarchy,
-    IconStretching,
-    IconSunElectricity,
-    IconVectorBezier,
-    IconVolcano,
+    IconBombFilled,
+    IconBow,
+    IconHandGrab,
+    IconKarate,
+    IconShieldFilled,
+    IconSwords
 } from "@tabler/icons-react";
 
 type SingleVoteGroupProp = {
@@ -29,11 +29,11 @@ export function SingleVoteGroup({
     ended,
 }: SingleVoteGroupProp) {
     const appIcons = [
-        IconCactus,
-        IconVectorBezier,
-        IconVolcano,
-        IconSunElectricity,
-        IconHierarchy,
+        IconSwords,
+        IconShieldFilled,
+        IconBow,
+        IconBombFilled,
+        IconHandGrab,
     ];
 
     const appGroup = applications.map((app, index) => {
@@ -61,7 +61,7 @@ export function SingleVoteGroup({
 
 type SingleVoteProp = {
     matchId: number;
-    application: PlayerInfo["cursed_technique"]["applications"][0];
+    application: BaseCtAppInfo;
     playerId: number;
     prevVotes: number;
     icon?: Icon;
@@ -73,7 +73,7 @@ function SingleVote({
     application,
     playerId,
     prevVotes,
-    icon = IconStretching,
+    icon = IconKarate,
     ended,
 }: SingleVoteProp) {
     const { token } = useAuth();
@@ -115,7 +115,7 @@ function SingleVote({
                     maw={200}
                     events={{ focus: false, hover: true, touch: true }}
                 >
-                    <AppIcon />
+                    <AppIcon size={18} />
                 </Tooltip>
             </ActionIcon>
 

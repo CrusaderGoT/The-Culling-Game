@@ -3,8 +3,9 @@
 import { MatchInfo, PlayerInfo } from "@/api/client";
 import { SingleVoteGroup } from "@/components/vote/single-votes";
 import { getColorFromId } from "@/lib/utils";
-import classes from "@/styles/player-card.module.css";
+import styles from "@/styles/player-card.module.css";
 import {
+    AspectRatio,
     Badge,
     Divider,
     Group,
@@ -39,13 +40,20 @@ export function PlayerCard({
                 points += vote.point;
             }
         });
-        return points;
+        return points.toFixed(1);
     }, [match?.votes, player.id]);
 
     return (
-        <Paper withBorder p={"xs"} className={clsx(classes.fullHeight)}>
-            <Stack className={clsx(classes.fullHeight, classes.spaceBetween)}>
-                <Group p={5} className={clsx(classes.spaceBetween)}>
+        <Paper
+            withBorder
+            p={"xs"}
+            className={clsx(
+                styles.fullHeight,
+                !player.alive && styles.disabledState
+            )}
+        >
+            <Stack className={clsx(styles.fullHeight, styles.spaceBetween)}>
+                <Group p={5} className={clsx(styles.spaceBetween)}>
                     <Badge
                         size="xs"
                         leftSection={<IconPointFilled size={14} />}
@@ -79,7 +87,7 @@ export function PlayerCard({
                             size="xs"
                             rightSection={
                                 <Text size={"8"} visibleFrom="sm">
-                                    {playerMatchPoints > 0
+                                    {Number(playerMatchPoints) > 0
                                         ? "Battle Points"
                                         : "Battle Point"}
                                 </Text>
@@ -93,15 +101,20 @@ export function PlayerCard({
                 </Group>
 
                 <Group align="flex-start">
-                    <MantineImage
-                        component={Image}
-                        src={player.picture}
-                        fallbackSrc="/images/Kogane.png"
-                        alt="Player Image"
-                        height={100}
-                        width={100}
-                        className={clsx(classes.playerCard)}
-                    />
+                    <AspectRatio
+                        ratio={100 / 100}
+                        className={clsx(styles.mAuto)}
+                    >
+                        <MantineImage
+                            component={Image}
+                            src={player.picture}
+                            fallbackSrc="/images/Kogane.png"
+                            alt="Player Image"
+                            height={100}
+                            width={100}
+                            className={clsx(styles.playerImage)}
+                        />
+                    </AspectRatio>
 
                     <Group lts={4} flex={1} wrap="nowrap">
                         <Stack>
@@ -153,7 +166,7 @@ export function PlayerCard({
                     </Stack>
                 )}
 
-                {player.barrier_technique && match && (
+                {match && player.barrier_technique && (
                     <Stack>
                         <Divider label="Barrier techniques" />
 

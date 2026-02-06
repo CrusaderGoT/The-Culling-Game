@@ -13,18 +13,17 @@ import {
     useCreatePlayerForm,
 } from "@/components/player/forms/create-player-form-context";
 import { DisplayAPIError } from "@/components/ui/display-api-error";
-import { useAuth } from "@/lib/contexts/auth-provider";
+import { useAuth } from "@/lib/contexts/auth-context-provider";
 import { useCreatePlayer } from "@/lib/hooks/players";
-import { useCurrentUser } from "@/lib/hooks/users";
 
 import {
     Button,
     Center,
     Divider,
     Group,
+    LoadingOverlay,
     Paper,
     ScrollAreaAutosize,
-    Skeleton,
     Stack,
     Stepper,
     Text,
@@ -40,11 +39,16 @@ import {
 } from "@tabler/icons-react";
 
 import { zodResolver } from "mantine-form-zod-resolver";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 import { useState } from "react";
 
+import gstyles from "@/styles/global.module.css";
+import clsx from "clsx";
+
 export function CreatePlayerForm() {
+    const router = useRouter();
+
     // Constants
     const FIELD_KEYS = [
         "player", // step 0
@@ -57,7 +61,10 @@ export function CreatePlayerForm() {
         application: "",
     }));
 
-    const { token } = useAuth();
+    const {
+        token,
+        user: { userInfo },
+    } = useAuth();
 
     const [active, setActive] = useState(0);
     const [highestStepVisited, setHighestStepVisited] = useState(active);
@@ -116,21 +123,15 @@ export function CreatePlayerForm() {
     });
 
     const {
-        data: user,
-        error: userError,
-        refetch: refetchUser,
-        isLoading: userIsLoading,
-    } = useCurrentUser(token);
-
-    const {
         isPending: createPlayerIsPending,
+        isSuccess: createPlayerIsSuccess,
         mutateAsync: createPlayerMutate,
         error: createPlayerError,
         reset: createPlayerReset,
     } = useCreatePlayer(token);
 
     async function handleSubmit(data: CreatePlayerSchemaType) {
-        if (!user) {
+        if (!userInfo) {
             notifications.show({
                 message:
                     "User information not available. Please refresh and try again.",
@@ -142,40 +143,33 @@ export function CreatePlayerForm() {
         const newPlayer = await createPlayerMutate({
             // @ts-ignore: applications are always 5
             body: data,
-            path: { user: user.id },
+            path: { user: userInfo.id },
         });
 
-        if (!newPlayer) {
-            notifications.show({
-                message: "Failed to create player. Please try again.",
-                color: "red",
-            });
+        `if (!newPlayer) {
             createPlayerReset();
             return;
         } else {
-            redirect("/player");
-        }
-    }
-
-    // Loading state
-    if (userIsLoading) {
-        return <Skeleton width="100%" height={400} mx="auto" my={"sm"} />;
-    }
-
-    // Error state
-    if (userError || !user) {
-        return (
-            <Stack>
-                {userError && <DisplayAPIError error={userError} />}
-                <Button onClick={() => refetchUser()}>
-                    Retry Loading User
-                </Button>
-            </Stack>
-        );
+            router.refresh();
+        }`
     }
 
     return (
         <Paper radius="md" p="md" withBorder>
+            <LoadingOverlay
+                visible={createPlayerIsPending}
+                zIndex={600}
+                overlayProps={{ radius: "sm", blur: 0 }}
+                loaderProps={{ type: "bars" }}
+            />
+            <LoadingOverlay
+                visible={createPlayerIsPending}
+                overlayProps={{ radius: "sm", blur: 2 }}
+                loaderProps={{
+                    children: `Creating your Player...`,
+                    pt: 100,
+                }}
+            />
             <CreatePlayerFormProvider form={form}>
                 <form onSubmit={form.onSubmit(handleSubmit)}>
                     <Stepper
@@ -240,7 +234,9 @@ export function CreatePlayerForm() {
 
                         <Stepper.Completed>
                             {Object.keys(form.errors).length > 0 ? (
-                                <Center>
+                                <Center
+                                    className={clsx(gstyles.wrapSingleLongText)}
+                                >
                                     <ScrollAreaAutosize mah={300}>
                                         <Text c="red" fw={500} mb="md">
                                             Some fields have errors. Please
@@ -278,7 +274,9 @@ export function CreatePlayerForm() {
                                     </ScrollAreaAutosize>
                                 </Center>
                             ) : (
-                                <Stack>
+                                <Stack
+                                    className={clsx(gstyles.wrapSingleLongText)}
+                                >
                                     <ScrollAreaAutosize mah="60vh">
                                         <Divider
                                             label="Confirm your player information"
@@ -308,6 +306,10 @@ export function CreatePlayerForm() {
                                     <Button
                                         type="submit"
                                         loading={createPlayerIsPending}
+                                        disabled={
+                                            createPlayerIsPending ||
+                                            createPlayerIsSuccess
+                                        }
                                         size="md"
                                     >
                                         Create Player

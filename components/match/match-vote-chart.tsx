@@ -1,7 +1,7 @@
 "use client";
 
-import { BaseCtAppInfo, BaseVoteInfo, PlayerInfo } from "@/api/client";
-import { getColorFromId } from "@/lib/utils";
+import { BaseVoteInfo, PlayerInfo } from "@/api/client";
+import { getColorFromId, getCtAppMap } from "@/lib/utils";
 import { BarChart } from "@mantine/charts";
 import { Tooltip } from "@mantine/core";
 
@@ -13,12 +13,7 @@ type MatchVoteChartProps = {
 
 export function MatchVoteChart({ players, votes }: MatchVoteChartProps) {
     // Derive CT apps from players
-    const ctAppMap = new Map<number, BaseCtAppInfo>();
-    players.forEach((player) => {
-        player.cursed_technique.applications.forEach((app) => {
-            ctAppMap.set(app.id, app);
-        });
-    });
+    const ctAppMap = getCtAppMap(players);
 
     // Convert to chart data format
     const data: Record<string, string | number>[] = [];
@@ -52,14 +47,14 @@ export function MatchVoteChart({ players, votes }: MatchVoteChartProps) {
             }
 
             // Update vote points
-            const currentPoints = (voteData.get(ctAppName) as number) || 0;
-            voteData.set(ctAppName, currentPoints + vote.point);
+            const currentPoints = Number(voteData.get(ctAppName)) || 0;
+            voteData.set(ctAppName, (currentPoints + vote.point).toFixed(1));
 
             // Add series entry if not exists
             if (!series.some((s) => s.name === ctAppName)) {
                 series.push({
                     name: ctAppName,
-                    color: getColorFromId(vote.ct_app_id + vote.point),
+                    color: getColorFromId(vote.ct_app_id),
                 });
             }
         });
@@ -122,6 +117,11 @@ export function MatchVoteChart({ players, votes }: MatchVoteChartProps) {
             xAxisLabel="Vote Points"
             tooltipAnimationDuration={200}
             barChartProps={{ maxBarSize: 50 }}
+            xAxisProps={{
+                domain([_, dataMax]) {
+                    return [0, Number(dataMax.toFixed(1))];
+                },
+            }}
             yAxisProps={{
                 type: "category",
                 tick: renderCustomYAxisTick,

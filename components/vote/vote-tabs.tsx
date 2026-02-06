@@ -18,7 +18,13 @@ export function VoteTabs({ players, value, setValue }: VoteTabsProp) {
                     <Tabs.Tab
                         key={player.id}
                         value={`${player.id}`}
-                        leftSection={<Avatar name={player.name} size={18} />}
+                        leftSection={
+                            <Avatar
+                                name={player.name}
+                                src={player.picture}
+                                size={18}
+                            />
+                        }
                         color={getColorFromId(player.id)}
                     >
                         {player.name}

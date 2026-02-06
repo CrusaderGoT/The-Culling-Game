@@ -1,7 +1,6 @@
 "use client";
 
-import globalClasses from "@/styles/global.module.css";
-import classes from "@/styles/mode-toggle.module.css";
+import styles from "@/styles/mode-toggle.module.css";
 import {
     ActionIcon,
     useComputedColorScheme,
@@ -28,16 +27,9 @@ export function ModeToggle() {
             size="md"
             color="charcoal"
             aria-label="Toggle color scheme"
-            className={clsx(globalClasses.fixedTop, globalClasses.highZ)}
         >
-            <IconSun
-                className={clsx(classes.icon, classes.light)}
-                stroke={1.5}
-            />
-            <IconMoon
-                className={clsx(classes.icon, classes.dark)}
-                stroke={1.5}
-            />
+            <IconSun className={clsx(styles.icon, styles.light)} stroke={1.5} />
+            <IconMoon className={clsx(styles.icon, styles.dark)} stroke={1.5} />
         </ActionIcon>
     );
 }

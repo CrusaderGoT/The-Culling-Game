@@ -8,9 +8,9 @@ function makeQueryClient() {
     return new QueryClient({
         defaultOptions: {
             queries: {
-                // consider data fresh for most of the token lifetime
-                // to prevent unnecessary fetches
-                staleTime: 12 * 60 * 1000,
+                // Using staleTime: Infinity to prevent unnecessary fetches;
+                // adjust if periodic updates are required
+                staleTime: Infinity,
                 // Retry count set to 3 in development mode
                 retry: process.env.NODE_ENV === "development" ? 3 : false,
                 refetchOnWindowFocus: false, // to avoid unwanted refetch

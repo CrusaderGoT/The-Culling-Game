@@ -43,6 +43,12 @@ export function PlayerFormInputs() {
         <Stack>
             <Stack>
                 <TextInput
+                    label="Player Picture"
+                    key={form.key("player.picture")}
+                    {...form.getInputProps("player.picture")}
+                />
+
+                <TextInput
                     label="Player Name"
                     key={form.key("player.name")}
                     {...form.getInputProps("player.name")}
@@ -154,6 +160,9 @@ export function PlayerInfoFormList() {
                 Player Info
             </Title>
             <List withPadding listStyleType="disc" spacing={"xs"}>
+                <List.Item>
+                    Picture: <Text c={"gray"}>{player.picture}</Text>
+                </List.Item>
                 <List.Item>
                     Name: <Text c={"orange"}>{player.name}</Text>
                 </List.Item>

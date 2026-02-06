@@ -1,8 +1,8 @@
 "use client";
 
 import { BarrierTechActionProp } from "@/components/barrier/activate-barriers";
-import { useAuth } from "@/lib/contexts/auth-provider";
-import { useBindingVow } from "@/lib/hooks/barrier";
+import { useAuth } from "@/lib/contexts/auth-context-provider";
+import { useBindingVow } from "@/lib/hooks/barriers";
 import { getColorFromId } from "@/lib/utils";
 import { ActionIcon, Text, Tooltip } from "@mantine/core";
 import { IconLink } from "@tabler/icons-react";
@@ -13,7 +13,10 @@ export function BindingVowAction({
     match,
     ended,
 }: BarrierTechActionProp) {
-    const { token } = useAuth();
+    const {
+        token,
+        user: { userInfo },
+    } = useAuth();
     const { mutateAsync, isPending } = useBindingVow(token);
 
     const bindingVowUse = useMemo(() => {
@@ -37,11 +40,15 @@ export function BindingVowAction({
                 color={getColorFromId(bindingVowUse)}
                 onClick={async () => {
                     await mutateAsync({
-                        path: { player_id: barrierTech.player_id },
-                        query: { match_id: match.id },
+                        path: {
+                            player_id: barrierTech.player_id,
+                            match_id: match.id,
+                        },
                     });
                 }}
-                disabled={ended}
+                disabled={
+                    ended || userInfo?.player?.id !== barrierTech.player_id
+                }
             >
                 <Tooltip
                     label={ended ? "match ended" : "use binding vow"}
@@ -49,7 +56,7 @@ export function BindingVowAction({
                     maw={200}
                     events={{ focus: false, hover: true, touch: true }}
                 >
-                    <IconLink />
+                    <IconLink size={18} />
                 </Tooltip>
             </ActionIcon>
             <ActionIcon.GroupSection

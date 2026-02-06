@@ -1,8 +1,8 @@
 "use client";
 
 import { BarrierTechActionProp } from "@/components/barrier/activate-barriers";
-import { useAuth } from "@/lib/contexts/auth-provider";
-import { useReverseCursedTechnique } from "@/lib/hooks/barrier";
+import { useAuth } from "@/lib/contexts/auth-context-provider";
+import { useReverseCursedTechnique } from "@/lib/hooks/barriers";
 import { getColorFromId } from "@/lib/utils";
 import { ActionIcon, Text, Tooltip } from "@mantine/core";
 import { IconHeartPlus } from "@tabler/icons-react";
@@ -13,7 +13,10 @@ export function ReverseCursedTechniqueAction({
     match,
     ended,
 }: BarrierTechActionProp) {
-    const { token } = useAuth();
+    const {
+        token,
+        user: { userInfo },
+    } = useAuth();
     const { mutateAsync, isPending } = useReverseCursedTechnique(token);
 
     const rctUse = useMemo(() => {
@@ -35,11 +38,15 @@ export function ReverseCursedTechniqueAction({
                 flex={1}
                 loading={isPending}
                 color={getColorFromId(rctUse)}
-                disabled={ended}
+                disabled={
+                    ended || userInfo?.player?.id !== barrierTech.player_id
+                }
                 onClick={async () => {
                     await mutateAsync({
-                        path: { player_id: barrierTech.player_id },
-                        query: { match_id: match.id },
+                        path: {
+                            player_id: barrierTech.player_id,
+                            match_id: match.id,
+                        },
                     });
                 }}
             >
@@ -49,7 +56,7 @@ export function ReverseCursedTechniqueAction({
                     maw={200}
                     events={{ focus: false, hover: true, touch: true }}
                 >
-                    <IconHeartPlus />
+                    <IconHeartPlus size={18} />
                 </Tooltip>
             </ActionIcon>
 

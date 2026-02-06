@@ -1,5 +1,6 @@
 // auth/auth-provider.tsx
 "use client";
+
 import { UserInfo } from "@/api/client";
 import {
     refreshTokenMutation,
@@ -40,7 +41,7 @@ export const AuthContext = createContext<ContextProp>({
     },
 });
 
-export function AuthProvider({ children }: { children: ReactNode }) {
+export function AuthContextProvider({ children }: { children: ReactNode }) {
     const path = usePathname() || "/match";
     const [token, setToken] = useState<string>("");
     const [refreshToken, setRefreshToken] = useState<string>("");
@@ -115,7 +116,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const {
         isPending: isRefreshing,
-        mutate,
+        mutateAsync,
         error: refreshError,
     } = useMutation({
         ...refreshTokenMutation(),
@@ -130,6 +131,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 message: "Session Expired Log In To Continue",
                 color: "yellow",
             });
+
             redirect(`/login?next=${encodeURIComponent(path)}`);
         },
         onSuccess: async (t) => {
@@ -145,7 +147,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             setTokenExpiresIn(expDate);
             setTokenExpired(false); // Reset expired state
         },
-        retry: false, // one fail -> session is deleted
     });
 
     const { data: user, isPending: userIsPending } = useCurrentUser(
@@ -205,25 +206,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // Scenario 3: Token has expired
         const shouldRefresh =
             refreshToken &&
+            !refreshError && // this prevents loop when fail
             isOnline &&
             ((isError && !isLoading) || (!token && !isLoading) || tokenExpired);
 
         if (shouldRefresh) {
-            mutate({
-                body: { refresh_token: refreshToken },
-            });
+            async function refreshTokenAsyncMutate() {
+                const rt = await mutateAsync({
+                    body: { refresh_token: refreshToken },
+                });
+            }
+            refreshTokenAsyncMutate();
         }
     }, [
         isError,
         refreshToken,
+        refreshError,
         isRefreshing,
         isLoading,
-        mutate,
+        mutateAsync,
         tokensLoaded,
         token,
         mountedRef,
         tokenExpired,
         isOnline,
+        path,
     ]);
 
     // Redirect logic
