@@ -1,10 +1,12 @@
+from datetime import datetime
 from typing import Annotated
 from uuid import uuid4, uuid5
 
-from fastapi import Body, Depends, HTTPException, status
+from fastapi import Body, Depends, HTTPException, Request, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import HTMLResponse
 from fastapi.security import OAuth2PasswordRequestForm
+from fastapi.templating import Jinja2Templates
 from scalar_fastapi import get_scalar_api_reference
 from sqlmodel import or_, select
 
@@ -32,6 +34,10 @@ app.include_router(barriers.router)
 app.include_router(colonies.router)
 app.include_router(admins.superuser_router)
 app.include_router(admins.router)
+
+
+# Templates Object
+templates = Jinja2Templates(directory="./app/templates")
 
 
 # LOGIN
@@ -216,9 +222,18 @@ async def scalar_html():
 
 
 @app.get("/", response_class=HTMLResponse)
-async def chat_html():
-    with open("./app/api/index.html", "r") as fl:
-        return fl.read()
+async def home_page(request: Request):
+    live_url = (
+        "localhost:3000"
+        if not settings.live
+        else "https://the-culling-games.vercel.app/"
+    )
+
+    date = datetime.now().year
+
+    return templates.TemplateResponse(
+        request=request, name="index.html", context={"live_url": live_url, "date": date}
+    )
 
 
 # Event: when a client connects

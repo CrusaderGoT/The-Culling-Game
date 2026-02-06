@@ -29,6 +29,7 @@ class Settings(BaseSettings):
     "in milliseconds"
     refresh_token_expire: int = 604_800_000
     "in milliseconds"
+    live: bool = False
 
 
 settings = Settings()

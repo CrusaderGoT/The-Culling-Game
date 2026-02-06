@@ -4,8 +4,12 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>The Culling Games API</title>
-    <link rel="icon" type="image/x-icon" href="static/favicon.ico" />
-    <link rel="stylesheet" href="/static/styles.css" />
+    <link
+      rel="icon"
+      type="image/x-icon"
+      href="{{ url_for('static', path='/favicon.ico') }}"
+    />
+    <link rel="stylesheet" href="{{ url_for('static', path='/styles.css') }}" />
     <link
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
       rel="stylesheet"
@@ -38,13 +42,13 @@
           <h1 class="hero-title">Powerful Backend API for The Culling Games</h1>
           <p class="hero-description">
             A robust and scalable backend service that powers The Culling Games
-            experience. Our API handles all the complex data management, game
+            experience. The API handles all the complex data management, game
             logic, and real-time operations behind the scenes, so you can focus
             on creating amazing user experiences.
           </p>
           <div class="hero-buttons">
             <a
-              href="https://the-culling-games.up.railway.app/docs"
+              href="{{ url_for('scalar_html') }}"
               class="btn btn-primary"
               target="_blank"
               rel="noopener"
@@ -53,7 +57,7 @@
               View API Documentation
             </a>
             <a
-              href="https://the-culling-games.vercel.app"
+              href="{{ live_url }}"
               class="btn btn-secondary"
               target="_blank"
               rel="noopener"
@@ -69,7 +73,7 @@
     <!-- Features Section -->
     <section class="features">
       <div class="container">
-        <h2 class="section-title">What Our API Provides</h2>
+        <h2 class="section-title">What The API Provides</h2>
         <div class="features-grid">
           <div class="feature-card">
             <div class="feature-icon">
@@ -120,12 +124,12 @@
       <div class="container">
         <div class="info-grid">
           <div class="info-content">
-            <h2>Built for Developers, Designed for Everyone</h2>
+            <h2>Built for Fans of the Culling Games arc by Gege Akutami.</h2>
             <p>
-              Whether you're a seasoned developer or just getting started, our
-              API is designed to be intuitive and well-documented. The backend
-              handles all the complex logic, database operations, and server
-              management, providing you with clean, easy-to-use endpoints.
+              The API is designed to be intuitive and well-documented. The
+              backend handles all the complex logic, database operations, and
+              server management, providing you with clean, easy-to-use
+              endpoints.
             </p>
             <ul class="info-list">
               <li>
@@ -158,13 +162,36 @@
               </div>
               <div class="code-content">
                 <pre><code>{
-  "status": "success",
-  "data": {
-    "game_id": "cg_12345",
-    "players": 150,
-    "status": "active",
-    "round": 3
+  "username": "Gojo-Senpai",
+  "email": "hello@example.com",
+  "country": "AF",
+  "id": 1,
+  "created": "2026-02-06",
+  "player": {
+    "name": "string",
+    "gender": "male",
+    "age": 10,
+    "role": "string",
+    "picture": "string",
+    "id": 1,
+    "created": "2026-02-06",
+    "grade": 0,
+    "points": 1,
+    "alive": true
+  },
+  "admin": {
+    "id": "123e4567-e89b-12d3-a456-426614174000",
+    "is_superuser": true,
+    "permissions": [
+      {
+        "model": "colony",
+        "id": 1,
+        "name": "string",
+        "level": 1
+      }
+    ]
   }
+  
 }</code></pre>
               </div>
             </div>
@@ -184,7 +211,7 @@
           </p>
           <div class="cta-buttons">
             <a
-              href="https://the-culling-games.up.railway.app/docs"
+              href="{{ url_for('scalar_html') }}"
               class="btn btn-primary"
               target="_blank"
               rel="noopener"
@@ -192,7 +219,7 @@
               Start with Documentation
             </a>
             <a
-              href="https://the-culling-games.vercel.app"
+              href="{{ live_url }}"
               class="btn btn-outline"
               target="_blank"
               rel="noopener"
@@ -210,7 +237,7 @@
         <div class="footer-content">
           <div class="footer-brand">
             <h3>The Culling Games API</h3>
-            <p>Powering the next generation of gaming experiences.</p>
+            <p>Powering an incredible gaming experiences.</p>
           </div>
           <div class="footer-links">
             <div class="footer-section">
@@ -218,17 +245,14 @@
               <ul>
                 <li>
                   <a
-                    href="https://the-culling-games.up.railway.app/docs"
+                    href="{{ url_for('scalar_html') }}"
                     target="_blank"
                     rel="noopener"
                     >API Documentation</a
                   >
                 </li>
                 <li>
-                  <a
-                    href="https://the-culling-games.vercel.app"
-                    target="_blank"
-                    rel="noopener"
+                  <a href="{{ live_url }}" target="_blank" rel="noopener"
                     >Live Demo</a
                   >
                 </li>
@@ -238,23 +262,17 @@
               <h4>Connect</h4>
               <ul>
                 <li>
-                  <a href="#" target="_blank"
+                  <a
+                    href="https://github.com/CrusaderGoT/The-Culling-Game"
+                    target="_blank"
                     ><i class="fab fa-github"></i> GitHub</a
                   >
                 </li>
                 <li>
-                  <a href="#" target="_blank"
+                  <a
+                    href="https://www.reddit.com/r/TheCullingGames/"
+                    target="_blank"
                     ><i class="fab fa-reddit"></i> Reddit</a
-                  >
-                </li>
-                <li>
-                  <a href="#" target="_blank"
-                    ><i class="fab fa-twitter"></i> Twitter</a
-                  >
-                </li>
-                <li>
-                  <a href="#" target="_blank"
-                    ><i class="fab fa-linkedin"></i> LinkedIn</a
                   >
                 </li>
               </ul>
@@ -263,8 +281,8 @@
         </div>
         <div class="footer-bottom">
           <p>
-            &copy; 2025 The Culling Games API. Built with passion for great
-            gaming experiences.
+            &copy; {{ date }} The Culling Games API. Built with passion for
+            great gaming experiences.
           </p>
         </div>
       </div>
