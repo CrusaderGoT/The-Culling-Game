@@ -61,10 +61,7 @@ export function CreatePlayerForm() {
         application: "",
     }));
 
-    const {
-        token,
-        user: { userInfo },
-    } = useAuth();
+    const { token, user } = useAuth();
 
     const [active, setActive] = useState(0);
     const [highestStepVisited, setHighestStepVisited] = useState(active);
@@ -131,7 +128,7 @@ export function CreatePlayerForm() {
     } = useCreatePlayer(token);
 
     async function handleSubmit(data: CreatePlayerSchemaType) {
-        if (!userInfo) {
+        if (!user) {
             notifications.show({
                 message:
                     "User information not available. Please refresh and try again.",
@@ -143,7 +140,7 @@ export function CreatePlayerForm() {
         const newPlayer = await createPlayerMutate({
             // @ts-ignore: applications are always 5
             body: data,
-            path: { user: userInfo.id },
+            path: { user: user.id },
         });
 
         `if (!newPlayer) {
@@ -151,7 +148,7 @@ export function CreatePlayerForm() {
             return;
         } else {
             router.refresh();
-        }`
+        }`;
     }
 
     return (

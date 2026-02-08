@@ -11,7 +11,10 @@ import { authHeader } from "@/lib/constants/AUTHCONSTANTS";
 import { notifications } from "@mantine/notifications";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
-export const useCurrentAdmin = (token: string, tokenError?: boolean) => {
+export const useCurrentAdmin = (
+    token: string | undefined,
+    tokenError?: boolean
+) => {
     const query = useQuery({
         ...currentAdminOptions({
             headers: authHeader(token),
@@ -22,7 +25,7 @@ export const useCurrentAdmin = (token: string, tokenError?: boolean) => {
     return query;
 };
 
-export const useNewPermission = (token: string) => {
+export const useNewPermission = (token: string | undefined) => {
     const mutation = useMutation({
         ...newPermissionMutation({
             headers: authHeader(token),
@@ -55,7 +58,7 @@ export const useNewPermission = (token: string) => {
     return mutation;
 };
 
-export const useCreateAdmin = (token: string) => {
+export const useCreateAdmin = (token: string | undefined) => {
     const mutation = useMutation({
         ...createAdminMutation({
             headers: authHeader(token),
@@ -77,7 +80,7 @@ export const useCreateAdmin = (token: string) => {
     return mutation;
 };
 
-export const useRemovePermission = (token: string) => {
+export const useRemovePermission = (token: string | undefined) => {
     const mutation = useMutation({
         ...removePermissionMutation({
             headers: authHeader(token),
@@ -98,7 +101,7 @@ export const useRemovePermission = (token: string) => {
     return mutation;
 };
 
-export const useGrantPermission = (token: string) => {
+export const useGrantPermission = (token: string | undefined) => {
     const mutation = useMutation({
         ...grantPermissionMutation({
             headers: authHeader(token),
@@ -119,7 +122,7 @@ export const useGrantPermission = (token: string) => {
     return mutation;
 };
 
-export const useDemoSuperuser = (token: string) => {
+export const useDemoSuperuser = (token: string | undefined) => {
     const mutation = useMutation({
         ...demoSuperuserMutation({
             headers: authHeader(token),

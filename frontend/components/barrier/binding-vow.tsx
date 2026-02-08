@@ -13,10 +13,7 @@ export function BindingVowAction({
     match,
     ended,
 }: BarrierTechActionProp) {
-    const {
-        token,
-        user: { userInfo },
-    } = useAuth();
+    const { token, user } = useAuth();
     const { mutateAsync, isPending } = useBindingVow(token);
 
     const bindingVowUse = useMemo(() => {
@@ -46,9 +43,7 @@ export function BindingVowAction({
                         },
                     });
                 }}
-                disabled={
-                    ended || userInfo?.player?.id !== barrierTech.player_id
-                }
+                disabled={ended || user?.player?.id !== barrierTech.player_id}
             >
                 <Tooltip
                     label={ended ? "match ended" : "use binding vow"}

@@ -41,7 +41,7 @@ export const useAssignMatchWinner = (token: string | undefined) => {
     return mutation;
 };
 
-export const useCreateMatch = (token: string) => {
+export const useCreateMatch = (token: string | undefined) => {
     const mutation = useMutation({
         ...createMatchMutation({
             headers: authHeader(token),
@@ -67,7 +67,7 @@ export const useCreateMatch = (token: string) => {
     return mutation;
 };
 
-export const useDeleteMatch = (token: string) => {
+export const useDeleteMatch = (token: string | undefined) => {
     const mutation = useMutation({
         ...deleteMatchMutation({
             headers: authHeader(token),

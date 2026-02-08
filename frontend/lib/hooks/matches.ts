@@ -19,7 +19,7 @@ export const useLatestMatch = (token: string | undefined, ongoing: boolean = fal
     return query;
 };
 
-export const useCastVote = (token: string) => {
+export const useCastVote = (token: string | undefined) => {
     const { emit, isConnected } = useSocketEmit();
 
     const mutation = useMutation({

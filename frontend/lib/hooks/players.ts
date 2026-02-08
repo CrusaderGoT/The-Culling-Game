@@ -14,7 +14,7 @@ import { notifications } from "@mantine/notifications";
 import { useMutation, useQueries, useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
-export const useCreatePlayer = (token: string) => {
+export const useCreatePlayer = (token: string | undefined) => {
     const mutation = useMutation({
         ...createPlayerMutation({
             headers: authHeader(token),
@@ -41,7 +41,7 @@ export const useCreatePlayer = (token: string) => {
     return mutation;
 };
 
-export const useCurrentPlayer = (token: string) => {
+export const useCurrentPlayer = (token: string | undefined) => {
     const query = useQuery({
         ...myPlayerOptions({
             headers: authHeader(token),
@@ -137,7 +137,7 @@ export const useGetMatchPlayers = (
     return playerQueries;
 };
 
-export const useEditPlayer = (token: string) => {
+export const useEditPlayer = (token: string | undefined) => {
     const mutation = useMutation({
         ...editPlayerMutation({
             headers: authHeader(token),
@@ -164,7 +164,7 @@ export const useEditPlayer = (token: string) => {
     return mutation;
 };
 
-export const useDeletePlayer = (token: string) => {
+export const useDeletePlayer = (token: string | undefined) => {
     const router = useRouter();
 
     const mutation = useMutation({
@@ -194,7 +194,7 @@ export const useDeletePlayer = (token: string) => {
     return mutation;
 };
 
-export const useUpgradePlayer = (token: string) => {
+export const useUpgradePlayer = (token: string | undefined) => {
     const mutation = useMutation({
         ...upgradePlayerMutation({
             headers: authHeader(token),

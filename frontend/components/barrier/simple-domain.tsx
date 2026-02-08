@@ -13,10 +13,7 @@ export function SimpleDomainAction({
     match,
     ended,
 }: BarrierTechActionProp) {
-    const {
-        token,
-        user: { userInfo },
-    } = useAuth();
+    const { token, user } = useAuth();
     const { mutateAsync, isPending } = useSimpleDomain(token);
 
     const simpleDomainUse = useMemo(() => {
@@ -38,9 +35,7 @@ export function SimpleDomainAction({
                 flex={1}
                 loading={isPending}
                 color={getColorFromId(simpleDomainUse)}
-                disabled={
-                    ended || userInfo?.player?.id !== barrierTech.player_id
-                }
+                disabled={ended || user?.player?.id !== barrierTech.player_id}
                 onClick={async () => {
                     await mutateAsync({
                         path: {

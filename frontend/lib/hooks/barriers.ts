@@ -10,7 +10,7 @@ import { notifications } from "@mantine/notifications";
 import { useMutation } from "@tanstack/react-query";
 import { authHeader } from "../constants/AUTHCONSTANTS";
 
-export const useDomainExpansion = (token: string) => {
+export const useDomainExpansion = (token: string | undefined) => {
     const mutation = useMutation({
         ...domainExpansionMutation({
             headers: authHeader(token),
@@ -31,7 +31,7 @@ export const useDomainExpansion = (token: string) => {
     return mutation;
 };
 
-export const useSimpleDomain = (token: string) => {
+export const useSimpleDomain = (token: string | undefined) => {
     const mutation = useMutation({
         ...simpleDomainMutation({
             headers: authHeader(token),
@@ -52,7 +52,7 @@ export const useSimpleDomain = (token: string) => {
     return mutation;
 };
 
-export const useBindingVow = (token: string) => {
+export const useBindingVow = (token: string | undefined) => {
     const mutation = useMutation({
         ...bindindVowMutation({
             headers: authHeader(token),
@@ -73,7 +73,7 @@ export const useBindingVow = (token: string) => {
     return mutation;
 };
 
-export const useReverseCursedTechnique = (token: string) => {
+export const useReverseCursedTechnique = (token: string | undefined) => {
     const mutation = useMutation({
         ...reverseCursedTechniqueMutation({
             headers: authHeader(token),

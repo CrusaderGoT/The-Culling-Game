@@ -63,7 +63,6 @@ export const useLoginUser = () => {
  * @returns The result of the user query, including loading, error, and data states.
  */
 export const useCurrentUser = (token: string | undefined) => {
-    console.error("attempted")
     const query = useQuery({
         ...currentUserOptions({
             headers: authHeader(token),

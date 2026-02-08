@@ -10,7 +10,7 @@ import {
 
 import { zCastVote } from "@/api/client/zod.gen";
 
-import { zodResolver } from "@mantine/form";
+import { zodResolver } from "mantine-form-zod-resolver";
 
 import { z } from "zod";
 
@@ -19,7 +19,9 @@ import { useAuth } from "@/lib/contexts/auth-context-provider";
 import { useCastVote } from "@/lib/hooks/matches";
 
 export function VoteForm({ votes, matchId }: VoteFormType) {
-    const voteSchema = z.object({ votes: z.array(zCastVote) });
+    const voteSchema = z.object({
+        votes: z.array(zCastVote),
+    });
 
     const initialValues: VoteFormType = {
         votes: votes,

@@ -15,7 +15,7 @@ export function DomainExpansionAction({
 }: BarrierTechActionProp) {
     const {
         token,
-        user: { userInfo },
+        user,
     } = useAuth();
     const { mutateAsync, isPending } = useDomainExpansion(token);
 
@@ -39,7 +39,7 @@ export function DomainExpansionAction({
                 loading={isPending}
                 color={getColorFromId(domainUse)}
                 disabled={
-                    ended || userInfo?.player?.id !== barrierTech.player_id
+                    ended || user?.player?.id !== barrierTech.player_id
                 }
                 onClick={async () => {
                     await mutateAsync({

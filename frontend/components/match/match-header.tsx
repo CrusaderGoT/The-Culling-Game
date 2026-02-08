@@ -29,9 +29,7 @@ export function MatchHeader({
     isEnded,
     timeLeft,
 }: MatchStatusHeaderProp) {
-    const {
-        user: { userInfo },
-    } = useAuth();
+    const { user } = useAuth();
 
     const colony = `${match.colony.id} - ${match.colony.country}`;
 
@@ -96,13 +94,12 @@ export function MatchHeader({
                 {isEnded ? timeLeft : `ends in: ${timeLeft}`}
             </Code>
 
-            {userInfo?.admin &&
-                checkAdminPermission(userInfo.admin, "match", [4]) && (
-                    <DeleteMatchAction small />
-                )}
+            {user?.admin && checkAdminPermission(user.admin, "match", [4]) && (
+                <DeleteMatchAction small />
+            )}
 
-            {userInfo?.admin &&
-                checkAdminPermission(userInfo.admin, "match", [2, 3]) && (
+            {user?.admin &&
+                checkAdminPermission(user.admin, "match", [2, 3]) && (
                     <AssignMatchWinnerAction small />
                 )}
         </Group>
