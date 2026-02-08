@@ -10,7 +10,7 @@ const publicRoutes = ["/login", "/signup", "/"];
  * it's a good way to centralize redirect logic and pre-filter unauthorized users.
  * protect static routes that share data between users (e.g. content behind a paywall).
  */
-export default async function middleware(req: NextRequest) {
+export default async function proxy(req: NextRequest) {
     // 2. Check if the current route is protected or public
     const path = req.nextUrl.pathname;
     const isProtectedRoute = protectedRoutes.includes(path);
