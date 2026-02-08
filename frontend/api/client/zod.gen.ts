@@ -6,13 +6,13 @@ import { z } from 'zod';
  * BarrierRecordInfo
  */
 export const zBarrierRecordInfo = z.object({
-    domain_counter: z.number().int().optional().default(0),
-    simple_domain_counter: z.number().int().optional().default(0),
-    binding_vow_counter: z.number().int().optional().default(0),
-    reverse_cursed_technique_counter: z.number().int().optional().default(0),
-    id: z.number().int(),
-    barrier_tech_id: z.number().int(),
-    match_id: z.number().int()
+    domain_counter: z.int().optional().prefault(0),
+    simple_domain_counter: z.int().optional().prefault(0),
+    binding_vow_counter: z.int().optional().prefault(0),
+    reverse_cursed_technique_counter: z.int().optional().prefault(0),
+    id: z.int(),
+    barrier_tech_id: z.int(),
+    match_id: z.int()
 });
 
 /**
@@ -32,23 +32,23 @@ export const zBarrierRecordInfo = z.object({
  * sd_end_time: datetime | None = Field(default=None, description="the time a player cast their simple_domain")
  */
 export const zBarrierTechInfo = z.object({
-    domain_expansion: z.boolean().optional().default(false),
-    binding_vow: z.boolean().optional().default(false),
-    simple_domain: z.boolean().optional().default(false),
+    domain_expansion: z.boolean().optional().prefault(false),
+    binding_vow: z.boolean().optional().prefault(false),
+    simple_domain: z.boolean().optional().prefault(false),
     de_end_time: z.union([
-        z.string().datetime(),
+        z.iso.datetime(),
         z.null()
     ]).optional(),
     bv_end_time: z.union([
-        z.string().datetime(),
+        z.iso.datetime(),
         z.null()
     ]).optional(),
     sd_end_time: z.union([
-        z.string().datetime(),
+        z.iso.datetime(),
         z.null()
     ]).optional(),
-    id: z.number().int(),
-    player_id: z.number().int()
+    id: z.int(),
+    player_id: z.int()
 });
 
 /**
@@ -62,8 +62,8 @@ export const zBarrierTechInfo = z.object({
 export const zBaseCtAppInfo = z.object({
     name: z.string().min(3).max(100),
     application: z.string().min(100).max(500),
-    id: z.number().int(),
-    number: z.number().int()
+    id: z.int(),
+    number: z.int()
 });
 
 /**
@@ -77,7 +77,7 @@ export const zBaseCtAppInfo = z.object({
 export const zBaseCtInfo = z.object({
     name: z.string().min(3).max(100),
     definition: z.string().min(50).max(500),
-    id: z.number().int(),
+    id: z.int(),
     applications: z.array(zBaseCtAppInfo)
 });
 
@@ -90,15 +90,15 @@ export const zBaseCtInfo = z.object({
  * `point: float = Field(description="the point a vote carries")`
  */
 export const zBaseVoteInfo = z.object({
-    player_id: z.number().int(),
-    ct_app_id: z.number().int(),
-    id: z.number().int(),
+    player_id: z.int(),
+    ct_app_id: z.int(),
+    id: z.int(),
     user_id: z.union([
-        z.number().int(),
+        z.int(),
         z.null()
     ]),
     point: z.number(),
-    has_been_added: z.boolean().optional().default(false)
+    has_been_added: z.boolean().optional().prefault(false)
 });
 
 /**
@@ -111,7 +111,7 @@ export const zBodyCreateToken = z.object({
     ]).optional(),
     username: z.string(),
     password: z.string(),
-    scope: z.string().optional().default(''),
+    scope: z.string().optional().prefault(''),
     client_id: z.union([
         z.string(),
         z.null()
@@ -142,8 +142,8 @@ export const zBodyVerifyToken = z.object({
  * model for collecting data to cast a vote
  */
 export const zCastVote = z.object({
-    player_id: z.number().int(),
-    ct_app_id: z.number().int()
+    player_id: z.int(),
+    ct_app_id: z.int()
 });
 
 /**
@@ -157,7 +157,7 @@ export const zCastVote = z.object({
  */
 export const zClientVoteInfo = z.object({
     message: z.string(),
-    extra_info: z.record(z.unknown()),
+    extra_info: z.record(z.string(), z.unknown()),
     votes: z.array(zBaseVoteInfo)
 });
 
@@ -372,7 +372,7 @@ export const zCountry = z.enum([
  */
 export const zBaseColonyInfo = z.object({
     country: zCountry,
-    id: z.number().int()
+    id: z.int()
 });
 
 /**
@@ -385,13 +385,13 @@ export const zBaseColonyInfo = z.object({
  */
 export const zBaseUserInfo = z.object({
     username: z.string().min(4).regex(/^[A-Za-z][A-Za-z0-9_-]{2,19}$/),
-    email: z.string().email(),
+    email: z.email(),
     country: z.union([
         zCountry,
         z.null()
     ]).optional(),
-    id: z.number().int(),
-    created: z.string().date()
+    id: z.int(),
+    created: z.iso.date()
 });
 
 /**
@@ -421,7 +421,7 @@ export const zCreateCtApp = z.object({
  */
 export const zCreateUser = z.object({
     username: z.string().min(4).regex(/^[A-Za-z][A-Za-z0-9_-]{2,19}$/),
-    email: z.string().email(),
+    email: z.email(),
     country: z.union([
         zCountry,
         z.null()
@@ -452,7 +452,7 @@ export const zEditCt = z.object({
  * for editing a cursed technique application
  */
 export const zEditCtApp = z.object({
-    number: z.number().int().gte(1).lte(5),
+    number: z.int().gte(1).lte(5),
     name: z.union([
         z.string().min(3).max(100),
         z.null()
@@ -474,7 +474,7 @@ export const zEditUser = z.object({
         z.null()
     ]).optional(),
     email: z.union([
-        z.string().email(),
+        z.email(),
         z.null()
     ]).optional(),
     country: z.union([
@@ -502,7 +502,7 @@ export const zGender = z.enum([
 export const zCreatePlayer = z.object({
     name: z.string().min(4).max(50),
     gender: zGender,
-    age: z.number().int().gte(10).lte(102),
+    age: z.int().gte(10).lte(102),
     role: z.union([
         z.string().min(3).max(50),
         z.null()
@@ -543,7 +543,7 @@ export const zEditPlayer = z.object({
         z.null()
     ]).optional(),
     age: z.union([
-        z.number().int().gte(10).lte(102),
+        z.int().gte(10).lte(102),
         z.null()
     ]).optional(),
     role: z.union([
@@ -618,7 +618,7 @@ export const zGrade = z.union([
 export const zBasePlayerInfo = z.object({
     name: z.string().min(4).max(50),
     gender: zGender,
-    age: z.number().int().gte(10).lte(102),
+    age: z.int().gte(10).lte(102),
     role: z.union([
         z.string().min(3).max(50),
         z.null()
@@ -627,8 +627,8 @@ export const zBasePlayerInfo = z.object({
         z.string(),
         z.null()
     ]).optional(),
-    id: z.number().int(),
-    created: z.string().date(),
+    id: z.int(),
+    created: z.iso.date(),
     grade: zGrade,
     points: z.number(),
     alive: z.boolean()
@@ -643,11 +643,11 @@ export const zBasePlayerInfo = z.object({
  * `winner: Union[BasePlayerInfo, None]`
  */
 export const zBaseMatchInfo = z.object({
-    begin: z.string().datetime(),
-    end: z.string().datetime(),
-    part: z.number().int(),
-    draw: z.boolean().optional().default(false),
-    id: z.number().int(),
+    begin: z.iso.datetime(),
+    end: z.iso.datetime(),
+    part: z.int(),
+    draw: z.boolean().optional().prefault(false),
+    id: z.int(),
     winner: z.union([
         zBasePlayerInfo,
         z.null()
@@ -661,7 +661,7 @@ export const zBaseMatchInfo = z.object({
  */
 export const zColonyInfo = z.object({
     country: zCountry,
-    id: z.number().int(),
+    id: z.int(),
     players: z.array(zBasePlayerInfo)
 });
 
@@ -671,11 +671,11 @@ export const zColonyInfo = z.object({
  * match info for client side
  */
 export const zMatchInfo = z.object({
-    begin: z.string().datetime(),
-    end: z.string().datetime(),
-    part: z.number().int(),
-    draw: z.boolean().optional().default(false),
-    id: z.number().int(),
+    begin: z.iso.datetime(),
+    end: z.iso.datetime(),
+    part: z.int(),
+    draw: z.boolean().optional().prefault(false),
+    id: z.int(),
     winner: z.union([
         zBasePlayerInfo,
         z.null()
@@ -726,7 +726,7 @@ export const zPermissionLevel = z.union([
  */
 export const zBasePermissionInfo = z.object({
     model: zModelName,
-    id: z.number().int(),
+    id: z.int(),
     name: z.string(),
     level: zPermissionLevel
 });
@@ -737,7 +737,7 @@ export const zBasePermissionInfo = z.object({
  * the admin info for client side
  */
 export const zAdminInfo = z.object({
-    id: z.string().uuid(),
+    id: z.uuid(),
     is_superuser: z.boolean(),
     permissions: z.array(zBasePermissionInfo),
     user: zBaseUserInfo
@@ -752,7 +752,7 @@ export const zAdminInfo = z.object({
  * `permissions: list[BasePermissionInfo]`
  */
 export const zBaseAdminInfo = z.object({
-    id: z.string().uuid(),
+    id: z.uuid(),
     is_superuser: z.boolean(),
     permissions: z.array(zBasePermissionInfo)
 });
@@ -762,7 +762,7 @@ export const zBaseAdminInfo = z.object({
  */
 export const zPermissionInfo = z.object({
     model: zModelName,
-    id: z.number().int(),
+    id: z.int(),
     name: z.string(),
     level: zPermissionLevel
 });
@@ -785,7 +785,7 @@ export const zPermissionRequest = z.object({
 export const zPlayerInfo = z.object({
     name: z.string().min(4).max(50),
     gender: zGender,
-    age: z.number().int().gte(10).lte(102),
+    age: z.int().gte(10).lte(102),
     role: z.union([
         z.string().min(3).max(50),
         z.null()
@@ -794,8 +794,8 @@ export const zPlayerInfo = z.object({
         z.string(),
         z.null()
     ]).optional(),
-    id: z.number().int(),
-    created: z.string().date(),
+    id: z.int(),
+    created: z.iso.date(),
     grade: zGrade,
     points: z.number(),
     alive: z.boolean(),
@@ -826,8 +826,8 @@ export const zToken = z.object({
     access_token: z.string(),
     refresh_token: z.string(),
     token_type: z.string(),
-    expires_in: z.number().int(),
-    refresh_expires_in: z.number().int()
+    expires_in: z.int(),
+    refresh_expires_in: z.int()
 });
 
 /**
@@ -838,12 +838,12 @@ export const zToken = z.object({
 export const zTokenData = z.object({
     sub: z.string(),
     refresh_token_key: z.union([
-        z.string().uuid(),
+        z.uuid(),
         z.null()
     ]).optional(),
-    exp: z.string().datetime(),
-    iat: z.string().datetime(),
-    scopes: z.array(z.string()).optional().default([])
+    exp: z.iso.datetime(),
+    iat: z.iso.datetime(),
+    scopes: z.array(z.string()).optional().prefault([])
 });
 
 /**
@@ -853,13 +853,13 @@ export const zTokenData = z.object({
  */
 export const zUserInfo = z.object({
     username: z.string().min(4).regex(/^[A-Za-z][A-Za-z0-9_-]{2,19}$/),
-    email: z.string().email(),
+    email: z.email(),
     country: z.union([
         zCountry,
         z.null()
     ]).optional(),
-    id: z.number().int(),
-    created: z.string().date(),
+    id: z.int(),
+    created: z.iso.date(),
     player: z.union([
         zBasePlayerInfo,
         z.null()
@@ -874,7 +874,7 @@ export const zUserInfo = z.object({
  * ValidationError
  */
 export const zValidationError = z.object({
-    loc: z.array(z.union([z.string(), z.number().int()])),
+    loc: z.array(z.union([z.string(), z.int()])),
     msg: z.string(),
     type: z.string()
 });
@@ -901,7 +901,7 @@ export const zAUserData = z.object({
     body: z.never().optional(),
     path: z.object({
         user: z.union([
-            z.number().int(),
+            z.int(),
             z.string()
         ])
     }),
@@ -917,7 +917,7 @@ export const zEditUserData = z.object({
     body: zEditUser,
     path: z.object({
         user: z.union([
-            z.number().int(),
+            z.int(),
             z.string()
         ])
     }),
@@ -933,7 +933,7 @@ export const zDeleteUserData = z.object({
     body: z.never().optional(),
     path: z.object({
         user: z.union([
-            z.number().int(),
+            z.int(),
             z.string()
         ])
     }),
@@ -949,7 +949,7 @@ export const zCreatePlayerData = z.object({
     body: zBodyCreatePlayer,
     path: z.object({
         user: z.union([
-            z.number().int(),
+            z.int(),
             z.string()
         ])
     }),
@@ -976,22 +976,22 @@ export const zGetPlayersData = z.object({
     body: z.never().optional(),
     path: z.never().optional(),
     query: z.object({
-        offset: z.number().int().gte(0).optional().default(0),
-        limit: z.number().int().lte(30).optional().default(10),
-        slim: z.boolean().optional().default(false),
+        offset: z.int().gte(0).optional().prefault(0),
+        limit: z.int().lte(30).optional().prefault(10),
+        slim: z.boolean().optional().prefault(false),
         gender: z.union([
             zGender,
             z.null()
         ]).optional(),
         age: z.union([
-            z.number().int().gte(10).lte(102),
+            z.int().gte(10).lte(102),
             z.null()
         ]).optional(),
         role: z.union([
             z.string(),
             z.null()
         ]).optional(),
-        alive: z.boolean().optional().default(true)
+        alive: z.boolean().optional().prefault(true)
     }).optional()
 });
 
@@ -1008,10 +1008,10 @@ export const zGetPlayersResponse = z.union([
 export const zAPlayerData = z.object({
     body: z.never().optional(),
     path: z.object({
-        player_id: z.number().int()
+        player_id: z.int()
     }),
     query: z.object({
-        alive: z.boolean().optional().default(true)
+        alive: z.boolean().optional().prefault(true)
     }).optional()
 });
 
@@ -1023,7 +1023,7 @@ export const zAPlayerResponse = zPlayerInfo;
 export const zEditPlayerData = z.object({
     body: zBodyEditPlayer.optional(),
     path: z.object({
-        player_id: z.number().int()
+        player_id: z.int()
     }),
     query: z.never().optional()
 });
@@ -1036,7 +1036,7 @@ export const zEditPlayerResponse = zPlayerInfo;
 export const zDeletePlayerData = z.object({
     body: z.never().optional(),
     path: z.object({
-        player_id: z.number().int()
+        player_id: z.int()
     }),
     query: z.never().optional()
 });
@@ -1049,7 +1049,7 @@ export const zDeletePlayerResponse = zPlayerInfo;
 export const zUpgradePlayerData = z.object({
     body: z.never().optional(),
     path: z.object({
-        player_id: z.number().int()
+        player_id: z.int()
     }),
     query: z.object({
         grade_up: zGrade
@@ -1064,7 +1064,7 @@ export const zUpgradePlayerResponse = zPlayerInfo;
 export const zVoteData = z.object({
     body: z.array(zCastVote).min(1).max(5),
     path: z.object({
-        match_id: z.number().int()
+        match_id: z.int()
     }),
     query: z.never().optional()
 });
@@ -1078,7 +1078,7 @@ export const zCreateMatchData = z.object({
     body: z.never().optional(),
     path: z.never().optional(),
     query: z.object({
-        part: z.number().int()
+        part: z.int()
     })
 });
 
@@ -1091,8 +1091,8 @@ export const zGetMatchesData = z.object({
     body: z.never().optional(),
     path: z.never().optional(),
     query: z.object({
-        offset: z.number().int().gte(0).optional().default(0),
-        limit: z.number().int().lte(30).optional().default(10)
+        offset: z.int().gte(0).optional().prefault(0),
+        limit: z.int().lte(30).optional().prefault(10)
     }).optional()
 });
 
@@ -1107,7 +1107,7 @@ export const zGetLastestMatchData = z.object({
     body: z.never().optional(),
     path: z.never().optional(),
     query: z.object({
-        ongoing: z.boolean().optional().default(false)
+        ongoing: z.boolean().optional().prefault(false)
     }).optional()
 });
 
@@ -1119,7 +1119,7 @@ export const zGetLastestMatchResponse = zMatchInfo;
 export const zDeleteMatchData = z.object({
     body: z.never().optional(),
     path: z.object({
-        match_id: z.number().int()
+        match_id: z.int()
     }),
     query: z.never().optional()
 });
@@ -1132,7 +1132,7 @@ export const zDeleteMatchResponse = zMatchInfo;
 export const zAssignMatchWinnerData = z.object({
     body: z.never().optional(),
     path: z.object({
-        match_id: z.number().int()
+        match_id: z.int()
     }),
     query: z.never().optional()
 });
@@ -1145,8 +1145,8 @@ export const zAssignMatchWinnerResponse = zMatchInfo;
 export const zDomainExpansionData = z.object({
     body: z.never().optional(),
     path: z.object({
-        player_id: z.number().int(),
-        match_id: z.number().int()
+        player_id: z.int(),
+        match_id: z.int()
     }),
     query: z.never().optional()
 });
@@ -1159,8 +1159,8 @@ export const zDomainExpansionResponse = zBarrierTechInfo;
 export const zSimpleDomainData = z.object({
     body: z.never().optional(),
     path: z.object({
-        player_id: z.number().int(),
-        match_id: z.number().int()
+        player_id: z.int(),
+        match_id: z.int()
     }),
     query: z.never().optional()
 });
@@ -1173,8 +1173,8 @@ export const zSimpleDomainResponse = zBarrierTechInfo;
 export const zBindindVowData = z.object({
     body: z.never().optional(),
     path: z.object({
-        player_id: z.number().int(),
-        match_id: z.number().int()
+        player_id: z.int(),
+        match_id: z.int()
     }),
     query: z.never().optional()
 });
@@ -1187,8 +1187,8 @@ export const zBindindVowResponse = zBarrierTechInfo;
 export const zReverseCursedTechniqueData = z.object({
     body: z.never().optional(),
     path: z.object({
-        player_id: z.number().int(),
-        match_id: z.number().int()
+        player_id: z.int(),
+        match_id: z.int()
     }),
     query: z.never().optional()
 });
@@ -1201,7 +1201,7 @@ export const zReverseCursedTechniqueResponse = zBarrierTechInfo;
 export const zDeactivateDomainExpansionData = z.object({
     body: z.never().optional(),
     path: z.object({
-        player_id: z.number().int()
+        player_id: z.int()
     }),
     query: z.never().optional()
 });
@@ -1215,8 +1215,8 @@ export const zGetColoniesData = z.object({
     body: z.never().optional(),
     path: z.never().optional(),
     query: z.object({
-        offset: z.number().int().gte(0).optional().default(0),
-        limit: z.number().int().lte(30).optional().default(10)
+        offset: z.int().gte(0).optional().prefault(0),
+        limit: z.int().lte(30).optional().prefault(10)
     }).optional()
 });
 
@@ -1231,12 +1231,12 @@ export const zDemoSuperuserData = z.object({
     body: z.never().optional(),
     path: z.object({
         user: z.union([
-            z.number().int(),
+            z.int(),
             z.string()
         ])
     }),
     query: z.object({
-        code: z.string().uuid()
+        code: z.uuid()
     })
 });
 
@@ -1249,7 +1249,7 @@ export const zAdminEditUserData = z.object({
     body: zEditUser,
     path: z.object({
         user: z.union([
-            z.number().int(),
+            z.int(),
             z.string()
         ])
     }),
@@ -1265,7 +1265,7 @@ export const zAdminDeleteUserData = z.object({
     body: z.never().optional(),
     path: z.object({
         user: z.union([
-            z.number().int(),
+            z.int(),
             z.string()
         ])
     }),
@@ -1280,7 +1280,7 @@ export const zAdminDeleteUserResponse = zUserInfo;
 export const zAdminEditPlayerData = z.object({
     body: zBodyAdminEditPlayer.optional(),
     path: z.object({
-        player_id: z.number().int()
+        player_id: z.int()
     }),
     query: z.never().optional()
 });
@@ -1293,7 +1293,7 @@ export const zAdminEditPlayerResponse = zPlayerInfo;
 export const zAdminDeletePlayerData = z.object({
     body: z.never().optional(),
     path: z.object({
-        player_id: z.number().int()
+        player_id: z.int()
     }),
     query: z.never().optional()
 });
@@ -1307,7 +1307,7 @@ export const zCreateAdminData = z.object({
     body: z.array(zPermissionRequest),
     path: z.object({
         user: z.union([
-            z.number().int(),
+            z.int(),
             z.string()
         ])
     }),
@@ -1335,7 +1335,7 @@ export const zNewPermissionResponse = z.array(zPermissionInfo);
 export const zGrantPermissionData = z.object({
     body: z.array(zPermissionRequest),
     path: z.object({
-        admin_id: z.string().uuid()
+        admin_id: z.uuid()
     }),
     query: z.never().optional()
 });
@@ -1348,7 +1348,7 @@ export const zGrantPermissionResponse = zAdminInfo;
 export const zRemovePermissionData = z.object({
     body: z.array(zPermissionRequest),
     path: z.object({
-        admin_id: z.string().uuid()
+        admin_id: z.uuid()
     }),
     query: z.never().optional()
 });
