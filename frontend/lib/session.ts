@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 
 import { cookies } from "next/headers";
 
-import { AuthService, Token } from "@/api/client";
+import { Auth, Token } from "@/api/client";
 import { tokenNames } from "@/lib/constants/AUTHCONSTANTS";
 import { cache } from "react";
 
@@ -73,7 +73,7 @@ export const verifySession = cache(async (path: string = "/match") => {
         return null;
     }
 
-    const { data } = await AuthService.verifyToken({
+    const { data } = await Auth.verifyToken({
         body: { token: token },
     });
 

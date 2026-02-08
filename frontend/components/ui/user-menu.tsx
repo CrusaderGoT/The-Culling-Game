@@ -85,11 +85,9 @@ export function UserMenu() {
 
     const router = useRouter();
 
-    const {
-        user: { userInfo, isPendingUser },
-    } = useAuth();
+    const { user } = useAuth();
 
-    if (isPendingUser)
+    if (!user)
         return (
             <Box>
                 <Skeleton height={38} width={220} visibleFrom="sm" />
@@ -98,7 +96,7 @@ export function UserMenu() {
             </Box>
         );
 
-    if (!userInfo) return <AnonMenu />;
+    //if (!user) return <AnonMenu />;
 
     return (
         <Menu
@@ -109,20 +107,20 @@ export function UserMenu() {
         >
             <Menu.Target>
                 <Group>
-                    <UserButtonAlt user={userInfo} />
+                    <UserButtonAlt user={user} />
 
-                    <UserButton user={userInfo} />
+                    <UserButton user={user} />
                 </Group>
             </Menu.Target>
 
             <Menu.Dropdown>
                 <Box hiddenFrom="sm">
                     <Group justify="center" m={"xs"}>
-                        <Text size="xs">{userInfo.username}</Text>
-                        {userInfo?.player && (
+                        <Text size="xs">{user.username}</Text>
+                        {user?.player && (
                             <Indicator
                                 size={7}
-                                color={getColorFromId(userInfo.player.id)}
+                                color={getColorFromId(user.player.id)}
                             />
                         )}
                     </Group>
@@ -130,7 +128,7 @@ export function UserMenu() {
                     <Menu.Divider />
                 </Box>
 
-                {userInfo.admin && (
+                {user.admin && (
                     <Menu.Item
                         leftSection={<IconDashboard size={16} stroke={1.5} />}
                         component={Link}
@@ -147,7 +145,7 @@ export function UserMenu() {
                                 <IconUser
                                     size={16}
                                     stroke={1.5}
-                                    color={getColorFromId(userInfo.id)}
+                                    color={getColorFromId(user.id)}
                                 />
                             }
                         >
@@ -179,8 +177,8 @@ export function UserMenu() {
                             size={16}
                             stroke={1.5}
                             color={
-                                userInfo.player
-                                    ? getColorFromId(userInfo.player.id)
+                                user.player
+                                    ? getColorFromId(user.player.id)
                                     : theme.colors.green[7]
                             }
                         />
@@ -188,7 +186,7 @@ export function UserMenu() {
                     component={Link}
                     href="/player"
                 >
-                    {userInfo.player ? "Player Profile" : "Create Player"}
+                    {user.player ? "Player Profile" : "Create Player"}
                 </Menu.Item>
 
                 <Menu.Label>Settings</Menu.Label>

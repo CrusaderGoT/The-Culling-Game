@@ -3,7 +3,7 @@ export const tokenNames = {
     refresh: "resfresh_token",
 };
 
-export function authHeader(token: string) {
+export function authHeader(token: string | undefined) {
     const tokenObj = { Authorization: `Bearer ${token}` };
     return tokenObj;
 }

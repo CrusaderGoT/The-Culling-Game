@@ -61,6 +61,7 @@ export function LiveMatch({ ongoing = false }: { ongoing: boolean }) {
         }
     });
 
+    // Match countdown timer
     useEffect(() => {
         if (!match) return;
 
@@ -111,14 +112,14 @@ export function LiveMatch({ ongoing = false }: { ongoing: boolean }) {
 
     // effect for making match winner
     useEffect(() => {
+        if (!token || !match || !isEnded || match.winner || match.draw) return;
+
         async function assignMatchWinner(matchId: number) {
             await mutateAsync({ path: { match_id: matchId } });
         }
 
-        if (!match || !isEnded || match.winner || match.draw) return;
-
         assignMatchWinner(match.id);
-    }, [match, isEnded, mutateAsync, match?.winner, match?.draw]);
+    }, [match, isEnded, mutateAsync, match?.winner, match?.draw, token]);
 
     // Extract player IDs from match data safely
     const playerIds = match?.players?.map((player) => player.id) || [];
@@ -134,7 +135,7 @@ export function LiveMatch({ ongoing = false }: { ongoing: boolean }) {
         return players?.filter((player) => player !== undefined) || [];
     }, [players]);
 
-    if (matchIsPending || playersIsPending || !match) {
+    if (matchIsPending || playersIsPending) {
         return (
             <Stack>
                 <Skeleton h={40} radius={"md"} />
@@ -161,7 +162,7 @@ export function LiveMatch({ ongoing = false }: { ongoing: boolean }) {
         );
     }
 
-    if (matchError || playersError) {
+    if (matchError || !match) {
         return (
             <Stack>
                 <DisplayAPIError

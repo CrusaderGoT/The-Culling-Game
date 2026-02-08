@@ -8,7 +8,7 @@ import { notifications } from "@mantine/notifications";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useSocketEmit } from "../contexts/socket-context-provider";
 
-export const useLatestMatch = (token: string, ongoing: boolean = false) => {
+export const useLatestMatch = (token: string | undefined, ongoing: boolean = false) => {
     const query = useQuery({
         ...getLastestMatchOptions({
             query: { ongoing: ongoing },

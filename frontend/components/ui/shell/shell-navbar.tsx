@@ -8,27 +8,25 @@ import { useEffect } from "react";
 import { ShellNavLinks } from "./shell-navlinks";
 
 export function ShellNavbar() {
-    const {
-        user: { userInfo },
-    } = useAuth();
+    const { user } = useAuth();
 
     const { navbarProps } = useShellContext();
 
     const pathname = usePathname();
 
     useEffect(() => {
-        if (userInfo?.admin && !navbarProps.adminUser) {
+        if (user?.admin && !navbarProps.adminUser) {
             navbarProps.setAdminUser(true);
         }
         return;
     }, [
-        userInfo?.admin,
+        user?.admin,
         navbarProps,
         navbarProps.adminUser,
         navbarProps.setAdminUser,
     ]);
 
-    return userInfo?.admin && pathname.startsWith("/admin") ? (
+    return user?.admin && pathname.startsWith("/admin") ? (
         <AppShell.Navbar p="md">
             <AppShell.Section component={ScrollArea}>
                 <ShellNavLinks closeNavbar={navbarProps.toggleMobile} />

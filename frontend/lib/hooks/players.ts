@@ -71,7 +71,10 @@ export const useGetPlayer = (
 };
 
 // Custom hook for fetching multiple players
-export const useGetMatchPlayers = (token: string, playerIds: number[]) => {
+export const useGetMatchPlayers = (
+    token: string | undefined,
+    playerIds: number[]
+) => {
     // Filter out any invalid IDs (0, null, undefined)
     const validPlayerIds = playerIds.filter((id) => id && id !== 0);
 

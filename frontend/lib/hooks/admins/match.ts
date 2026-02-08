@@ -10,7 +10,7 @@ import { queryClient } from "@/lib/query-client/get-query-client";
 import { notifications } from "@mantine/notifications";
 import { useMutation } from "@tanstack/react-query";
 
-export const useAssignMatchWinner = (token: string) => {
+export const useAssignMatchWinner = (token: string | undefined) => {
     const mutation = useMutation({
         ...assignMatchWinnerMutation({
             headers: authHeader(token),

@@ -1,6 +1,6 @@
 "use client";
 
-import { CastVote, PlayerInfo } from "@/api/client";
+import { CastVote, HttpValidationError, PlayerInfo } from "@/api/client";
 import { VoteForm } from "@/components/vote/forms/vote-form";
 import { VoteTabs } from "@/components/vote/vote-tabs";
 import {
@@ -183,9 +183,12 @@ export function VoteDrawer({
         </Box>
     );
 }
+
 export type VoteDrawerProp = {
     players: PlayerInfo[];
     errors: boolean;
-    refetchFailed: () => Promise<QueryObserverResult<PlayerInfo, Error>[]>;
+    refetchFailed: () => Promise<
+        QueryObserverResult<PlayerInfo, HttpValidationError>[]
+    >;
     matchId: number;
 };

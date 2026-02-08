@@ -4,7 +4,7 @@
 import { UserInfo } from "@/api/client";
 import {
     refreshTokenMutation,
-    verifyTokenOptions,
+    verifyTokenMutation,
 } from "@/api/client/@tanstack/react-query.gen";
 import { getAPIErrorMessage } from "@/components/ui/display-api-error";
 import { tokenNames } from "@/lib/constants/AUTHCONSTANTS";
@@ -12,7 +12,7 @@ import { useCurrentUser } from "@/lib/hooks/users";
 import { createSession, deleteSession, getClientCookie } from "@/lib/session";
 import { useMounted } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { redirect, usePathname } from "next/navigation";
 import {
     createContext,
@@ -25,31 +25,34 @@ import {
 } from "react";
 
 type ContextProp = {
-    token: string;
+    token: string | undefined;
     isOnline: boolean;
-    user: {
-        userInfo?: UserInfo;
-        isPendingUser: boolean;
-    };
+    user: UserInfo | undefined;
 };
 
 export const AuthContext = createContext<ContextProp>({
-    token: "",
+    token: undefined,
     isOnline: false,
-    user: {
-        isPendingUser: true,
-    },
+    user: undefined,
 });
 
 export function AuthContextProvider({ children }: { children: ReactNode }) {
     const path = usePathname() || "/match";
-    const [token, setToken] = useState<string>("");
-    const [refreshToken, setRefreshToken] = useState<string>("");
+
+    const [loadedToken, setLoadedToken] = useState<string | undefined>(
+        undefined
+    );
+    const [realToken, setRealToken] = useState<string | undefined>(undefined);
+    const [refreshToken, setRefreshToken] = useState<string | undefined>(
+        undefined
+    );
     const [tokensLoaded, setTokensLoaded] = useState(false);
     const [tokenExpiresIn, setTokenExpiresIn] = useState<Date>();
     const [tokenExpired, setTokenExpired] = useState(false);
+
     const mountedRef = useMounted();
     const refreshTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
     const [isOnline, setIsOnline] = useState(true);
 
     useEffect(() => {
@@ -82,7 +85,7 @@ export function AuthContextProvider({ children }: { children: ReactNode }) {
                 ]);
 
                 if (!canceled && mountedRef) {
-                    setToken(accessToken || "");
+                    setLoadedToken(accessToken);
                     setRefreshToken(refreshTokenValue || "");
                     setTokensLoaded(true);
                 }
@@ -101,22 +104,9 @@ export function AuthContextProvider({ children }: { children: ReactNode }) {
         };
     }, [mountedRef]);
 
-    // Always run verify query when tokens are loaded (even with empty token)
     const {
-        isError,
-        isLoading,
-        data: tokenData,
-    } = useQuery({
-        ...verifyTokenOptions({ body: { token: token } }),
-        enabled: tokensLoaded && isOnline,
-        retry: (failureCount) => {
-            return failureCount < 2 && !!token && mountedRef;
-        },
-    });
-
-    const {
-        isPending: isRefreshing,
-        mutateAsync,
+        isPending: isPendingRefreshToken,
+        mutateAsync: refreshTokenAsync,
         error: refreshError,
     } = useMutation({
         ...refreshTokenMutation(),
@@ -138,7 +128,8 @@ export function AuthContextProvider({ children }: { children: ReactNode }) {
             if (!mountedRef) return;
 
             await createSession(t);
-            setToken(t.access_token);
+            setLoadedToken(t.access_token);
+            setRealToken(t.access_token);
             setRefreshToken(t.refresh_token);
 
             // Handle expiration - t.expires_in is in milliseconds
@@ -149,20 +140,63 @@ export function AuthContextProvider({ children }: { children: ReactNode }) {
         },
     });
 
-    const { data: user, isPending: userIsPending } = useCurrentUser(
-        token,
-        isError
-    );
+    const { isError: isVerifyTokenError, mutateAsync: verifyTokenAsync } =
+        useMutation({
+            ...verifyTokenMutation(),
+            retry: (failureCount) => {
+                return failureCount < 2 && !!loadedToken && mountedRef;
+            },
+            onError: async () => {
+                // Remove invalid token
+                setLoadedToken(undefined);
 
-    // Set token expires after successful token verification
+                // Refresh token if possible
+                if (refreshToken) {
+                    await refreshTokenAsync({
+                        body: { refresh_token: refreshToken },
+                    });
+                } else {
+                    // Redirect to login
+                    redirect(`/login?next=${encodeURIComponent(path)}`);
+                }
+            },
+        });
+
+    // Effect for verify a token
     useEffect(() => {
-        if (tokenData) {
-            // tokenData.exp is a date time
-            const expDate = new Date(tokenData.exp);
-            setTokenExpiresIn(expDate);
-            setTokenExpired(false); // Reset expired state
+        async function verifyTokenEffect() {
+            if (tokensLoaded && isOnline) {
+                if (refreshToken && (!loadedToken || tokenExpired)) {
+                    const refreshTokenValue = refreshToken;
+                    await refreshTokenAsync({
+                        body: { refresh_token: refreshTokenValue },
+                    });
+                } else if (loadedToken) {
+                    const tokenData = await verifyTokenAsync({
+                        body: { token: loadedToken },
+                    });
+
+                    // Set token expires after successful token verification
+                    if (tokenData) {
+                        setRealToken(loadedToken); // set verified token to be used site wide
+                        // tokenData.exp is a date time
+                        const expDate = new Date(tokenData.exp);
+                        setTokenExpiresIn(expDate);
+                        setTokenExpired(false); // Reset expired state
+                    }
+                }
+            }
         }
-    }, [tokenData]);
+        verifyTokenEffect();
+    }, [
+        tokensLoaded,
+        isOnline,
+        verifyTokenAsync,
+        loadedToken,
+        refreshToken,
+        tokenExpired,
+        refreshTokenAsync,
+    ]);
 
     // Timer-based expiration tracking
     useEffect(() => {
@@ -197,72 +231,15 @@ export function AuthContextProvider({ children }: { children: ReactNode }) {
         };
     }, [tokenExpiresIn, mountedRef, refreshError, isOnline]);
 
-    // Simplified refresh logic
-    useEffect(() => {
-        if (!tokensLoaded || isRefreshing || !mountedRef) return;
-
-        // Scenario 1: Verify failed and we have refresh token
-        // Scenario 2: No access token but we have refresh token (token removed from session)
-        // Scenario 3: Token has expired
-        const shouldRefresh =
-            refreshToken &&
-            !refreshError && // this prevents loop when fail
-            isOnline &&
-            ((isError && !isLoading) || (!token && !isLoading) || tokenExpired);
-
-        if (shouldRefresh) {
-            async function refreshTokenAsyncMutate() {
-                const rt = await mutateAsync({
-                    body: { refresh_token: refreshToken },
-                });
-            }
-            refreshTokenAsyncMutate();
-        }
-    }, [
-        isError,
-        refreshToken,
-        refreshError,
-        isRefreshing,
-        isLoading,
-        mutateAsync,
-        tokensLoaded,
-        token,
-        mountedRef,
-        tokenExpired,
-        isOnline,
-        path,
-    ]);
-
-    // Redirect logic
-    useEffect(() => {
-        if (!tokensLoaded) return;
-
-        const hasNoTokens = !token && !refreshToken;
-        const hasFailedAuth = isError && !refreshToken && !isRefreshing;
-
-        if ((hasNoTokens || hasFailedAuth) && mountedRef) {
-            redirect(`/login?next=${encodeURIComponent(path)}`);
-        }
-    }, [
-        tokensLoaded,
-        token,
-        refreshToken,
-        isError,
-        isRefreshing,
-        path,
-        mountedRef,
-    ]);
+    const { data: user, isError, error } = useCurrentUser(realToken);
 
     const value = useMemo<ContextProp>(() => {
         return {
-            token: token,
+            token: realToken,
             isOnline: isOnline,
-            user: {
-                userInfo: user,
-                isPendingUser: userIsPending,
-            },
+            user: user,
         };
-    }, [token, isOnline, user, userIsPending]);
+    }, [realToken, isOnline, user]);
 
     return (
         <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

@@ -62,12 +62,13 @@ export const useLoginUser = () => {
  * @param tokenError - Optional flag indicating if there is an error with the token; disables the query if true.
  * @returns The result of the user query, including loading, error, and data states.
  */
-export const useCurrentUser = (token: string, tokenError?: boolean) => {
+export const useCurrentUser = (token: string | undefined) => {
+    console.error("attempted")
     const query = useQuery({
         ...currentUserOptions({
             headers: authHeader(token),
         }),
-        enabled: !!token && !tokenError, // run only if token is available
+        enabled: !!token, // run only if token is available
     });
 
     return query;
