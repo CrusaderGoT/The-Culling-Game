@@ -72,8 +72,8 @@ async def vote(
 
                 # votes to be added and commited to session
                 new_votes: list[Vote] = list()
-                # message for player with binding vow limit
-                extra_info: list[str] = list()
+                # extra_info to include in response
+                extra_info: dict = {"match_id": match_id}
                 # now iterate over the votes and cast them for correct player ct app
                 for vote in votes:
                     # Check if the player_id exists and if the ct_app_id is in their list of ct_app_ids
@@ -128,11 +128,11 @@ async def vote(
                                     # add the vote points to players points
                                     player.points = round(player.points + vote_point, 1)
                                 else:
-                                    extra_info.append(
+                                    extra_info["binding_vow"] = (
                                         f"{player.name}'s binding vow vote limit reached."
                                     )
 
-                else:  # runs after the loop
+                else:  # runs if the loop finishes without breaking
                     # make sure new votes will not exceed the 5 vote limit
                     expected_limit = atp.vote_limit - len(prev_votes)
                     real_limit = (
@@ -154,9 +154,10 @@ async def vote(
                     vote_info = {
                         "message": msg,
                         "votes": new_votes,
-                        "extra_info": extra_info if extra_info else None,
+                        "extra_info": extra_info,
                     }
                     info = ClientVoteInfo.model_validate(vote_info)
+
                     return info
 
         else:  # match has ended

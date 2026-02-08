@@ -6,6 +6,7 @@ import { getAPIErrorMessage } from "@/components/ui/display-api-error";
 import { authHeader } from "@/lib/constants/AUTHCONSTANTS";
 import { notifications } from "@mantine/notifications";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { useSocketEmit } from "../contexts/socket-context-provider";
 
 export const useLatestMatch = (token: string, ongoing: boolean = false) => {
     const query = useQuery({
@@ -19,6 +20,8 @@ export const useLatestMatch = (token: string, ongoing: boolean = false) => {
 };
 
 export const useCastVote = (token: string) => {
+    const { emit, isConnected } = useSocketEmit();
+
     const mutation = useMutation({
         ...voteMutation({
             headers: authHeader(token),
@@ -30,8 +33,13 @@ export const useCastVote = (token: string) => {
             });
         },
         onSuccess(data) {
+            // send socket emit to server, if connected
+            if (isConnected) {
+                emit("vote_casted", { match_id: data.extra_info.match_id });
+            }
+
             if (data.extra_info) {
-                data.extra_info.forEach((msg) => {
+                Object.values(data.extra_info).forEach((msg) => {
                     notifications.show({
                         message: `${msg}`,
                         autoClose: false,

@@ -10,7 +10,7 @@ from fastapi.templating import Jinja2Templates
 from scalar_fastapi import get_scalar_api_reference
 from sqlmodel import or_, select
 
-from app.api.setting import app, settings, sio
+from app.api.setting import app, settings
 from app.auth.credentials import (
     PasswordAuth,
     authenticate_user,
@@ -79,6 +79,7 @@ async def create_token(
         expires_in=settings.access_token_expire,
         refresh_expires_in=settings.refresh_token_expire,
     )
+
     return token
 
 
@@ -234,26 +235,3 @@ async def home_page(request: Request):
     return templates.TemplateResponse(
         request=request, name="index.html", context={"live_url": live_url, "date": date}
     )
-
-
-# Event: when a client connects
-@sio.event
-async def connect(sid, environ):
-    print(f"Client connected: {sid}")
-    await sio.emit("message", {"msg": f"Welcome {sid}!"}, to=sid)
-
-
-# Event: when a client disconnects
-@sio.event
-async def disconnect(sid):
-    print(f"Client disconnected: {sid}")
-    await sio.emit("message", {"msg": f"{sid} left!"})
-
-
-# Event: on receiving a chat message
-@sio.event
-async def message(sid, data):
-    msg = data.get("msg")
-    print(f"Message from {sid}: {msg}")
-    # Broadcast to all clients
-    await sio.emit("message", {"msg": msg})

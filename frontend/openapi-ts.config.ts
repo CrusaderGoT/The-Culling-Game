@@ -6,25 +6,37 @@ export default defineConfig({
             ? "https://the-culling-games.up.railway.app/openapi.json"
             : "http://localhost:8000/openapi.json",
     output: {
-        format: "prettier",
-        lint: "eslint",
         path: "api/client",
+        postProcess: ["eslint", "prettier"],
     },
     plugins: [
         {
             name: "@hey-api/client-next",
-            runtimeConfigPath: "./api/hey-api.ts",
+            runtimeConfigPath: "@/api/hey-api",
         },
         {
             name: "@hey-api/sdk",
-            asClass: true,
+            operations: {
+                strategy: "byTags",
+            },
+            auth: true,
+            validator: true,
         },
         {
             name: "@hey-api/typescript",
             enums: "javascript",
         },
-        "zod",
-        "@tanstack/react-query",
+        {
+            name: "zod",
+        },
+        {
+            name: "@tanstack/react-query",
+            queryOptions: {
+                meta(operation) {
+                    return { id: operation.id };
+                },
+            },
+        },
     ],
     watch: false, // true to keep check for changes to fastapi openapi specs
 });

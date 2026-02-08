@@ -1,8 +1,8 @@
 import {
+    assignMatchWinnerMutation,
     createMatchMutation,
     deleteMatchMutation,
     getLastestMatchQueryKey,
-    matchWinnerMutation,
 } from "@/api/client/@tanstack/react-query.gen";
 import { getAPIErrorMessage } from "@/components/ui/display-api-error";
 import { authHeader } from "@/lib/constants/AUTHCONSTANTS";
@@ -12,7 +12,7 @@ import { useMutation } from "@tanstack/react-query";
 
 export const useAssignMatchWinner = (token: string) => {
     const mutation = useMutation({
-        ...matchWinnerMutation({
+        ...assignMatchWinnerMutation({
             headers: authHeader(token),
         }),
         onError(error) {

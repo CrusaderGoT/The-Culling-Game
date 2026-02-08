@@ -27,7 +27,7 @@ class ClientVoteInfo(SQLModel):
     """
 
     message: str
-    extra_info: list[str] | None
+    extra_info: dict
     votes: list[BaseVoteInfo]
 
 

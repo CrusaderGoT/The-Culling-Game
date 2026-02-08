@@ -17,6 +17,7 @@ import { VoteDrawer } from "@/components/vote/vote-drawer";
 
 import { DisplayAPIError } from "@/components/ui/display-api-error";
 import { useAuth } from "@/lib/contexts/auth-context-provider";
+import { useSocketEventStable } from "@/lib/contexts/socket-context-provider";
 import { useAssignMatchWinner } from "@/lib/hooks/admins/match";
 import { useLatestMatch } from "@/lib/hooks/matches";
 import { useGetMatchPlayers } from "@/lib/hooks/players";
@@ -36,10 +37,29 @@ export function LiveMatch({ ongoing = false }: { ongoing: boolean }) {
     const [isEnded, setIsEnded] = useState<boolean>(false);
 
     const {
-        data: match,
+        data: latestMatch,
         isPending: matchIsPending,
         error: matchError,
     } = useLatestMatch(token, ongoing);
+
+    const [match, setMatch] = useState(latestMatch);
+
+    // Efffect for updating match state to lastest match when available
+    useEffect(() => {
+        if (!latestMatch) return;
+
+        setMatch(latestMatch);
+    }, [latestMatch]);
+
+    // Vote Socket Events, for updating match votes
+    useSocketEventStable("vote_casted", (...data) => {
+        if (match) {
+            setMatch({
+                ...match,
+                votes: data,
+            });
+        }
+    });
 
     useEffect(() => {
         if (!match) return;
@@ -114,7 +134,7 @@ export function LiveMatch({ ongoing = false }: { ongoing: boolean }) {
         return players?.filter((player) => player !== undefined) || [];
     }, [players]);
 
-    if (matchIsPending || playersIsPending) {
+    if (matchIsPending || playersIsPending || !match) {
         return (
             <Stack>
                 <Skeleton h={40} radius={"md"} />
