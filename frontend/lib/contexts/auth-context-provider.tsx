@@ -140,7 +140,7 @@ export function AuthContextProvider({ children }: { children: ReactNode }) {
         },
     });
 
-    const { isError: isVerifyTokenError, mutateAsync: verifyTokenAsync } =
+    const { mutateAsync: verifyTokenAsync, isPending: isPendingVerifyToken } =
         useMutation({
             ...verifyTokenMutation(),
             retry: (failureCount) => {
@@ -164,9 +164,15 @@ export function AuthContextProvider({ children }: { children: ReactNode }) {
 
     // Effect for verify a token
     useEffect(() => {
+        if (isPendingVerifyToken) return;
+
         async function verifyTokenEffect() {
             if (tokensLoaded && isOnline) {
-                if (refreshToken && (!loadedToken || tokenExpired)) {
+                if (
+                    refreshToken &&
+                    !isPendingRefreshToken &&
+                    (!loadedToken || tokenExpired)
+                ) {
                     const refreshTokenValue = refreshToken;
                     await refreshTokenAsync({
                         body: { refresh_token: refreshTokenValue },
@@ -231,7 +237,7 @@ export function AuthContextProvider({ children }: { children: ReactNode }) {
         };
     }, [tokenExpiresIn, mountedRef, refreshError, isOnline]);
 
-    const { data: user, isError, error } = useCurrentUser(realToken);
+    const { data: user } = useCurrentUser(realToken);
 
     const value = useMemo<ContextProp>(() => {
         return {

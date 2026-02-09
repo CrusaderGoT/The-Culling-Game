@@ -4,8 +4,6 @@ import {
     ApplicationFormList,
     ApplicationsFormInputs,
     CreatePlayerFormProvider,
-    createPlayerSchema,
-    CreatePlayerSchemaType,
     CursedTechniqueFormInputs,
     CursedTechniqueFormList,
     PlayerFormInputs,
@@ -43,6 +41,8 @@ import { useRouter } from "next/navigation";
 
 import { useState } from "react";
 
+import { BodyCreatePlayer } from "@/api/client";
+import { zBodyCreatePlayer } from "@/api/client/zod.gen";
 import gstyles from "@/styles/global.module.css";
 import clsx from "clsx";
 
@@ -55,11 +55,6 @@ export function CreatePlayerForm() {
         "cursed_technique", // step 1
         "applications", // step 2
     ] as const;
-
-    const INITIAL_APPLICATIONS = Array.from({ length: 5 }, () => ({
-        name: "",
-        application: "",
-    }));
 
     const { token, user } = useAuth();
 
@@ -111,12 +106,16 @@ export function CreatePlayerForm() {
                 name: "",
                 definition: "",
             },
-            applications: INITIAL_APPLICATIONS,
+            applications: [
+                { name: "", application: "" },
+                { name: "", application: "" },
+                { name: "", application: "" },
+                { name: "", application: "" },
+                { name: "", application: "" },
+            ],
         },
-        initialErrors: { player: "must be completed" },
         mode: "uncontrolled",
-        validate: zodResolver(createPlayerSchema),
-        validateInputOnBlur: true,
+        validate: zodResolver(zBodyCreatePlayer),
     });
 
     const {
@@ -127,7 +126,7 @@ export function CreatePlayerForm() {
         reset: createPlayerReset,
     } = useCreatePlayer(token);
 
-    async function handleSubmit(data: CreatePlayerSchemaType) {
+    async function handleSubmit(data: BodyCreatePlayer) {
         if (!user) {
             notifications.show({
                 message:
@@ -143,12 +142,12 @@ export function CreatePlayerForm() {
             path: { user: user.id },
         });
 
-        `if (!newPlayer) {
+        if (!newPlayer) {
             createPlayerReset();
             return;
         } else {
             router.refresh();
-        }`;
+        }
     }
 
     return (

@@ -2,12 +2,9 @@
 
 import { createFormContext } from "@mantine/form";
 
-import { z } from "zod";
-
-import { zCreateCt, zCreateCtApp, zCreatePlayer } from "@/api/client/zod.gen";
-
 import { GENDERS } from "@/lib/constants/GENDERS";
 
+import { BodyCreatePlayer } from "@/api/client";
 import Naluka from "@/fonts/NalukaFont";
 import {
     Group,
@@ -22,19 +19,11 @@ import {
     Title,
 } from "@mantine/core";
 
-export const createPlayerSchema = z.object({
-    player: zCreatePlayer,
-    cursed_technique: zCreateCt,
-    applications: z.array(zCreateCtApp).min(5).max(5),
-});
-
-export type CreatePlayerSchemaType = z.infer<typeof createPlayerSchema>;
-
 export const [
     CreatePlayerFormProvider,
     useCreatePlayerFormContext,
     useCreatePlayerForm,
-] = createFormContext<CreatePlayerSchemaType>();
+] = createFormContext<BodyCreatePlayer>();
 
 export function PlayerFormInputs() {
     const form = useCreatePlayerFormContext();

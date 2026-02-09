@@ -3,7 +3,7 @@
 import { useForm } from "@mantine/form";
 import { zodResolver } from "mantine-form-zod-resolver";
 
-import { Country } from "@/api/client";
+import { CreateUser } from "@/api/client";
 import { zCreateUser } from "@/api/client/zod.gen";
 
 import { COUNTRIES } from "@/lib/constants/COUNTRIES";
@@ -27,8 +27,6 @@ import {
     Title,
 } from "@mantine/core";
 
-import { z } from "zod";
-
 import Naluka from "@/fonts/NalukaFont";
 import {
     IconAt,
@@ -45,17 +43,15 @@ import { useCreateUser, useLoginUser } from "@/lib/hooks/users";
 export function CreateUserForm() {
     const router = useRouter();
 
-    type zCreateUserType = z.infer<typeof zCreateUser>;
-
-    const initialValues: zCreateUserType = {
+    const initialValues: CreateUser = {
         username: "",
         email: "",
-        country: Country.AD,
+        country: undefined,
         password: "",
         confirm_password: "",
     };
 
-    const form = useForm<zCreateUserType>({
+    const form = useForm<CreateUser>({
         mode: "uncontrolled",
         initialValues,
         validate: zodResolver(zCreateUser),
@@ -83,7 +79,7 @@ export function CreateUserForm() {
         isSuccess: loginUserIsSuccess,
     } = useLoginUser();
 
-    const handleSubmit = async (data: zCreateUserType) => {
+    const handleSubmit = async (data: CreateUser) => {
         await createUserAsync({
             body: data,
         });

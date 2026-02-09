@@ -11,14 +11,12 @@ type AdminContextProp = {
     admin?: AdminInfo;
     isPending: boolean;
     error?: unknown;
-    refresh: () => void;
 };
 
 export const AdminContext = createContext<AdminContextProp>({
     admin: undefined,
     isPending: false,
     error: undefined,
-    refresh: () => {},
 });
 
 /**
@@ -41,7 +39,7 @@ export const AdminContext = createContext<AdminContextProp>({
 export function AdminContextProvider({ children }: { children: ReactNode }) {
     const { token } = useAuth();
 
-    const { data, error, isPending, refetch } = useCurrentAdmin(token);
+    const { data, error, isPending } = useCurrentAdmin(token);
 
     // Memoize context value for efficiency
     const contextValue: AdminContextProp = useMemo(
@@ -49,9 +47,8 @@ export function AdminContextProvider({ children }: { children: ReactNode }) {
             admin: data,
             isPending,
             error,
-            refresh: refetch,
         }),
-        [data, isPending, error, refetch]
+        [data, isPending, error]
     );
 
     return (

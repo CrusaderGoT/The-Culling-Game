@@ -59,7 +59,6 @@ export const useLoginUser = () => {
  * Custom React hook to fetch the current user's data using a provided authentication token.
  *
  * @param token - The authentication token used for API requests.
- * @param tokenError - Optional flag indicating if there is an error with the token; disables the query if true.
  * @returns The result of the user query, including loading, error, and data states.
  */
 export const useCurrentUser = (token: string | undefined) => {
