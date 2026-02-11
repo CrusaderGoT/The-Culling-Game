@@ -15,6 +15,7 @@ import { MatchPlayers } from "@/components/match/match-players";
 import { MatchVoteChart } from "@/components/match/match-vote-chart";
 import { VoteDrawer } from "@/components/vote/vote-drawer";
 
+import { zMatchInfo } from "@/api/client/zod.gen";
 import { DisplayAPIError } from "@/components/ui/display-api-error";
 import { useAuth } from "@/lib/contexts/auth-context-provider";
 import { useSocketEventStable } from "@/lib/contexts/socket-context-provider";
@@ -35,6 +36,7 @@ export function LiveMatch({ ongoing = false }: { ongoing: boolean }) {
 
     const [timeLeft, setTimeLeft] = useState<string>("");
     const [isEnded, setIsEnded] = useState<boolean>(false);
+    zMatchInfo;
 
     const {
         data: latestMatch,
@@ -51,8 +53,22 @@ export function LiveMatch({ ongoing = false }: { ongoing: boolean }) {
         setMatch(latestMatch);
     }, [latestMatch]);
 
+    // Extract player IDs from match data safely
+    const playerIds = match?.players?.map((player) => player.id) || [];
+
+    const {
+        data: players,
+        isPending: playersIsPending,
+        error: playersError,
+        refetchFailed,
+    } = useGetMatchPlayers(token, playerIds);
+
+    const validPlayers = useMemo(() => {
+        return players?.filter((player) => player !== undefined) || [];
+    }, [players]);
+
     // Vote Socket Events, for updating match votes
-    useSocketEventStable("vote_casted", (...data) => {
+    useSocketEventStable("vote_casted", (data) => {
         if (match) {
             setMatch({
                 ...match,
@@ -60,6 +76,21 @@ export function LiveMatch({ ongoing = false }: { ongoing: boolean }) {
             });
         }
     });
+
+    const { mutateAsync } = useAssignMatchWinner(token);
+
+    // effect for making match winner
+    useEffect(() => {
+        if (!token || !match || !isEnded || match.winner || match.draw) return;
+
+        async function assignMatchWinner(matchId: number) {
+            const wonMatch = await mutateAsync({ path: { match_id: matchId } });
+
+            if (wonMatch) setMatch(wonMatch);
+        }
+
+        assignMatchWinner(match.id);
+    }, [match, isEnded, mutateAsync, match?.winner, match?.draw, token]);
 
     // Match countdown timer
     useEffect(() => {
@@ -107,33 +138,6 @@ export function LiveMatch({ ongoing = false }: { ongoing: boolean }) {
         // Cleanup interval on unmount
         return () => clearInterval(interval);
     }, [match]);
-
-    const { mutateAsync } = useAssignMatchWinner(token);
-
-    // effect for making match winner
-    useEffect(() => {
-        if (!token || !match || !isEnded || match.winner || match.draw) return;
-
-        async function assignMatchWinner(matchId: number) {
-            await mutateAsync({ path: { match_id: matchId } });
-        }
-
-        assignMatchWinner(match.id);
-    }, [match, isEnded, mutateAsync, match?.winner, match?.draw, token]);
-
-    // Extract player IDs from match data safely
-    const playerIds = match?.players?.map((player) => player.id) || [];
-
-    const {
-        data: players,
-        isPending: playersIsPending,
-        error: playersError,
-        refetchFailed,
-    } = useGetMatchPlayers(token, playerIds);
-
-    const validPlayers = useMemo(() => {
-        return players?.filter((player) => player !== undefined) || [];
-    }, [players]);
 
     if (matchIsPending || playersIsPending) {
         return (

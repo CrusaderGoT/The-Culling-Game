@@ -3,7 +3,7 @@
 import {
     useSocket,
     useSocketEmit,
-    useSocketEvent,
+    useSocketEventStable,
 } from "@/lib/contexts/socket-context-provider";
 import {
     Button,
@@ -15,7 +15,8 @@ import {
     TextInput,
     Title,
 } from "@mantine/core";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { notifications } from "@mantine/notifications";
+import { useEffect, useRef, useState } from "react";
 
 export default function ChatPage() {
     const [messages, setMessages] = useState<string[]>([]);
@@ -29,12 +30,9 @@ export default function ChatPage() {
     // Get emit function
     const { emit } = useSocketEmit();
 
-    // Listen for messages using the custom hook with stable handler
-    const handleMessage = useCallback((data: { msg: string }) => {
-        setMessages((prev) => [...prev, data.msg]);
-    }, []);
-
-    useSocketEvent("message", handleMessage);
+    useSocketEventStable("chat", (data: { message: string }) => {
+        setMessages((prev) => [...prev, data.message]);
+    });
 
     useEffect(() => {
         // Auto-focus input on mount
@@ -54,12 +52,15 @@ export default function ChatPage() {
         const message = inputValue.trim();
         if (!message) return;
 
-        const success = emit("message", { msg: message });
+        const success = emit("chat", { message: message });
         if (success) {
             setInputValue("");
             if (inputRef.current) {
                 inputRef.current.focus();
             }
+            notifications.show({
+                message: "success sent",
+            });
         }
     };
 

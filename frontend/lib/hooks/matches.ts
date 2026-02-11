@@ -8,7 +8,10 @@ import { notifications } from "@mantine/notifications";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useSocketEmit } from "../contexts/socket-context-provider";
 
-export const useLatestMatch = (token: string | undefined, ongoing: boolean = false) => {
+export const useLatestMatch = (
+    token: string | undefined,
+    ongoing: boolean = false
+) => {
     const query = useQuery({
         ...getLastestMatchOptions({
             query: { ongoing: ongoing },
@@ -38,29 +41,19 @@ export const useCastVote = (token: string | undefined) => {
                 emit("vote_casted", { match_id: data.extra_info.match_id });
             }
 
-            if (data.extra_info) {
+            if (data.extra_info && !data.extra_info.match_id) {
                 Object.values(data.extra_info).forEach((msg) => {
                     notifications.show({
                         message: `${msg}`,
-                        autoClose: false,
                         color: "green",
                     });
                 });
             }
 
-            if (data.votes.length < 1) {
-                notifications.show({
-                    message: `${data.message}`,
-                    autoClose: false,
-                    color: "yellow",
-                });
-            } else {
-                notifications.show({
-                    message: `${data.message}`,
-                    autoClose: false,
-                    color: "green",
-                });
-            }
+            notifications.show({
+                message: `${data.message}`,
+                color: data.votes.length < 1 ? "yellow" : "green",
+            });
         },
     });
     return mutation;

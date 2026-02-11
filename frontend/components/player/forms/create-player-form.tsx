@@ -36,70 +36,25 @@ import {
     IconYinYangFilled,
 } from "@tabler/icons-react";
 
-import { zodResolver } from "mantine-form-zod-resolver";
+import { zod4Resolver } from "mantine-form-zod-resolver";
 import { useRouter } from "next/navigation";
 
 import { useState } from "react";
 
 import { BodyCreatePlayer } from "@/api/client";
 import { zBodyCreatePlayer } from "@/api/client/zod.gen";
-import gstyles from "@/styles/global.module.css";
-import clsx from "clsx";
 
 export function CreatePlayerForm() {
     const router = useRouter();
 
-    // Constants
-    const FIELD_KEYS = [
-        "player", // step 0
-        "cursed_technique", // step 1
-        "applications", // step 2
-    ] as const;
-
     const { token, user } = useAuth();
-
-    const [active, setActive] = useState(0);
-    const [highestStepVisited, setHighestStepVisited] = useState(active);
-
-    const handleStepChange = (nextStep: number) => {
-        const isOutOfBounds = nextStep > FIELD_KEYS.length || nextStep < 0;
-        if (isOutOfBounds) return;
-
-        // Validate current section before moving forward
-        if (nextStep > active) {
-            const currentFieldKey = FIELD_KEYS[active] as
-                | "player"
-                | "cursed_technique"
-                | "applications";
-            const validationResult = form.validateField(currentFieldKey);
-
-            // Prevent navigation if current step has validation errors
-            if (validationResult.hasError) {
-                notifications.show({
-                    message: `Please fix errors in ${currentFieldKey.replace(
-                        "_",
-                        " "
-                    )} section`,
-                    color: "orange",
-                });
-                return;
-            }
-        }
-
-        setActive(nextStep);
-        setHighestStepVisited((prev) => Math.max(prev, nextStep));
-    };
-
-    // Allow the user to freely go back and forth between visited steps.
-    const shouldAllowSelectStep = (step: number) =>
-        highestStepVisited >= step && active !== step;
 
     const form = useCreatePlayerForm({
         initialValues: {
             player: {
                 name: "",
                 role: "",
-                age: 18,
+                age: 10,
                 gender: "non-binary",
             },
             cursed_technique: {
@@ -115,7 +70,11 @@ export function CreatePlayerForm() {
             ],
         },
         mode: "uncontrolled",
-        validate: zodResolver(zBodyCreatePlayer),
+        validate: zod4Resolver(zBodyCreatePlayer),
+        validateInputOnBlur: true,
+        enhanceGetInputProps: () => ({
+            disabled: createPlayerIsPending || createPlayerIsSuccess,
+        }),
     });
 
     const {
@@ -137,21 +96,67 @@ export function CreatePlayerForm() {
         }
 
         const newPlayer = await createPlayerMutate({
-            // @ts-ignore: applications are always 5
             body: data,
             path: { user: user.id },
         });
 
         if (!newPlayer) {
             createPlayerReset();
+            notifications.show({
+                message: "Failed to create your player, try again",
+            });
             return;
         } else {
             router.refresh();
         }
     }
 
+    // Constants
+    const FIELD_KEYS = [
+        "player", // step 0
+        "cursed_technique", // step 1
+        "applications", // step 2
+    ] as const;
+
+    const [active, setActive] = useState(0);
+    const [highestStepVisited, setHighestStepVisited] = useState(active);
+
+    const handleStepChange = (nextStep: number) => {
+        const isOutOfBounds = nextStep > FIELD_KEYS.length || nextStep < 0;
+        if (isOutOfBounds) return;
+
+        // Validate current section before moving forward
+        if (nextStep > active) {
+            const currentFieldKey = FIELD_KEYS[active] as
+                | "player"
+                | "cursed_technique"
+                | "applications";
+
+            const validationResult = form.validateField(currentFieldKey);
+
+            // Prevent navigation if current step has validation errors
+            if (validationResult.hasError) {
+                notifications.show({
+                    message: `Please fix errors "${
+                        validationResult.error
+                    }" in ${currentFieldKey.replace("_", " ")} section `,
+                    color: "orange",
+                });
+
+                return;
+            }
+        }
+
+        setActive(nextStep);
+        setHighestStepVisited((prev) => Math.max(prev, nextStep));
+    };
+
+    // Allow the user to freely go back and forth between visited steps.
+    const shouldAllowSelectStep = (step: number) =>
+        highestStepVisited >= step && active !== step;
+
     return (
-        <Paper radius="md" p="md" withBorder>
+        <Paper radius="md" p="md" withBorder pos={"relative"}>
             <LoadingOverlay
                 visible={createPlayerIsPending}
                 zIndex={600}
@@ -230,9 +235,7 @@ export function CreatePlayerForm() {
 
                         <Stepper.Completed>
                             {Object.keys(form.errors).length > 0 ? (
-                                <Center
-                                    className={clsx(gstyles.wrapSingleLongText)}
-                                >
+                                <Center>
                                     <ScrollAreaAutosize mah={300}>
                                         <Text c="red" fw={500} mb="md">
                                             Some fields have errors. Please
@@ -270,10 +273,11 @@ export function CreatePlayerForm() {
                                     </ScrollAreaAutosize>
                                 </Center>
                             ) : (
-                                <Stack
-                                    className={clsx(gstyles.wrapSingleLongText)}
-                                >
-                                    <ScrollAreaAutosize mah="60vh">
+                                <Stack>
+                                    <ScrollAreaAutosize
+                                        mah="60vh"
+                                        offsetScrollbars
+                                    >
                                         <Divider
                                             label="Confirm your player information"
                                             mb="md"
@@ -297,19 +301,22 @@ export function CreatePlayerForm() {
                                                 error={createPlayerError}
                                             />
                                         )}
-                                    </ScrollAreaAutosize>
 
-                                    <Button
-                                        type="submit"
-                                        loading={createPlayerIsPending}
-                                        disabled={
-                                            createPlayerIsPending ||
-                                            createPlayerIsSuccess
-                                        }
-                                        size="md"
-                                    >
-                                        Create Player
-                                    </Button>
+                                        <Center>
+                                            <Button
+                                                type="submit"
+                                                loading={createPlayerIsPending}
+                                                disabled={
+                                                    createPlayerIsPending ||
+                                                    createPlayerIsSuccess
+                                                }
+                                                size="md"
+                                                mt="md"
+                                            >
+                                                Create Player
+                                            </Button>
+                                        </Center>
+                                    </ScrollAreaAutosize>
                                 </Stack>
                             )}
                         </Stepper.Completed>
@@ -320,7 +327,10 @@ export function CreatePlayerForm() {
                             <Button
                                 variant="default"
                                 onClick={() => handleStepChange(active - 1)}
-                                disabled={createPlayerIsPending}
+                                disabled={
+                                    createPlayerIsPending ||
+                                    createPlayerIsSuccess
+                                }
                             >
                                 Back
                             </Button>

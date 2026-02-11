@@ -12,8 +12,9 @@ import {
     IconHandGrab,
     IconKarate,
     IconShieldFilled,
-    IconSwords
+    IconSwords,
 } from "@tabler/icons-react";
+import { useMemo } from "react";
 
 type SingleVoteGroupProp = {
     applications: PlayerInfo["cursed_technique"]["applications"];
@@ -37,9 +38,11 @@ export function SingleVoteGroup({
     ];
 
     const appGroup = applications.map((app, index) => {
-        const prevVotes = match.votes.filter(
-            (vote) => vote.ct_app_id === app.id
-        ).length;
+        // keep votes in a memo recalculated when match votes change
+        const prevVotes = useMemo(() => {
+            return match.votes.filter((vote) => vote.ct_app_id === app.id)
+                .length;
+        }, [match.votes]);
 
         const icon = appIcons[index];
 

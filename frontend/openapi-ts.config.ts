@@ -20,7 +20,7 @@ export default defineConfig({
                 strategy: "byTags",
             },
             auth: true,
-            validator: true,
+            validator: { request: true },
         },
         {
             name: "@hey-api/typescript",

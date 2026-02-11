@@ -144,28 +144,28 @@ export function ApplicationsFormInputs() {
 export function PlayerInfoFormList() {
     const player = useCreatePlayerFormContext().getValues().player;
     return (
-        <List>
+        <>
             <Title ff={`${Naluka.style.fontFamily}`} order={3} ta={"center"}>
                 Player Info
             </Title>
-            <List withPadding listStyleType="disc" spacing={"xs"}>
+            <List listStyleType="disc" spacing={"xs"}>
                 <List.Item>
-                    Picture: <Text c={"gray"}>{player.picture}</Text>
+                    Picture: <Text>{player.picture}</Text>
                 </List.Item>
                 <List.Item>
-                    Name: <Text c={"orange"}>{player.name}</Text>
+                    Name: <Text>{player.name}</Text>
                 </List.Item>
                 <List.Item>
-                    Age: <Text c={"blue"}>{player.age}</Text>
+                    Age: <Text>{player.age}</Text>
                 </List.Item>
                 <List.Item>
-                    Gender: <Text c={"green"}>{player.gender}</Text>
+                    Gender: <Text>{player.gender}</Text>
                 </List.Item>
                 <List.Item>
-                    Role: <Text c={"red"}>{player.role}</Text>
+                    Role: <Text>{player.role}</Text>
                 </List.Item>
             </List>
-        </List>
+        </>
     );
 }
 
@@ -173,20 +173,20 @@ export function CursedTechniqueFormList() {
     const cursed_technique =
         useCreatePlayerFormContext().getValues().cursed_technique;
     return (
-        <List>
+        <>
             <Title ff={`${Naluka.style.fontFamily}`} order={3} ta={"center"}>
                 Cursed Technique
             </Title>
             <List withPadding listStyleType="disc" spacing={"xs"}>
                 <List.Item>
-                    Name: <Text c={"lime"}>{cursed_technique.name}</Text>
+                    Name: <Text>{cursed_technique.name}</Text>
                 </List.Item>
                 <List.Item>
-                    Definition:{" "}
-                    <Text c={"deepred"}>{cursed_technique.definition}</Text>
+                    Definition:
+                    <Text>{cursed_technique.definition}</Text>
                 </List.Item>
             </List>
-        </List>
+        </>
     );
 }
 
@@ -194,16 +194,19 @@ export function ApplicationFormList() {
     const applications = useCreatePlayerFormContext().getValues().applications;
     const appList = applications.map((app, index) => {
         return (
-            <List key={index}>
-                <Title order={6}>Application {index + 1}</Title>
+            <>
+                <Title order={6} key={index}>
+                    Application {index + 1}
+                </Title>
 
-                <List withPadding listStyleType="disc" spacing={"xs"}>
+                <List key={index} listStyleType="disc" spacing={"xs"}>
                     <List.Item>
-                        Name: <Text c={"lime"}>{app.name}</Text>
-                        Application: <Text c={"cyan"}> {app.application}</Text>
+                        Name: <Text>{app.name}</Text>
+                        Application:
+                        <Text> {app.application}</Text>
                     </List.Item>
                 </List>
-            </List>
+            </>
         );
     });
 

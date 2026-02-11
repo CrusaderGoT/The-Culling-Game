@@ -32,7 +32,7 @@ export const useAssignMatchWinner = (token: string | undefined) => {
                 });
             } else {
                 notifications.show({
-                    message: "Success",
+                    message: "Match Ended",
                 });
             }
         },

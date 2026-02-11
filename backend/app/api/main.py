@@ -10,6 +10,7 @@ from fastapi.templating import Jinja2Templates
 from scalar_fastapi import get_scalar_api_reference
 from sqlmodel import or_, select
 
+from app.api import socket  # noqa: F401 ; this is to keep main lean
 from app.api.setting import app, settings
 from app.auth.credentials import (
     PasswordAuth,
@@ -225,7 +226,7 @@ async def scalar_html():
 @app.get("/", response_class=HTMLResponse)
 async def home_page(request: Request):
     live_url = (
-        "localhost:3000"
+        "http://localhost:3000/"
         if not settings.live
         else "https://the-culling-games.vercel.app/"
     )

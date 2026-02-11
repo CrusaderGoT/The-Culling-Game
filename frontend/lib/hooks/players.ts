@@ -48,6 +48,7 @@ export const useCurrentPlayer = (token: string | undefined) => {
         }),
         refetchOnWindowFocus: false, // to avoid unwanted refetch
         enabled: !!token, // run only if token is available
+        staleTime: Infinity
     });
 
     return query;

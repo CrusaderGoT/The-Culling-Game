@@ -3,7 +3,7 @@
 import { type Client, type Options as Options2, type TDataShape, urlSearchParamsBodySerializer } from './client';
 import { client } from './client.gen';
 import type { AdminDeletePlayerData, AdminDeletePlayerErrors, AdminDeletePlayerResponses, AdminDeleteUserData, AdminDeleteUserErrors, AdminDeleteUserResponses, AdminEditPlayerData, AdminEditPlayerErrors, AdminEditPlayerResponses, AdminEditUserData, AdminEditUserErrors, AdminEditUserResponses, APlayerData, APlayerErrors, APlayerResponses, AssignMatchWinnerData, AssignMatchWinnerErrors, AssignMatchWinnerResponses, AUserData, AUserErrors, AUserResponses, BindindVowData, BindindVowErrors, BindindVowResponses, CreateAdminData, CreateAdminErrors, CreateAdminResponses, CreateMatchData, CreateMatchErrors, CreateMatchResponses, CreatePlayerData, CreatePlayerErrors, CreatePlayerResponses, CreateTokenData, CreateTokenErrors, CreateTokenResponses, CreateUserData, CreateUserErrors, CreateUserResponses, CurrentAdminData, CurrentAdminResponses, CurrentUserData, CurrentUserResponses, DeactivateDomainExpansionData, DeactivateDomainExpansionErrors, DeactivateDomainExpansionResponses, DeleteMatchData, DeleteMatchErrors, DeleteMatchResponses, DeletePlayerData, DeletePlayerErrors, DeletePlayerResponses, DeleteUserData, DeleteUserErrors, DeleteUserResponses, DemoSuperuserData, DemoSuperuserErrors, DemoSuperuserResponses, DomainExpansionData, DomainExpansionErrors, DomainExpansionResponses, EditPlayerData, EditPlayerErrors, EditPlayerResponses, EditUserData, EditUserErrors, EditUserResponses, GetColoniesData, GetColoniesErrors, GetColoniesResponses, GetLastestMatchData, GetLastestMatchErrors, GetLastestMatchResponses, GetMatchesData, GetMatchesErrors, GetMatchesResponses, GetPlayersData, GetPlayersErrors, GetPlayersResponses, GrantPermissionData, GrantPermissionErrors, GrantPermissionResponses, HomePageData, HomePageResponses, MyPlayerData, MyPlayerResponses, NewPermissionData, NewPermissionErrors, NewPermissionResponses, RefreshTokenData, RefreshTokenErrors, RefreshTokenResponses, RemovePermissionData, RemovePermissionErrors, RemovePermissionResponses, ReverseCursedTechniqueData, ReverseCursedTechniqueErrors, ReverseCursedTechniqueResponses, SimpleDomainData, SimpleDomainErrors, SimpleDomainResponses, UpgradePlayerData, UpgradePlayerErrors, UpgradePlayerResponses, VerifyTokenData, VerifyTokenErrors, VerifyTokenResponses, VoteData, VoteErrors, VoteResponses } from './types.gen';
-import { zAdminDeletePlayerData, zAdminDeletePlayerResponse, zAdminDeleteUserData, zAdminDeleteUserResponse, zAdminEditPlayerData, zAdminEditPlayerResponse, zAdminEditUserData, zAdminEditUserResponse, zAPlayerData, zAPlayerResponse, zAssignMatchWinnerData, zAssignMatchWinnerResponse, zAUserData, zAUserResponse, zBindindVowData, zBindindVowResponse, zCreateAdminData, zCreateAdminResponse, zCreateMatchData, zCreateMatchResponse, zCreatePlayerData, zCreatePlayerResponse, zCreateTokenData, zCreateTokenResponse, zCreateUserData, zCreateUserResponse, zCurrentAdminData, zCurrentAdminResponse, zCurrentUserData, zCurrentUserResponse, zDeactivateDomainExpansionData, zDeactivateDomainExpansionResponse, zDeleteMatchData, zDeleteMatchResponse, zDeletePlayerData, zDeletePlayerResponse, zDeleteUserData, zDeleteUserResponse, zDemoSuperuserData, zDemoSuperuserResponse, zDomainExpansionData, zDomainExpansionResponse, zEditPlayerData, zEditPlayerResponse, zEditUserData, zEditUserResponse, zGetColoniesData, zGetColoniesResponse, zGetLastestMatchData, zGetLastestMatchResponse, zGetMatchesData, zGetMatchesResponse, zGetPlayersData, zGetPlayersResponse, zGrantPermissionData, zGrantPermissionResponse, zHomePageData, zHomePageResponse, zMyPlayerData, zMyPlayerResponse, zNewPermissionData, zNewPermissionResponse, zRefreshTokenData, zRefreshTokenResponse, zRemovePermissionData, zRemovePermissionResponse, zReverseCursedTechniqueData, zReverseCursedTechniqueResponse, zSimpleDomainData, zSimpleDomainResponse, zUpgradePlayerData, zUpgradePlayerResponse, zVerifyTokenData, zVerifyTokenResponse, zVoteData, zVoteResponse } from './zod.gen';
+import { zAdminDeletePlayerData, zAdminDeleteUserData, zAdminEditPlayerData, zAdminEditUserData, zAPlayerData, zAssignMatchWinnerData, zAUserData, zBindindVowData, zCreateAdminData, zCreateMatchData, zCreatePlayerData, zCreateTokenData, zCreateUserData, zCurrentAdminData, zCurrentUserData, zDeactivateDomainExpansionData, zDeleteMatchData, zDeletePlayerData, zDeleteUserData, zDemoSuperuserData, zDomainExpansionData, zEditPlayerData, zEditUserData, zGetColoniesData, zGetLastestMatchData, zGetMatchesData, zGetPlayersData, zGrantPermissionData, zHomePageData, zMyPlayerData, zNewPermissionData, zRefreshTokenData, zRemovePermissionData, zReverseCursedTechniqueData, zSimpleDomainData, zUpgradePlayerData, zVerifyTokenData, zVoteData } from './zod.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -26,7 +26,6 @@ export class Users {
     public static currentUser<ThrowOnError extends boolean = false>(options?: Options<CurrentUserData, ThrowOnError>) {
         return (options?.client ?? client).get<CurrentUserResponses, unknown, ThrowOnError>({
             requestValidator: async (data) => await zCurrentUserData.parseAsync(data),
-            responseValidator: async (data) => await zCurrentUserResponse.parseAsync(data),
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/users/me',
             ...options
@@ -39,7 +38,6 @@ export class Users {
     public static aUser<ThrowOnError extends boolean = false>(options: Options<AUserData, ThrowOnError>) {
         return (options.client ?? client).get<AUserResponses, AUserErrors, ThrowOnError>({
             requestValidator: async (data) => await zAUserData.parseAsync(data),
-            responseValidator: async (data) => await zAUserResponse.parseAsync(data),
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/users/{user}',
             ...options
@@ -52,7 +50,6 @@ export class Users {
     public static editUser<ThrowOnError extends boolean = false>(options: Options<EditUserData, ThrowOnError>) {
         return (options.client ?? client).patch<EditUserResponses, EditUserErrors, ThrowOnError>({
             requestValidator: async (data) => await zEditUserData.parseAsync(data),
-            responseValidator: async (data) => await zEditUserResponse.parseAsync(data),
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/users/edit/{user}',
             ...options,
@@ -71,7 +68,6 @@ export class Users {
     public static deleteUser<ThrowOnError extends boolean = false>(options: Options<DeleteUserData, ThrowOnError>) {
         return (options.client ?? client).delete<DeleteUserResponses, DeleteUserErrors, ThrowOnError>({
             requestValidator: async (data) => await zDeleteUserData.parseAsync(data),
-            responseValidator: async (data) => await zDeleteUserResponse.parseAsync(data),
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/users/delete/{user}',
             ...options
@@ -84,7 +80,6 @@ export class Users {
     public static createUser<ThrowOnError extends boolean = false>(options: Options<CreateUserData, ThrowOnError>) {
         return (options.client ?? client).post<CreateUserResponses, CreateUserErrors, ThrowOnError>({
             requestValidator: async (data) => await zCreateUserData.parseAsync(data),
-            responseValidator: async (data) => await zCreateUserResponse.parseAsync(data),
             url: '/signup',
             ...options,
             headers: {
@@ -102,7 +97,6 @@ export class Players {
     public static createPlayer<ThrowOnError extends boolean = false>(options: Options<CreatePlayerData, ThrowOnError>) {
         return (options.client ?? client).post<CreatePlayerResponses, CreatePlayerErrors, ThrowOnError>({
             requestValidator: async (data) => await zCreatePlayerData.parseAsync(data),
-            responseValidator: async (data) => await zCreatePlayerResponse.parseAsync(data),
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/player/create/{user}',
             ...options,
@@ -119,7 +113,6 @@ export class Players {
     public static myPlayer<ThrowOnError extends boolean = false>(options?: Options<MyPlayerData, ThrowOnError>) {
         return (options?.client ?? client).get<MyPlayerResponses, unknown, ThrowOnError>({
             requestValidator: async (data) => await zMyPlayerData.parseAsync(data),
-            responseValidator: async (data) => await zMyPlayerResponse.parseAsync(data),
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/player/me',
             ...options
@@ -132,7 +125,6 @@ export class Players {
     public static getPlayers<ThrowOnError extends boolean = false>(options?: Options<GetPlayersData, ThrowOnError>) {
         return (options?.client ?? client).get<GetPlayersResponses, GetPlayersErrors, ThrowOnError>({
             requestValidator: async (data) => await zGetPlayersData.parseAsync(data),
-            responseValidator: async (data) => await zGetPlayersResponse.parseAsync(data),
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/player/all',
             ...options
@@ -145,7 +137,6 @@ export class Players {
     public static aPlayer<ThrowOnError extends boolean = false>(options: Options<APlayerData, ThrowOnError>) {
         return (options.client ?? client).get<APlayerResponses, APlayerErrors, ThrowOnError>({
             requestValidator: async (data) => await zAPlayerData.parseAsync(data),
-            responseValidator: async (data) => await zAPlayerResponse.parseAsync(data),
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/player/{player_id}',
             ...options
@@ -164,7 +155,6 @@ export class Players {
     public static editPlayer<ThrowOnError extends boolean = false>(options: Options<EditPlayerData, ThrowOnError>) {
         return (options.client ?? client).patch<EditPlayerResponses, EditPlayerErrors, ThrowOnError>({
             requestValidator: async (data) => await zEditPlayerData.parseAsync(data),
-            responseValidator: async (data) => await zEditPlayerResponse.parseAsync(data),
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/player/edit/{player_id}',
             ...options,
@@ -181,7 +171,6 @@ export class Players {
     public static deletePlayer<ThrowOnError extends boolean = false>(options: Options<DeletePlayerData, ThrowOnError>) {
         return (options.client ?? client).delete<DeletePlayerResponses, DeletePlayerErrors, ThrowOnError>({
             requestValidator: async (data) => await zDeletePlayerData.parseAsync(data),
-            responseValidator: async (data) => await zDeletePlayerResponse.parseAsync(data),
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/player/delete/{player_id}',
             ...options
@@ -198,7 +187,6 @@ export class Players {
     public static upgradePlayer<ThrowOnError extends boolean = false>(options: Options<UpgradePlayerData, ThrowOnError>) {
         return (options.client ?? client).post<UpgradePlayerResponses, UpgradePlayerErrors, ThrowOnError>({
             requestValidator: async (data) => await zUpgradePlayerData.parseAsync(data),
-            responseValidator: async (data) => await zUpgradePlayerResponse.parseAsync(data),
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/player/upgrade/{player_id}',
             ...options
@@ -218,7 +206,6 @@ export class Matches {
     public static vote<ThrowOnError extends boolean = false>(options: Options<VoteData, ThrowOnError>) {
         return (options.client ?? client).post<VoteResponses, VoteErrors, ThrowOnError>({
             requestValidator: async (data) => await zVoteData.parseAsync(data),
-            responseValidator: async (data) => await zVoteResponse.parseAsync(data),
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/match/vote/{match_id}',
             ...options,
@@ -237,7 +224,6 @@ export class Matches {
     public static createMatch<ThrowOnError extends boolean = false>(options: Options<CreateMatchData, ThrowOnError>) {
         return (options.client ?? client).post<CreateMatchResponses, CreateMatchErrors, ThrowOnError>({
             requestValidator: async (data) => await zCreateMatchData.parseAsync(data),
-            responseValidator: async (data) => await zCreateMatchResponse.parseAsync(data),
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/match/create',
             ...options
@@ -252,7 +238,6 @@ export class Matches {
     public static getMatches<ThrowOnError extends boolean = false>(options?: Options<GetMatchesData, ThrowOnError>) {
         return (options?.client ?? client).get<GetMatchesResponses, GetMatchesErrors, ThrowOnError>({
             requestValidator: async (data) => await zGetMatchesData.parseAsync(data),
-            responseValidator: async (data) => await zGetMatchesResponse.parseAsync(data),
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/match/all',
             ...options
@@ -267,7 +252,6 @@ export class Matches {
     public static getLastestMatch<ThrowOnError extends boolean = false>(options?: Options<GetLastestMatchData, ThrowOnError>) {
         return (options?.client ?? client).get<GetLastestMatchResponses, GetLastestMatchErrors, ThrowOnError>({
             requestValidator: async (data) => await zGetLastestMatchData.parseAsync(data),
-            responseValidator: async (data) => await zGetLastestMatchResponse.parseAsync(data),
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/match/latest',
             ...options
@@ -282,7 +266,6 @@ export class Matches {
     public static deleteMatch<ThrowOnError extends boolean = false>(options: Options<DeleteMatchData, ThrowOnError>) {
         return (options.client ?? client).delete<DeleteMatchResponses, DeleteMatchErrors, ThrowOnError>({
             requestValidator: async (data) => await zDeleteMatchData.parseAsync(data),
-            responseValidator: async (data) => await zDeleteMatchResponse.parseAsync(data),
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/match/delete/{match_id}',
             ...options
@@ -297,7 +280,6 @@ export class Matches {
     public static assignMatchWinner<ThrowOnError extends boolean = false>(options: Options<AssignMatchWinnerData, ThrowOnError>) {
         return (options.client ?? client).post<AssignMatchWinnerResponses, AssignMatchWinnerErrors, ThrowOnError>({
             requestValidator: async (data) => await zAssignMatchWinnerData.parseAsync(data),
-            responseValidator: async (data) => await zAssignMatchWinnerResponse.parseAsync(data),
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/match/winner/{match_id}',
             ...options
@@ -318,7 +300,6 @@ export class Barriers {
     public static domainExpansion<ThrowOnError extends boolean = false>(options: Options<DomainExpansionData, ThrowOnError>) {
         return (options.client ?? client).post<DomainExpansionResponses, DomainExpansionErrors, ThrowOnError>({
             requestValidator: async (data) => await zDomainExpansionData.parseAsync(data),
-            responseValidator: async (data) => await zDomainExpansionResponse.parseAsync(data),
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/barrier/activate/domain/{player_id}/{match_id}',
             ...options
@@ -336,7 +317,6 @@ export class Barriers {
     public static simpleDomain<ThrowOnError extends boolean = false>(options: Options<SimpleDomainData, ThrowOnError>) {
         return (options.client ?? client).post<SimpleDomainResponses, SimpleDomainErrors, ThrowOnError>({
             requestValidator: async (data) => await zSimpleDomainData.parseAsync(data),
-            responseValidator: async (data) => await zSimpleDomainResponse.parseAsync(data),
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/barrier/activate/simple/{player_id}/{match_id}',
             ...options
@@ -351,7 +331,6 @@ export class Barriers {
     public static bindindVow<ThrowOnError extends boolean = false>(options: Options<BindindVowData, ThrowOnError>) {
         return (options.client ?? client).post<BindindVowResponses, BindindVowErrors, ThrowOnError>({
             requestValidator: async (data) => await zBindindVowData.parseAsync(data),
-            responseValidator: async (data) => await zBindindVowResponse.parseAsync(data),
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/barrier/activate/binding/{player_id}/{match_id}',
             ...options
@@ -366,7 +345,6 @@ export class Barriers {
     public static reverseCursedTechnique<ThrowOnError extends boolean = false>(options: Options<ReverseCursedTechniqueData, ThrowOnError>) {
         return (options.client ?? client).post<ReverseCursedTechniqueResponses, ReverseCursedTechniqueErrors, ThrowOnError>({
             requestValidator: async (data) => await zReverseCursedTechniqueData.parseAsync(data),
-            responseValidator: async (data) => await zReverseCursedTechniqueResponse.parseAsync(data),
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/barrier/activate/rct/{player_id}/{match_id}',
             ...options
@@ -385,7 +363,6 @@ export class Barriers {
     public static deactivateDomainExpansion<ThrowOnError extends boolean = false>(options: Options<DeactivateDomainExpansionData, ThrowOnError>) {
         return (options.client ?? client).post<DeactivateDomainExpansionResponses, DeactivateDomainExpansionErrors, ThrowOnError>({
             requestValidator: async (data) => await zDeactivateDomainExpansionData.parseAsync(data),
-            responseValidator: async (data) => await zDeactivateDomainExpansionResponse.parseAsync(data),
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/barrier/deactivate/barrier/{player_id}',
             ...options
@@ -402,7 +379,6 @@ export class Colonies {
     public static getColonies<ThrowOnError extends boolean = false>(options?: Options<GetColoniesData, ThrowOnError>) {
         return (options?.client ?? client).get<GetColoniesResponses, GetColoniesErrors, ThrowOnError>({
             requestValidator: async (data) => await zGetColoniesData.parseAsync(data),
-            responseValidator: async (data) => await zGetColoniesResponse.parseAsync(data),
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/colony/all',
             ...options
@@ -417,7 +393,6 @@ export class Admins {
     public static demoSuperuser<ThrowOnError extends boolean = false>(options: Options<DemoSuperuserData, ThrowOnError>) {
         return (options.client ?? client).post<DemoSuperuserResponses, DemoSuperuserErrors, ThrowOnError>({
             requestValidator: async (data) => await zDemoSuperuserData.parseAsync(data),
-            responseValidator: async (data) => await zDemoSuperuserResponse.parseAsync(data),
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/admin/superuser/{user}',
             ...options
@@ -430,7 +405,6 @@ export class Admins {
     public static adminEditUser<ThrowOnError extends boolean = false>(options: Options<AdminEditUserData, ThrowOnError>) {
         return (options.client ?? client).patch<AdminEditUserResponses, AdminEditUserErrors, ThrowOnError>({
             requestValidator: async (data) => await zAdminEditUserData.parseAsync(data),
-            responseValidator: async (data) => await zAdminEditUserResponse.parseAsync(data),
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/admin/edit-user/{user}',
             ...options,
@@ -447,7 +421,6 @@ export class Admins {
     public static adminDeleteUser<ThrowOnError extends boolean = false>(options: Options<AdminDeleteUserData, ThrowOnError>) {
         return (options.client ?? client).delete<AdminDeleteUserResponses, AdminDeleteUserErrors, ThrowOnError>({
             requestValidator: async (data) => await zAdminDeleteUserData.parseAsync(data),
-            responseValidator: async (data) => await zAdminDeleteUserResponse.parseAsync(data),
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/admin/delete-user/{user}',
             ...options
@@ -462,7 +435,6 @@ export class Admins {
     public static adminEditPlayer<ThrowOnError extends boolean = false>(options: Options<AdminEditPlayerData, ThrowOnError>) {
         return (options.client ?? client).patch<AdminEditPlayerResponses, AdminEditPlayerErrors, ThrowOnError>({
             requestValidator: async (data) => await zAdminEditPlayerData.parseAsync(data),
-            responseValidator: async (data) => await zAdminEditPlayerResponse.parseAsync(data),
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/admin/edit-player/{player_id}',
             ...options,
@@ -481,7 +453,6 @@ export class Admins {
     public static adminDeletePlayer<ThrowOnError extends boolean = false>(options: Options<AdminDeletePlayerData, ThrowOnError>) {
         return (options.client ?? client).delete<AdminDeletePlayerResponses, AdminDeletePlayerErrors, ThrowOnError>({
             requestValidator: async (data) => await zAdminDeletePlayerData.parseAsync(data),
-            responseValidator: async (data) => await zAdminDeletePlayerResponse.parseAsync(data),
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/admin/delete-player/{player_id}',
             ...options
@@ -496,7 +467,6 @@ export class Admins {
     public static createAdmin<ThrowOnError extends boolean = false>(options: Options<CreateAdminData, ThrowOnError>) {
         return (options.client ?? client).post<CreateAdminResponses, CreateAdminErrors, ThrowOnError>({
             requestValidator: async (data) => await zCreateAdminData.parseAsync(data),
-            responseValidator: async (data) => await zCreateAdminResponse.parseAsync(data),
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/admin/create/{user}',
             ...options,
@@ -526,7 +496,6 @@ export class Admins {
     public static newPermission<ThrowOnError extends boolean = false>(options: Options<NewPermissionData, ThrowOnError>) {
         return (options.client ?? client).post<NewPermissionResponses, NewPermissionErrors, ThrowOnError>({
             requestValidator: async (data) => await zNewPermissionData.parseAsync(data),
-            responseValidator: async (data) => await zNewPermissionResponse.parseAsync(data),
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/admin/new-permission',
             ...options,
@@ -548,7 +517,6 @@ export class Admins {
     public static grantPermission<ThrowOnError extends boolean = false>(options: Options<GrantPermissionData, ThrowOnError>) {
         return (options.client ?? client).patch<GrantPermissionResponses, GrantPermissionErrors, ThrowOnError>({
             requestValidator: async (data) => await zGrantPermissionData.parseAsync(data),
-            responseValidator: async (data) => await zGrantPermissionResponse.parseAsync(data),
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/admin/grant-permission/{admin_id}',
             ...options,
@@ -567,7 +535,6 @@ export class Admins {
     public static removePermission<ThrowOnError extends boolean = false>(options: Options<RemovePermissionData, ThrowOnError>) {
         return (options.client ?? client).patch<RemovePermissionResponses, RemovePermissionErrors, ThrowOnError>({
             requestValidator: async (data) => await zRemovePermissionData.parseAsync(data),
-            responseValidator: async (data) => await zRemovePermissionResponse.parseAsync(data),
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/admin/remove-permission/{admin_id}',
             ...options,
@@ -584,7 +551,6 @@ export class Admins {
     public static currentAdmin<ThrowOnError extends boolean = false>(options?: Options<CurrentAdminData, ThrowOnError>) {
         return (options?.client ?? client).get<CurrentAdminResponses, unknown, ThrowOnError>({
             requestValidator: async (data) => await zCurrentAdminData.parseAsync(data),
-            responseValidator: async (data) => await zCurrentAdminResponse.parseAsync(data),
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/admin/me',
             ...options
@@ -600,7 +566,6 @@ export class Auth {
         return (options.client ?? client).post<CreateTokenResponses, CreateTokenErrors, ThrowOnError>({
             ...urlSearchParamsBodySerializer,
             requestValidator: async (data) => await zCreateTokenData.parseAsync(data),
-            responseValidator: async (data) => await zCreateTokenResponse.parseAsync(data),
             url: '/login',
             ...options,
             headers: {
@@ -616,7 +581,6 @@ export class Auth {
     public static refreshToken<ThrowOnError extends boolean = false>(options: Options<RefreshTokenData, ThrowOnError>) {
         return (options.client ?? client).post<RefreshTokenResponses, RefreshTokenErrors, ThrowOnError>({
             requestValidator: async (data) => await zRefreshTokenData.parseAsync(data),
-            responseValidator: async (data) => await zRefreshTokenResponse.parseAsync(data),
             url: '/refresh-token',
             ...options,
             headers: {
@@ -638,7 +602,6 @@ export class Auth {
     public static verifyToken<ThrowOnError extends boolean = false>(options: Options<VerifyTokenData, ThrowOnError>) {
         return (options.client ?? client).post<VerifyTokenResponses, VerifyTokenErrors, ThrowOnError>({
             requestValidator: async (data) => await zVerifyTokenData.parseAsync(data),
-            responseValidator: async (data) => await zVerifyTokenResponse.parseAsync(data),
             url: '/verify-token',
             ...options,
             headers: {
@@ -656,7 +619,6 @@ export class Default {
     public static homePage<ThrowOnError extends boolean = false>(options?: Options<HomePageData, ThrowOnError>) {
         return (options?.client ?? client).get<HomePageResponses, unknown, ThrowOnError>({
             requestValidator: async (data) => await zHomePageData.parseAsync(data),
-            responseValidator: async (data) => await zHomePageResponse.parseAsync(data),
             url: '/',
             ...options
         });

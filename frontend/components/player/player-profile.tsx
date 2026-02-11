@@ -38,7 +38,7 @@ export function PlayerProfile() {
 
     // Show loading while token is being loaded or query is pending
     if (!token || player.isPending) {
-        return <Skeleton width="100%" height={400} mx="auto" />;
+        return <Skeleton width="100%" height={"85dvh"} mx="auto" />;
     }
 
     // Handle query errors
