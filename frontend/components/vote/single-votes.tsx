@@ -1,6 +1,6 @@
 "use client";
 
-import { BaseCtAppInfo, MatchInfo, PlayerInfo } from "@/api/client";
+import { BaseCtAppInfo, MatchInfo, PlayerInfo } from "@/apis/client";
 import { useAuth } from "@/lib/contexts/auth-context-provider";
 import { useCastVote } from "@/lib/hooks/matches";
 import { getColorFromId } from "@/lib/utils";

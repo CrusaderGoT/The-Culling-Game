@@ -1,6 +1,6 @@
 "use client";
 
-import { MatchInfo, PlayerInfo } from "@/api/client";
+import { MatchInfo, PlayerInfo } from "@/apis/client";
 import { SingleVoteGroup } from "@/components/vote/single-votes";
 import { getColorFromId } from "@/lib/utils";
 import styles from "@/styles/player-card.module.css";

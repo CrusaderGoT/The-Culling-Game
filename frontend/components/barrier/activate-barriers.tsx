@@ -1,6 +1,6 @@
 "use client";
 
-import { BarrierTechInfo, MatchInfo } from "@/api/client";
+import { BarrierTechInfo, MatchInfo } from "@/apis/client";
 import { BindingVowAction } from "@/components/barrier/binding-vow";
 import { DomainExpansionAction } from "@/components/barrier/domain-expansion";
 import { SimpleDomainAction } from "@/components/barrier/simple-domain";

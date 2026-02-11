@@ -1,6 +1,6 @@
 "use client";
 
-import { MatchInfo } from "@/api/client";
+import { MatchInfo } from "@/apis/client";
 import { AssignMatchWinnerAction } from "@/components/admin/match/assign-match-winner";
 import { DeleteMatchAction } from "@/components/admin/match/delete-match";
 import { useAuth } from "@/lib/contexts/auth-context-provider";

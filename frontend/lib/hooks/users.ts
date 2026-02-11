@@ -2,7 +2,7 @@ import {
     createTokenMutation,
     createUserMutation,
     currentUserOptions,
-} from "@/api/client/@tanstack/react-query.gen";
+} from "@/apis/client/@tanstack/react-query.gen";
 
 import { useMutation, useQuery } from "@tanstack/react-query";
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { PlayerInfo } from "@/api/client";
+import { PlayerInfo } from "@/apis/client";
 import { CreatePlayerForm } from "@/components/player/forms/create-player-form";
 import { PlayerCard } from "@/components/player/player-card";
 import {

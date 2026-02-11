@@ -3,8 +3,8 @@
 import { useForm } from "@mantine/form";
 import { zodResolver } from "mantine-form-zod-resolver";
 
-import { CreateUser } from "@/api/client";
-import { zCreateUser } from "@/api/client/zod.gen";
+import { CreateUser } from "@/apis/client";
+import { zCreateUser } from "@/apis/client/zod.gen";
 
 import { COUNTRIES } from "@/lib/constants/COUNTRIES";
 import {

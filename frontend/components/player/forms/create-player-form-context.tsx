@@ -4,7 +4,7 @@ import { createFormContext } from "@mantine/form";
 
 import { GENDERS } from "@/lib/constants/GENDERS";
 
-import { BodyCreatePlayer } from "@/api/client";
+import { BodyCreatePlayer } from "@/apis/client";
 import Naluka from "@/fonts/NalukaFont";
 import {
     Group,

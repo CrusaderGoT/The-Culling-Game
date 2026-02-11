@@ -6,7 +6,7 @@ import {
     myPlayerOptions,
     myPlayerQueryKey,
     upgradePlayerMutation,
-} from "@/api/client/@tanstack/react-query.gen";
+} from "@/apis/client/@tanstack/react-query.gen";
 import { getAPIErrorMessage } from "@/components/ui/display-api-error";
 import { authHeader } from "@/lib/constants/AUTHCONSTANTS";
 import { queryClient } from "@/lib/query-client/get-query-client";

@@ -8,7 +8,7 @@ import {
     VoteFormType,
 } from "@/components/vote/forms/vote-form-context";
 
-import { zCastVote } from "@/api/client/zod.gen";
+import { zCastVote } from "@/apis/client/zod.gen";
 
 import { zodResolver } from "mantine-form-zod-resolver";
 

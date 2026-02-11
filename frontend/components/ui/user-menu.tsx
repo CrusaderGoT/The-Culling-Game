@@ -1,6 +1,6 @@
 "use client";
 
-import { UserInfo } from "@/api/client";
+import { UserInfo } from "@/apis/client";
 
 import {
     ActionIcon,

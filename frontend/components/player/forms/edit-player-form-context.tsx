@@ -4,7 +4,7 @@ import { createFormContext } from "@mantine/form";
 
 import { z } from "zod";
 
-import { zEditCt, zEditCtApp, zEditPlayer } from "@/api/client/zod.gen";
+import { zEditCt, zEditCtApp, zEditPlayer } from "@/apis/client/zod.gen";
 import { GENDERS } from "@/lib/constants/GENDERS";
 import {
     Group,

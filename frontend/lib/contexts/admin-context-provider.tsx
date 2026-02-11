@@ -1,6 +1,6 @@
 "use client";
 
-import { AdminInfo } from "@/api/client";
+import { AdminInfo } from "@/apis/client";
 import { AdminAccessDenied } from "@/components/ui/admin-access-denied";
 import { useAuth } from "@/lib/contexts/auth-context-provider";
 import { useCurrentAdmin } from "@/lib/hooks/admins/admin";

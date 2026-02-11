@@ -15,7 +15,7 @@ import { MatchPlayers } from "@/components/match/match-players";
 import { MatchVoteChart } from "@/components/match/match-vote-chart";
 import { VoteDrawer } from "@/components/vote/vote-drawer";
 
-import { zMatchInfo } from "@/api/client/zod.gen";
+import { zMatchInfo } from "@/apis/client/zod.gen";
 import { DisplayAPIError } from "@/components/ui/display-api-error";
 import { useAuth } from "@/lib/contexts/auth-context-provider";
 import { useSocketEventStable } from "@/lib/contexts/socket-context-provider";

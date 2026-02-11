@@ -1,11 +1,11 @@
 // auth/auth-provider.tsx
 "use client";
 
-import { UserInfo } from "@/api/client";
+import { UserInfo } from "@/apis/client";
 import {
     refreshTokenMutation,
     verifyTokenMutation,
-} from "@/api/client/@tanstack/react-query.gen";
+} from "@/apis/client/@tanstack/react-query.gen";
 import { getAPIErrorMessage } from "@/components/ui/display-api-error";
 import { tokenNames } from "@/lib/constants/AUTHCONSTANTS";
 import { useCurrentUser } from "@/lib/hooks/users";

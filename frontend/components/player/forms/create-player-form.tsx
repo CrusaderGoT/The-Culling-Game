@@ -41,8 +41,8 @@ import { useRouter } from "next/navigation";
 
 import { useState } from "react";
 
-import { BodyCreatePlayer } from "@/api/client";
-import { zBodyCreatePlayer } from "@/api/client/zod.gen";
+import { BodyCreatePlayer } from "@/apis/client";
+import { zBodyCreatePlayer } from "@/apis/client/zod.gen";
 
 export function CreatePlayerForm() {
     const router = useRouter();

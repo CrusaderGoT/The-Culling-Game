@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 
 import { cookies } from "next/headers";
 
-import { Auth, Token } from "@/api/client";
+import { Auth, Token } from "@/apis/client";
 import { tokenNames } from "@/lib/constants/AUTHCONSTANTS";
 import { cache } from "react";
 

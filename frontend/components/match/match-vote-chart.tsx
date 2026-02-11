@@ -1,6 +1,6 @@
 "use client";
 
-import { BaseVoteInfo, PlayerInfo } from "@/api/client";
+import { BaseVoteInfo, PlayerInfo } from "@/apis/client";
 import { getColorFromId, getCtAppMap } from "@/lib/utils";
 import { BarChart } from "@mantine/charts";
 import { Tooltip } from "@mantine/core";

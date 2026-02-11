@@ -1,6 +1,6 @@
 "use client";
 
-import { CastVote, HttpValidationError, PlayerInfo } from "@/api/client";
+import { CastVote, HttpValidationError, PlayerInfo } from "@/apis/client";
 import { VoteForm } from "@/components/vote/forms/vote-form";
 import { VoteTabs } from "@/components/vote/vote-tabs";
 import {

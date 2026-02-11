@@ -5,7 +5,7 @@ import {
     ModelName,
     PermissionLevel,
     PlayerInfo,
-} from "@/api/client";
+} from "@/apis/client";
 import { MantineColor } from "@mantine/core";
 
 export function cleanString(input: string) {

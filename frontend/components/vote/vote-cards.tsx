@@ -1,6 +1,6 @@
 "use client";
 
-import { PlayerInfo } from "@/api/client";
+import { PlayerInfo } from "@/apis/client";
 import {
     Box,
     Checkbox,

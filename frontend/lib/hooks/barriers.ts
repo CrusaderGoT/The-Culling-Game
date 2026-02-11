@@ -3,7 +3,7 @@ import {
     domainExpansionMutation,
     reverseCursedTechniqueMutation,
     simpleDomainMutation,
-} from "@/api/client/@tanstack/react-query.gen";
+} from "@/apis/client/@tanstack/react-query.gen";
 
 import { getAPIErrorMessage } from "@/components/ui/display-api-error";
 import { notifications } from "@mantine/notifications";

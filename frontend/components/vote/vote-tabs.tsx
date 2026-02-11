@@ -1,6 +1,6 @@
 "use client";
 
-import { PlayerInfo } from "@/api/client";
+import { PlayerInfo } from "@/apis/client";
 import { VoteCards } from "@/components/vote/vote-cards";
 import { getColorFromId } from "@/lib/utils";
 import { Avatar, ScrollArea, Tabs, Text } from "@mantine/core";
