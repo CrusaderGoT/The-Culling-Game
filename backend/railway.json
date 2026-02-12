@@ -1,10 +1,11 @@
 {
-  "$schema": "https://railway.app/railway.schema.json",
-  "build": {
-    "builder": "NIXPACKS"
+  "$schema": "https://schema.railpack.com",
+  "steps": {
+    "preDeployCommand": {
+      "commands": ["alembic upgrade head"]
+    }
   },
   "deploy": {
-    "preDeployCommand": ["alembic upgrade head"],
     "startCommand": "fastapi run app/api/main.py"
   }
 }
