@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 import json
+from pathlib import Path
 
-from ..api.setting import BASE_DIR
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 TABLE_JSON = BASE_DIR / "database" / "table_names.json"
 
