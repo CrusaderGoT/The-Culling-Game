@@ -11,7 +11,7 @@ from app.utils.user import edit_user_helper, get_user, id_name_email
 from fastapi import APIRouter, BackgroundTasks, Body, Depends, HTTPException, status
 from fastapi_mail import FastMail, MessageSchema, MessageType
 
-from backend.app.auth.credentials import create_access_token
+from app.auth.credentials import create_access_token
 
 # USERS
 
