@@ -1,15 +1,13 @@
 #!/usr/bin/env python3
 import json
-from pathlib import Path
 
-# 1. Locate JSON and target file
-BASE = Path(__file__).parent.parent
+from ..api.setting import BASE_DIR
 
-TABLE_JSON = BASE / "database" / "table_names.json"
+TABLE_JSON = BASE_DIR / "database" / "table_names.json"
 
 # changing this file name,will require match that change in it importation in model.base.py
 # and delete the prev name existing file
-OUT_FILE = BASE / "models" / "table.py"
+OUT_FILE = BASE_DIR / "models" / "table.py"
 
 # 2. Read the JSON mapping
 data: dict[str, str] = json.loads(TABLE_JSON.read_text())

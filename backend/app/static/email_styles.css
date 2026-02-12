@@ -1,0 +1,638 @@
+/* ============================================
+   EMAIL VERIFICATION - ELEGANT TEMPLATE STYLES
+   ============================================ */
+
+/* Import Fonts */
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Montserrat:wght@300;400;500;600&display=swap");
+
+/* CSS Variables for Theming */
+:root {
+  /* Colors */
+  --primary-dark: #1a2332;
+  --primary-blue: #2c3e5d;
+  --accent-gold: #d4af37;
+  --accent-light: #f0e6d2;
+  --text-primary: #1a2332;
+  --text-secondary: #5a6a7a;
+  --text-light: #8b96a3;
+  --bg-white: #ffffff;
+  --bg-subtle: #f8f9fa;
+  --border-light: #e5e8eb;
+  --success-green: #2d7a5f;
+  --success-light: #e8f5f1;
+
+  /* Typography */
+  --font-display: "Cormorant Garamond", Georgia, serif;
+  --font-body: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+
+  /* Spacing */
+  --spacing-xs: 8px;
+  --spacing-sm: 16px;
+  --spacing-md: 24px;
+  --spacing-lg: 32px;
+  --spacing-xl: 48px;
+  --spacing-xxl: 64px;
+
+  /* Border Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(26, 35, 50, 0.08);
+  --shadow-md: 0 4px 12px rgba(26, 35, 50, 0.1);
+  --shadow-lg: 0 8px 24px rgba(26, 35, 50, 0.12);
+  --shadow-xl: 0 16px 48px rgba(26, 35, 50, 0.15);
+}
+
+/* ============================================
+   BASE STYLES
+   ============================================ */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--text-primary);
+  background: linear-gradient(135deg, #f5f7fa 0%, #e8ebef 100%);
+  padding: var(--spacing-lg);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================================
+   CONTAINER
+   ============================================ */
+
+.email-container {
+  max-width: 600px;
+  margin: 0 auto;
+  background: var(--bg-white);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-xl);
+  position: relative;
+}
+
+/* ============================================
+   HEADER
+   ============================================ */
+
+.email-header {
+  background: linear-gradient(
+    135deg,
+    var(--primary-dark) 0%,
+    var(--primary-blue) 100%
+  );
+  padding: var(--spacing-lg) var(--spacing-xl);
+  position: relative;
+  overflow: hidden;
+}
+
+.email-header::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(
+    circle,
+    rgba(212, 175, 55, 0.1) 0%,
+    transparent 70%
+  );
+  border-radius: 50%;
+  transform: translate(30%, -30%);
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  position: relative;
+  z-index: 1;
+}
+
+.logo-icon {
+  width: 40px;
+  height: 40px;
+  color: var(--accent-gold);
+  filter: drop-shadow(0 2px 8px rgba(212, 175, 55, 0.3));
+}
+
+.company-name {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--bg-white);
+  letter-spacing: 0.5px;
+  margin: 0;
+}
+
+/* ============================================
+   BODY
+   ============================================ */
+
+.email-body {
+  padding: var(--spacing-xxl) var(--spacing-xl) var(--spacing-xl);
+  background: var(--bg-white);
+}
+
+.content-wrapper {
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+/* Icon Circle */
+.icon-circle {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto var(--spacing-lg);
+  background: linear-gradient(135deg, var(--success-light) 0%, #f0f9f6 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-md);
+  position: relative;
+}
+
+.icon-circle::before {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 2px solid var(--success-green);
+  opacity: 0.2;
+}
+
+.mail-icon {
+  width: 40px;
+  height: 40px;
+  color: var(--success-green);
+}
+
+/* Typography */
+.greeting {
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-align: center;
+  margin-bottom: var(--spacing-md);
+  letter-spacing: -0.5px;
+}
+
+.intro-text {
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+  font-weight: 400;
+}
+
+/* ============================================
+   BUTTON
+   ============================================ */
+
+.button-container {
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+}
+
+.verify-button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: 16px 40px;
+  background: linear-gradient(135deg, var(--accent-gold) 0%, #c9a635 100%);
+  color: var(--primary-dark);
+  text-decoration: none;
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 16px;
+  letter-spacing: 0.3px;
+  box-shadow: var(--shadow-md), 0 0 0 0 rgba(212, 175, 55, 0.5);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.verify-button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  transition: left 0.5s;
+}
+
+.verify-button:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg), 0 0 0 4px rgba(212, 175, 55, 0.2);
+}
+
+.verify-button:hover::before {
+  left: 100%;
+}
+
+.verify-button:active {
+  transform: translateY(0);
+}
+
+.button-text {
+  position: relative;
+  z-index: 1;
+}
+
+.button-icon {
+  width: 20px;
+  height: 20px;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  z-index: 1;
+}
+
+.verify-button:hover .button-icon {
+  transform: translateX(4px);
+}
+
+/* ============================================
+   INFO BOX
+   ============================================ */
+
+.info-box {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+  background: var(--bg-subtle);
+  border-left: 3px solid var(--primary-blue);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.info-icon {
+  width: 20px;
+  height: 20px;
+  color: var(--primary-blue);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.info-text {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.info-text strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* ============================================
+   ALTERNATIVE SECTION
+   ============================================ */
+
+.alternative-section {
+  margin-bottom: var(--spacing-xl);
+  padding-top: var(--spacing-lg);
+  border-top: 1px solid var(--border-light);
+}
+
+.alt-text {
+  font-size: 14px;
+  color: var(--text-secondary);
+  text-align: center;
+  margin-bottom: var(--spacing-sm);
+}
+
+.link-box {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  text-align: center;
+  transition: background 0.2s;
+}
+
+.link-box:hover {
+  background: #f0f2f5;
+}
+
+.verification-code {
+  font-family: "Courier New", monospace;
+  font-size: 12px;
+  color: var(--primary-blue);
+  word-break: break-all;
+  display: block;
+  line-height: 1.5;
+}
+
+/* ============================================
+   SECURITY NOTICE
+   ============================================ */
+
+.security-notice {
+  display: flex;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--spacing-lg);
+}
+
+.shield-icon {
+  width: 32px;
+  height: 32px;
+  color: var(--text-light);
+  flex-shrink: 0;
+}
+
+.security-text {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.security-text strong {
+  color: var(--text-primary);
+  font-weight: 600;
+  display: block;
+  margin-bottom: 4px;
+}
+
+/* ============================================
+   FOOTER
+   ============================================ */
+
+.email-footer {
+  background: var(--bg-subtle);
+  padding: var(--spacing-lg) var(--spacing-xl);
+  border-top: 1px solid var(--border-light);
+}
+
+.footer-content {
+  max-width: 500px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.footer-links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+  flex-wrap: wrap;
+}
+
+.footer-link {
+  font-size: 13px;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color 0.2s;
+  font-weight: 500;
+}
+
+.footer-link:hover {
+  color: var(--primary-blue);
+  text-decoration: underline;
+}
+
+.footer-divider {
+  color: var(--border-light);
+  font-size: 12px;
+}
+
+.footer-company {
+  margin-bottom: var(--spacing-md);
+}
+
+.footer-text,
+.footer-address {
+  font-size: 12px;
+  color: var(--text-light);
+  margin: 4px 0;
+  line-height: 1.5;
+}
+
+/* Social Icons */
+.social-icons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+}
+
+.social-link {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-white);
+  border-radius: 50%;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--shadow-sm);
+}
+
+.social-link:hover {
+  background: var(--primary-blue);
+  color: var(--bg-white);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.social-link svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* ============================================
+   DECORATIVE ELEMENTS
+   ============================================ */
+
+.decorative-line {
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--accent-gold) 20%,
+    var(--accent-gold) 80%,
+    transparent 100%
+  );
+  opacity: 0.3;
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+@media only screen and (max-width: 640px) {
+  body {
+    padding: var(--spacing-sm);
+  }
+
+  .email-header {
+    padding: var(--spacing-md) var(--spacing-md);
+  }
+
+  .company-name {
+    font-size: 24px;
+  }
+
+  .logo-icon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .email-body {
+    padding: var(--spacing-lg) var(--spacing-md);
+  }
+
+  .greeting {
+    font-size: 28px;
+  }
+
+  .intro-text {
+    font-size: 15px;
+  }
+
+  .verify-button {
+    padding: 14px 32px;
+    font-size: 15px;
+  }
+
+  .email-footer {
+    padding: var(--spacing-md);
+  }
+
+  .footer-links {
+    flex-direction: column;
+    gap: var(--spacing-xs);
+  }
+
+  .footer-divider {
+    display: none;
+  }
+}
+
+@media only screen and (max-width: 480px) {
+  .icon-circle {
+    width: 64px;
+    height: 64px;
+  }
+
+  .mail-icon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .greeting {
+    font-size: 24px;
+  }
+
+  .security-notice {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .shield-icon {
+    margin: 0 auto;
+  }
+}
+
+/* ============================================
+   PRINT STYLES
+   ============================================ */
+
+@media print {
+  body {
+    background: white;
+    padding: 0;
+  }
+
+  .email-container {
+    box-shadow: none;
+  }
+
+  .verify-button {
+    background: var(--accent-gold);
+    color: var(--primary-dark);
+  }
+}
+
+/* ============================================
+   DARK MODE SUPPORT (Optional)
+   ============================================ */
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --primary-dark: #1a1f2e;
+    --text-primary: #e8eaed;
+    --text-secondary: #b8bdc4;
+    --text-light: #9aa0a6;
+    --bg-white: #1f2937;
+    --bg-subtle: #374151;
+    --border-light: #4b5563;
+  }
+
+  body {
+    background: linear-gradient(135deg, #1a1f2e 0%, #111827 100%);
+  }
+
+  .email-container {
+    background: var(--bg-white);
+  }
+
+  .info-box {
+    background: var(--bg-subtle);
+  }
+
+  .link-box {
+    background: var(--bg-subtle);
+    border-color: var(--border-light);
+  }
+
+  .security-notice {
+    background: var(--bg-subtle);
+    border-color: var(--border-light);
+  }
+
+  .email-footer {
+    background: var(--bg-subtle);
+  }
+
+  .social-link {
+    background: var(--bg-subtle);
+  }
+
+  .social-link:hover {
+    background: var(--primary-blue);
+  }
+}

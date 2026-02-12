@@ -1,6 +1,7 @@
 """settings for the api"""
 
 from contextlib import asynccontextmanager
+from pathlib import Path
 from uuid import UUID
 
 import socketio
@@ -10,9 +11,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.routing import APIRoute
 from fastapi.staticfiles import StaticFiles
+from fastapi_mail import ConnectionConfig
+from pydantic import EmailStr
 from pydantic_settings import BaseSettings
 from taskiq import InMemoryBroker, TaskiqScheduler, ZeroMQBroker
 from taskiq_redis import ListRedisScheduleSource
+
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 class Settings(BaseSettings):
@@ -30,9 +35,21 @@ class Settings(BaseSettings):
     refresh_token_expire: int = 604_800_000
     "in milliseconds"
     live: bool = False
+    mail_username: str = "***"
+    mail_password: str = "***"
+    mail_from: EmailStr = "example@email.com"
+    mail_port: int = 1234
+    mail_server: str = "***"
+    whoisxml_api_key: str = "at_mLiGoXr1Pj9V5s516uFfBgNBx4lhC"
 
 
 settings = Settings()
+
+BASE_URL = (
+    "http://localhost:3000/"
+    if not settings.live
+    else "https://the-culling-games.vercel.app/"
+)
 
 
 if settings.debug:
@@ -139,4 +156,19 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+)
+
+
+mail_connection_config = ConnectionConfig(
+    MAIL_USERNAME=settings.mail_username,
+    MAIL_PASSWORD=settings.mail_password,
+    MAIL_FROM=settings.mail_from,
+    MAIL_PORT=settings.mail_port,
+    MAIL_SERVER=settings.mail_server,
+    MAIL_FROM_NAME="The Culling Games",
+    MAIL_STARTTLS=True,
+    MAIL_SSL_TLS=False,
+    USE_CREDENTIALS=True,
+    VALIDATE_CERTS=True,
+    TEMPLATE_FOLDER=BASE_DIR / "templates",
 )

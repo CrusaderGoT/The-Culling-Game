@@ -4,8 +4,11 @@ from random import choice
 from typing import Annotated
 
 from fastapi import Depends
+from fastapi_mail import email_utils
+from pydantic import EmailStr
 from sqlmodel import Session, func, select
 
+from ..api.setting import settings
 from ..database.pgsql import engine
 from ..models.base import ActionTimePoint, Country, PlayerUpgradeCost
 from ..models.colony import Colony
@@ -79,3 +82,10 @@ player_upgrade_cost = Annotated[PlayerUpgradeCost, Depends(_puc_def)]
 """
 The Player Upgrade Cost as a dependency.
 """
+
+
+def whoisxmlapi_checker(email: EmailStr):
+    checker = email_utils.WhoIsXmlApi(settings.whoisxml_api_key, email)
+    can_receive_mail = checker.smtp_check_()
+
+    return can_receive_mail

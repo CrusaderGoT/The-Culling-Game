@@ -11,19 +11,16 @@ import os
 import uuid
 from datetime import date, datetime, timedelta
 from enum import Enum, IntEnum
-from pathlib import Path
-from typing import Annotated, Union
+from typing import Annotated, Any, Union
 
 from pydantic import EmailStr, HttpUrl, StringConstraints
 from sqlmodel import TIMESTAMP, Column, Field, SQLModel
 
+from app.api.setting import BASE_DIR
+
 from ..models.table import (
     ModelName,  # exception importation from auto generated enum class
 )
-
-# Get the base directory of the current script or project
-BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # write your base models here
 
@@ -471,3 +468,10 @@ class BaseBarrierRecord(SQLModel):
         default=0,
         description="the number of times a reverse cursed technique is activated",
     )
+
+
+class EmailSchema(SQLModel):
+    "schema/model class for email address validaion. for use in email sending."
+
+    email: list[EmailStr]
+    template: dict[str, Any]

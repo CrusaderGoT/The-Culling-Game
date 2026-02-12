@@ -1,7 +1,6 @@
 """Test database connection with SQLModel"""
 
 import os
-import sys
 
 from dotenv import load_dotenv
 from sqlmodel import Session, create_engine, text
@@ -60,15 +59,10 @@ def test_connection():
                 print(f"\n🔄 Current migration: {version[0]}")
 
         print("\n✅ All tests passed!")
-        return True
+        assert True
 
     except Exception as e:
         print("\n❌ Connection failed!")
         print(f"Error type: {type(e).__name__}")
         print(f"Error message: {e}")
-        return False
-
-
-if __name__ == "__main__":
-    success = test_connection()
-    sys.exit(0 if success else 1)
+        assert False

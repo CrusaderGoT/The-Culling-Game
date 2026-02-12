@@ -1,11 +1,17 @@
+from datetime import UTC, datetime, timedelta
 from typing import Annotated
 
+from app.api.setting import BASE_URL, mail_connection_config
 from app.auth.dependencies import active_user, oauth2_scheme
+from app.models.base import EmailSchema
 from app.models.user import EditUser, User, UserInfo
 from app.utils.config import Tag, UserException
-from app.utils.dependencies import session
+from app.utils.dependencies import session, whoisxmlapi_checker
 from app.utils.user import edit_user_helper, get_user, id_name_email
-from fastapi import APIRouter, Body, Depends, HTTPException, status
+from fastapi import APIRouter, BackgroundTasks, Body, Depends, HTTPException, status
+from fastapi_mail import FastMail, MessageSchema, MessageType
+
+from backend.app.auth.credentials import create_access_token
 
 # USERS
 
@@ -96,3 +102,46 @@ def delete_user(
     else:
         err_msg = f"User '{user}' not found."
         raise HTTPException(status.HTTP_404_NOT_FOUND, err_msg)
+
+
+@router.post("/verify")
+async def verify_user(
+    email: EmailSchema, background_tasks: BackgroundTasks, current_user: active_user
+):
+
+    single_email = email.email[0]
+
+    # check if email is valid and passes checkers
+    valid_email = whoisxmlapi_checker(single_email)
+
+    if not valid_email:
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, "Email address")
+
+    exp = timedelta(minutes=10)
+    now = datetime.now(UTC)
+
+    token = create_access_token({"email": single_email}, exp)
+
+    template_body = email.template.update(
+        {
+            "token": token,
+            "email": single_email,
+            "company_name": "The Culling Games",
+            "verification_link": BASE_URL,
+            "expiration_hours": now - exp,
+            "current_year": now.year,
+        }
+    )  # update with token verification
+
+    message = MessageSchema(
+        subject="Fastapi-Mail module",
+        recipients=email.email,
+        template_body=template_body,
+        subtype=MessageType.html,
+    )
+
+    fm = FastMail(mail_connection_config)
+
+    background_tasks.add_task(
+        fm.send_message, message, template_name="verify_email.html"
+    )
