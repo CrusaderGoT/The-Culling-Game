@@ -27,7 +27,7 @@ jobs:
         run: uv sync --locked --all-extras --dev
 
       - name: Generate ModelName enum
-        run: python app/scripts/gen_table_enum.py
+        run: py -m app.scripts.gen_table_enum
 
       - name: Run Tests
         run: uv run pytest -v
