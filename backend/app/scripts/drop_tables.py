@@ -8,9 +8,13 @@ from sqlalchemy import create_engine, text
 def drop_all_tables():
     """Drop all tables in the database"""
     database_url = os.getenv("DATABASE_URL")
+    live = os.getenv("LIVE")
 
-    if not database_url:
-        print("❌ ERROR: DATABASE_URL environment variable not set")
+    if not database_url or live:
+        print(
+            "❌ ERROR: DATABASE_URL environment variable not set",
+            "Make sure you are not in production also.",
+        )
         sys.exit(1)
 
     print("🔌 Connecting to database...")
