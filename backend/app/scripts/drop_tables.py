@@ -25,7 +25,20 @@ def drop_all_tables():
         with engine.begin() as conn:
             conn.execute(text("DROP TABLE IF EXISTS alembic_version CASCADE"))
             # Drop all enum types
-            conn.execute(text("DROP TYPE IF EXISTS ... CASCADE"))
+            conn.execute(
+                text(
+                    """
+                    DO $$ DECLARE
+                        r RECORD;
+                    BEGIN
+                        FOR r IN (SELECT typname FROM pg_type WHERE typtype = 'e' AND typnamespace = (SELECT oid FROM pg_namespace WHERE nspname = 'public'))
+                        LOOP
+                            EXECUTE 'DROP TYPE IF EXISTS ' || quote_ident(r.typname) || ' CASCADE';
+                        END LOOP;
+                    END $$;
+                    """
+                )
+            )
 
         print("✅ Alembic version table dropped")
         print("✅ Enum types dropped")
