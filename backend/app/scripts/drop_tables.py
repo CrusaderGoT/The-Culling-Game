@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 import os
 import sys
+
 from sqlalchemy import create_engine, text
-from sqlmodel import SQLModel
 
 
 def drop_all_tables():
@@ -17,14 +17,24 @@ def drop_all_tables():
     engine = create_engine(database_url, echo=False)
 
     try:
-        print("⚠️  Dropping all tables...")
-        SQLModel.metadata.drop_all(engine)
-        print("✅ All tables dropped successfully")
-
         # Also drop alembic_version if it exists
         with engine.begin() as conn:
-            conn.execute(text("DROP TABLE IF EXISTS alembic_version CASCADE"))
+            print("⚠️  Dropping all tables...")
+            conn.execute(
+                text(
+                    """
+                        DO $$ DECLARE
+                            r RECORD;
+                        BEGIN
+                            FOR r IN (SELECT tablename FROM pg_tables WHERE schemaname = 'public') LOOP
+                                EXECUTE 'DROP TABLE IF EXISTS ' || quote_ident(r.tablename) || ' CASCADE';
+                            END LOOP;
+                        END $$;
+                    """
+                )
+            )
             # Drop all enum types
+            print("⚠️  Dropping all enum types...")
             conn.execute(
                 text(
                     """
@@ -40,7 +50,7 @@ def drop_all_tables():
                 )
             )
 
-        print("✅ Alembic version table dropped")
+        print("✅ All tables dropped successfully")
         print("✅ Enum types dropped")
 
     except Exception as e:
