@@ -4,7 +4,7 @@
     "builder": "RAILPACK"
   },
   "deploy": {
-    "preDeployCommand": ["alembic upgrade head"],
+    "preDeployCommand": ["alembic stamp head", "alembic upgrade head"],
     "startCommand": "fastapi run app/api/main.py"
   }
 }
