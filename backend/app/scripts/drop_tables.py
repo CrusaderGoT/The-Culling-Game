@@ -24,7 +24,11 @@ def drop_all_tables():
         # Also drop alembic_version if it exists
         with engine.begin() as conn:
             conn.execute(text("DROP TABLE IF EXISTS alembic_version CASCADE"))
+            # Drop all enum types
+            conn.execute(text("DROP TYPE IF EXISTS ... CASCADE"))
+
         print("✅ Alembic version table dropped")
+        print("✅ Enum types dropped")
 
     except Exception as e:
         print(f"❌ Error dropping tables: {e}")
