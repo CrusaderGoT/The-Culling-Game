@@ -1,17 +1,24 @@
 from datetime import UTC, datetime, timedelta
 from typing import Annotated
 
-from app.api.setting import BASE_URL, mail_connection_config
+from app.api.setting import FRONTEND_BASE_URL, mail_connection_config
+from app.auth.credentials import create_access_token, decode_access_token
 from app.auth.dependencies import active_user, oauth2_scheme
-from app.models.base import EmailSchema
 from app.models.user import EditUser, User, UserInfo
-from app.utils.config import Tag, UserException
-from app.utils.dependencies import session, whoisxmlapi_checker
+from app.utils.config import Tag, UserException, whoisxmlapi_checker
+from app.utils.dependencies import session
 from app.utils.user import edit_user_helper, get_user, id_name_email
-from fastapi import APIRouter, BackgroundTasks, Body, Depends, HTTPException, status
+from fastapi import (
+    APIRouter,
+    BackgroundTasks,
+    Body,
+    Depends,
+    HTTPException,
+    Query,
+    status,
+)
+from fastapi.responses import JSONResponse, RedirectResponse, Response
 from fastapi_mail import FastMail, MessageSchema, MessageType
-
-from app.auth.credentials import create_access_token
 
 # USERS
 
@@ -106,36 +113,66 @@ def delete_user(
 
 @router.post("/verify")
 async def verify_user(
-    email: EmailSchema, background_tasks: BackgroundTasks, current_user: active_user
-):
+    background_tasks: BackgroundTasks,
+    current_user: active_user,
+    session: session,
+    token: Annotated[str | None, Query(description="the verification token")] = None,
+) -> Response:
+    if current_user.is_verified:
+        # raise an error
+        raise UserException(
+            current_user, status.HTTP_304_NOT_MODIFIED, "This user is already verified"
+        )
 
-    single_email = email.email[0]
+    # if token is available, try and verify the user
+    if token:
+        decoded_token = decode_access_token(token)
+        decode_email = decoded_token.data["email"]
+        if decode_email == current_user.email:
+            # mark user as verified
+            current_user.is_verified = True
+            session.add(current_user)
+            session.commit()
+            session.refresh(current_user)
+            return RedirectResponse(url=FRONTEND_BASE_URL)
+        # the decoded token was not meant for this current user
+        else:
+            raise UserException(
+                current_user,
+                status.HTTP_400_BAD_REQUEST,
+                "mismatched token to current user.",
+            )
+
+    # When no token is sent
+    user_email = current_user.email
 
     # check if email is valid and passes checkers
-    valid_email = whoisxmlapi_checker(single_email)
+    valid_email = await whoisxmlapi_checker(user_email)
 
     if not valid_email:
-        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, "Email address")
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_ENTITY, "Email address is not allowed"
+        )
 
+    # setup token
     exp = timedelta(minutes=10)
     now = datetime.now(UTC)
 
-    token = create_access_token({"email": single_email}, exp)
+    verify_token = create_access_token({"email": user_email}, exp)
 
-    template_body = email.template.update(
-        {
-            "token": token,
-            "email": single_email,
-            "company_name": "The Culling Games",
-            "verification_link": BASE_URL,
-            "expiration_hours": now - exp,
-            "current_year": now.year,
-        }
-    )  # update with token verification
+    template_body = {
+        "username": current_user.username,
+        "email": user_email,
+        "company_name": "The Culling Games",
+        "verification_link": FRONTEND_BASE_URL + f"verify?token={verify_token}",
+        "expiration": (now + exp).ctime(),
+        "current_year": now.year,
+    }
+    # update with token verification
 
     message = MessageSchema(
-        subject="Fastapi-Mail module",
-        recipients=email.email,
+        subject="Verify Your Account",
+        recipients=[user_email],
         template_body=template_body,
         subtype=MessageType.html,
     )
@@ -143,5 +180,9 @@ async def verify_user(
     fm = FastMail(mail_connection_config)
 
     background_tasks.add_task(
-        fm.send_message, message, template_name="verify_email.html"
+        fm.send_message, message, template_name="verify-email.html"
+    )
+    return JSONResponse(
+        status_code=status.HTTP_204_NO_CONTENT,
+        content={"message": "Email sent, check your inbox or spam."},
     )

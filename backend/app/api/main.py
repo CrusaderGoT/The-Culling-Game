@@ -11,7 +11,7 @@ from scalar_fastapi import get_scalar_api_reference
 from sqlmodel import or_, select
 
 from app.api import socket  # noqa: F401 ; this is to keep main lean
-from app.api.setting import BASE_URL, app, settings
+from app.api.setting import FRONTEND_BASE_URL, app, settings
 from app.auth.credentials import (
     PasswordAuth,
     authenticate_user,
@@ -99,7 +99,7 @@ async def refresh_token(
 ):
     # 1. Verify incoming refresh token
     payload = decode_access_token(token=refresh_token)
-    user = get_user(session, payload.sub)
+    user = get_user(session, payload.data["sub"])
     key = payload.refresh_token_key
     if not key:
         raise HTTPException(
@@ -225,7 +225,7 @@ async def scalar_html():
 
 @app.get("/", response_class=HTMLResponse)
 async def home_page(request: Request):
-    live_url = BASE_URL
+    live_url = FRONTEND_BASE_URL
 
     date = datetime.now().year
 

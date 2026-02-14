@@ -59,6 +59,7 @@ class User(BaseUser, table=True):
     refresh_token_key: UUID | None = (
         None  # for validating and invalidating refresh tokens
     )
+    is_verified: bool = Field(default=False)
 
     @hybrid_property
     def usernamedb(self):

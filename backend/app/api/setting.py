@@ -40,12 +40,12 @@ class Settings(BaseSettings):
     mail_from: EmailStr = "example@email.com"
     mail_port: int = 1234
     mail_server: str = "***"
-    whoisxml_api_key: str = "at_mLiGoXr1Pj9V5s516uFfBgNBx4lhC"
+    whoisxml_api_key: str = "***"
 
 
 settings = Settings()
 
-BASE_URL = (
+FRONTEND_BASE_URL = (
     "http://localhost:3000/"
     if not settings.live
     else "https://the-culling-games.vercel.app/"

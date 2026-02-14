@@ -10,8 +10,10 @@ from typing import Any
 
 from fastapi import Request, status
 from fastapi.responses import JSONResponse
+from fastapi_mail import email_utils
+from pydantic import EmailStr
 
-from app.api.setting import app
+from app.api.setting import app, settings
 from app.models.admin import Admin, AdminInfo
 from app.models.player import Player, PlayerInfo
 from app.models.user import User, UserInfo
@@ -114,3 +116,32 @@ class Tag(str, Enum):
     admin = "admins"
     colony = "colonies"
     barrier = "barriers"
+
+
+async def whoisxmlapi_checker(email: EmailStr) -> bool:
+    """
+    Comprehensive email validation using WhoIsXmlApi.
+
+    Args:
+        email: Email address to validate
+
+    Returns:
+        boolean validation results
+    """
+
+    try:
+        # Initialize the checker
+        checker = email_utils.WhoIsXmlApi(settings.whoisxml_api_key, email)
+
+        # IMPORTANT: Fetch the data from the API first
+        await checker.fetch_info()
+
+        # Overall validation
+        return checker.smtp_check == "true" and checker.disposable == "false"
+
+    except Exception as e:
+        print(f"Error validating email {email}: {str(e)}")
+        import traceback
+
+        traceback.print_exc()
+        return False

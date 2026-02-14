@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Any
 from uuid import UUID
 
 from sqlmodel import SQLModel
@@ -20,8 +21,8 @@ class Token(SQLModel):
 class TokenData(SQLModel):
     "response model for decoded token"
 
-    sub: str
-    refresh_token_key: UUID | None = None  # optional for tokens
+    data: dict[str, Any]
+    refresh_token_key: UUID | None = None  # optional for login tokens
     exp: datetime
     iat: datetime
     scopes: list[str] = []

@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Verify Your Email Address</title>
-    <link rel="stylesheet" href="email_styles.css" />
+    <link rel="stylesheet" href="/static/email_styles.css" />
   </head>
   <body>
     <div class="email-container">
@@ -68,7 +68,7 @@
 
           <!-- Greeting -->
           <h2 class="greeting">
-            Hello{{ ", " + user_name if user_name else "" }}!
+            Hello{{ ", " + username if username else "" }}!
           </h2>
 
           <p class="intro-text">
@@ -123,7 +123,7 @@
             </svg>
             <p class="info-text">
               This verification link will expire in
-              <strong>{{ expiration_hours }} hours</strong>.
+              <strong>{{ expiration }}</strong>.
             </p>
           </div>
 
@@ -193,8 +193,7 @@
               © {{ current_year }} {{ company_name }}. All rights reserved.
             </p>
             <p class="footer-address">
-              {{ company_address|default('123 Business Ave, Suite 100, City,
-              State 12345') }}
+              {{ company_address|default('The Colonies.') }}
             </p>
           </div>
 

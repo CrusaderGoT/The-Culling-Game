@@ -22,7 +22,7 @@ def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], session: ses
     )
 
     payload = decode_access_token(token=token)
-    usernamedb = payload.sub
+    usernamedb = payload.data["sub"]
     if usernamedb is None:
         raise credentials_exception
 
@@ -45,7 +45,7 @@ def get_admin_user(token: Annotated[str, Depends(oauth2_scheme)], session: sessi
     )
 
     payload = decode_access_token(token=token)
-    usernamedb = payload.sub
+    usernamedb = payload.data["sub"]
     if usernamedb is None:
         raise credentials_exception
 
