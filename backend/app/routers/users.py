@@ -1,11 +1,11 @@
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Annotated
 
 from app.api.setting import FRONTEND_BASE_URL, mail_connection_config
 from app.auth.credentials import create_access_token, decode_access_token
 from app.auth.dependencies import active_user, oauth2_scheme
 from app.models.user import EditUser, User, UserInfo
-from app.utils.config import Tag, UserException, whoisxmlapi_checker
+from app.utils.config import Tag, UserException
 from app.utils.dependencies import session
 from app.utils.user import edit_user_helper, get_user, id_name_email
 from fastapi import (
@@ -17,7 +17,7 @@ from fastapi import (
     Query,
     status,
 )
-from fastapi.responses import JSONResponse, RedirectResponse, Response
+from fastapi.responses import JSONResponse, Response
 from fastapi_mail import FastMail, MessageSchema, MessageType
 
 # USERS
@@ -121,7 +121,9 @@ async def verify_user(
     if current_user.is_verified:
         # raise an error
         raise UserException(
-            current_user, status.HTTP_304_NOT_MODIFIED, "This user is already verified"
+            current_user,
+            status.HTTP_417_EXPECTATION_FAILED,
+            "This user is already verified",
         )
 
     # if token is available, try and verify the user
@@ -134,7 +136,10 @@ async def verify_user(
             session.add(current_user)
             session.commit()
             session.refresh(current_user)
-            return RedirectResponse(url=FRONTEND_BASE_URL)
+            return JSONResponse(
+                status_code=status.HTTP_202_ACCEPTED,
+                content={"message": "User Verified Successfully."},
+            )
         # the decoded token was not meant for this current user
         else:
             raise UserException(
@@ -147,16 +152,18 @@ async def verify_user(
     user_email = current_user.email
 
     # check if email is valid and passes checkers
-    valid_email = await whoisxmlapi_checker(user_email)
+    """valid_email = await whoisxmlapi_checker(user_email)
 
     if not valid_email:
-        raise HTTPException(
-            status.HTTP_422_UNPROCESSABLE_ENTITY, "Email address is not allowed"
-        )
+        raise UserException(
+            current_user,
+            status.HTTP_422_UNPROCESSABLE_ENTITY,
+            "Email address is not allowed",
+        )"""
 
     # setup token
     exp = timedelta(minutes=10)
-    now = datetime.now(UTC)
+    now = datetime.now(timezone.utc)
 
     verify_token = create_access_token({"email": user_email}, exp)
 
@@ -183,6 +190,6 @@ async def verify_user(
         fm.send_message, message, template_name="verify-email.html"
     )
     return JSONResponse(
-        status_code=status.HTTP_204_NO_CONTENT,
+        status_code=status.HTTP_200_OK,
         content={"message": "Email sent, check your inbox or spam."},
     )

@@ -8,7 +8,7 @@ module for configurations of
 from enum import Enum
 from typing import Any
 
-from fastapi import Request, status
+from fastapi import HTTPException, Request, status
 from fastapi.responses import JSONResponse
 from fastapi_mail import email_utils
 from pydantic import EmailStr
@@ -140,8 +140,10 @@ async def whoisxmlapi_checker(email: EmailStr) -> bool:
         return checker.smtp_check == "true" and checker.disposable == "false"
 
     except Exception as e:
-        print(f"Error validating email {email}: {str(e)}")
+        print(f"Error validating email {email}: {repr(e)}")
         import traceback
 
         traceback.print_exc()
-        return False
+        raise HTTPException(
+            status.HTTP_503_SERVICE_UNAVAILABLE, f"Error validating email {repr(e)}"
+        )
