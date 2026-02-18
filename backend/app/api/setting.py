@@ -126,7 +126,7 @@ socket_app = socketio.ASGIApp(sio, app, socketio_path="/ws")
 """The Websocket App, to be mounted on the main FastAI app."""
 
 # Mount the Socket.IO app to a specific route
-app.mount("/ws", socket_app)
+app.mount("/ws", app=socket_app)
 
 # Mount static files
 app.mount("/static", StaticFiles(directory="app/static"), name="static")

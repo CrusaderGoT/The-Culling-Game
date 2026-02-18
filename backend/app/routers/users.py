@@ -138,14 +138,14 @@ async def verify_user(
             session.refresh(current_user)
             return JSONResponse(
                 status_code=status.HTTP_202_ACCEPTED,
-                content={"message": "User Verified Successfully."},
+                content={"message": "User verified successfully."},
             )
         # the decoded token was not meant for this current user
         else:
             raise UserException(
                 current_user,
                 status.HTTP_400_BAD_REQUEST,
-                "mismatched token to current user.",
+                "Mismatched token to current user.",
             )
 
     # When no token is sent
@@ -175,7 +175,6 @@ async def verify_user(
         "expiration": (now + exp).ctime(),
         "current_year": now.year,
     }
-    # update with token verification
 
     message = MessageSchema(
         subject="Verify Your Account",

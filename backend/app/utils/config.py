@@ -121,10 +121,9 @@ class Tag(str, Enum):
 async def whoisxmlapi_checker(email: EmailStr) -> bool:
     """
     Comprehensive email validation using WhoIsXmlApi.
-
     Args:
         email: Email address to validate
-
+    -
     Returns:
         boolean validation results
     """
