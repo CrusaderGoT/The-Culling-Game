@@ -4,7 +4,7 @@ from uuid import uuid4, uuid5
 
 from fastapi import Body, Depends, HTTPException, Request, status
 from fastapi.encoders import jsonable_encoder
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.templating import Jinja2Templates
 from scalar_fastapi import get_scalar_api_reference
@@ -56,12 +56,16 @@ async def create_token(
     user = authenticate_user(
         usernamedb(form_data.username), form_data.password, session
     )
+
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
+
+    if not user.is_verified:
+        return RedirectResponse(url=FRONTEND_BASE_URL + "verify")
 
     access_token = create_access_token(data={"sub": user.usernamedb})
 
