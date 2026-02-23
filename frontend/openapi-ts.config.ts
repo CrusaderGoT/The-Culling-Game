@@ -6,7 +6,7 @@ export default defineConfig({
             ? "https://the-culling-games.up.railway.app/openapi.json"
             : "http://localhost:8000/openapi.json",
     output: {
-        path: "api/client",
+        path: "apis/client",
         postProcess: ["eslint", "prettier"],
     },
     plugins: [

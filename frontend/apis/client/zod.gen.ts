@@ -390,6 +390,7 @@ export const zBaseUserInfo = z.object({
         zCountry,
         z.null()
     ])),
+    is_verified: z.optional(z.boolean()).default(false),
     id: z.int(),
     created: z.iso.date()
 });
@@ -426,6 +427,7 @@ export const zCreateUser = z.object({
         zCountry,
         z.null()
     ])),
+    is_verified: z.optional(z.boolean()).default(false),
     password: z.string(),
     confirm_password: z.string()
 });
@@ -692,17 +694,17 @@ export const zMatchInfo = z.object({
  * class for the enum of database table names.
  */
 export const zModelName = z.enum([
-    'colony',
-    'user',
+    'admin',
+    'permission',
     'barriertech',
     'barrierrecord',
+    'colony',
+    'match',
     'vote',
     'player',
     'cursedtechnique',
     'ctapp',
-    'match',
-    'admin',
-    'permission'
+    'user'
 ]);
 
 /**
@@ -836,7 +838,7 @@ export const zToken = z.object({
  * response model for decoded token
  */
 export const zTokenData = z.object({
-    sub: z.string(),
+    data: z.record(z.string(), z.unknown()),
     refresh_token_key: z.optional(z.union([
         z.uuid(),
         z.null()
@@ -858,6 +860,7 @@ export const zUserInfo = z.object({
         zCountry,
         z.null()
     ])),
+    is_verified: z.optional(z.boolean()).default(false),
     id: z.int(),
     created: z.iso.date(),
     player: z.optional(z.union([
@@ -944,6 +947,17 @@ export const zDeleteUserData = z.object({
  * Deleted User
  */
 export const zDeleteUserResponse = zUserInfo;
+
+export const zVerifyUserData = z.object({
+    body: z.optional(z.never()),
+    path: z.optional(z.never()),
+    query: z.optional(z.object({
+        token: z.optional(z.union([
+            z.string(),
+            z.null()
+        ]))
+    }))
+});
 
 export const zCreatePlayerData = z.object({
     body: zBodyCreatePlayer,

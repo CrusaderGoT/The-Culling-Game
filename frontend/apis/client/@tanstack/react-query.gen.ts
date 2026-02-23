@@ -4,7 +4,7 @@ import { type DefaultError, type InfiniteData, infiniteQueryOptions, queryOption
 
 import { client } from '../client.gen';
 import { Admins, Auth, Barriers, Colonies, Default, Matches, type Options, Players, Users } from '../sdk.gen';
-import type { AdminDeletePlayerData, AdminDeletePlayerError, AdminDeletePlayerResponse, AdminDeleteUserData, AdminDeleteUserError, AdminDeleteUserResponse, AdminEditPlayerData, AdminEditPlayerError, AdminEditPlayerResponse, AdminEditUserData, AdminEditUserError, AdminEditUserResponse, APlayerData, APlayerError, APlayerResponse, AssignMatchWinnerData, AssignMatchWinnerError, AssignMatchWinnerResponse, AUserData, AUserError, AUserResponse, BindindVowData, BindindVowError, BindindVowResponse, CreateAdminData, CreateAdminError, CreateAdminResponse, CreateMatchData, CreateMatchError, CreateMatchResponse, CreatePlayerData, CreatePlayerError, CreatePlayerResponse, CreateTokenData, CreateTokenError, CreateTokenResponse, CreateUserData, CreateUserError, CreateUserResponse, CurrentAdminData, CurrentAdminResponse, CurrentUserData, CurrentUserResponse, DeactivateDomainExpansionData, DeactivateDomainExpansionError, DeactivateDomainExpansionResponse, DeleteMatchData, DeleteMatchError, DeleteMatchResponse, DeletePlayerData, DeletePlayerError, DeletePlayerResponse, DeleteUserData, DeleteUserError, DeleteUserResponse, DemoSuperuserData, DemoSuperuserError, DemoSuperuserResponse, DomainExpansionData, DomainExpansionError, DomainExpansionResponse, EditPlayerData, EditPlayerError, EditPlayerResponse, EditUserData, EditUserError, EditUserResponse, GetColoniesData, GetColoniesError, GetColoniesResponse, GetLastestMatchData, GetLastestMatchError, GetLastestMatchResponse, GetMatchesData, GetMatchesError, GetMatchesResponse, GetPlayersData, GetPlayersError, GetPlayersResponse, GrantPermissionData, GrantPermissionError, GrantPermissionResponse, HomePageData, HomePageResponse, MyPlayerData, MyPlayerResponse, NewPermissionData, NewPermissionError, NewPermissionResponse, RefreshTokenData, RefreshTokenError, RefreshTokenResponse, RemovePermissionData, RemovePermissionError, RemovePermissionResponse, ReverseCursedTechniqueData, ReverseCursedTechniqueError, ReverseCursedTechniqueResponse, SimpleDomainData, SimpleDomainError, SimpleDomainResponse, UpgradePlayerData, UpgradePlayerError, UpgradePlayerResponse, VerifyTokenData, VerifyTokenError, VerifyTokenResponse, VoteData, VoteError, VoteResponse } from '../types.gen';
+import type { AdminDeletePlayerData, AdminDeletePlayerError, AdminDeletePlayerResponse, AdminDeleteUserData, AdminDeleteUserError, AdminDeleteUserResponse, AdminEditPlayerData, AdminEditPlayerError, AdminEditPlayerResponse, AdminEditUserData, AdminEditUserError, AdminEditUserResponse, APlayerData, APlayerError, APlayerResponse, AssignMatchWinnerData, AssignMatchWinnerError, AssignMatchWinnerResponse, AUserData, AUserError, AUserResponse, BindindVowData, BindindVowError, BindindVowResponse, CreateAdminData, CreateAdminError, CreateAdminResponse, CreateMatchData, CreateMatchError, CreateMatchResponse, CreatePlayerData, CreatePlayerError, CreatePlayerResponse, CreateTokenData, CreateTokenError, CreateTokenResponse, CreateUserData, CreateUserError, CreateUserResponse, CurrentAdminData, CurrentAdminResponse, CurrentUserData, CurrentUserResponse, DeactivateDomainExpansionData, DeactivateDomainExpansionError, DeactivateDomainExpansionResponse, DeleteMatchData, DeleteMatchError, DeleteMatchResponse, DeletePlayerData, DeletePlayerError, DeletePlayerResponse, DeleteUserData, DeleteUserError, DeleteUserResponse, DemoSuperuserData, DemoSuperuserError, DemoSuperuserResponse, DomainExpansionData, DomainExpansionError, DomainExpansionResponse, EditPlayerData, EditPlayerError, EditPlayerResponse, EditUserData, EditUserError, EditUserResponse, GetColoniesData, GetColoniesError, GetColoniesResponse, GetLastestMatchData, GetLastestMatchError, GetLastestMatchResponse, GetMatchesData, GetMatchesError, GetMatchesResponse, GetPlayersData, GetPlayersError, GetPlayersResponse, GrantPermissionData, GrantPermissionError, GrantPermissionResponse, HomePageData, HomePageResponse, MyPlayerData, MyPlayerResponse, NewPermissionData, NewPermissionError, NewPermissionResponse, RefreshTokenData, RefreshTokenError, RefreshTokenResponse, RemovePermissionData, RemovePermissionError, RemovePermissionResponse, ReverseCursedTechniqueData, ReverseCursedTechniqueError, ReverseCursedTechniqueResponse, SimpleDomainData, SimpleDomainError, SimpleDomainResponse, UpgradePlayerData, UpgradePlayerError, UpgradePlayerResponse, VerifyTokenData, VerifyTokenError, VerifyTokenResponse, VerifyUserData, VerifyUserError, VoteData, VoteError, VoteResponse } from '../types.gen';
 
 export type QueryKey<TOptions extends Options> = [
     Pick<TOptions, 'baseUrl' | 'body' | 'headers' | 'path' | 'query'> & {
@@ -103,6 +103,23 @@ export const deleteUserMutation = (options?: Partial<Options<DeleteUserData>>): 
     const mutationOptions: UseMutationOptions<DeleteUserResponse, DeleteUserError, Options<DeleteUserData>> = {
         mutationFn: async (fnOptions) => {
             const { data } = await Users.deleteUser({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Verify User
+ */
+export const verifyUserMutation = (options?: Partial<Options<VerifyUserData>>): UseMutationOptions<unknown, VerifyUserError, Options<VerifyUserData>> => {
+    const mutationOptions: UseMutationOptions<unknown, VerifyUserError, Options<VerifyUserData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await Users.verifyUser({
                 ...options,
                 ...fnOptions,
                 throwOnError: true

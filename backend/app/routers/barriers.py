@@ -3,7 +3,11 @@
 from datetime import UTC, datetime
 from typing import Annotated
 
-from app.auth.dependencies import active_user, oauth2_scheme
+from app.auth.dependencies import (
+    active_user,
+    get_verified_user,
+    oauth2_scheme,
+)
 from app.models.barrier import BarrierTech, BarrierTechInfo
 from app.models.match import Match
 from app.models.player import Player
@@ -27,7 +31,9 @@ from fastapi import (
 )
 
 router = APIRouter(
-    prefix="/barrier", tags=[Tag.barrier], dependencies=[Depends(oauth2_scheme)]
+    prefix="/barrier",
+    tags=[Tag.barrier],
+    dependencies=[Depends(oauth2_scheme), Depends(get_verified_user)],
 )
 
 

@@ -3,7 +3,7 @@ from typing import Annotated
 
 from app.api.setting import FRONTEND_BASE_URL, mail_connection_config
 from app.auth.credentials import create_access_token, decode_access_token
-from app.auth.dependencies import active_user, oauth2_scheme
+from app.auth.dependencies import active_user, oauth2_scheme, verified_active_user
 from app.models.user import EditUser, User, UserInfo
 from app.utils.config import Tag, UserException
 from app.utils.dependencies import session
@@ -65,7 +65,7 @@ def edit_user(
     session: session,
     user: id_name_email,
     edit_user: Annotated[EditUser, Body()],
-    current_user: active_user,
+    current_user: verified_active_user,
 ) -> User:
     userdb = get_user(session, user)
     if userdb:
@@ -93,7 +93,7 @@ def edit_user(
     description="Deleting a user will _set null_ on the *player* if any.",
 )
 def delete_user(
-    session: session, user: id_name_email, current_user: active_user
+    session: session, user: id_name_email, current_user: verified_active_user
 ) -> User:
     userdb = get_user(session, user)
     if userdb:

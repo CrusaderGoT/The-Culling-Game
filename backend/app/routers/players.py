@@ -1,5 +1,6 @@
 from typing import Annotated, Union
 
+from app.auth.dependencies import active_user, oauth2_scheme, verified_active_user
 from app.models.barrier import BarrierTech
 from app.models.player import (
     BasePlayerInfo,
@@ -13,7 +14,7 @@ from app.models.player import (
     PlayerInfo,
 )
 from app.utils.config import PlayerException, Tag, UserException
-from app.utils.dependencies import atp, colony, session, player_upgrade_cost
+from app.utils.dependencies import atp, colony, player_upgrade_cost, session
 from app.utils.player import (
     calculate_points,
     create_player_helper,
@@ -29,8 +30,6 @@ from app.utils.user import (
 )
 from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, status
 from sqlmodel import or_, select
-
-from ..auth.dependencies import active_user, oauth2_scheme
 
 # PLAYERS
 
@@ -49,7 +48,7 @@ router = APIRouter(
 def create_player(
     session: session,
     colony: colony,
-    current_user: active_user,
+    current_user: verified_active_user,
     user: id_name_email,
     player: Annotated[CreatePlayer, Body()],
     cursed_technique: Annotated[CreateCT, Body()],
@@ -233,7 +232,7 @@ def edit_player(
 def delete_player(
     player_id: Annotated[int, Path(description="the player id")],
     session: session,
-    current_user: active_user,
+    current_user: verified_active_user,
 ):
     playerdb = get_alive_player(session=session, player_id=player_id)
     if playerdb:
@@ -255,7 +254,7 @@ def upgrade_player(
     player_id: Annotated[int, Path(description="the player id")],
     session: session,
     grade_up: Annotated[Player.Grade, Query(description="specified upgrade")],
-    current_user: active_user,
+    current_user: verified_active_user,
     atp: atp,
     upgrade_cost: player_upgrade_cost,
 ):

@@ -50,9 +50,10 @@ only underscore or/and dashes.\n
 class BaseUser(SQLModel):
     """
     Base class for a user, containing common attributes.\n
-    `username: str = Field(index=True, unique=True)`
-    `email: EmailStr = Field(index=True, unique=True)`
-    `country: str | None = None`
+    `username: str = Field(index=True, unique=True)`\n
+    `email: EmailStr = Field(index=True, unique=True)`\n
+    `country: str | None = None`\n
+    `is_verified: bool = Field(default=False)`\n
     """
 
     username: UsernameRegex = Field(
@@ -68,12 +69,13 @@ class BaseUser(SQLModel):
     country: Union["Country", None] = Field(
         default=None, description="the country of origin of the user", index=True
     )
+    is_verified: bool = Field(default=False)
 
 
 class BaseUserInfo(BaseUser):
     """
     Base model for user info, without player info\n
-    `id: int`
+    `id: int`\n
     `created: date`
     """
 
@@ -85,9 +87,9 @@ class BaseUserInfo(BaseUser):
 class BasePlayer(SQLModel):
     """
     The base player, without cursed technique\n
-    `name: str`
-    `gender: Gender`
-    `age: int| None = Field(default=None, gt=0, le=102)`
+    `name: str`\n
+    `gender: Gender`\n
+    `age: int| None = Field(default=None, gt=0, le=102)`\n
     `role: str | None = None`
     """
 
@@ -130,9 +132,9 @@ class BasePlayer(SQLModel):
 class BasePlayerInfo(BasePlayer):
     """
     Base model for player info, without cursed technique info and user info\n
-    `id: int`
-    `created: date`
-    `grade: BasePlayer.Grade`
+    `id: int`\n
+    `created: date`\n
+    `grade: BasePlayer.Grade`\n
     `points: Decimal`
     """
 
@@ -147,7 +149,7 @@ class BasePlayerInfo(BasePlayer):
 class BaseCT(SQLModel):
     """
     The base cursed technique
-    `name: str`
+    `name: str`\n
     `definition: str`
     """
 
@@ -272,7 +274,7 @@ class BasePermissionInfo(BasePermission):
 class BaseAdminInfo(SQLModel):
     """
     base admin info without the user info\n
-    `is_superuser: bool | None`
+    `is_superuser: bool | None`\n
     `permissions: list[BasePermissionInfo]`
     """
 
@@ -318,7 +320,7 @@ class BaseMatch(SQLModel):
 
 class BaseMatchInfo(BaseMatch):
     """base match info with the `winner`, but without players and colony infos.\n
-    `id: int`
+    `id: int`\n
     `winner: Union[BasePlayerInfo, None]`
     """
 
@@ -328,14 +330,14 @@ class BaseMatchInfo(BaseMatch):
 
 class BaseBarrierTech(SQLModel):
     """base class for barrier techniques\n
-    domain_expansion: bool = Field(default=False, description="the player's domain expansion")
-    binding_vow: bool = Field(default=False, description="the player's binding vow")
-    simple_domain: bool = Field(default=False, description="the player's simple domain")
+    `domain_expansion: bool = Field(default=False, description="the player's domain expansion")`\n
+    `binding_vow: bool = Field(default=False, description="the player's binding vow")`\n
+    `simple_domain: bool = Field(default=False, description="the player's simple domain")`
 
     #### The times are useful for know when to activate/deactivate the techniques
-    de_end_time: datetime | None = Field(default=None, description="the time a player cast their domain")
-    bv_end_time: datetime | None = Field(default=None, description="the time a player cast their binding_vow")
-    sd_end_time: datetime | None = Field(default=None, description="the time a player cast their simple_domain")
+    `de_end_time: datetime | None = Field(default=None, description="the time a player cast their domain")`\n
+    `bv_end_time: datetime | None = Field(default=None, description="the time a player cast their binding_vow")`\n
+    `sd_end_time: datetime | None = Field(default=None, description="the time a player cast their simple_domain")`
     """
 
     domain_expansion: bool = Field(
@@ -366,7 +368,7 @@ class BaseBarrierTech(SQLModel):
 class BaseVote(SQLModel):
     """
     ### The base class for a vote
-    `player_id: = Field(foreign_key="player.id", ondelete="CASCADE", index=True)`
+    `player_id: = Field(foreign_key="player.id", ondelete="CASCADE", index=True)`\n
     `ct_app_id: = Field(foreign_key="ctapp.id", ondelete="CASCADE", index=True)`
     """
 
@@ -419,7 +421,7 @@ class ActionTimePoint(SQLModel):
 class BaseVoteInfo(BaseVote):
     """
     #### Base vote info: Inherits from `BaseVote`\n
-    `user_id: int = Field(description='the id of the user that casted their votes')`
+    `user_id: int = Field(description='the id of the user that casted their votes')`\n
     `point: float = Field(description="the point a vote carries")`
     """
 

@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from app.auth.dependencies import active_user
+from app.auth.dependencies import verified_active_user
 from app.models.match import Match
 from app.models.player import CTApp, CursedTechnique, Player
 from app.models.user import User
@@ -20,7 +20,7 @@ router = APIRouter()
 async def vote(
     session: session,
     match_id: Annotated[int, Path()],
-    voter: active_user,
+    voter: verified_active_user,
     votes: Annotated[list[CastVote], Body(min_length=1, max_length=5)],
     atp: atp,
 ) -> ClientVoteInfo:

@@ -4,7 +4,7 @@ from uuid import uuid4, uuid5
 
 from fastapi import Body, Depends, HTTPException, Request, status
 from fastapi.encoders import jsonable_encoder
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.templating import Jinja2Templates
 from scalar_fastapi import get_scalar_api_reference
@@ -63,9 +63,6 @@ async def create_token(
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-
-    if not user.is_verified:
-        return RedirectResponse(url=FRONTEND_BASE_URL + "verify")
 
     access_token = create_access_token(data={"sub": user.usernamedb})
 

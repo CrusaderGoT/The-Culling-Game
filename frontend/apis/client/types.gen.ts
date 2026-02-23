@@ -374,6 +374,10 @@ export type BaseUserInfo = {
      */
     country?: Country | null;
     /**
+     * Is Verified
+     */
+    is_verified?: boolean;
+    /**
      * Id
      */
     id: number;
@@ -878,6 +882,10 @@ export type CreateUser = {
      */
     country?: Country | null;
     /**
+     * Is Verified
+     */
+    is_verified?: boolean;
+    /**
      * Password
      *
      * the user's password
@@ -1085,17 +1093,17 @@ export type MatchInfo = {
  * class for the enum of database table names.
  */
 export const ModelName = {
-    COLONY: 'colony',
-    USER: 'user',
+    ADMIN: 'admin',
+    PERMISSION: 'permission',
     BARRIERTECH: 'barriertech',
     BARRIERRECORD: 'barrierrecord',
+    COLONY: 'colony',
+    MATCH: 'match',
     VOTE: 'vote',
     PLAYER: 'player',
     CURSEDTECHNIQUE: 'cursedtechnique',
     CTAPP: 'ctapp',
-    MATCH: 'match',
-    ADMIN: 'admin',
-    PERMISSION: 'permission'
+    USER: 'user'
 } as const;
 
 /**
@@ -1253,9 +1261,11 @@ export type Token = {
  */
 export type TokenData = {
     /**
-     * Sub
+     * Data
      */
-    sub: string;
+    data: {
+        [key: string]: unknown;
+    };
     /**
      * Refresh Token Key
      */
@@ -1296,6 +1306,10 @@ export type UserInfo = {
      * the country of origin of the user
      */
     country?: Country | null;
+    /**
+     * Is Verified
+     */
+    is_verified?: boolean;
     /**
      * Id
      */
@@ -1439,6 +1453,36 @@ export type DeleteUserResponses = {
 };
 
 export type DeleteUserResponse = DeleteUserResponses[keyof DeleteUserResponses];
+
+export type VerifyUserData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Token
+         *
+         * the verification token
+         */
+        token?: string | null;
+    };
+    url: '/users/verify';
+};
+
+export type VerifyUserErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type VerifyUserError = VerifyUserErrors[keyof VerifyUserErrors];
+
+export type VerifyUserResponses = {
+    /**
+     * Successful Response
+     */
+    200: unknown;
+};
 
 export type CreatePlayerData = {
     body: BodyCreatePlayer;
