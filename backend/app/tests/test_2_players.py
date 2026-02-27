@@ -6,6 +6,7 @@ from random import choice
 
 from fastapi.encoders import jsonable_encoder as je
 from fastapi.testclient import TestClient
+from sqlmodel import Session
 
 from app.tests.utils_test import (
     PlayerUpgradeCostTest,
@@ -77,7 +78,7 @@ def test_my_player(authorized_client: TestClient):
     assert_compare_players(res.json(), payload)
 
 
-def test_a_player(authorized_client: TestClient, session):
+def test_a_player(authorized_client: TestClient, session: Session):
     "test for getting a player"
     player = create_player_via_session(session)
 
@@ -165,7 +166,7 @@ def test_delete_player(authorized_client: TestClient):
     assert response.json() == je(player.model_dump())
 
 
-def test_delete_player_by_diff_client(authorized_client: TestClient, session):
+def test_delete_player_by_diff_client(authorized_client: TestClient, session: Session):
     """test function for deleting a player."""
 
     player = create_player_via_session(session)
@@ -175,7 +176,7 @@ def test_delete_player_by_diff_client(authorized_client: TestClient, session):
     assert response.is_client_error, "A user cannot delete a player that isn't theirs"
 
 
-def test_get_players(authorized_client: TestClient, session):
+def test_get_players(authorized_client: TestClient, session: Session):
     "test get all players"
 
     no_of_players = 2
@@ -202,7 +203,7 @@ def test_get_players(authorized_client: TestClient, session):
         PlayerInfo.model_validate(response_data[0])
 
 
-def test_upgrade_player(authorized_client, session):
+def test_upgrade_player(authorized_client: TestClient, session: Session):
     "test for uprading a player"
     # create player
     payload = player_payload()
@@ -240,8 +241,8 @@ def test_upgrade_player(authorized_client, session):
     )
 
 
-def test_upgrade_player_no_point(authorized_client, session):
-    "test for uprading a player"
+def test_upgrade_player_no_point(authorized_client: TestClient):
+    "test for uprading a player, with insufficient points"
     # create player
     payload = player_payload()
     player = create_player_via_client(authorized_client, payload)
@@ -267,7 +268,7 @@ def test_upgrade_player_no_point(authorized_client, session):
     )
 
 
-def test_upgrade_player_by_diff_client(authorized_client, session):
+def test_upgrade_player_by_diff_client(authorized_client: TestClient, session: Session):
     "test for uprading a player by a different client, than the one that has the player"
     # create player
     player = create_player_via_session(session)

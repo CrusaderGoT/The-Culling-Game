@@ -5,6 +5,8 @@ test file for votes
 from random import choice, randint
 
 from fastapi.encoders import jsonable_encoder as je
+from fastapi.testclient import TestClient
+from sqlmodel import Session
 
 from app.models.vote import CastVote
 from app.tests.utils_test import (
@@ -14,7 +16,7 @@ from app.tests.utils_test import (
 )
 
 
-def test_vote_by_authorized_client(authorized_client, session):
+def test_vote_by_authorized_client(authorized_client: TestClient, session: Session):
     part = 1
     match = create_match_via_session(session, part)
 
@@ -41,7 +43,7 @@ def test_vote_by_authorized_client(authorized_client, session):
     assert_valid_vote(response.json(), votes[0], authorized_client)
 
 
-def test_vote_by_non_auth_client(client, session):
+def test_vote_by_non_auth_client(client: TestClient, session: Session):
     part = 1
     match = create_match_via_session(session, part)
 
@@ -66,7 +68,7 @@ def test_vote_by_non_auth_client(client, session):
     assert response.is_client_error, ("Non authorized cient cannot vote", response_data)
 
 
-def test_vote_by_admin_client(admin_client, session):
+def test_vote_by_admin_client(admin_client: TestClient, session: Session):
     part = 1
     match = create_match_via_session(session, part)
 
@@ -94,7 +96,7 @@ def test_vote_by_admin_client(admin_client, session):
     assert_valid_vote(response.json(), votes[0], admin_client)
 
 
-def test_vote_max_votes(authorized_client, session):
+def test_vote_max_votes(authorized_client: TestClient, session: Session):
     part = 1
     match = create_match_via_session(session, part)
 
@@ -143,7 +145,7 @@ def test_vote_max_votes(authorized_client, session):
             assert_valid_vote(response_data, votes[0], authorized_client)
 
 
-def test_vote_no_valid_votes(admin_client, session):
+def test_vote_no_valid_votes(admin_client: TestClient, session: Session):
     part = 1
     match = create_match_via_session(session, part)
 

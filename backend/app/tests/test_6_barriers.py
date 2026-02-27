@@ -2,6 +2,9 @@
 test file for barriers
 """
 
+from fastapi.testclient import TestClient
+from sqlmodel import Session
+
 from app.models.barrier import BarrierTechInfo
 from app.models.player import Player
 from app.tests.utils_test import (
@@ -18,7 +21,7 @@ from app.tests.utils_test import (
 atp = ATPTest()
 
 
-def test_domain_expansion(authorized_client, session):
+def test_domain_expansion(authorized_client: TestClient, session: Session):
     "test for activation of a domain expansion"
     # create authorized client player
     player = create_player_via_client(authorized_client)
@@ -45,7 +48,7 @@ def test_domain_expansion(authorized_client, session):
     assert response_barrier.domain_expansion, "Domain expansion should be active"
 
 
-def test_simple_domain(authorized_client, session):
+def test_simple_domain(authorized_client: TestClient, session: Session):
     "test for activation of a simple domain"
     # create authorized client player
     player = create_player_via_client(authorized_client)
@@ -71,7 +74,7 @@ def test_simple_domain(authorized_client, session):
     assert response_barrier.simple_domain, "Simple domain should be active"
 
 
-def test_binding_vow(authorized_client, session):
+def test_binding_vow(authorized_client: TestClient, session: Session):
     "test for activation of a binding vow"
     # create authorized client player
     player = create_player_via_client(authorized_client)
@@ -97,7 +100,7 @@ def test_binding_vow(authorized_client, session):
     assert response_barrier.binding_vow, "BInding vow should be active"
 
 
-def test_reversed_cursed_technique(authorized_client, session):
+def test_reversed_cursed_technique(authorized_client: TestClient, session: Session):
     "test for use of RCT"
     # create authorized client player
     player = create_player_via_client(authorized_client)
@@ -112,7 +115,10 @@ def test_reversed_cursed_technique(authorized_client, session):
     response_data = response.json()
 
     # confirm success
-    assert response.is_success, ("Reversed cursed technique failed to activate", response_data)
+    assert response.is_success, (
+        "Reversed cursed technique failed to activate",
+        response_data,
+    )
     BarrierTechInfo.model_validate(response_data)
 
     # check if player point increased
@@ -120,7 +126,9 @@ def test_reversed_cursed_technique(authorized_client, session):
     assert player.points == atp.reverse_cursed_technique_point
 
 
-def test_domain_expansion_by_diff_client_player(authorized_client, session):
+def test_domain_expansion_by_diff_client_player(
+    authorized_client: TestClient, session: Session
+):
     "test for activation of a domain expansion, by another player"
     # create different player
     player = create_player_via_session(session)

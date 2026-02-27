@@ -5,6 +5,9 @@ test file for the matches, votes, barriers, etc. router/paths
 import time
 from random import choice, random
 
+from fastapi.testclient import TestClient
+from sqlmodel import Session
+
 from app.models.base import BasePermission
 from app.models.match import MatchInfo
 from app.models.player import PlayerInfo
@@ -22,8 +25,26 @@ player_info_keys = PlayerInfo.model_fields.keys()
 "expected return keys, for the player route/ playerinfo"
 
 
-def test_create_match_by_admin(admin_client, session):
-    "test function for  and creation a match"
+def test_create_match_by_superuser(superuser_client: TestClient, session: Session):
+    "test function for a superuser creation a match"
+
+    # create players for the match
+    players = multiple_players_via_session(session, 2)
+
+    # test create match
+    part = 1
+    response = superuser_client.post(f"/match/create?part={part}")
+    assert response.is_success is True, response.json()
+
+    response_info = MatchInfo.model_validate(response.json())
+
+    assert response_info.part == part
+
+    assert len(response_info.players) == len(players)
+
+
+def test_create_match_by_admin(admin_client: TestClient, session: Session):
+    "test function for admin creation a match"
     # grant permission for match creation to admin
     perm = _make_permission_to_create(
         model=ModelName.match, level=BasePermission.PermissionLevel.CREATE
@@ -46,7 +67,7 @@ def test_create_match_by_admin(admin_client, session):
     assert len(response_info.players) == len(players)
 
 
-def test_get_matches(authorized_client, session):
+def test_get_matches(authorized_client: TestClient, session: Session):
     # create some matches
     part = 1
     create_match_via_session(session, part)
@@ -63,7 +84,7 @@ def test_get_matches(authorized_client, session):
         MatchInfo.model_validate(res)
 
 
-def test_latest_match(authorized_client, session):
+def test_latest_match(authorized_client: TestClient, session: Session):
     # create match
     part = 1
     match = create_match_via_session(session, part)
@@ -79,7 +100,7 @@ def test_latest_match(authorized_client, session):
     assert match.id == response_match.id
 
 
-def test_delete_match_by_non_admin(authorized_client, session):
+def test_delete_match_by_non_admin(authorized_client: TestClient, session: Session):
     part = 1
     match = create_match_via_session(session, part)
 
@@ -89,7 +110,7 @@ def test_delete_match_by_non_admin(authorized_client, session):
     assert response.is_client_error, response_data
 
 
-def test_delete_match_by_admin(admin_client, session):
+def test_delete_match_by_admin(admin_client: TestClient, session: Session):
     perm = _make_permission_to_create(
         model=ModelName.match, level=BasePermission.PermissionLevel.DELETE
     )
@@ -110,7 +131,7 @@ def test_delete_match_by_admin(admin_client, session):
     assert match.id == response_match.id
 
 
-def test_delete_match_by_admin_no_perm(admin_client, session):
+def test_delete_match_by_admin_no_perm(admin_client: TestClient, session: Session):
     part = 1
     match = create_match_via_session(session, part)
 
@@ -120,7 +141,7 @@ def test_delete_match_by_admin_no_perm(admin_client, session):
     assert response.is_client_error, response_data
 
 
-def test_assign_match_winner_draw(authorized_client, session):
+def test_assign_match_winner_draw(authorized_client: TestClient, session: Session):
     part = 1
     match = create_match_via_session(session, part)
 
@@ -143,7 +164,7 @@ def test_assign_match_winner_draw(authorized_client, session):
     assert not match.winner, "A draw match cannot have a winner"
 
 
-def test_assign_match_winner_winner(authorized_client, session):
+def test_assign_match_winner_winner(authorized_client: TestClient, session: Session):
     part = 1
     match = create_match_via_session(session, part)
 

@@ -480,4 +480,6 @@ class EmailSchema(SQLModel):
 
 
 class VerifyUserOut(SQLModel):
+    "schema for response of verify user route"
+
     message: str

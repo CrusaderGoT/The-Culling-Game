@@ -16,11 +16,11 @@ from sqlmodel import Session, select
 from app.api.main import app
 from app.auth.credentials import PasswordAuth as pw
 from app.models.admin import Admin, Permission, PermissionInfo, PermissionRequest
+from app.models.barrier import BarrierTech
 from app.models.base import (
     ActionTimePoint,
     BasePermission,
     ModelName,
-    PlayerUpgradeCost,
 )
 from app.models.player import (
     CreateCT,
@@ -35,7 +35,6 @@ from app.utils.admin import _make_permission_to_create
 from app.utils.dependencies import _atp_def, _puc_def, get_or_create_colony, get_session
 from app.utils.match import create_new_match
 from app.utils.player import create_player_helper, get_player
-from app.models.barrier import BarrierTech
 
 # PAYLOADS
 
@@ -110,7 +109,7 @@ def player_payload():
     return player_dict
 
 
-def user_payload():
+def user_payload(verified: bool = True):
     pw = user_password()
     pyld = CreateUser(
         username=generate_random_string(),
@@ -118,6 +117,7 @@ def user_payload():
         country=choice(list(Country)),
         password=pw,
         confirm_password=pw,
+        is_verified=verified,
     )
 
     return pyld
@@ -166,10 +166,10 @@ class ATPTest(ActionTimePoint):
 class PlayerUpgradeCostTest(IntEnum):
     "Class containing the upgrade costs for player grades"
 
-    SPECIAL = 16
-    ONE = 8
-    TWO = 4
-    THREE = 2
+    SPECIAL = 4
+    ONE = 3
+    TWO = 2
+    THREE = 1
     FOUR = 0
 
 
@@ -341,7 +341,7 @@ def permission_payload(models: dict[ModelName, set[BasePermission.PermissionLeve
     return payload
 
 
-def create_user_via_session(ses: Session):
+def create_user_via_session(ses: Session, verified: bool = True):
     """
     adds a User to the session.
     ### Note: User password is hashed in the database,
@@ -349,7 +349,7 @@ def create_user_via_session(ses: Session):
     ### update with rehased password, if it will be commited again.
     """
     # make user via session
-    payload = user_payload()
+    payload = user_payload(verified)
     update = {"password": hashed_password(payload.password)}
     user = User.model_validate(payload, update=update)
 

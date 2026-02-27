@@ -4,6 +4,7 @@ test file for the admin router/paths
 
 from fastapi.encoders import jsonable_encoder as je
 from fastapi.testclient import TestClient
+from sqlmodel import Session
 
 from app.api.setting import settings
 from app.models.base import BasePermission
@@ -51,7 +52,9 @@ def test_create_super_user(authorized_client: TestClient):
     AdminInfo.model_validate(response.json())
 
 
-def test_create_admin_by_perm_admin_same_perm_payload(admin_client, session):
+def test_create_admin_by_perm_admin_same_perm_payload(
+    admin_client: TestClient, session: Session
+):
     "test for creating admin, by admin and superuser"
     # give admin the permission
     create_admin_perm = _make_permission_to_create(
@@ -83,7 +86,9 @@ def test_create_admin_by_perm_admin_same_perm_payload(admin_client, session):
     AdminInfo.model_validate(response.json())
 
 
-def test_create_admin_by_perm_admin_diff_perm_payload(admin_client, session):
+def test_create_admin_by_perm_admin_diff_perm_payload(
+    admin_client: TestClient, session: Session
+):
     "test for creating admin, by admin and superuser"
     # give admin the permission
     create_admin_perm = _make_permission_to_create(
@@ -114,7 +119,7 @@ def test_create_admin_by_perm_admin_diff_perm_payload(admin_client, session):
     )
 
 
-def test_create_admin_by_no_perm_admin(admin_client, session):
+def test_create_admin_by_no_perm_admin(admin_client: TestClient, session: Session):
     "test for creating admin, by no perm admin"
     # add user to session
     user = create_user_via_session(session)
@@ -137,7 +142,7 @@ def test_create_admin_by_no_perm_admin(admin_client, session):
     )
 
 
-def test_create_admin_by_superuser(superuser_client, session):
+def test_create_admin_by_superuser(superuser_client: TestClient, session: Session):
     "test for creating admin, by admin and superuser"
     # add user to session
     user = create_user_via_session(session)
@@ -162,7 +167,7 @@ def test_create_admin_by_superuser(superuser_client, session):
     AdminInfo.model_validate(response.json())
 
 
-def test_new_permission_by_superuser(superuser_client):
+def test_new_permission_by_superuser(superuser_client: TestClient):
     "function for testing creation of new permissions"
     payload = permission_payload(
         {
@@ -183,7 +188,7 @@ def test_new_permission_by_superuser(superuser_client):
     assert_permissions_in_payload(response.json(), payload)
 
 
-def test_new_permission_by_no_perm_admin(admin_client):
+def test_new_permission_by_no_perm_admin(admin_client: TestClient):
     payload = permission_payload(
         {
             ModelName.match: {
@@ -203,7 +208,9 @@ def test_new_permission_by_no_perm_admin(admin_client):
     )
 
 
-def test_new_permission_by_create_perm_admin(admin_client, session):
+def test_new_permission_by_create_perm_admin(
+    admin_client: TestClient, session: Session
+):
     # make perm to create perm for admin
     create_perm_perm = _make_permission_to_create(
         ModelName.permission, level=BasePermission.PermissionLevel.CREATE
@@ -234,7 +241,9 @@ def test_new_permission_by_create_perm_admin(admin_client, session):
     assert_permissions_in_payload(response.json(), payload)
 
 
-def test_grant_permission_by_perm_admin_client_diff_perm_payload(admin_client, session):
+def test_grant_permission_by_perm_admin_client_diff_perm_payload(
+    admin_client: TestClient, session: Session
+):
     "function for testing creation of new permissions"
     # give admin perm to update other admins
     update_admin_perm = _make_permission_to_create(
@@ -268,7 +277,7 @@ def test_grant_permission_by_perm_admin_client_diff_perm_payload(admin_client, s
 
 
 def test_grant_permission_by_perm_admin_client_some_same_perm_payload(
-    admin_client, session
+    admin_client: TestClient, session: Session
 ):
     "function for testing creation of new permissions"
     # give admin perm to update other admins
@@ -321,7 +330,7 @@ def test_grant_permission_by_perm_admin_client_some_same_perm_payload(
         assert granted_perm in admin_client_perms
 
 
-def test_grant_permission_by_superuser(superuser_client, session):
+def test_grant_permission_by_superuser(superuser_client: TestClient, session: Session):
     "function for testing creation of new permissions"
     # give admin perm to update other admins
     update_admin_perm = _make_permission_to_create(
@@ -365,7 +374,9 @@ def test_grant_permission_by_superuser(superuser_client, session):
     assert_permissions_in_payload(response_admin.permissions, perm_payload)
 
 
-def test_grant_permission_by_no_perm_superuser(superuser_client, session):
+def test_grant_permission_by_no_perm_superuser(
+    superuser_client: TestClient, session: Session
+):
     "function for testing creation of new permissions"
 
     diff_perm_payload = permission_payload(
@@ -398,7 +409,9 @@ def test_grant_permission_by_no_perm_superuser(superuser_client, session):
     assert_permissions_in_payload(response_admin_info.permissions, diff_perm_payload)
 
 
-def test_grant_permission_by_no_perm_admin_client(admin_client, session):
+def test_grant_permission_by_no_perm_admin_client(
+    admin_client: TestClient, session: Session
+):
     "function for testing creation of new permissions"
 
     diff_perm_payload = permission_payload(
@@ -425,7 +438,9 @@ def test_grant_permission_by_no_perm_admin_client(admin_client, session):
     )
 
 
-def test_grant_permission_by_perm_admin_client_same_perm_payload(admin_client, session):
+def test_grant_permission_by_perm_admin_client_same_perm_payload(
+    admin_client: TestClient, session: Session
+):
     "function for testing creation of new permissions"
 
     same_perm_payload = permission_payload(
@@ -462,7 +477,7 @@ def test_grant_permission_by_perm_admin_client_same_perm_payload(admin_client, s
     assert_permissions_in_payload(response_admin_info.permissions, same_perm_payload)
 
 
-def test_get_current_admin(admin_client):
+def test_get_current_admin(admin_client: TestClient):
     response = admin_client.get("/admin/me")
 
     assert response.is_success, response.json()
@@ -479,7 +494,7 @@ def test_get_current_admin(admin_client):
     )
 
 
-def test_get_current_superuser(superuser_client):
+def test_get_current_superuser(superuser_client: TestClient):
     response = superuser_client.get("/admin/me")
 
     assert response.is_success, response.json()
@@ -496,7 +511,7 @@ def test_get_current_superuser(superuser_client):
     )
 
 
-def test_remove_perm_by_superuser(superuser_client, session):
+def test_remove_perm_by_superuser(superuser_client: TestClient, session: Session):
     # make admin and give the permissions via session
     user = create_user_via_session(session)
     admin = create_admin_via_session(session, user)
@@ -533,7 +548,7 @@ def test_remove_perm_by_superuser(superuser_client, session):
     )
 
 
-def test_remove_perm_by_admin(admin_client, session):
+def test_remove_perm_by_admin(admin_client: TestClient, session: Session):
     # make another admin and give them permissions via session
     user = create_user_via_session(session)
     admin = create_admin_via_session(session, user)
@@ -560,7 +575,7 @@ def test_remove_perm_by_admin(admin_client, session):
     )
 
 
-def test_remove_perm_by_unauth_client(client, session):
+def test_remove_perm_by_unauth_client(client: TestClient, session: Session):
     # make admin and give the permissions via session
     user = create_user_via_session(session)
     admin = create_admin_via_session(session, user)
