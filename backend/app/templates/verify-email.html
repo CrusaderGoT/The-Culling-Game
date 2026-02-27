@@ -3,341 +3,432 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="format-detection"
+      content="telephone=no, date=no, address=no, email=no"
+    />
     <title>Verify Your Email Address</title>
-    <!--[if mso]>
-    <noscript>
-      <xml>
-        <o:OfficeDocumentSettings>
-          <o:PixelsPerInch>96</o:PixelsPerInch>
-        </o:OfficeDocumentSettings>
-      </xml>
-    </noscript>
-    <![endif]-->
-    <style>
-      .copy-btn:hover {
-        background: #2c3e5d !important;
-        color: #ffffff !important;
-      }
-      .copy-btn:active {
-        transform: scale(0.96);
-      }
-
-      /* Ensure SVGs always render as blocks inside flex containers */
-      svg { display: block; overflow: visible; }
-
-      /* ── Mobile ── */
-      @media only screen and (max-width: 600px) {
-
-        body {
-          padding: 0 !important;
-          background: #f5f7fa !important;
-        }
-
-        /* Outer card: full-width, no rounded corners, no heavy shadow */
-        .email-card {
-          border-radius: 0 !important;
-          box-shadow: none !important;
-          width: 100% !important;
-          max-width: 100% !important;
-        }
-
-        /* Header */
-        .email-header {
-          padding: 20px 20px !important;
-        }
-        .company-name {
-          font-size: 22px !important;
-        }
-        .logo-icon {
-          width: 30px !important;
-          height: 30px !important;
-        }
-
-        /* Body */
-        .email-body {
-          padding: 32px 20px 28px !important;
-        }
-        .content-wrapper {
-          max-width: 100% !important;
-        }
-
-        /* Icon circle */
-        .icon-circle {
-          width: 64px !important;
-          height: 64px !important;
-          margin-bottom: 20px !important;
-        }
-        .icon-circle svg {
-          width: 32px !important;
-          height: 32px !important;
-        }
-
-        /* Typography */
-        .greeting {
-          font-size: 24px !important;
-          margin-bottom: 16px !important;
-        }
-        .intro-text {
-          font-size: 14px !important;
-          margin-bottom: 28px !important;
-        }
-
-        /* Token block */
-        .token-block {
-          padding: 16px !important;
-          margin-bottom: 20px !important;
-        }
-        .token-row {
-          padding: 10px 12px !important;
-          gap: 8px !important;
-        }
-        .token-code {
-          font-size: 11px !important;
-        }
-        .copy-btn {
-          width: 40px !important;
-          height: 40px !important;
-          min-width: 40px !important;
-        }
-
-        /* Info / expiry box */
-        .info-box {
-          padding: 16px !important;
-          margin-bottom: 20px !important;
-          gap: 12px !important;
-        }
-        .info-box svg {
-          width: 18px !important;
-          height: 18px !important;
-          min-width: 18px !important;
-        }
-        .info-text {
-          font-size: 13px !important;
-        }
-
-        /* Security notice */
-        .security-notice {
-          padding: 16px !important;
-          gap: 14px !important;
-          margin-bottom: 20px !important;
-        }
-        .security-notice svg {
-          width: 24px !important;
-          height: 24px !important;
-          min-width: 24px !important;
-        }
-        .security-text {
-          font-size: 12px !important;
-        }
-
-        /* Footer */
-        .email-footer {
-          padding: 24px 20px !important;
-        }
-        .footer-links {
-          gap: 10px !important;
-          flex-direction: column !important;
-        }
-        .footer-divider {
-          display: none !important;
-        }
-        .footer-link {
-          font-size: 13px !important;
-        }
-        .footer-text, .footer-address {
-          font-size: 11px !important;
-        }
-
-        /* Social icons */
-        .social-icons {
-          gap: 12px !important;
-        }
-        .social-link {
-          width: 40px !important;
-          height: 40px !important;
-          min-width: 40px !important;
-        }
-        .social-link svg {
-          width: 20px !important;
-          height: 20px !important;
-        }
-      }
-    </style>
   </head>
-  <body style="margin: 0; padding: 32px; box-sizing: border-box; font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 16px; line-height: 1.6; color: #1a2332; background: linear-gradient(135deg, #f5f7fa 0%, #e8ebef 100%); min-height: 100vh; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;">
-
-    <div class="email-card" style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 16px 48px rgba(26, 35, 50, 0.15); position: relative;">
-
-      <!-- Header -->
-      <div class="email-header" style="background: linear-gradient(135deg, #1a2332 0%, #2c3e5d 100%); padding: 32px 48px; position: relative; overflow: hidden;">
-        <div style="display: flex; align-items: center; gap: 16px; position: relative; z-index: 1;">
-          <svg class="logo-icon" style="width: 40px; height: 40px; filter: drop-shadow(0 2px 8px rgba(212, 175, 55, 0.3)); flex-shrink: 0;" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="25" cy="25" r="23" stroke="#d4af37" stroke-width="2" />
-            <path d="M15 25L22 32L35 19" stroke="#d4af37" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
-          <h1 class="company-name" style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 28px; font-weight: 700; color: #ffffff; letter-spacing: 0.5px; margin: 0;">{{ company_name }}</h1>
-        </div>
-      </div>
-
-      <!-- Main Content -->
-      <div class="email-body" style="padding: 64px 48px 48px; background: #ffffff;">
-        <div class="content-wrapper" style="max-width: 500px; margin: 0 auto;">
-
-          <!-- Icon Circle -->
-          <div class="icon-circle" style="width: 80px; height: 80px; margin: 0 auto 32px; background: linear-gradient(135deg, #e8f5f1 0%, #f0f9f6 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(26, 35, 50, 0.1); position: relative; border: 2px solid rgba(45, 122, 95, 0.2);">
-            <svg style="width: 40px; height: 40px;" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect x="8" y="16" width="48" height="32" rx="2" stroke="#2d7a5f" stroke-width="2" />
-              <path d="M8 20L32 36L56 20" stroke="#2d7a5f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-          </div>
-
-          <!-- Greeting -->
-          <h2 class="greeting" style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 32px; font-weight: 700; color: #1a2332; text-align: center; margin-bottom: 24px; letter-spacing: -0.5px;">
-            Hello{{ ", " + username if username else "" }}!
-          </h2>
-
-          <p class="intro-text" style="font-size: 16px; line-height: 1.7; color: #5a6a7a; text-align: center; margin-bottom: 40px; font-weight: 400;">
-            Thank you for joining {{ company_name }}. To complete your
-            registration and begin participating in the games, please use the
-            verification token below to confirm your email address.
-          </p>
-
-          <!-- Token Copy Block -->
-          <div class="token-block" style="background: #f8f9fa; border: 1px solid #e5e8eb; border-radius: 12px; padding: 24px; margin-bottom: 32px;">
-            <p style="font-size: 12px; font-weight: 600; color: #8b96a3; text-transform: uppercase; letter-spacing: 0.8px; margin: 0 0 12px 0;">Your Verification Token</p>
-            <div class="token-row" style="display: flex; align-items: center; gap: 12px; background: #ffffff; border: 1px solid #e5e8eb; border-radius: 8px; padding: 14px 16px;">
-              <code class="token-code" id="verification-token" style="font-family: 'Courier New', monospace; font-size: 13px; color: #2c3e5d; word-break: break-all; flex: 1; line-height: 1.5; user-select: all;">{{ verification_token }}</code>
-              <button
-                class="copy-btn"
-                onclick="copyToken()"
-                title="Copy token"
-                style="flex-shrink: 0; width: 36px; height: 36px; border-radius: 8px; border: 1px solid #e5e8eb; background: #f8f9fa; color: #5a6a7a; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; transition: background 0.2s, color 0.2s;"
+  <body
+    style="
+      margin: 0;
+      padding: 0;
+      background-color: #f0f2f5;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica,
+        Arial, sans-serif;
+      font-size: 14px;
+      line-height: 1.6;
+      color: #1a2332;
+      -webkit-text-size-adjust: 100%;
+      -ms-text-size-adjust: 100%;
+    "
+  >
+    <table
+      width="100%"
+      cellpadding="0"
+      cellspacing="0"
+      border="0"
+      style="background-color: #f0f2f5"
+    >
+      <tr>
+        <td align="center" style="padding: 24px 10px">
+          <!-- Card -->
+          <table
+            width="100%"
+            cellpadding="0"
+            cellspacing="0"
+            border="0"
+            style="
+              max-width: 560px;
+              background-color: #ffffff;
+              border-radius: 12px;
+              overflow: hidden;
+              box-shadow: 0 4px 24px rgba(26, 35, 50, 0.12);
+            "
+          >
+            <!-- HEADER -->
+            <tr>
+              <td
+                style="
+                  background: linear-gradient(135deg, #1a2332 0%, #2c3e5d 100%);
+                  padding: 18px 20px;
+                "
               >
-                <!-- Copy icon -->
-                <svg id="copy-icon" style="width: 16px; height: 16px;" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <rect x="8" y="8" width="12" height="14" rx="2" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path d="M16 8V6C16 4.895 15.105 4 14 4H6C4.895 4 4 4.895 4 6V16C4 17.105 4.895 18 6 18H8" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-                <!-- Checkmark icon (hidden by default) -->
-                <svg id="check-icon" style="width: 16px; height: 16px; display: none;" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M5 13L9 17L19 7" stroke="#2d7a5f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-              </button>
-            </div>
-            <p style="font-size: 12px; color: #8b96a3; margin: 10px 0 0 0; line-height: 1.5;">Tap the copy icon to copy your token, then paste it into the verification field.</p>
-          </div>
+                <table cellpadding="0" cellspacing="0" border="0">
+                  <tr>
+                    <td style="vertical-align: middle; padding-right: 10px">
+                      <img
+                        src="{{ backend_url }}static/favicon.ico"
+                        width="30"
+                        height="30"
+                        alt="kogane"
+                        style="display: block; border: 0; outline: none"
+                      />
+                    </td>
+                    <td style="vertical-align: middle">
+                      <span
+                        style="
+                          font-family: Georgia, 'Times New Roman', serif;
+                          font-size: 20px;
+                          font-weight: 700;
+                          color: #ffffff;
+                          letter-spacing: 0.3px;
+                        "
+                        >{{ company_name }}</span
+                      >
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
 
-          <!-- Expiration Notice -->
-          <div class="info-box" style="display: flex; align-items: flex-start; gap: 16px; padding: 24px; background: #f8f9fa; border-left: 3px solid #2c3e5d; border-radius: 8px; margin-bottom: 32px;">
-            <svg style="width: 20px; height: 20px; flex-shrink: 0; margin-top: 2px;" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="12" cy="12" r="10" stroke="#2c3e5d" stroke-width="1.5" />
-              <path d="M12 8V12L14 14" stroke="#2c3e5d" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-            <p class="info-text" style="font-size: 14px; line-height: 1.6; color: #5a6a7a; margin: 0;">
-              This verification token will expire in
-              <strong style="color: #1a2332; font-weight: 600;">{{ expiration }}</strong>. Please verify your email before it expires.
-            </p>
-          </div>
+            <!-- BODY -->
+            <tr>
+              <td style="padding: 30px 20px 22px; background-color: #ffffff">
+                <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                  <!-- Envelope icon -->
+                  <tr>
+                    <td align="center" style="padding-bottom: 18px">
+                      <img
+                        src="{{ backend_url }}static/email-icon.png"
+                        width="60"
+                        height="60"
+                        alt="email-icon"
+                        style="
+                          display: block;
+                          border: 0;
+                          outline: none;
+                          border-radius: 50%;
+                          margin: 0 auto;
+                        "
+                      />
+                    </td>
+                  </tr>
 
-          <!-- Security Notice -->
-          <div class="security-notice" style="display: flex; gap: 24px; padding: 24px; background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%); border: 1px solid #e5e8eb; border-radius: 12px; margin-bottom: 32px;">
-            <svg style="width: 32px; height: 32px; flex-shrink: 0;" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 2L4 6V12C4 16.5 7 20.5 12 22C17 20.5 20 16.5 20 12V6L12 2Z" stroke="#8b96a3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-              <path d="M9 12L11 14L15 10" stroke="#8b96a3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-            <p class="security-text" style="font-size: 13px; line-height: 1.6; color: #5a6a7a; margin: 0;">
-              <strong style="color: #1a2332; font-weight: 600; display: block; margin-bottom: 4px;">Didn't request this email?</strong>
-              If you did not create an account with {{ company_name }}, you can
-              safely ignore this email. Your email address will not be used
-              without verification.
-            </p>
-          </div>
+                  <!-- Greeting -->
+                  <tr>
+                    <td align="center" style="padding-bottom: 12px">
+                      <span
+                        style="
+                          font-family: Georgia, 'Times New Roman', serif;
+                          font-size: 24px;
+                          font-weight: 700;
+                          color: #1a2332;
+                        "
+                        >Hello{{ ', ' + username if username else '' }}!</span
+                      >
+                    </td>
+                  </tr>
 
-        </div>
-      </div>
+                  <!-- Intro -->
+                  <tr>
+                    <td align="center" style="padding-bottom: 26px">
+                      <p
+                        style="
+                          margin: 0;
+                          font-size: 14px;
+                          line-height: 1.7;
+                          color: #5a6a7a;
+                          text-align: center;
+                        "
+                      >
+                        Thank you for joining {{ company_name }}. To complete
+                        your registration and begin participating in the games,
+                        please use the verification token below to confirm your
+                        email address.
+                      </p>
+                    </td>
+                  </tr>
 
-      <!-- Footer -->
-      <div class="email-footer" style="background: #f8f9fa; padding: 32px 48px; border-top: 1px solid #e5e8eb;">
-        <div style="max-width: 500px; margin: 0 auto; text-align: center;">
+                  <!-- Token block -->
+                  <tr>
+                    <td style="padding-bottom: 18px">
+                      <table
+                        width="100%"
+                        cellpadding="0"
+                        cellspacing="0"
+                        border="0"
+                        style="
+                          background-color: #f8f9fa;
+                          border: 1px solid #e5e8eb;
+                          border-radius: 10px;
+                        "
+                      >
+                        <tr>
+                          <td style="padding: 14px 16px 8px">
+                            <span
+                              style="
+                                font-size: 10px;
+                                font-weight: 600;
+                                color: #8b96a3;
+                                text-transform: uppercase;
+                                letter-spacing: 0.8px;
+                              "
+                              >Your Verification Token</span
+                            >
+                          </td>
+                        </tr>
+                        <tr>
+                          <td style="padding: 0 16px 14px">
+                            <table
+                              width="100%"
+                              cellpadding="0"
+                              cellspacing="0"
+                              border="0"
+                              style="
+                                background-color: #ffffff;
+                                border: 1px solid #e5e8eb;
+                                border-radius: 6px;
+                              "
+                            >
+                              <tr>
+                                <td style="padding: 12px 14px">
+                                  <code
+                                    style="
+                                      font-family: 'Courier New', Courier,
+                                        monospace;
+                                      font-size: 12px;
+                                      color: #2c3e5d;
+                                      word-break: break-all;
+                                      display: block;
+                                      line-height: 1.7;
+                                    "
+                                    >{{ verification_token }}</code
+                                  >
+                                </td>
+                              </tr>
+                            </table>
+                            <p
+                              style="
+                                margin: 8px 0 0;
+                                font-size: 11px;
+                                color: #8b96a3;
+                                line-height: 1.5;
+                              "
+                            >
+                              Press and hold the token above to copy, then paste
+                              it into the verification field.
+                            </p>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
 
-          <div class="footer-links" style="display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 24px; flex-wrap: wrap;">
-            <a href="{{ help_link|default('#') }}" class="footer-link" style="font-size: 13px; color: #5a6a7a; text-decoration: none; font-weight: 500;">Help Center</a>
-            <span class="footer-divider" style="color: #e5e8eb; font-size: 12px;">•</span>
-            <a href="{{ privacy_link|default('#') }}" class="footer-link" style="font-size: 13px; color: #5a6a7a; text-decoration: none; font-weight: 500;">Privacy Policy</a>
-            <span class="footer-divider" style="color: #e5e8eb; font-size: 12px;">•</span>
-            <a href="{{ terms_link|default('#') }}" class="footer-link" style="font-size: 13px; color: #5a6a7a; text-decoration: none; font-weight: 500;">Terms of Service</a>
-          </div>
+                  <!-- Expiry notice -->
+                  <tr>
+                    <td style="padding-bottom: 18px">
+                      <table
+                        width="100%"
+                        cellpadding="0"
+                        cellspacing="0"
+                        border="0"
+                        style="
+                          background-color: #f4f6fb;
+                          border-left: 3px solid #2c3e5d;
+                          border-radius: 0 6px 6px 0;
+                        "
+                      >
+                        <tr>
+                          <td style="padding: 13px 14px">
+                            <p
+                              style="
+                                margin: 0;
+                                font-size: 13px;
+                                color: #5a6a7a;
+                                line-height: 1.6;
+                              "
+                            >
+                              &#9201;&ensp;This verification token will expire
+                              in
+                              <strong style="color: #1a2332; font-weight: 600"
+                                >{{ expiration }}</strong
+                              >. Please verify your email before it expires.
+                            </p>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
 
-          <div style="margin-bottom: 24px;">
-            <p class="footer-text" style="font-size: 12px; color: #8b96a3; margin: 4px 0; line-height: 1.5;">
-              © {{ current_year }} {{ company_name }}. All rights reserved.
-            </p>
-            <p class="footer-address" style="font-size: 12px; color: #8b96a3; margin: 4px 0; line-height: 1.5;">
-              {{ company_address|default('The Colonies.') }}
-            </p>
-          </div>
+                  <!-- Security notice -->
+                  <tr>
+                    <td>
+                      <table
+                        width="100%"
+                        cellpadding="0"
+                        cellspacing="0"
+                        border="0"
+                        style="
+                          background-color: #f8f9fa;
+                          border: 1px solid #e5e8eb;
+                          border-radius: 10px;
+                        "
+                      >
+                        <tr>
+                          <td style="padding: 14px 14px">
+                            <p
+                              style="
+                                margin: 0 0 5px;
+                                font-size: 13px;
+                                font-weight: 600;
+                                color: #1a2332;
+                              "
+                            >
+                              &#128274;&ensp;Didn&#39;t request this email?
+                            </p>
+                            <p
+                              style="
+                                margin: 0;
+                                font-size: 12px;
+                                color: #5a6a7a;
+                                line-height: 1.6;
+                              "
+                            >
+                              If you did not create an account with {{
+                              company_name }}, you can safely ignore this email.
+                              Your email address will not be used without
+                              verification.
+                            </p>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
 
-          <!-- Social Icons: GitHub & Reddit -->
-          <div class="social-icons" style="display: flex; align-items: center; justify-content: center; gap: 16px;">
+            <!-- FOOTER -->
+            <tr>
+              <td
+                style="
+                  background-color: #f8f9fa;
+                  padding: 18px 20px 20px;
+                  border-top: 1px solid #e5e8eb;
+                "
+              >
+                <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                  <!-- Footer links -->
+                  <tr>
+                    <td align="center" style="padding-bottom: 10px">
+                      <a
+                        href="{{ backend_url }}docs"
+                        style="
+                          font-size: 12px;
+                          color: #5a6a7a;
+                          text-decoration: none;
+                          font-weight: 500;
+                        "
+                        >API Docs</a
+                      >
+                      <span
+                        style="color: #c8cdd2; padding: 0 5px; font-size: 11px"
+                        >|</span
+                      >
+                      <a
+                        href="{{ frontend_url }}"
+                        style="
+                          font-size: 12px;
+                          color: #5a6a7a;
+                          text-decoration: none;
+                          font-weight: 500;
+                        "
+                        >Live Page</a
+                      >
+                    </td>
+                  </tr>
 
-            {% if social_github %}
-            <a href="{{ social_github }}" class="social-link" style="width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; background: #ffffff; border-radius: 50%; text-decoration: none; box-shadow: 0 1px 3px rgba(26, 35, 50, 0.08);" aria-label="GitHub">
-              <svg style="width: 18px; height: 18px; display: block;" viewBox="0 0 24 24" fill="#5a6a7a" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
-              </svg>
-            </a>
-            {% endif %}
+                  <!-- Company info -->
+                  <tr>
+                    <td align="center" style="padding-bottom: 14px">
+                      <p
+                        style="margin: 0 0 2px; font-size: 11px; color: #8b96a3"
+                      >
+                        &copy; {{ current_year }} {{ company_name }}. All rights
+                        reserved.
+                      </p>
+                      <p style="margin: 0; font-size: 11px; color: #8b96a3">
+                        {{ company_address|default('The Colonies.') }}
+                      </p>
+                    </td>
+                  </tr>
 
-            {% if social_reddit %}
-            <a href="{{ social_reddit }}" class="social-link" style="width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; background: #ffffff; border-radius: 50%; text-decoration: none; box-shadow: 0 1px 3px rgba(26, 35, 50, 0.08);" aria-label="Reddit">
-              <svg style="width: 18px; height: 18px; display: block;" viewBox="0 0 24 24" fill="#5a6a7a" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/>
-              </svg>
-            </a>
-            {% endif %}
+                  <!-- Social icons -->
+                  <tr>
+                    <td align="center">
+                      <table cellpadding="0" cellspacing="0" border="0">
+                        <tr>
+                          {% if social_github %}
+                          <td style="padding: 0 5px">
+                            <a
+                              href="{{ social_github }}"
+                              style="display: block; text-decoration: none"
+                              aria-label="GitHub"
+                            >
+                              <img
+                                src="{{ backend_url }}static/github-icon.png"
+                                width="30"
+                                height="30"
+                                alt="GitHub"
+                                style="
+                                  display: block;
+                                  border: 0;
+                                  outline: none;
+                                  border-radius: 50%;
+                                "
+                              />
+                            </a>
+                          </td>
+                          {% endif %} {% if social_reddit %}
+                          <td style="padding: 0 5px">
+                            <a
+                              href="{{ social_reddit }}"
+                              style="display: block; text-decoration: none"
+                              aria-label="Reddit"
+                            >
+                              <img
+                                src="{{ backend_url }}static/reddit-icon.png"
+                                width="30"
+                                height="30"
+                                alt="Reddit"
+                                style="
+                                  display: block;
+                                  border: 0;
+                                  outline: none;
+                                  border-radius: 50%;
+                                "
+                              />
+                            </a>
+                          </td>
+                          {% endif %}
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
 
-          </div>
-
-        </div>
-      </div>
-
-      <!-- Decorative Line -->
-      <div style="height: 3px; background: linear-gradient(90deg, transparent 0%, #d4af37 20%, #d4af37 80%, transparent 100%); opacity: 0.3;"></div>
-
-    </div>
-
-    <script>
-      function copyToken() {
-        const tokenEl = document.getElementById('verification-token');
-        const copyIcon = document.getElementById('copy-icon');
-        const checkIcon = document.getElementById('check-icon');
-        const btn = copyIcon.closest('button');
-
-        const token = tokenEl.innerText.trim();
-
-        navigator.clipboard.writeText(token).then(function () {
-          copyIcon.style.display = 'none';
-          checkIcon.style.display = 'block';
-          btn.style.borderColor = '#2d7a5f';
-          btn.style.background = '#e8f5f1';
-
-          setTimeout(function () {
-            checkIcon.style.display = 'none';
-            copyIcon.style.display = 'block';
-            btn.style.borderColor = '#e5e8eb';
-            btn.style.background = '#f8f9fa';
-          }, 2000);
-        }).catch(function () {
-          // Fallback for older browsers
-          const range = document.createRange();
-          range.selectNode(tokenEl);
-          window.getSelection().removeAllRanges();
-          window.getSelection().addRange(range);
-          document.execCommand('copy');
-          window.getSelection().removeAllRanges();
-        });
-      }
-    </script>
-
+            <!-- Gold accent line -->
+            <tr>
+              <td
+                style="
+                  height: 3px;
+                  background: linear-gradient(
+                    90deg,
+                    #ffffff 0%,
+                    #d4af37 30%,
+                    #d4af37 70%,
+                    #ffffff 100%
+                  );
+                "
+              ></td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
   </body>
 </html>

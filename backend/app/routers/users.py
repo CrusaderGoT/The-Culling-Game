@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta, timezone
 from typing import Annotated
 
-from app.api.setting import mail_connection_config
+from app.api.setting import BACKEND_BASE_URL, FRONTEND_BASE_URL, mail_connection_config
 from app.auth.credentials import create_access_token, decode_access_token
 from app.auth.dependencies import active_user, oauth2_scheme, verified_active_user
 from app.models.base import VerifyUserOut
@@ -183,6 +183,8 @@ async def verify_user(
         "current_year": now.year,
         "social_reddit": "https://www.reddit.com/r/TheCullingGames/",
         "social_github": "https://github.com/CrusaderGoT/The-Culling-Game",
+        "backend_url": BACKEND_BASE_URL,
+        "frontend_url": FRONTEND_BASE_URL,
     }
 
     message = MessageSchema(

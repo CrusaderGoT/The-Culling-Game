@@ -51,6 +51,12 @@ FRONTEND_BASE_URL = (
     else "https://the-culling-games.vercel.app/"
 )
 
+BACKEND_BASE_URL = (
+    "http://localhost:8000/"
+    if not settings.live
+    else "https://the-culling-games.up.railway.app/"
+)
+
 
 if settings.debug:
     broker = InMemoryBroker()
