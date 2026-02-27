@@ -136,6 +136,7 @@ export type BarrierTechInfo = {
  * base admin info without the user info
  *
  * `is_superuser: bool | None`
+ *
  * `permissions: list[BasePermissionInfo]`
  */
 export type BaseAdminInfo = {
@@ -236,6 +237,7 @@ export type BaseColonyInfo = {
  * base match info with the `winner`, but without players and colony infos.
  *
  * `id: int`
+ *
  * `winner: Union[BasePlayerInfo, None]`
  */
 export type BaseMatchInfo = {
@@ -301,8 +303,11 @@ export type BasePermissionInfo = {
  * Base model for player info, without cursed technique info and user info
  *
  * `id: int`
+ *
  * `created: date`
+ *
  * `grade: BasePlayer.Grade`
+ *
  * `points: Decimal`
  */
 export type BasePlayerInfo = {
@@ -354,6 +359,7 @@ export type BasePlayerInfo = {
  * Base model for user info, without player info
  *
  * `id: int`
+ *
  * `created: date`
  */
 export type BaseUserInfo = {
@@ -395,6 +401,7 @@ export type BaseUserInfo = {
  * #### Base vote info: Inherits from `BaseVote`
  *
  * `user_id: int = Field(description='the id of the user that casted their votes')`
+ *
  * `point: float = Field(description="the point a vote carries")`
  */
 export type BaseVoteInfo = {
@@ -1342,6 +1349,16 @@ export type ValidationError = {
     type: string;
 };
 
+/**
+ * VerifyUserOut
+ */
+export type VerifyUserOut = {
+    /**
+     * Message
+     */
+    message: string;
+};
+
 export type CurrentUserData = {
     body?: never;
     path?: never;
@@ -1479,10 +1496,16 @@ export type VerifyUserError = VerifyUserErrors[keyof VerifyUserErrors];
 
 export type VerifyUserResponses = {
     /**
-     * Successful Response
+     * Verification Token Sent
      */
-    200: unknown;
+    200: VerifyUserOut;
+    /**
+     * User Verified Successfully
+     */
+    202: VerifyUserOut;
 };
+
+export type VerifyUserResponse = VerifyUserResponses[keyof VerifyUserResponses];
 
 export type CreatePlayerData = {
     body: BodyCreatePlayer;

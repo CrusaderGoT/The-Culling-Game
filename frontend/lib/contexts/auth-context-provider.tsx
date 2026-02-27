@@ -7,6 +7,7 @@ import {
     verifyTokenMutation,
 } from "@/apis/client/@tanstack/react-query.gen";
 import { getAPIErrorMessage } from "@/components/ui/display-api-error";
+import { VerifyUser } from "@/components/user/verify-user";
 import { tokenNames } from "@/lib/constants/AUTHCONSTANTS";
 import { useCurrentUser } from "@/lib/hooks/users";
 import { createSession, deleteSession, getClientCookie } from "@/lib/session";
@@ -237,7 +238,11 @@ export function AuthContextProvider({ children }: { children: ReactNode }) {
         };
     }, [tokenExpiresIn, mountedRef, refreshError, isOnline]);
 
-    const { data: user } = useCurrentUser(realToken);
+    const {
+        data: user,
+        isPending: isPendingUser,
+        error: userError,
+    } = useCurrentUser(realToken);
 
     const value = useMemo<ContextProp>(() => {
         return {
@@ -248,7 +253,13 @@ export function AuthContextProvider({ children }: { children: ReactNode }) {
     }, [realToken, isOnline, user]);
 
     return (
-        <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+        <AuthContext.Provider value={value}>
+            {!isPendingUser && !userError && !user.is_verified ? (
+                <VerifyUser user={user} />
+            ) : (
+                children
+            )}
+        </AuthContext.Provider>
     );
 }
 

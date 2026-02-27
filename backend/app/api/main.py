@@ -218,7 +218,7 @@ def create_user(
 @app.get("/docs", include_in_schema=False)
 async def scalar_html():
     return get_scalar_api_reference(
-        openapi_url=app.openapi_url,  # type: ignore
+        openapi_url=app.openapi_url,
         title=app.title,
         scalar_favicon_url="static/favicon.ico",
     )

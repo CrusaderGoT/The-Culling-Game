@@ -2,6 +2,7 @@ import {
     createTokenMutation,
     createUserMutation,
     currentUserOptions,
+    verifyUserMutation,
 } from "@/apis/client/@tanstack/react-query.gen";
 
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -11,6 +12,7 @@ import { authHeader } from "@/lib/constants/AUTHCONSTANTS";
 import { queryClient } from "@/lib/query-client/get-query-client";
 import { createSession } from "@/lib/session";
 import { notifications } from "@mantine/notifications";
+import { useRouter } from "next/navigation";
 
 export const useCreateUser = () => {
     const mutation = useMutation({
@@ -70,4 +72,31 @@ export const useCurrentUser = (token: string | undefined) => {
     });
 
     return query;
+};
+
+export const useVerifyUser = (token: string | undefined) => {
+    const router = useRouter();
+
+    const mutation = useMutation({
+        ...verifyUserMutation({
+            headers: authHeader(token),
+        }),
+        onError: (error) => {
+            notifications.show({
+                message: `An error occurred -> ${getAPIErrorMessage(error)}`,
+                color: "red",
+            });
+        },
+        onSuccess: (res) => {
+            notifications.show({
+                message: res.message,
+                color: "green",
+            });
+
+            router.refresh();
+            //queryClient.invalidateQueries(); invalidate current user query
+        },
+    });
+
+    return mutation;
 };

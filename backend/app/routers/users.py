@@ -1,9 +1,10 @@
 from datetime import datetime, timedelta, timezone
 from typing import Annotated
 
-from app.api.setting import FRONTEND_BASE_URL, mail_connection_config
+from app.api.setting import mail_connection_config
 from app.auth.credentials import create_access_token, decode_access_token
 from app.auth.dependencies import active_user, oauth2_scheme, verified_active_user
+from app.models.base import VerifyUserOut
 from app.models.user import EditUser, User, UserInfo
 from app.utils.config import Tag, UserException
 from app.utils.dependencies import session
@@ -111,7 +112,13 @@ def delete_user(
         raise HTTPException(status.HTTP_404_NOT_FOUND, err_msg)
 
 
-@router.post("/verify")
+@router.post(
+    "/verify",
+    responses={
+        200: {"model": VerifyUserOut, "description": "Verification Token Sent"},
+        202: {"model": VerifyUserOut, "description": "User Verified Successfully"},
+    },
+)
 async def verify_user(
     background_tasks: BackgroundTasks,
     current_user: active_user,
@@ -171,9 +178,11 @@ async def verify_user(
         "username": current_user.username,
         "email": user_email,
         "company_name": "The Culling Games",
-        "verification_link": FRONTEND_BASE_URL + f"verify?token={verify_token}",
+        "verification_token": verify_token,
         "expiration": (now + exp).ctime(),
         "current_year": now.year,
+        "social_reddit": "https://www.reddit.com/r/TheCullingGames/",
+        "social_github": "https://github.com/CrusaderGoT/The-Culling-Game",
     }
 
     message = MessageSchema(
@@ -188,6 +197,7 @@ async def verify_user(
     background_tasks.add_task(
         fm.send_message, message, template_name="verify-email.html"
     )
+
     return JSONResponse(
         status_code=status.HTTP_200_OK,
         content={"message": "Email sent, check your inbox or spam."},

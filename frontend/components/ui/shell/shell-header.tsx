@@ -1,7 +1,7 @@
 "use client";
 
 import { ModeToggle } from "@/components/ui/mode-toggle";
-import { UserMenu } from "@/components/ui/user-menu";
+import { UserMenu } from "@/components/user/user-menu";
 import { ActionIcon, AppShell, Burger, Group } from "@mantine/core";
 import { IconHome } from "@tabler/icons-react";
 import Link from "next/link";

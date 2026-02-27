@@ -4,905 +4,340 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Verify Your Email Address</title>
+    <!--[if mso]>
+    <noscript>
+      <xml>
+        <o:OfficeDocumentSettings>
+          <o:PixelsPerInch>96</o:PixelsPerInch>
+        </o:OfficeDocumentSettings>
+      </xml>
+    </noscript>
+    <![endif]-->
     <style>
-      /* 
-      ============================================
-      EMAIL VERIFICATION - ELEGANT TEMPLATE STYLES
-      ============================================
-      */
+      .copy-btn:hover {
+        background: #2c3e5d !important;
+        color: #ffffff !important;
+      }
+      .copy-btn:active {
+        transform: scale(0.96);
+      }
 
-      /* Import Fonts */
-      @import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Montserrat:wght@300;400;500;600&display=swap");
+      /* Ensure SVGs always render as blocks inside flex containers */
+      svg { display: block; overflow: visible; }
 
-      /* CSS Variables for Theming */
-      :root {
-        /* Colors */
-        --primary-dark: #1a2332;
-        --primary-blue: #2c3e5d;
-        --accent-gold: #d4af37;
-        --accent-light: #f0e6d2;
-        --text-primary: #1a2332;
-        --text-secondary: #5a6a7a;
-        --text-light: #8b96a3;
-        --bg-white: #ffffff;
-        --bg-subtle: #f8f9fa;
-        --border-light: #e5e8eb;
-        --success-green: #2d7a5f;
-        --success-light: #e8f5f1;
+      /* ── Mobile ── */
+      @media only screen and (max-width: 600px) {
+
+        body {
+          padding: 0 !important;
+          background: #f5f7fa !important;
+        }
+
+        /* Outer card: full-width, no rounded corners, no heavy shadow */
+        .email-card {
+          border-radius: 0 !important;
+          box-shadow: none !important;
+          width: 100% !important;
+          max-width: 100% !important;
+        }
+
+        /* Header */
+        .email-header {
+          padding: 20px 20px !important;
+        }
+        .company-name {
+          font-size: 22px !important;
+        }
+        .logo-icon {
+          width: 30px !important;
+          height: 30px !important;
+        }
+
+        /* Body */
+        .email-body {
+          padding: 32px 20px 28px !important;
+        }
+        .content-wrapper {
+          max-width: 100% !important;
+        }
+
+        /* Icon circle */
+        .icon-circle {
+          width: 64px !important;
+          height: 64px !important;
+          margin-bottom: 20px !important;
+        }
+        .icon-circle svg {
+          width: 32px !important;
+          height: 32px !important;
+        }
 
         /* Typography */
-        --font-display: "Cormorant Garamond", Georgia, serif;
-        --font-body: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI",
-          sans-serif;
-
-        /* Spacing */
-        --spacing-xs: 8px;
-        --spacing-sm: 16px;
-        --spacing-md: 24px;
-        --spacing-lg: 32px;
-        --spacing-xl: 48px;
-        --spacing-xxl: 64px;
-
-        /* Border Radius */
-        --radius-sm: 4px;
-        --radius-md: 8px;
-        --radius-lg: 12px;
-        --radius-xl: 16px;
-
-        /* Shadows */
-        --shadow-sm: 0 1px 3px rgba(26, 35, 50, 0.08);
-        --shadow-md: 0 4px 12px rgba(26, 35, 50, 0.1);
-        --shadow-lg: 0 8px 24px rgba(26, 35, 50, 0.12);
-        --shadow-xl: 0 16px 48px rgba(26, 35, 50, 0.15);
-      }
-
-      /* ============================================
-   BASE STYLES
-   ============================================ */
-
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-
-      body {
-        font-family: var(--font-body);
-        font-size: 16px;
-        line-height: 1.6;
-        color: var(--text-primary);
-        background: linear-gradient(135deg, #f5f7fa 0%, #e8ebef 100%);
-        padding: var(--spacing-lg);
-        min-height: 100vh;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-      }
-
-      /* ============================================
-   CONTAINER
-   ============================================ */
-
-      .email-container {
-        max-width: 600px;
-        margin: 0 auto;
-        background: var(--bg-white);
-        border-radius: var(--radius-xl);
-        overflow: hidden;
-        box-shadow: var(--shadow-xl);
-        position: relative;
-      }
-
-      /* ============================================
-   HEADER
-   ============================================ */
-
-      .email-header {
-        background: linear-gradient(
-          135deg,
-          var(--primary-dark) 0%,
-          var(--primary-blue) 100%
-        );
-        padding: var(--spacing-lg) var(--spacing-xl);
-        position: relative;
-        overflow: hidden;
-      }
-
-      .email-header::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        right: 0;
-        width: 200px;
-        height: 200px;
-        background: radial-gradient(
-          circle,
-          rgba(212, 175, 55, 0.1) 0%,
-          transparent 70%
-        );
-        border-radius: 50%;
-        transform: translate(30%, -30%);
-      }
-
-      .logo-container {
-        display: flex;
-        align-items: center;
-        gap: var(--spacing-sm);
-        position: relative;
-        z-index: 1;
-      }
-
-      .logo-icon {
-        width: 40px;
-        height: 40px;
-        color: var(--accent-gold);
-        filter: drop-shadow(0 2px 8px rgba(212, 175, 55, 0.3));
-      }
-
-      .company-name {
-        font-family: var(--font-display);
-        font-size: 28px;
-        font-weight: 700;
-        color: var(--bg-white);
-        letter-spacing: 0.5px;
-        margin: 0;
-      }
-
-      /* ============================================
-   BODY
-   ============================================ */
-
-      .email-body {
-        padding: var(--spacing-xxl) var(--spacing-xl) var(--spacing-xl);
-        background: var(--bg-white);
-      }
-
-      .content-wrapper {
-        max-width: 500px;
-        margin: 0 auto;
-      }
-
-      /* Icon Circle */
-      .icon-circle {
-        width: 80px;
-        height: 80px;
-        margin: 0 auto var(--spacing-lg);
-        background: linear-gradient(
-          135deg,
-          var(--success-light) 0%,
-          #f0f9f6 100%
-        );
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: var(--shadow-md);
-        position: relative;
-      }
-
-      .icon-circle::before {
-        content: "";
-        position: absolute;
-        inset: -4px;
-        border-radius: 50%;
-        border: 2px solid var(--success-green);
-        opacity: 0.2;
-      }
-
-      .mail-icon {
-        width: 40px;
-        height: 40px;
-        color: var(--success-green);
-      }
-
-      /* Typography */
-      .greeting {
-        font-family: var(--font-display);
-        font-size: 32px;
-        font-weight: 700;
-        color: var(--text-primary);
-        text-align: center;
-        margin-bottom: var(--spacing-md);
-        letter-spacing: -0.5px;
-      }
-
-      .intro-text {
-        font-size: 16px;
-        line-height: 1.7;
-        color: var(--text-secondary);
-        text-align: center;
-        margin-bottom: var(--spacing-xl);
-        font-weight: 400;
-      }
-
-      /* ============================================
-   BUTTON
-   ============================================ */
-
-      .button-container {
-        text-align: center;
-        margin-bottom: var(--spacing-xl);
-      }
-
-      .verify-button {
-        display: inline-flex;
-        align-items: center;
-        gap: var(--spacing-xs);
-        padding: 16px 40px;
-        background: linear-gradient(
-          135deg,
-          var(--accent-gold) 0%,
-          #c9a635 100%
-        );
-        color: var(--primary-dark);
-        text-decoration: none;
-        border-radius: var(--radius-md);
-        font-family: var(--font-body);
-        font-weight: 600;
-        font-size: 16px;
-        letter-spacing: 0.3px;
-        box-shadow: var(--shadow-md), 0 0 0 0 rgba(212, 175, 55, 0.5);
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        position: relative;
-        overflow: hidden;
-      }
-
-      .verify-button::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(
-          90deg,
-          transparent,
-          rgba(255, 255, 255, 0.3),
-          transparent
-        );
-        transition: left 0.5s;
-      }
-
-      .verify-button:hover {
-        transform: translateY(-2px);
-        box-shadow: var(--shadow-lg), 0 0 0 4px rgba(212, 175, 55, 0.2);
-      }
-
-      .verify-button:hover::before {
-        left: 100%;
-      }
-
-      .verify-button:active {
-        transform: translateY(0);
-      }
-
-      .button-text {
-        position: relative;
-        z-index: 1;
-      }
-
-      .button-icon {
-        width: 20px;
-        height: 20px;
-        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        position: relative;
-        z-index: 1;
-      }
-
-      .verify-button:hover .button-icon {
-        transform: translateX(4px);
-      }
-
-      /* ============================================
-   INFO BOX
-   ============================================ */
-
-      .info-box {
-        display: flex;
-        align-items: flex-start;
-        gap: var(--spacing-sm);
-        padding: var(--spacing-md);
-        background: var(--bg-subtle);
-        border-left: 3px solid var(--primary-blue);
-        border-radius: var(--radius-md);
-        margin-bottom: var(--spacing-lg);
-      }
-
-      .info-icon {
-        width: 20px;
-        height: 20px;
-        color: var(--primary-blue);
-        flex-shrink: 0;
-        margin-top: 2px;
-      }
-
-      .info-text {
-        font-size: 14px;
-        line-height: 1.6;
-        color: var(--text-secondary);
-        margin: 0;
-      }
-
-      .info-text strong {
-        color: var(--text-primary);
-        font-weight: 600;
-      }
-
-      /* ============================================
-   ALTERNATIVE SECTION
-   ============================================ */
-
-      .alternative-section {
-        margin-bottom: var(--spacing-xl);
-        padding-top: var(--spacing-lg);
-        border-top: 1px solid var(--border-light);
-      }
-
-      .alt-text {
-        font-size: 14px;
-        color: var(--text-secondary);
-        text-align: center;
-        margin-bottom: var(--spacing-sm);
-      }
-
-      .link-box {
-        background: var(--bg-subtle);
-        border: 1px solid var(--border-light);
-        border-radius: var(--radius-md);
-        padding: var(--spacing-md);
-        text-align: center;
-        transition: background 0.2s;
-      }
-
-      .link-box:hover {
-        background: #f0f2f5;
-      }
-
-      .verification-code {
-        font-family: "Courier New", monospace;
-        font-size: 12px;
-        color: var(--primary-blue);
-        word-break: break-all;
-        display: block;
-        line-height: 1.5;
-      }
-
-      /* ============================================
-   SECURITY NOTICE
-   ============================================ */
-
-      .security-notice {
-        display: flex;
-        gap: var(--spacing-md);
-        padding: var(--spacing-md);
-        background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
-        border: 1px solid var(--border-light);
-        border-radius: var(--radius-lg);
-        margin-bottom: var(--spacing-lg);
-      }
-
-      .shield-icon {
-        width: 32px;
-        height: 32px;
-        color: var(--text-light);
-        flex-shrink: 0;
-      }
-
-      .security-text {
-        font-size: 13px;
-        line-height: 1.6;
-        color: var(--text-secondary);
-        margin: 0;
-      }
-
-      .security-text strong {
-        color: var(--text-primary);
-        font-weight: 600;
-        display: block;
-        margin-bottom: 4px;
-      }
-
-      /* ============================================
-   FOOTER
-   ============================================ */
-
-      .email-footer {
-        background: var(--bg-subtle);
-        padding: var(--spacing-lg) var(--spacing-xl);
-        border-top: 1px solid var(--border-light);
-      }
-
-      .footer-content {
-        max-width: 500px;
-        margin: 0 auto;
-        text-align: center;
-      }
-
-      .footer-links {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: var(--spacing-sm);
-        margin-bottom: var(--spacing-md);
-        flex-wrap: wrap;
-      }
-
-      .footer-link {
-        font-size: 13px;
-        color: var(--text-secondary);
-        text-decoration: none;
-        transition: color 0.2s;
-        font-weight: 500;
-      }
-
-      .footer-link:hover {
-        color: var(--primary-blue);
-        text-decoration: underline;
-      }
-
-      .footer-divider {
-        color: var(--border-light);
-        font-size: 12px;
-      }
-
-      .footer-company {
-        margin-bottom: var(--spacing-md);
-      }
-
-      .footer-text,
-      .footer-address {
-        font-size: 12px;
-        color: var(--text-light);
-        margin: 4px 0;
-        line-height: 1.5;
-      }
-
-      /* Social Icons */
-      .social-icons {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: var(--spacing-sm);
-      }
-
-      .social-link {
-        width: 36px;
-        height: 36px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: var(--bg-white);
-        border-radius: 50%;
-        color: var(--text-secondary);
-        text-decoration: none;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: var(--shadow-sm);
-      }
-
-      .social-link:hover {
-        background: var(--primary-blue);
-        color: var(--bg-white);
-        transform: translateY(-2px);
-        box-shadow: var(--shadow-md);
-      }
-
-      .social-link svg {
-        width: 18px;
-        height: 18px;
-      }
-
-      /* ============================================
-   DECORATIVE ELEMENTS
-   ============================================ */
-
-      .decorative-line {
-        height: 3px;
-        background: linear-gradient(
-          90deg,
-          transparent 0%,
-          var(--accent-gold) 20%,
-          var(--accent-gold) 80%,
-          transparent 100%
-        );
-        opacity: 0.3;
-      }
-
-      /* ============================================
-   RESPONSIVE DESIGN
-   ============================================ */
-
-      @media only screen and (max-width: 640px) {
-        body {
-          padding: var(--spacing-sm);
-        }
-
-        .email-header {
-          padding: var(--spacing-md) var(--spacing-md);
-        }
-
-        .company-name {
-          font-size: 24px;
-        }
-
-        .logo-icon {
-          width: 32px;
-          height: 32px;
-        }
-
-        .email-body {
-          padding: var(--spacing-lg) var(--spacing-md);
-        }
-
         .greeting {
-          font-size: 28px;
+          font-size: 24px !important;
+          margin-bottom: 16px !important;
         }
-
         .intro-text {
-          font-size: 15px;
+          font-size: 14px !important;
+          margin-bottom: 28px !important;
         }
 
-        .verify-button {
-          padding: 14px 32px;
-          font-size: 15px;
+        /* Token block */
+        .token-block {
+          padding: 16px !important;
+          margin-bottom: 20px !important;
+        }
+        .token-row {
+          padding: 10px 12px !important;
+          gap: 8px !important;
+        }
+        .token-code {
+          font-size: 11px !important;
+        }
+        .copy-btn {
+          width: 40px !important;
+          height: 40px !important;
+          min-width: 40px !important;
         }
 
-        .email-footer {
-          padding: var(--spacing-md);
-        }
-
-        .footer-links {
-          flex-direction: column;
-          gap: var(--spacing-xs);
-        }
-
-        .footer-divider {
-          display: none;
-        }
-      }
-
-      @media only screen and (max-width: 480px) {
-        .icon-circle {
-          width: 64px;
-          height: 64px;
-        }
-
-        .mail-icon {
-          width: 32px;
-          height: 32px;
-        }
-
-        .greeting {
-          font-size: 24px;
-        }
-
-        .security-notice {
-          flex-direction: column;
-          text-align: center;
-        }
-
-        .shield-icon {
-          margin: 0 auto;
-        }
-      }
-
-      /* ============================================
-   PRINT STYLES
-   ============================================ */
-
-      @media print {
-        body {
-          background: white;
-          padding: 0;
-        }
-
-        .email-container {
-          box-shadow: none;
-        }
-
-        .verify-button {
-          background: var(--accent-gold);
-          color: var(--primary-dark);
-        }
-      }
-
-      /* ============================================
-   DARK MODE SUPPORT (Optional)
-   ============================================ */
-
-      @media (prefers-color-scheme: dark) {
-        :root {
-          --primary-dark: #1a1f2e;
-          --text-primary: #e8eaed;
-          --text-secondary: #b8bdc4;
-          --text-light: #9aa0a6;
-          --bg-white: #1f2937;
-          --bg-subtle: #374151;
-          --border-light: #4b5563;
-        }
-
-        body {
-          background: linear-gradient(135deg, #1a1f2e 0%, #111827 100%);
-        }
-
-        .email-container {
-          background: var(--bg-white);
-        }
-
+        /* Info / expiry box */
         .info-box {
-          background: var(--bg-subtle);
+          padding: 16px !important;
+          margin-bottom: 20px !important;
+          gap: 12px !important;
+        }
+        .info-box svg {
+          width: 18px !important;
+          height: 18px !important;
+          min-width: 18px !important;
+        }
+        .info-text {
+          font-size: 13px !important;
         }
 
-        .link-box {
-          background: var(--bg-subtle);
-          border-color: var(--border-light);
-        }
-
+        /* Security notice */
         .security-notice {
-          background: var(--bg-subtle);
-          border-color: var(--border-light);
+          padding: 16px !important;
+          gap: 14px !important;
+          margin-bottom: 20px !important;
+        }
+        .security-notice svg {
+          width: 24px !important;
+          height: 24px !important;
+          min-width: 24px !important;
+        }
+        .security-text {
+          font-size: 12px !important;
         }
 
+        /* Footer */
         .email-footer {
-          background: var(--bg-subtle);
+          padding: 24px 20px !important;
+        }
+        .footer-links {
+          gap: 10px !important;
+          flex-direction: column !important;
+        }
+        .footer-divider {
+          display: none !important;
+        }
+        .footer-link {
+          font-size: 13px !important;
+        }
+        .footer-text, .footer-address {
+          font-size: 11px !important;
         }
 
+        /* Social icons */
+        .social-icons {
+          gap: 12px !important;
+        }
         .social-link {
-          background: var(--bg-subtle);
+          width: 40px !important;
+          height: 40px !important;
+          min-width: 40px !important;
         }
-
-        .social-link:hover {
-          background: var(--primary-blue);
+        .social-link svg {
+          width: 20px !important;
+          height: 20px !important;
         }
       }
     </style>
   </head>
-  <body>
-    <div class="email-container">
+  <body style="margin: 0; padding: 32px; box-sizing: border-box; font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 16px; line-height: 1.6; color: #1a2332; background: linear-gradient(135deg, #f5f7fa 0%, #e8ebef 100%); min-height: 100vh; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;">
+
+    <div class="email-card" style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 16px 48px rgba(26, 35, 50, 0.15); position: relative;">
+
       <!-- Header -->
-      <div class="email-header">
-        <div class="logo-container">
-          <svg
-            class="logo-icon"
-            viewBox="0 0 50 50"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <circle
-              cx="25"
-              cy="25"
-              r="23"
-              stroke="currentColor"
-              stroke-width="2"
-            />
-            <path
-              d="M15 25L22 32L35 19"
-              stroke="currentColor"
-              stroke-width="2.5"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
+      <div class="email-header" style="background: linear-gradient(135deg, #1a2332 0%, #2c3e5d 100%); padding: 32px 48px; position: relative; overflow: hidden;">
+        <div style="display: flex; align-items: center; gap: 16px; position: relative; z-index: 1;">
+          <svg class="logo-icon" style="width: 40px; height: 40px; filter: drop-shadow(0 2px 8px rgba(212, 175, 55, 0.3)); flex-shrink: 0;" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="25" cy="25" r="23" stroke="#d4af37" stroke-width="2" />
+            <path d="M15 25L22 32L35 19" stroke="#d4af37" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
           </svg>
-          <h1 class="company-name">{{ company_name }}</h1>
+          <h1 class="company-name" style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 28px; font-weight: 700; color: #ffffff; letter-spacing: 0.5px; margin: 0;">{{ company_name }}</h1>
         </div>
       </div>
 
       <!-- Main Content -->
-      <div class="email-body">
-        <div class="content-wrapper">
-          <!-- Icon -->
-          <div class="icon-circle">
-            <svg
-              class="mail-icon"
-              viewBox="0 0 64 64"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <rect
-                x="8"
-                y="16"
-                width="48"
-                height="32"
-                rx="2"
-                stroke="currentColor"
-                stroke-width="2"
-              />
-              <path
-                d="M8 20L32 36L56 20"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
+      <div class="email-body" style="padding: 64px 48px 48px; background: #ffffff;">
+        <div class="content-wrapper" style="max-width: 500px; margin: 0 auto;">
+
+          <!-- Icon Circle -->
+          <div class="icon-circle" style="width: 80px; height: 80px; margin: 0 auto 32px; background: linear-gradient(135deg, #e8f5f1 0%, #f0f9f6 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(26, 35, 50, 0.1); position: relative; border: 2px solid rgba(45, 122, 95, 0.2);">
+            <svg style="width: 40px; height: 40px;" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="8" y="16" width="48" height="32" rx="2" stroke="#2d7a5f" stroke-width="2" />
+              <path d="M8 20L32 36L56 20" stroke="#2d7a5f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
           </div>
 
           <!-- Greeting -->
-          <h2 class="greeting">
+          <h2 class="greeting" style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 32px; font-weight: 700; color: #1a2332; text-align: center; margin-bottom: 24px; letter-spacing: -0.5px;">
             Hello{{ ", " + username if username else "" }}!
           </h2>
 
-          <p class="intro-text">
+          <p class="intro-text" style="font-size: 16px; line-height: 1.7; color: #5a6a7a; text-align: center; margin-bottom: 40px; font-weight: 400;">
             Thank you for joining {{ company_name }}. To complete your
-            registration and begin participating in the games, please verify
-            your email address.
+            registration and begin participating in the games, please use the
+            verification token below to confirm your email address.
           </p>
 
-          <!-- Verification Button -->
-          <div class="button-container">
-            <a href="{{ verification_link }}" class="verify-button">
-              <span class="button-text">Verify Email Address</span>
-              <svg
-                class="button-icon"
-                viewBox="0 0 20 20"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
+          <!-- Token Copy Block -->
+          <div class="token-block" style="background: #f8f9fa; border: 1px solid #e5e8eb; border-radius: 12px; padding: 24px; margin-bottom: 32px;">
+            <p style="font-size: 12px; font-weight: 600; color: #8b96a3; text-transform: uppercase; letter-spacing: 0.8px; margin: 0 0 12px 0;">Your Verification Token</p>
+            <div class="token-row" style="display: flex; align-items: center; gap: 12px; background: #ffffff; border: 1px solid #e5e8eb; border-radius: 8px; padding: 14px 16px;">
+              <code class="token-code" id="verification-token" style="font-family: 'Courier New', monospace; font-size: 13px; color: #2c3e5d; word-break: break-all; flex: 1; line-height: 1.5; user-select: all;">{{ verification_token }}</code>
+              <button
+                class="copy-btn"
+                onclick="copyToken()"
+                title="Copy token"
+                style="flex-shrink: 0; width: 36px; height: 36px; border-radius: 8px; border: 1px solid #e5e8eb; background: #f8f9fa; color: #5a6a7a; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; transition: background 0.2s, color 0.2s;"
               >
-                <path
-                  d="M7 10L17 10M17 10L13 6M17 10L13 14"
-                  stroke="currentColor"
-                  stroke-width="1.5"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-              </svg>
-            </a>
+                <!-- Copy icon -->
+                <svg id="copy-icon" style="width: 16px; height: 16px;" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="8" y="8" width="12" height="14" rx="2" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M16 8V6C16 4.895 15.105 4 14 4H6C4.895 4 4 4.895 4 6V16C4 17.105 4.895 18 6 18H8" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <!-- Checkmark icon (hidden by default) -->
+                <svg id="check-icon" style="width: 16px; height: 16px; display: none;" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M5 13L9 17L19 7" stroke="#2d7a5f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+            </div>
+            <p style="font-size: 12px; color: #8b96a3; margin: 10px 0 0 0; line-height: 1.5;">Tap the copy icon to copy your token, then paste it into the verification field.</p>
           </div>
 
           <!-- Expiration Notice -->
-          <div class="info-box">
-            <svg
-              class="info-icon"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <circle
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                stroke-width="1.5"
-              />
-              <path
-                d="M12 8V12L14 14"
-                stroke="currentColor"
-                stroke-width="1.5"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
+          <div class="info-box" style="display: flex; align-items: flex-start; gap: 16px; padding: 24px; background: #f8f9fa; border-left: 3px solid #2c3e5d; border-radius: 8px; margin-bottom: 32px;">
+            <svg style="width: 20px; height: 20px; flex-shrink: 0; margin-top: 2px;" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="10" stroke="#2c3e5d" stroke-width="1.5" />
+              <path d="M12 8V12L14 14" stroke="#2c3e5d" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
-            <p class="info-text">
-              This verification link will expire in
-              <strong>{{ expiration }}</strong>.
+            <p class="info-text" style="font-size: 14px; line-height: 1.6; color: #5a6a7a; margin: 0;">
+              This verification token will expire in
+              <strong style="color: #1a2332; font-weight: 600;">{{ expiration }}</strong>. Please verify your email before it expires.
             </p>
-          </div>
-
-          <!-- Alternative Link -->
-          <div class="alternative-section">
-            <p class="alt-text">
-              If the button above doesn't work, copy and paste this link into
-              your browser:
-            </p>
-            <div class="link-box">
-              <code class="verification-code">{{ verification_link }}</code>
-            </div>
           </div>
 
           <!-- Security Notice -->
-          <div class="security-notice">
-            <svg
-              class="shield-icon"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M12 2L4 6V12C4 16.5 7 20.5 12 22C17 20.5 20 16.5 20 12V6L12 2Z"
-                stroke="currentColor"
-                stroke-width="1.5"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-              <path
-                d="M9 12L11 14L15 10"
-                stroke="currentColor"
-                stroke-width="1.5"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
+          <div class="security-notice" style="display: flex; gap: 24px; padding: 24px; background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%); border: 1px solid #e5e8eb; border-radius: 12px; margin-bottom: 32px;">
+            <svg style="width: 32px; height: 32px; flex-shrink: 0;" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2L4 6V12C4 16.5 7 20.5 12 22C17 20.5 20 16.5 20 12V6L12 2Z" stroke="#8b96a3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+              <path d="M9 12L11 14L15 10" stroke="#8b96a3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
-            <p class="security-text">
-              <strong>Didn't request this email?</strong><br />
-              If you didn't create an account with {{ company_name }}, you can
+            <p class="security-text" style="font-size: 13px; line-height: 1.6; color: #5a6a7a; margin: 0;">
+              <strong style="color: #1a2332; font-weight: 600; display: block; margin-bottom: 4px;">Didn't request this email?</strong>
+              If you did not create an account with {{ company_name }}, you can
               safely ignore this email. Your email address will not be used
               without verification.
             </p>
           </div>
+
         </div>
       </div>
 
       <!-- Footer -->
-      <div class="email-footer">
-        <div class="footer-content">
-          <div class="footer-links">
-            <a href="{{ help_link|default('#') }}" class="footer-link"
-              >Help Center</a
-            >
-            <span class="footer-divider">•</span>
-            <a href="{{ privacy_link|default('#') }}" class="footer-link"
-              >Privacy Policy</a
-            >
-            <span class="footer-divider">•</span>
-            <a href="{{ terms_link|default('#') }}" class="footer-link"
-              >Terms of Service</a
-            >
+      <div class="email-footer" style="background: #f8f9fa; padding: 32px 48px; border-top: 1px solid #e5e8eb;">
+        <div style="max-width: 500px; margin: 0 auto; text-align: center;">
+
+          <div class="footer-links" style="display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 24px; flex-wrap: wrap;">
+            <a href="{{ help_link|default('#') }}" class="footer-link" style="font-size: 13px; color: #5a6a7a; text-decoration: none; font-weight: 500;">Help Center</a>
+            <span class="footer-divider" style="color: #e5e8eb; font-size: 12px;">•</span>
+            <a href="{{ privacy_link|default('#') }}" class="footer-link" style="font-size: 13px; color: #5a6a7a; text-decoration: none; font-weight: 500;">Privacy Policy</a>
+            <span class="footer-divider" style="color: #e5e8eb; font-size: 12px;">•</span>
+            <a href="{{ terms_link|default('#') }}" class="footer-link" style="font-size: 13px; color: #5a6a7a; text-decoration: none; font-weight: 500;">Terms of Service</a>
           </div>
 
-          <div class="footer-company">
-            <p class="footer-text">
+          <div style="margin-bottom: 24px;">
+            <p class="footer-text" style="font-size: 12px; color: #8b96a3; margin: 4px 0; line-height: 1.5;">
               © {{ current_year }} {{ company_name }}. All rights reserved.
             </p>
-            <p class="footer-address">
+            <p class="footer-address" style="font-size: 12px; color: #8b96a3; margin: 4px 0; line-height: 1.5;">
               {{ company_address|default('The Colonies.') }}
             </p>
           </div>
 
-          <!-- Social Icons -->
-          <div class="social-icons">
-            {% if social_twitter %}
-            <a
-              href="{{ social_twitter }}"
-              class="social-link"
-              aria-label="Twitter"
-            >
-              <svg
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"
-                />
-              </svg>
-            </a>
-            {% endif %} {% if social_facebook %}
-            <a
-              href="{{ social_facebook }}"
-              class="social-link"
-              aria-label="Facebook"
-            >
-              <svg
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"
-                />
-              </svg>
-            </a>
-            {% endif %} {% if social_linkedin %}
-            <a
-              href="{{ social_linkedin }}"
-              class="social-link"
-              aria-label="LinkedIn"
-            >
-              <svg
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"
-                />
+          <!-- Social Icons: GitHub & Reddit -->
+          <div class="social-icons" style="display: flex; align-items: center; justify-content: center; gap: 16px;">
+
+            {% if social_github %}
+            <a href="{{ social_github }}" class="social-link" style="width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; background: #ffffff; border-radius: 50%; text-decoration: none; box-shadow: 0 1px 3px rgba(26, 35, 50, 0.08);" aria-label="GitHub">
+              <svg style="width: 18px; height: 18px; display: block;" viewBox="0 0 24 24" fill="#5a6a7a" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
               </svg>
             </a>
             {% endif %}
+
+            {% if social_reddit %}
+            <a href="{{ social_reddit }}" class="social-link" style="width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; background: #ffffff; border-radius: 50%; text-decoration: none; box-shadow: 0 1px 3px rgba(26, 35, 50, 0.08);" aria-label="Reddit">
+              <svg style="width: 18px; height: 18px; display: block;" viewBox="0 0 24 24" fill="#5a6a7a" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/>
+              </svg>
+            </a>
+            {% endif %}
+
           </div>
+
         </div>
       </div>
 
-      <!-- Decorative Element -->
-      <div class="decorative-line"></div>
+      <!-- Decorative Line -->
+      <div style="height: 3px; background: linear-gradient(90deg, transparent 0%, #d4af37 20%, #d4af37 80%, transparent 100%); opacity: 0.3;"></div>
+
     </div>
+
+    <script>
+      function copyToken() {
+        const tokenEl = document.getElementById('verification-token');
+        const copyIcon = document.getElementById('copy-icon');
+        const checkIcon = document.getElementById('check-icon');
+        const btn = copyIcon.closest('button');
+
+        const token = tokenEl.innerText.trim();
+
+        navigator.clipboard.writeText(token).then(function () {
+          copyIcon.style.display = 'none';
+          checkIcon.style.display = 'block';
+          btn.style.borderColor = '#2d7a5f';
+          btn.style.background = '#e8f5f1';
+
+          setTimeout(function () {
+            checkIcon.style.display = 'none';
+            copyIcon.style.display = 'block';
+            btn.style.borderColor = '#e5e8eb';
+            btn.style.background = '#f8f9fa';
+          }, 2000);
+        }).catch(function () {
+          // Fallback for older browsers
+          const range = document.createRange();
+          range.selectNode(tokenEl);
+          window.getSelection().removeAllRanges();
+          window.getSelection().addRange(range);
+          document.execCommand('copy');
+          window.getSelection().removeAllRanges();
+        });
+      }
+    </script>
+
   </body>
 </html>

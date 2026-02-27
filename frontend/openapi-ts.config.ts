@@ -1,10 +1,14 @@
 import { defineConfig } from "@hey-api/openapi-ts";
 
 export default defineConfig({
-    input:
-        process.env.NODE_ENV === "production"
-            ? "https://the-culling-games.up.railway.app/openapi.json"
-            : "http://localhost:8000/openapi.json",
+    input: {
+        path:
+            process.env.NODE_ENV === "production"
+                ? "https://the-culling-games.up.railway.app/openapi.json"
+                : "http://localhost:8000/openapi.json",
+        watch: true, // true to keep check for changes to fastapi openapi specs
+    },
+
     output: {
         path: "apis/client",
         postProcess: ["eslint", "prettier"],
@@ -12,7 +16,7 @@ export default defineConfig({
     plugins: [
         {
             name: "@hey-api/client-next",
-            runtimeConfigPath: "@/api/hey-api",
+            runtimeConfigPath: "@/apis/hey-api",
         },
         {
             name: "@hey-api/sdk",
@@ -38,5 +42,4 @@ export default defineConfig({
             },
         },
     ],
-    watch: false, // true to keep check for changes to fastapi openapi specs
 });

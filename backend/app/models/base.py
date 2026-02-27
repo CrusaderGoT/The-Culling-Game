@@ -477,3 +477,7 @@ class EmailSchema(SQLModel):
 
     email: list[EmailStr]
     template: dict[str, Any]
+
+
+class VerifyUserOut(SQLModel):
+    message: str

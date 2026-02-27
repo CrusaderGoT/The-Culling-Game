@@ -87,6 +87,7 @@ export const zBaseCtInfo = z.object({
  * #### Base vote info: Inherits from `BaseVote`
  *
  * `user_id: int = Field(description='the id of the user that casted their votes')`
+ *
  * `point: float = Field(description="the point a vote carries")`
  */
 export const zBaseVoteInfo = z.object({
@@ -381,6 +382,7 @@ export const zBaseColonyInfo = z.object({
  * Base model for user info, without player info
  *
  * `id: int`
+ *
  * `created: date`
  */
 export const zBaseUserInfo = z.object({
@@ -613,8 +615,11 @@ export const zGrade = z.union([
  * Base model for player info, without cursed technique info and user info
  *
  * `id: int`
+ *
  * `created: date`
+ *
  * `grade: BasePlayer.Grade`
+ *
  * `points: Decimal`
  */
 export const zBasePlayerInfo = z.object({
@@ -642,6 +647,7 @@ export const zBasePlayerInfo = z.object({
  * base match info with the `winner`, but without players and colony infos.
  *
  * `id: int`
+ *
  * `winner: Union[BasePlayerInfo, None]`
  */
 export const zBaseMatchInfo = z.object({
@@ -751,6 +757,7 @@ export const zAdminInfo = z.object({
  * base admin info without the user info
  *
  * `is_superuser: bool | None`
+ *
  * `permissions: list[BasePermissionInfo]`
  */
 export const zBaseAdminInfo = z.object({
@@ -889,6 +896,13 @@ export const zHttpValidationError = z.object({
     detail: z.optional(z.array(zValidationError))
 });
 
+/**
+ * VerifyUserOut
+ */
+export const zVerifyUserOut = z.object({
+    message: z.string()
+});
+
 export const zCurrentUserData = z.object({
     body: z.optional(z.never()),
     path: z.optional(z.never()),
@@ -958,6 +972,11 @@ export const zVerifyUserData = z.object({
         ]))
     }))
 });
+
+/**
+ * Verification Token Sent
+ */
+export const zVerifyUserResponse = zVerifyUserOut;
 
 export const zCreatePlayerData = z.object({
     body: zBodyCreatePlayer,
