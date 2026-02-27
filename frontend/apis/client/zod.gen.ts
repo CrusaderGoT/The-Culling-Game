@@ -898,6 +898,8 @@ export const zHttpValidationError = z.object({
 
 /**
  * VerifyUserOut
+ *
+ * schema for response of verify user route
  */
 export const zVerifyUserOut = z.object({
     message: z.string()

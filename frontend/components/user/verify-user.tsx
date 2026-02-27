@@ -17,14 +17,23 @@ export function VerifyUser({ user }: { user: UserInfo }) {
     const [timeLeft, setTimeLeft] = useState<string>("");
     const [isEmailWaitingTime, setIsEmailWaitingTime] =
         useState<boolean>(false);
+    const [sendTokenSubmittedAt, setSendTokenSubmittedAt] =
+        useState(submittedAt);
+    const [sentTokenSubmit, setSentTokenSubmit] = useState(false);
+
+    // effect for updating the submitted at to use for timer
+    useEffect(() => {
+        if (isEmailWaitingTime || sentTokenSubmit) return;
+        setSendTokenSubmittedAt(submittedAt);
+    }, [submittedAt, isEmailWaitingTime, sentTokenSubmit]);
 
     // Match countdown timer
     useEffect(() => {
-        if (submittedAt < 1) return;
+        if (sendTokenSubmittedAt < 1) return;
 
         const updateTimer = () => {
             const now = dayjs();
-            const endTime = dayjs(submittedAt + 10 * 1000); // 1 minute
+            const endTime = dayjs(sendTokenSubmittedAt + 60 * 1000); // 1 minute
 
             if (now.isAfter(endTime) || now.isSame(endTime)) {
                 setIsEmailWaitingTime(false);
@@ -64,12 +73,19 @@ export function VerifyUser({ user }: { user: UserInfo }) {
 
         // Cleanup interval on unmount
         return () => clearInterval(interval);
-    }, [submittedAt]);
+    }, [sendTokenSubmittedAt]);
+
+    function maskEmail(email: string) {
+        return email.replace(/^(.)(.*)(.{2}@)/, "$1*****$3");
+    }
 
     return (
         <Paper withBorder p={"md"}>
             <Stack>
-                <Text>This user: {user.username} is not yet verified.</Text>
+                <Text>
+                    This user: {user.username} with email{" "}
+                    {maskEmail(user.email)} is not yet verified.
+                </Text>
 
                 <Text>
                     Click the 'send token' button below to get verification
@@ -87,11 +103,15 @@ export function VerifyUser({ user }: { user: UserInfo }) {
 
                 <Button
                     onClick={async () => {
-                        await mutateAsync({
-                            query: {
-                                token: verificationToken,
-                            },
-                        });
+                        try {
+                            setSentTokenSubmit(!!verificationToken);
+
+                            await mutateAsync({
+                                query: {
+                                    token: verificationToken,
+                                },
+                            });
+                        } catch {}
                     }}
                     disabled={
                         (isEmailWaitingTime && !verificationToken) || isPending
@@ -100,7 +120,7 @@ export function VerifyUser({ user }: { user: UserInfo }) {
                     {verificationToken ? "Verify" : "Send Token"}
                 </Button>
                 {!verificationToken && isEmailWaitingTime && (
-                    <Text>wait: {timeLeft}</Text>
+                    <Text fz={"xs"}>wait: {timeLeft}</Text>
                 )}
             </Stack>
         </Paper>

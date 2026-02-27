@@ -1351,6 +1351,8 @@ export type ValidationError = {
 
 /**
  * VerifyUserOut
+ *
+ * schema for response of verify user route
  */
 export type VerifyUserOut = {
     /**
