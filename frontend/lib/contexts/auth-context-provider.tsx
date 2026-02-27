@@ -40,6 +40,8 @@ export const AuthContext = createContext<ContextProp>({
 export function AuthContextProvider({ children }: { children: ReactNode }) {
     const path = usePathname() || "/match";
 
+    // loadedToken: raw value from cookie, not yet verified
+    // realToken:   verified and ready to use site-wide
     const [loadedToken, setLoadedToken] = useState<string | undefined>(
         undefined
     );
@@ -48,12 +50,15 @@ export function AuthContextProvider({ children }: { children: ReactNode }) {
         undefined
     );
     const [tokensLoaded, setTokensLoaded] = useState(false);
-    const [tokenExpiresIn, setTokenExpiresIn] = useState<Date>();
+    const [tokenExpiresIn, setTokenExpiresIn] = useState<Date | undefined>(
+        undefined
+    );
     const [tokenExpired, setTokenExpired] = useState(false);
 
     const mountedRef = useMounted();
     const refreshTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+    // ─── Online / Offline detection ──────────────────────────────────────────
     const [isOnline, setIsOnline] = useState(true);
 
     useEffect(() => {
@@ -65,8 +70,8 @@ export function AuthContextProvider({ children }: { children: ReactNode }) {
         window.addEventListener("online", handleOnline);
         window.addEventListener("offline", handleOffline);
 
-        // Initial check
-        setIsOnline(navigator.onLine || true);
+        // BUG FIX: removed `|| true` which made this check always return true
+        setIsOnline(navigator.onLine);
 
         return () => {
             window.removeEventListener("online", handleOnline);
@@ -74,7 +79,7 @@ export function AuthContextProvider({ children }: { children: ReactNode }) {
         };
     }, []);
 
-    // Load both tokens in a single useEffect
+    // ─── Load tokens from cookies ─────────────────────────────────────────────
     useEffect(() => {
         let canceled = false;
 
@@ -85,180 +90,173 @@ export function AuthContextProvider({ children }: { children: ReactNode }) {
                     getClientCookie(tokenNames.refresh),
                 ]);
 
-                if (!canceled && mountedRef) {
-                    setLoadedToken(accessToken);
-                    setRefreshToken(refreshTokenValue || "");
-                    setTokensLoaded(true);
-                }
+                if (canceled) return;
+                setLoadedToken(accessToken);
+                setRefreshToken(refreshTokenValue ?? "");
             } catch (err) {
-                if (!canceled && mountedRef) {
-                    console.error("Error loading tokens:", err);
-                    setTokensLoaded(true); // Still mark as loaded to prevent infinite loading
-                }
+                if (canceled) return;
+                console.error("Error loading tokens:", err);
+            } finally {
+                if (!canceled) setTokensLoaded(true);
             }
         }
 
         loadTokens();
-
         return () => {
             canceled = true;
         };
-    }, [mountedRef]);
+        // Only run once on mount — mountedRef is intentionally omitted because
+        // re-loading tokens every time the component mounts/unmounts is undesirable.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
-    const {
-        isPending: isPendingRefreshToken,
-        mutateAsync: refreshTokenAsync,
-        error: refreshError,
-    } = useMutation({
-        ...refreshTokenMutation(),
-        onError: async (e) => {
-            if (!mountedRef) return;
+    // ─── Mutations ────────────────────────────────────────────────────────────
+    const { mutateAsync: refreshTokenAsync, error: refreshError } = useMutation(
+        {
+            ...refreshTokenMutation(),
+            onError: async (e) => {
+                if (!mountedRef) return;
 
-            await deleteSession();
+                await deleteSession();
+                console.error("Refresh token error:", getAPIErrorMessage(e));
+                notifications.show({
+                    message: "Session Expired — Log In To Continue",
+                    color: "yellow",
+                });
 
-            console.log("Refresh token error:", getAPIErrorMessage(e));
+                redirect(`/login?next=${encodeURIComponent(path)}`);
+            },
+            onSuccess: async (t) => {
+                if (!mountedRef) return;
 
-            notifications.show({
-                message: "Session Expired Log In To Continue",
-                color: "yellow",
-            });
+                await createSession(t);
 
-            redirect(`/login?next=${encodeURIComponent(path)}`);
-        },
-        onSuccess: async (t) => {
-            if (!mountedRef) return;
+                const expDate = new Date(Date.now() + t.expires_in);
+                // Update all token state atomically to avoid inconsistent windows
+                setLoadedToken(t.access_token);
+                setRealToken(t.access_token);
+                setRefreshToken(t.refresh_token);
+                setTokenExpiresIn(expDate);
+                setTokenExpired(false);
+            },
+        }
+    );
 
-            await createSession(t);
-            setLoadedToken(t.access_token);
-            setRealToken(t.access_token);
-            setRefreshToken(t.refresh_token);
+    const { mutateAsync: verifyTokenAsync } = useMutation({
+        ...verifyTokenMutation(),
+        retry: (failureCount) =>
+            failureCount < 2 && !!loadedToken && mountedRef,
+        onError: async () => {
+            setLoadedToken(undefined);
 
-            // Handle expiration - t.expires_in is in milliseconds
-            const expiresAt = Date.now() + t.expires_in;
-            const expDate = new Date(expiresAt);
-            setTokenExpiresIn(expDate);
-            setTokenExpired(false); // Reset expired state
+            if (refreshToken) {
+                await refreshTokenAsync({
+                    body: { refresh_token: refreshToken },
+                });
+            } else {
+                redirect(`/login?next=${encodeURIComponent(path)}`);
+            }
         },
     });
 
-    const { mutateAsync: verifyTokenAsync, isPending: isPendingVerifyToken } =
-        useMutation({
-            ...verifyTokenMutation(),
-            retry: (failureCount) => {
-                return failureCount < 2 && !!loadedToken && mountedRef;
-            },
-            onError: async () => {
-                // Remove invalid token
-                setLoadedToken(undefined);
+    // ─── Verify / refresh token on load and when token expires ───────────────
+    // Use a ref to track in-flight checks so we don't add pending booleans to
+    // the dependency array — that would cause the effect to re-fire each time a
+    // mutation settles, creating an infinite verify loop.
+    const isCheckingRef = useRef(false);
 
-                // Refresh token if possible
-                if (refreshToken) {
+    useEffect(() => {
+        if (!tokensLoaded || !isOnline) return;
+        if (isCheckingRef.current) return;
+
+        let canceled = false;
+        isCheckingRef.current = true;
+
+        async function runTokenCheck() {
+            try {
+                if (refreshToken && (!loadedToken || tokenExpired)) {
+                    // No valid access token — get a new one via refresh
                     await refreshTokenAsync({
                         body: { refresh_token: refreshToken },
                     });
-                } else {
-                    // Redirect to login
-                    redirect(`/login?next=${encodeURIComponent(path)}`);
-                }
-            },
-        });
-
-    // Effect for verify a token
-    useEffect(() => {
-        if (isPendingVerifyToken) return;
-
-        async function verifyTokenEffect() {
-            if (tokensLoaded && isOnline) {
-                if (
-                    refreshToken &&
-                    !isPendingRefreshToken &&
-                    (!loadedToken || tokenExpired)
-                ) {
-                    const refreshTokenValue = refreshToken;
-                    await refreshTokenAsync({
-                        body: { refresh_token: refreshTokenValue },
-                    });
-                } else if (loadedToken) {
+                } else if (loadedToken && !tokenExpired) {
                     const tokenData = await verifyTokenAsync({
                         body: { token: loadedToken },
                     });
 
-                    // Set token expires after successful token verification
-                    if (tokenData) {
-                        setRealToken(loadedToken); // set verified token to be used site wide
-                        // tokenData.exp is a date time
-                        const expDate = new Date(tokenData.exp);
-                        setTokenExpiresIn(expDate);
-                        setTokenExpired(false); // Reset expired state
-                    }
+                    if (canceled || !tokenData) return;
+
+                    setRealToken(loadedToken);
+                    setTokenExpiresIn(new Date(tokenData.exp));
+                    setTokenExpired(false);
                 }
+            } catch {
+                // Individual mutation onError handlers deal with redirects/refresh fallback
+            } finally {
+                if (!canceled) isCheckingRef.current = false;
             }
         }
-        verifyTokenEffect();
+
+        runTokenCheck();
+        return () => {
+            canceled = true;
+            isCheckingRef.current = false;
+        };
     }, [
         tokensLoaded,
         isOnline,
-        verifyTokenAsync,
         loadedToken,
         refreshToken,
         tokenExpired,
+        verifyTokenAsync,
         refreshTokenAsync,
     ]);
 
-    // Timer-based expiration tracking
+    // ─── Schedule proactive token refresh before expiry ───────────────────────
     useEffect(() => {
-        // Clear existing timeout
-        if (refreshTimeoutRef.current) {
-            clearTimeout(refreshTimeoutRef.current);
-        }
+        if (refreshTimeoutRef.current) clearTimeout(refreshTimeoutRef.current);
 
+        // Don't schedule if there's nothing to refresh against, or refresh already failed
         if (!tokenExpiresIn || !mountedRef || refreshError || !isOnline) return;
 
-        const REFRESH_BUFFER_MS = 30000; // 30 seconds before expiration
-        const now = Date.now();
+        const REFRESH_BUFFER_MS = 30_000; // refresh 30 s before expiry
         const timeUntilRefresh =
-            tokenExpiresIn.getTime() - now - REFRESH_BUFFER_MS;
+            tokenExpiresIn.getTime() - Date.now() - REFRESH_BUFFER_MS;
 
         if (timeUntilRefresh <= 0) {
-            // Token is already expired or should be refreshed now
             setTokenExpired(true);
         } else {
-            // Set timer to mark token as expired at the right time
             refreshTimeoutRef.current = setTimeout(() => {
-                if (mountedRef) {
-                    setTokenExpired(true);
-                }
+                if (mountedRef) setTokenExpired(true);
             }, timeUntilRefresh);
         }
 
         return () => {
-            if (refreshTimeoutRef.current) {
+            if (refreshTimeoutRef.current)
                 clearTimeout(refreshTimeoutRef.current);
-            }
         };
     }, [tokenExpiresIn, mountedRef, refreshError, isOnline]);
 
+    // ─── Current user ─────────────────────────────────────────────────────────
     const {
         data: user,
         isPending: isPendingUser,
         error: userError,
     } = useCurrentUser(realToken);
 
-    const value = useMemo<ContextProp>(() => {
-        return {
-            token: realToken,
-            isOnline: isOnline,
-            user: user,
-        };
-    }, [realToken, isOnline, user]);
+    const value = useMemo<ContextProp>(
+        () => ({ token: realToken, isOnline, user }),
+        [realToken, isOnline, user]
+    );
+
+    // `user` can be undefined while loading or on error.
+    // The original `!user.is_verified` would throw in those cases.
+    const showVerifyPrompt =
+        !isPendingUser && !userError && user != null && !user.is_verified;
 
     return (
         <AuthContext.Provider value={value}>
-            {!isPendingUser && !userError && !user.is_verified ? (
-                <VerifyUser user={user} />
-            ) : (
-                children
-            )}
+            {showVerifyPrompt ? <VerifyUser user={user} /> : children}
         </AuthContext.Provider>
     );
 }
