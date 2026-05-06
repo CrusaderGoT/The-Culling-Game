@@ -1,65 +1,192 @@
-# The Culling Games
+<div align="center">
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://user-images.githubusercontent.com/25423296/163456776-7f95b81a-f1ed-45f7-b7ab-8fa810d529fa.png">
-  <source media="(prefers-color-scheme: light)" srcset="https://user-images.githubusercontent.com/25423296/163456779-a8556205-d0a5-45e2-ac17-42d089e3c3f8.png">
-  <img alt="Shows an illustrated sun in light mode and a moon with stars in dark mode." src="https://user-images.githubusercontent.com/25423296/163456779-a8556205-d0a5-45e2-ac17-42d089e3c3f8.png">
-</picture>
+<br />
 
+# ⚔ The Culling Game
 
+**A full-stack implementation of the Culling Games — brought to life as a web application and REST API.**
 
+[![API Status](https://img.shields.io/badge/API-live-brightgreen?style=flat-square&labelColor=0d0d0d)](https://the-culling-games.up.railway.app/docs)
+[![Frontend Status](https://img.shields.io/badge/Frontend-beta-orange?style=flat-square&labelColor=0d0d0d)](https://the-culling-games.vercel.app)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-009688?style=flat-square&logo=fastapi&logoColor=white&labelColor=0d0d0d)](https://fastapi.tiangolo.com)
+[![Next.js](https://img.shields.io/badge/Next.js-15-black?style=flat-square&logo=next.js&logoColor=white&labelColor=0d0d0d)](https://nextjs.org)
+[![Python](https://img.shields.io/badge/Python-3.11+-3776ab?style=flat-square&logo=python&logoColor=white&labelColor=0d0d0d)](https://www.python.org)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6?style=flat-square&logo=typescript&logoColor=white&labelColor=0d0d0d)](https://www.typescriptlang.org)
+[![Last Commit](https://img.shields.io/github/last-commit/CrusaderGoT/The-Culling-Game?style=flat-square&labelColor=0d0d0d&color=555)](https://github.com/CrusaderGoT/The-Culling-Game/commits/main)
 
-*This is a repository for the Implementation of the culling games from reddit, r/thecullinggames as a website/api.*
-*Engineered using FastAPI and NextJS.*
+<br />
 
-## Basics
-* The repo is divided into two directories (`BACKEND` and `FRONTEND`). The `BACKEND` holds the main logistics on how the 
-games API are defined. Which includes the Database, Models, Routers, Middleware, and Authentication. While the `FRONTEND`
-holds the design, interaction with the backend, user interface, and user experience of the games.
+> *The games are real. The stakes are higher. May your technique hold.*
 
-* It uses data validation via pydantic, fastapi, and python, with typescript on nextjs to make sure data transfered is interpreted, and enforced correctly.
+<br />
 
-* Database: Postgresql, with alembic for migration, etc... SQLModel/SQLAlchemy is used for communicating with the database in python.
+[**→ Play**](https://the-culling-games.vercel.app) · [**→ API Docs**](https://the-culling-games.up.railway.app/docs)
 
-## THE CULLING GAMES
-### __The User__
-To particate in the games, you need to create a user. The user is capable of creating a player, casting a vote, etc.
+<br />
 
-### __The Player__
-The player is the fighter in the games, one must be a user before making a player.
+---
 
-#### Cursed Technique
-This is the ability of the player, and contains one to five applications, that will be voted on.
-#### Barrier Technique
-This are the advanced techniques of a player, i.e, domain expansion, simple domain, and binding vow. These gives different buffs to votes, i.e vote could x2 in points. Only players of grade 2 and up can use them.
-#### Points
-This is the players total points, gained through voting and winning matches, and is used to activate advanced techniques, or upgrade player.
+![The Culling Game — add a screenshot here](https://placehold.co/900x480/0d0d0d/444444?text=Add+a+screenshot+of+the+platform)
 
-### __Colony__
-This is where players fight, each player belongs to a colony containing ten players in total, and they all fight fellow players from the same colony. A colony is situated in a country, i.e apart from colony number, a colony is refered to by the country it is situated in. Though matches will take place in different places in the colony.
+> 💡 Replace the image above with an actual screenshot of the platform.
 
+---
 
-## Running Locally
-* You need python, vscode, and node installed.
-* Fork this repository.\n
-In the `BACKEND` directory in vscode, run `pip install -r requirements.txt`.
-* And in the `FRONTEND` run `npm install`
+</div>
 
-**Finally**
-- Backend: `uvicorn app.api.main:app --reload`
-- FRONTEND: `pnpm run dev`
+## Overview
 
-## Contribution
-* If you have uderstanding of NextJS, FastAPI, SQLAlchemy/SQLModel, or Pydantic. It will be highly appreciated if you can contribute in the completion of this project.
+The Culling Game is a fan-built web platform inspired by the [r/thecullinggames](https://reddit.com/r/thecullinggames) community. Players register, define their cursed techniques, join colonies, and battle opponents through a community-driven voting system — all backed by a robust REST API and a responsive frontend.
 
-### Work Needed
-- **Frontend**: The frontend needs a lot of work. i have been focused on the backend, as that is my niche, but i am learning nextjs in order to complete the frontend (i already had sufficient knowledge on frontend technologies like JS, HTML, CSS). I am looking to do more work on it, especially at the dashboard, also i suck at design, so even contributing design, will be appreciated.
+The project is split into two directories:
 
-- **Backend**: The backend i would say is around 60-70% done, the major thing i am yet to do is api for generating location/image for a match. Also i need to add more routes for admins, match, etc. Scale up the middleware, and refactoring.
+- **`BACKEND`** — FastAPI application handling game logic, authentication, database models, and all API routes. Deployed on Railway.
+- **`FRONTEND`** — Next.js application handling the UI, user interactions, and API consumption. Deployed on Vercel. *(Currently in beta.)*
 
-- **Documentaion**: This will be documenting the intricates of the app on the  README, helping to correct grammar, or even improving code documentation.
+---
 
-This doesn't cover everything needed to be done, it is the core things i can think of for now.
-So if you have any contribution, mostly programming , and design skills, do reach out to me on github or reddit.
+## Game Mechanics
 
-# **Repost on any relevant Jujutsu Kaisen group, that could get us progress. Thanks.**
+### Users & Players
+To participate, you register as a **User**, then create a **Player** — your fighter in the games. A user can cast votes, manage their player, and interact with the broader game world.
+
+### Cursed Technique
+Every player has a **Cursed Technique** — their core ability. Each technique contains between one and five **applications**, which other players vote on during matches.
+
+### Barrier Techniques
+Higher-grade players unlock **Barrier Techniques** — advanced abilities like Domain Expansion, Simple Domain, and Binding Vow. These grant vote multipliers and combat buffs, giving seasoned players a significant edge.
+
+### Points & Grades
+Players accumulate **points** through votes and match victories. Points are used to activate barrier techniques and upgrade player grade — starting from Grade 4 and climbing toward Special Grade.
+
+### Colonies
+Players are assigned to a **Colony** — a group of ten fighters situated in a real-world country. All matches take place within a colony, and players fight only those in their own. Each colony is identified by both its number and its country.
+
+---
+
+## Tech Stack
+
+| Layer | Technology | Version |
+|---|---|---|
+| **Backend Framework** | FastAPI | 0.100+ |
+| **Language (Backend)** | Python | 3.11+ |
+| **Data Validation** | Pydantic | v2 |
+| **ORM** | SQLModel / SQLAlchemy | latest |
+| **Database** | PostgreSQL | — |
+| **Migrations** | Alembic | latest |
+| **Backend Deployment** | Railway | — |
+| **Frontend Framework** | Next.js (App Router) | 15 |
+| **Language (Frontend)** | TypeScript | 5 |
+| **Frontend Deployment** | Vercel | — |
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+- **Python** `>= 3.11`
+- **Node.js** `>= 20`
+- **pnpm** (recommended) or npm
+- A **PostgreSQL** database instance
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/CrusaderGoT/The-Culling-Game.git
+cd The-Culling-Game
+```
+
+### 2. Backend setup
+
+```bash
+cd BACKEND
+pip install -r requirements.txt
+```
+
+Create a `.env` file in the `BACKEND` directory:
+
+```env
+DATABASE_URL=your_postgresql_connection_string
+SECRET_KEY=your_secret_key
+```
+
+Run migrations:
+
+```bash
+alembic upgrade head
+```
+
+Start the development server:
+
+```bash
+uvicorn app.api.main:app --reload
+```
+
+API will be available at [http://localhost:8000](http://localhost:8000) · Docs at [http://localhost:8000/docs](http://localhost:8000/docs)
+
+### 3. Frontend setup
+
+```bash
+cd ../FRONTEND
+pnpm install
+```
+
+Create a `.env.local` file in the `FRONTEND` directory:
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:8000
+```
+
+Start the development server:
+
+```bash
+pnpm dev
+```
+
+Frontend will be available at [http://localhost:3000](http://localhost:3000)
+
+---
+
+## API Documentation
+
+The live API is fully documented via FastAPI's interactive Swagger UI.
+
+**→ [https://the-culling-games.up.railway.app/docs](https://the-culling-games.up.railway.app/docs)**
+
+All routes are documented with request/response schemas, authentication requirements, and example payloads.
+
+---
+
+## Contributing
+
+Contributions are welcome — the project is actively developed and there's meaningful work across the stack.
+
+**Areas where help is appreciated:**
+
+- **Frontend** — The UI is in beta. Design improvements, dashboard work, and component refinements are all open. If you have an eye for design or experience with Next.js, jump in.
+- **Backend** — Additional admin routes, match endpoints, and middleware improvements are in progress. SQLModel / Pydantic / FastAPI experience is ideal.
+- **Documentation** — Improving code comments, fixing grammar, or expanding this README are all valuable contributions.
+
+**To contribute:**
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/your-feature`
+3. Commit your changes with clear messages
+4. Open a Pull Request describing what you've done and why
+
+For larger changes, open an issue first to discuss the approach.
+
+---
+
+<div align="center">
+
+<br />
+
+Built by **[CrusaderGoT](https://github.com/CrusaderGoT)** · Inspired by the community at [r/thecullinggames](https://reddit.com/r/thecullinggames)
+
+*May your technique hold.*
+
+<br />
+
+</div>
