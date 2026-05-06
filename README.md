@@ -28,7 +28,7 @@
 
 ![The Culling Game — add a screenshot here](https://placehold.co/900x480/0d0d0d/444444?text=Add+a+screenshot+of+the+platform)
 
-> 💡 Replace the image above with an actual screenshot of the platform.
+> 💡 screenshot of the platform.
 
 ---
 
